@@ -1,0 +1,61 @@
+/* ==========================================================================
+   테마 변수 — 라이트(기본) / 다크
+   data-theme 속성으로 전환. 색상/간격은 모두 여기서 관리.
+   ========================================================================== */
+
+:root {
+  /* 브랜드 액센트 (테마 공통) */
+  --accent: #7c5cff;          /* 바이올렛 */
+  --accent-2: #22d3ee;        /* 시안 */
+  --accent-soft: rgba(124, 92, 255, 0.14);
+
+  /* 타이포 */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk", var(--font-sans);
+
+  /* 레이아웃 */
+  --container: 1100px;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.25);
+
+  /* 모션 */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- 라이트 테마 ---------- */
+:root,
+[data-theme="light"] {
+  --bg: #f7f8fc;
+  --bg-elev: #ffffff;
+  --bg-alt: #eef1f8;
+  --text: #15172b;
+  --text-muted: #5b607a;
+  --text-faint: #8a8fa8;
+  --border: rgba(20, 22, 43, 0.10);
+  --border-strong: rgba(20, 22, 43, 0.18);
+  --nav-bg: rgba(247, 248, 252, 0.72);
+  --tag-bg: rgba(124, 92, 255, 0.10);
+  --tag-text: #5b3df0;
+  --grid-line: rgba(20, 22, 43, 0.05);
+  --glow: rgba(124, 92, 255, 0.18);
+  --card-hover-border: rgba(124, 92, 255, 0.45);
+}
+
+/* ---------- 다크 테마 ---------- */
+[data-theme="dark"] {
+  --bg: #0a0b14;
+  --bg-elev: #12131f;
+  --bg-alt: #0f1019;
+  --text: #eef0f8;
+  --text-muted: #a4a9c2;
+  --text-faint: #6c7191;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --nav-bg: rgba(10, 11, 20, 0.66);
+  --tag-bg: rgba(124, 92, 255, 0.16);
+  --tag-text: #c0b3ff;
+  --grid-line: rgba(255, 255, 255, 0.035);
+  --glow: rgba(124, 92, 255, 0.28);
+  --card-hover-border: rgba(124, 92, 255, 0.55);
+}

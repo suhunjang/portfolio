@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장수훈 · COO · CTO · Full-Stack & AI Leader</title>
+  <meta name="description" content="코드와 사업을 동시에 운영하는 기술 베이스의 COO·CTO. 15년간 웹·AI·데이터 플랫폼 개발과 50명 조직 운영. LLM·RAG 마케팅 자동화, 의료 AI, 풍력 예측 ML." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="장수훈 · COO · CTO · Full-Stack & AI Leader" />
+  <meta property="og:description" content="코드와 사업을 동시에 운영하는 기술 베이스의 COO·CTO. 15년 경력의 풀스택·머신러닝 리더." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 배경 데코레이션 -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#hero" class="brand" aria-label="홈으로">
+        <span class="brand-mark" id="brandMark">SH</span>
+        <span class="brand-name" id="brandName">장수훈</span>
+      </a>
+
+      <nav class="nav-links" id="navLinks" aria-label="주요 메뉴">
+        <a href="#about" class="nav-link">About</a>
+        <a href="#strengths" class="nav-link">Strengths</a>
+        <a href="#career" class="nav-link">Career</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          type="button"
+          aria-label="테마 전환"
+          title="라이트/다크 전환"
+        >
+          <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="2" x2="12" y2="5" />
+              <line x1="12" y1="19" x2="12" y2="22" />
+              <line x1="2" y1="12" x2="5" y2="12" />
+              <line x1="19" y1="12" x2="22" y2="12" />
+              <line x1="4.9" y1="4.9" x2="7" y2="7" />
+              <line x1="17" y1="17" x2="19.1" y2="19.1" />
+              <line x1="4.9" y1="19.1" x2="7" y2="17" />
+              <line x1="17" y1="7" x2="19.1" y2="4.9" />
+            </g>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+              d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+
+        <button
+          class="menu-toggle"
+          id="menuToggle"
+          type="button"
+          aria-label="메뉴 열기"
+          aria-expanded="false"
+          aria-controls="navLinks"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero">
+      <div class="container hero-inner">
+        <p class="hero-eyebrow reveal">👋 안녕하세요, 저는</p>
+        <h1 class="hero-name reveal" id="heroName">장수훈</h1>
+        <h2 class="hero-role reveal">
+          <span class="typed" id="typed"></span><span class="caret" aria-hidden="true">|</span>
+        </h2>
+        <p class="hero-summary reveal" id="heroSummary"></p>
+
+        <div class="hero-cta reveal">
+          <a href="#projects" class="btn btn-primary">프로젝트 보기</a>
+          <a href="#contact" class="btn btn-ghost">연락하기</a>
+        </div>
+
+        <ul class="hero-stats reveal" id="heroStats" aria-label="핵심 지표"></ul>
+      </div>
+      <a href="#about" class="scroll-hint" aria-label="아래로 스크롤">
+        <span></span>
+      </a>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">01 — About</span>
+          <h2 class="section-title">소개</h2>
+        </div>
+        <div class="about-grid">
+          <div class="about-text reveal">
+            <p id="aboutSummary"></p>
+            <p>
+              저는 기술과 사업의 경계에서 일합니다. 코드를 작성하는 엔지니어(CTO)인 동시에,
+              그 코드가 시장에서 가치를 만들어내도록 제품·조직·사업을 운영하는 COO입니다.
+            </p>
+            <ul class="about-points">
+              <li>아이디어를 빠르게 검증 가능한 제품으로 구현</li>
+              <li>AI/LLM을 실제 비즈니스 문제에 적용하고 프로덕션화</li>
+              <li>확장 가능한 아키텍처와 엔지니어링 문화 설계</li>
+            </ul>
+          </div>
+          <aside class="about-card reveal" aria-label="요약 정보">
+            <div class="about-avatar" id="aboutAvatar" aria-hidden="true">SH</div>
+            <dl class="about-meta">
+              <div><dt>Role</dt><dd>COO · CTO</dd></div>
+              <div><dt>Focus</dt><dd>AI Products</dd></div>
+              <div><dt>Location</dt><dd id="aboutLocation">Seoul</dd></div>
+            </dl>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STRENGTHS ============ -->
+    <section class="section section-alt" id="strengths">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">02 — Strengths</span>
+          <h2 class="section-title">업무상 강점</h2>
+          <p class="section-sub reveal">이력서에 정리된 6가지 핵심 강점 — 기술·제품·경영이 한 사람 안에서 만나는 지점입니다.</p>
+        </div>
+        <div class="strengths-grid" id="strengthsGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ CAREER ============ -->
+    <section class="section" id="career">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">03 — Career</span>
+          <h2 class="section-title">경력 &amp; 창업</h2>
+        </div>
+        <ol class="timeline" id="timeline" aria-label="경력 타임라인"></ol>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">04 — Projects</span>
+          <h2 class="section-title">프로젝트 &amp; 제품</h2>
+        </div>
+        <div class="project-grid" id="projectGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ SKILLS + CONTACT ============ -->
+    <section class="section section-alt" id="contact">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">05 — Stack &amp; Contact</span>
+          <h2 class="section-title">기술 스택 &amp; 연락처</h2>
+        </div>
+
+        <div class="skills-grid" id="skillsGrid"></div>
+
+        <div class="contact-card reveal">
+          <div class="contact-text">
+            <h3>함께 만들어요</h3>
+            <p>새로운 제품, 협업, 또는 기술 자문에 대해 이야기 나누고 싶다면 언제든 연락 주세요.</p>
+          </div>
+          <div class="contact-actions" id="contactActions"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ PROJECT MODAL ============ -->
+  <div class="modal" id="projectModal" hidden>
+    <div class="modal-backdrop" data-modal-close></div>
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <button
+        class="modal-close"
+        type="button"
+        data-modal-close
+        aria-label="닫기"
+      >✕</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span id="footerName">© 장수훈</span>
+      <span class="footer-note">Built with HTML · CSS · JS</span>
+      <a href="#hero" class="footer-top" aria-label="맨 위로">↑ Top</a>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# ── 민감·내부 파일: GitHub Pages(공개)에 올리지 않음 ──────────────
+# 원본 이력서 (개인정보 포함)
+resume/
+
+# 회사/경력 자료 (브로셔 등 기밀 가능성)
+career/
+
+# Claude Code 작업용 내부 파일
+CLAUDE.md
+.omc/
+.claude/
+
+# OS / 에디터 부산물
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
