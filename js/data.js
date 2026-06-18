@@ -413,6 +413,55 @@ const PROJECTS = [
     },
   },
   {
+    title: "NDI (뇌병변 국소화 AI)",
+    blurb:
+      "눈동자 움직임을 다각도로 측정해 뇌병변 위치를 판별하는 의료 AI. 고려대 의료진과 협업해 시야 데이터만으로 뇌병변을 국소화 → 검사 복잡도와 비용을 낮춘다.",
+    tags: ["Computer Vision", "Medical AI", "Eye Tracking", "PyTorch"],
+    links: { live: "", repo: "" },
+    accent: "violet",
+    // 컨셉: 다각도 시선 벡터가 한 점(병변)으로 수렴 + 뇌 윤곽 + 국소화 표적
+    hero: makeVisual("violet", (c) =>
+      // 뇌 윤곽
+      `<path d="M250 110 Q 200 100 196 150 Q 170 165 185 200 Q 185 240 235 240 Q 260 258 300 246 Q 350 256 372 222 Q 410 212 398 168 Q 410 128 360 116 Q 320 92 290 108 Q 268 100 250 110 Z" fill="#0d1326" stroke="${c.a}" stroke-width="2" stroke-opacity="0.7"/>` +
+      // 뇌 주름
+      `<g stroke="${c.a}" stroke-width="1.4" stroke-opacity="0.35" fill="none">` +
+      `<path d="M230 140 Q 260 160 240 185"/><path d="M300 125 Q 320 160 300 195"/><path d="M345 150 Q 360 180 335 205"/></g>` +
+      // 병변 표적 (국소화 포인트)
+      `<circle cx="318" cy="182" r="22" fill="none" stroke="${c.b}" stroke-opacity="0.4" stroke-width="2"/>` +
+      `<circle cx="318" cy="182" r="12" fill="none" stroke="${c.b}" stroke-opacity="0.7" stroke-width="2"/>` +
+      `<circle cx="318" cy="182" r="4" fill="${c.b}"/>` +
+      // 눈 + 다각도 시선 벡터가 병변으로 수렴
+      `<g stroke="${c.b}" stroke-width="1.6" stroke-opacity="0.85" stroke-dasharray="4 4">` +
+      `<line x1="120" y1="130" x2="318" y2="182"/>` +
+      `<line x1="120" y1="182" x2="318" y2="182"/>` +
+      `<line x1="120" y1="234" x2="318" y2="182"/></g>` +
+      // 눈 아이콘
+      `<g transform="translate(96 182)">` +
+      `<path d="M-32 0 Q 0 -26 32 0 Q 0 26 -32 0 Z" fill="#0d1326" stroke="${c.a}" stroke-width="2"/>` +
+      `<circle cx="0" cy="0" r="11" fill="none" stroke="${c.b}" stroke-width="2"/>` +
+      `<circle cx="0" cy="0" r="4.5" fill="${c.b}"/></g>` +
+      // 각도 라벨
+      `<text x="150" y="120" font-family="Space Grotesk" font-size="13" fill="${c.b}" fill-opacity="0.85">multi-angle gaze</text>`
+    ),
+    detail: {
+      period: "2023.03 — 2024.07",
+      company: "㈜Tenetus",
+      role: "개발 운영 이사 · AI 개발 총괄",
+      stack: ["Python", "PyTorch", "Computer Vision", "Eye Tracking"],
+      work: [
+        "눈동자의 움직임을 다각도로 측정해 뇌병변을 측정하는 검사 방식 설계",
+        "고려대 의료진과 협업해 시야 데이터 기반 뇌병변 판별 AI(NDI) 설계 총괄",
+        "뇌병변 국소화 모델을 위한 의료 데이터 수집 및 가공 파이프라인 구축",
+        "시야 검사 데이터만으로 병변 위치를 추정하는 알고리즘 연구",
+      ],
+      results: [
+        "시야 검사만으로 뇌병변 판별이 가능한 알고리즘 개발",
+        "기존 대비 검사 복잡도 감소 및 검사 비용 절감",
+        "VR 시각 측정 장비(VigoRight)와 연계한 AI 진단 방향성 정립",
+      ],
+    },
+  },
+  {
     title: "Lost Energy Intel",
     blurb:
       "풍력발전 SCADA 데이터 기반 에너지 손실 예측 시스템. 설비 이상을 사전 감지해 연간 2억 원 원가 절감을 달성한 상용 ML 모델.",
