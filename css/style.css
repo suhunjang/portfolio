@@ -39,6 +39,7 @@ img { max-width: 100%; display: block; }
 
 /* ---------- 배경 데코 ---------- */
 .bg-grid {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: -2;
@@ -49,6 +50,7 @@ img { max-width: 100%; display: block; }
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
 }
 .bg-glow {
+  display: none;
   position: fixed;
   top: -10%;
   left: 50%;
@@ -100,7 +102,7 @@ img { max-width: 100%; display: block; }
   width: 34px;
   height: 34px;
   border-radius: 9px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   color: #fff;
   font-size: 0.85rem;
   letter-spacing: 0.5px;
@@ -186,7 +188,7 @@ img { max-width: 100%; display: block; }
     background 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   color: #fff;
   box-shadow: 0 8px 24px -8px var(--accent);
 }
@@ -240,10 +242,7 @@ img { max-width: 100%; display: block; }
   margin-bottom: 1.4rem;
 }
 .typed {
-  background: linear-gradient(120deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
 }
 .caret {
   color: var(--accent);
@@ -277,10 +276,8 @@ img { max-width: 100%; display: block; }
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.6rem, 4vw, 2.2rem);
-  background: linear-gradient(120deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
 }
 .stat-label {
   font-size: 0.82rem;
@@ -382,7 +379,7 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
   font-size: 1.8rem;
   color: #fff;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   margin-bottom: 1.4rem;
 }
 .about-meta { display: grid; gap: 0.9rem; }
@@ -411,7 +408,7 @@ img { max-width: 100%; display: block; }
   top: 6px;
   bottom: 6px;
   width: 2px;
-  background: linear-gradient(var(--accent), transparent);
+  background: var(--border-strong);
 }
 .timeline-item {
   position: relative;
@@ -503,7 +500,7 @@ img { max-width: 100%; display: block; }
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   opacity: 0;
   transition: opacity 0.28s var(--ease);
 }
@@ -813,7 +810,7 @@ body.modal-open { overflow: hidden; }
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  background: var(--border-strong);
   opacity: 0.85;
 }
 .strength-card:hover {
@@ -898,9 +895,7 @@ body.modal-open { overflow: hidden; }
   gap: 1.5rem;
   padding: clamp(1.6rem, 4vw, 2.6rem);
   border-radius: var(--radius);
-  background:
-    radial-gradient(circle at 100% 0%, var(--accent-soft), transparent 60%),
-    var(--bg-elev);
+  background: var(--bg-elev);
   border: 1px solid var(--border);
 }
 .contact-text h3 {
