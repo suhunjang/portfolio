@@ -229,6 +229,20 @@
     return `<div class="modal-section"><h4>제품 구성</h4><div class="lineup-grid">${cards}</div></div>`;
   }
 
+  function shotsBlock(items) {
+    if (!items || !items.length) return "";
+    const figs = items
+      .map(
+        (s) => `
+        <figure class="shot${s.wide ? " wide" : ""}">
+          <img src="${esc(s.src)}" alt="${esc(s.alt || "")}" loading="lazy">
+          <figcaption>${esc(s.caption)}</figcaption>
+        </figure>`
+      )
+      .join("");
+    return `<div class="modal-section"><h4>화면 · 현장</h4><div class="shot-grid">${figs}</div></div>`;
+  }
+
   function openProjectModal(idx) {
     const p = PROJECTS[idx];
     if (!p || !p.detail || !modal || !modalBody) return;
@@ -253,6 +267,7 @@
       ${lineupBlock(d.lineup)}
       ${listBlock("담당 업무", d.work)}
       ${listBlock("주요 성과", d.results)}
+      ${shotsBlock(d.shots)}
       ${stack ? `<div class="modal-section"><h4>기술 스택</h4><div class="modal-stack">${stack}</div></div>` : ""}
     `;
     lastFocused = document.activeElement;
@@ -319,7 +334,11 @@
     const btns = [];
     if (PROFILE.email)
       btns.push(
-        `<a class="btn btn-primary" href="mailto:${esc(PROFILE.email)}">✉ 이메일</a>`
+        `<span class="contact-info">✉ ${esc(PROFILE.email)}</span>`
+      );
+    if (PROFILE.phone)
+      btns.push(
+        `<span class="contact-info">☎ ${esc(PROFILE.phone)}</span>`
       );
     const s = PROFILE.social || {};
     if (s.github)

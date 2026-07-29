@@ -269,6 +269,10 @@ const PROJECTS = [
         "Backend/Frontend 분리 및 CI/CD로 유지보수·확장성·릴리스 안정성 향상",
         "기존 챗봇에 LLM·RAG 적용, 맞춤형 응대로 고객 유입률 20% 증가",
       ],
+      shots: [
+        { src: "assets/projects/motion-e-waitboard.png", alt: "모션E 대기현황판", wide: true,
+          caption: "모션E 대기현황판. 대기중 → 상담 → 세안·촬영 → 시술대기 → 마취까지 원내 동선을 단계별 보드로 배치해, 환자가 지금 어디에 있고 얼마나 기다렸는지 한 화면에서 파악한다. (환자 정보는 마스킹 처리)" },
+      ],
     },
   },
   {
@@ -410,6 +414,20 @@ const PROJECTS = [
         "Grad-CAM XAI로 모델 해석 가능성·임상 신뢰도 향상",
         "대학병원·개원가 시장 진입, 약 3억 원 매출 달성",
       ],
+      shots: [
+        { src: "assets/projects/vror_v200_1.png", alt: "VigoRight 검사 장비 구성",
+          caption: "VigoRight 검사 장비 구성. 이동형 카트에 검사자용 모니터와 VR HMD를 통합해 안진·안구운동·온도안진 검사를 한 자리에서 수행." },
+        { src: "assets/projects/vror_v300.png", alt: "임상 현장 적용 모습",
+          caption: "임상 현장 적용 모습. 피검자는 HMD를 착용하고, 검사자는 별도 화면으로 실시간 시선·동공 데이터를 확인한다." },
+        { src: "assets/projects/vror_7_ocular_torsion.png", alt: "OcularTorsion 회선 검사 화면",
+          caption: "OcularTorsion(회선) 검사 화면. 좌우 안구 적외선 영상에서 동공 경계를 추적해 회전 각도를 정량화 — RANSAC 기하 정합과 CNN 회귀가 적용된 핵심 검사." },
+        { src: "assets/projects/vror_6_visual_field.png", alt: "Visual Field 시야 검사 화면",
+          caption: "Visual Field(시야) 검사 화면. 중심 주시 상태에서 주변 자극 인지 여부를 기록하며, 이 시야 데이터가 뇌병변 판별 AI(NDI)의 입력이 된다." },
+        { src: "assets/projects/vror_3_rapd.png", alt: "RAPD 상대구심성 동공결손 검사 화면",
+          caption: "RAPD(상대구심성 동공결손) 검사 화면. 한쪽 눈에 광자극을 주고 양안 동공 반응을 동시에 추적해 좌우 비대칭을 판정." },
+        { src: "assets/projects/vror_v200_2.png", alt: "검사용 VR HMD",
+          caption: "검사에 사용되는 VR HMD. 내장 Eye Tracker로 시선·동공·토션 데이터를 실시간 수집한다." },
+      ],
     },
   },
   {
@@ -505,6 +523,10 @@ const PROJECTS = [
         "풍력발전기 Lost Energy 사전 예측으로 연간 2억 원 원가 절감",
         "설비 이상을 사전 감지해 운영 효율성 극대화",
       ],
+      shots: [
+        { src: "assets/projects/wind-engineers-inspecting-blade-failure.jpg", alt: "현장 엔지니어의 블레이드 결함 점검",
+          caption: "현장 엔지니어의 블레이드 결함 점검. 모델이 사전 감지한 이상을 현장에서 검증하며 성능을 함께 다듬었다." },
+      ],
     },
   },
   {
@@ -553,6 +575,68 @@ const PROJECTS = [
         "기존 수동 분류 이슈를 자동화하여 처리 속도 향상",
         "사용자 직급·단지 정보 기반 맞춤형 Case 추천",
         "장비별 데이터 확인·이슈 공유로 협업 강화",
+      ],
+      shots: [
+        { src: "assets/projects/case-management-two-screens-onyx.jpg", alt: "AI-Hub Case Management 화면",
+          caption: "AI-Hub 운영 화면. Monitoring Case Summary 대시보드와 Case Management 테이블로 단지별 이슈를 한 화면에서 추적한다." },
+      ],
+    },
+  },
+  {
+    title: "FieldPro (풍력단지 관리 SaaS)",
+    blurb:
+      "풍력단지 현장 점검·데이터 관리 산업용 SaaS. Web·iOS 전 영역을 개발하고 서버리스 미들웨어로 재설계했으며, 광산 산업까지 서비스를 확장했다.",
+    tags: ["AngularJS2", "Swift", "AWS Lambda", "PostgreSQL"],
+    links: { live: "", repo: "" },
+    accent: "blue",
+    // 컨셉: 풍력단지 맵 + 점검 체크리스트 카드 + 모바일 동기화
+    hero: makeVisual("blue", (c) =>
+      // 단지 맵 그리드
+      `<g stroke="${c.a}" stroke-opacity="0.18" stroke-width="1">` +
+      `<line x1="90" y1="110" x2="560" y2="110"/><line x1="90" y1="170" x2="560" y2="170"/>` +
+      `<line x1="90" y1="230" x2="560" y2="230"/></g>` +
+      // 터빈 2기 (점검 대상)
+      `<g stroke="${c.a}" stroke-width="2.5" stroke-linecap="round">` +
+      `<line x1="140" y1="150" x2="140" y2="232"/><line x1="140" y1="150" x2="140" y2="120"/>` +
+      `<line x1="140" y1="150" x2="166" y2="166"/><line x1="140" y1="150" x2="114" y2="166"/>` +
+      `<line x1="228" y1="150" x2="228" y2="232"/><line x1="228" y1="150" x2="228" y2="120"/>` +
+      `<line x1="228" y1="150" x2="254" y2="166"/><line x1="228" y1="150" x2="202" y2="166"/></g>` +
+      `<circle cx="140" cy="150" r="4.5" fill="${c.b}"/><circle cx="228" cy="150" r="4.5" fill="${c.b}"/>` +
+      // 점검 체크리스트 카드
+      `<rect x="330" y="96" width="200" height="140" rx="10" fill="#0d1326" stroke="${c.a}" stroke-width="2"/>` +
+      `<text x="348" y="122" font-family="Space Grotesk" font-size="13" fill="${c.b}">Inspection</text>` +
+      `<g stroke="${c.b}" stroke-width="2" fill="none" stroke-linecap="round">` +
+      `<path d="M350 145 l7 7 l13 -14"/><path d="M350 175 l7 7 l13 -14"/><path d="M350 205 l7 7 l13 -14"/></g>` +
+      `<g stroke="${c.a}" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round">` +
+      `<line x1="382" y1="150" x2="508" y2="150"/><line x1="382" y1="180" x2="508" y2="180"/>` +
+      `<line x1="382" y1="210" x2="474" y2="210"/></g>` +
+      // 동기화 화살표
+      `<g stroke="${c.b}" stroke-width="2" fill="none" stroke-opacity="0.75" stroke-dasharray="5 4">` +
+      `<path d="M262 166 h 52"/></g>` +
+      `<text x="264" y="156" font-family="Space Grotesk" font-size="12" fill="${c.b}" fill-opacity="0.85">sync</text>`
+    ),
+    detail: {
+      period: "2018.08 — 2021.03",
+      company: "ONYX Insight (BP Group)",
+      role: "Senior Developer",
+      stack: ["AngularJS2", "JSP", "PostgreSQL", "Swift 3", "AWS Lambda", "Node.js"],
+      work: [
+        "풍력단지 데이터 관리 시스템 FieldPro Front-end·Back-end 개발 및 운영",
+        "FieldPro iOS Application v2 개발 — Data Sync 및 사용자 UI 개선",
+        "AWS API Gateway + Lambda 기반 Serverless Middleware 재개발, 영국 본사 Live Report와 연동",
+        "풍력단지용 서비스를 광산 산업에 맞게 커스터마이징(FieldPro Mining), Fleet Monitor 데이터 연계·차트 시각화",
+      ],
+      results: [
+        "풍력 → 광산 산업으로 서비스 확장",
+        "Serverless 설계로 관리 리소스 절감 및 안정성 강화",
+        "iOS 다운로드/업로드 기능 강화로 현장 데이터 동기화 개선",
+        "서비스 안정화·성능 개선으로 사용자 만족도 향상",
+      ],
+      shots: [
+        { src: "assets/projects/onyx-insight-fieldpro-two-phones.jpg", alt: "FieldPro 모바일 점검 앱",
+          caption: "FieldPro 모바일 앱. 현장 엔지니어가 Inspection Checklist와 Drivetrain·Gearbox 점검 항목을 단말에서 바로 기록한다." },
+        { src: "assets/projects/fieldpro-desktop-application-punch-list-screenshot-1024x566.jpg", alt: "FieldPro 데스크톱 Issue Punch List",
+          caption: "FieldPro 데스크톱의 Issue Punch List. 현장에서 올라온 이슈를 단지 단위로 모아 상태별로 관리한다." },
       ],
     },
   },

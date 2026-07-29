@@ -10,6 +10,11 @@ CLAUDE.md
 .omc/
 .claude/
 
+# 토큰·자격증명 (절대 커밋 금지)
+.gh_token_tmp
+*.token
+.env
+
 # OS / 에디터 부산물
 .DS_Store
 Thumbs.db

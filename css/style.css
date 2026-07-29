@@ -739,6 +739,50 @@ body.modal-open { overflow: hidden; }
   line-height: 1.5;
   color: var(--text-muted);
 }
+/* 실제 제품 화면 / 현장 사진 갤러리 */
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.7rem;
+}
+.shot {
+  margin: 0;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.shot img {
+  display: block;
+  width: 100%;
+  height: 168px;
+  object-fit: cover;
+  background: var(--bg-alt);
+}
+.shot figcaption {
+  padding: 0.6rem 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+/* 파노라마 형태(가로로 긴) 캡처 — 잘리지 않도록 전체 폭으로 펼친다 */
+.shot.wide {
+  grid-column: 1 / -1;
+}
+.shot.wide img {
+  height: auto;
+  object-fit: contain;
+}
+.shot-credit {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+@media (max-width: 720px) {
+  .shot img { height: 150px; }
+  .shot.wide img { height: auto; }
+}
+
 @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modalPop {
   from { opacity: 0; transform: translateY(12px) scale(0.98); }
@@ -865,7 +909,12 @@ body.modal-open { overflow: hidden; }
   margin-bottom: 0.4rem;
 }
 .contact-text p { color: var(--text-muted); max-width: 420px; }
-.contact-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.contact-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem 1.2rem; }
+.contact-info {
+  font-size: 0.98rem;
+  color: var(--text);
+  white-space: nowrap;
+}
 
 /* ---------- FOOTER ---------- */
 .footer {
