@@ -137,9 +137,9 @@ img { max-width: 100%; display: block; }
   background: var(--bg-elev);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  transition: border-color 0.2s var(--ease);
 }
-.theme-toggle:hover { border-color: var(--accent); transform: translateY(-1px); }
+.theme-toggle:hover { border-color: var(--border-strong); }
 .theme-toggle .icon-sun { display: none; }
 .theme-toggle .icon-moon { display: block; }
 [data-theme="light"] .theme-toggle .icon-sun { display: block; }
@@ -184,21 +184,20 @@ img { max-width: 100%; display: block; }
   border-radius: 11px;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease),
-    background 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease),
+    opacity 0.2s var(--ease);
 }
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 8px 24px -8px var(--accent);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -8px var(--accent); }
+.btn-primary:hover { opacity: 0.88; }
 .btn-ghost {
   background: var(--bg-elev);
   color: var(--text);
   border-color: var(--border-strong);
 }
-.btn-ghost:hover { transform: translateY(-2px); border-color: var(--accent); }
+.btn-ghost:hover { border-color: var(--border-strong); background: var(--accent-soft); }
 
 .tag {
   display: inline-block;
@@ -315,7 +314,7 @@ img { max-width: 100%; display: block; }
 /* ==========================================================================
    SECTIONS (공통)
    ========================================================================== */
-.section { padding-block: clamp(4rem, 10vw, 7rem); }
+.section { padding-block: clamp(6rem, 14vw, 11rem); }
 .section-alt { background: var(--bg-alt); }
 .section-head { margin-bottom: clamp(2rem, 5vw, 3.2rem); }
 .section-kicker {
@@ -493,8 +492,7 @@ img { max-width: 100%; display: block; }
   border-radius: var(--radius);
   padding: 1.5rem;
   overflow: hidden;
-  transition: transform 0.28s var(--ease), border-color 0.28s var(--ease),
-    box-shadow 0.28s var(--ease);
+  transition: border-color 0.28s var(--ease);
 }
 .project-card::before {
   content: "";
@@ -506,9 +504,7 @@ img { max-width: 100%; display: block; }
   transition: opacity 0.28s var(--ease);
 }
 .project-card:hover {
-  transform: translateY(-6px);
   border-color: var(--card-hover-border);
-  box-shadow: var(--shadow);
 }
 .project-card:hover::before { opacity: 1; }
 .project-thumb {
@@ -803,7 +799,7 @@ body.modal-open { overflow: hidden; }
   border-radius: var(--radius);
   padding: 1.6rem 1.5rem;
   box-shadow: var(--shadow);
-  transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+  transition: border-color 0.25s var(--ease);
   overflow: hidden;
 }
 .strength-card::before {
@@ -816,7 +812,6 @@ body.modal-open { overflow: hidden; }
 }
 .strength-card:hover {
   border-color: var(--card-hover-border);
-  transform: translateY(-3px);
 }
 .strength-icon {
   display: inline-flex;
