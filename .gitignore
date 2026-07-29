@@ -15,6 +15,10 @@ CLAUDE.md
 *.token
 .env
 
+# git worktree / 작업 스크래치
+.worktrees/
+.superpowers/
+
 # OS / 에디터 부산물
 .DS_Store
 Thumbs.db
