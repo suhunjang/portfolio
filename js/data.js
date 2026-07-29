@@ -211,6 +211,10 @@ const PROJECTS = [
         "Midjourney API 연동으로 디자이너 투입 없이 콘텐츠 이미지 생산",
         "사내 마케팅 프로세스를 SaaS 솔루션으로 제품화 → 신규 수익 모델 창출",
       ],
+      shots: [
+        { src: "assets/projects/motion-ad-marketing.png", alt: "모션AD 마케팅 서비스 구성",
+          caption: "모션AD 서비스 구성. 개원의 마케팅 · 블로그 마케팅 · 네이버 플레이스 SEO 세 축으로 나누고, 전환 키워드 발굴부터 콘텐츠 발행·리뷰 관리까지 구독형으로 제공한다." },
+      ],
     },
   },
   {
@@ -270,6 +274,8 @@ const PROJECTS = [
         "기존 챗봇에 LLM·RAG 적용, 맞춤형 응대로 고객 유입률 20% 증가",
       ],
       shots: [
+        { src: "assets/projects/motion-series-lineup.png", alt: "모션 제품 라인업 5종",
+          caption: "모션 제품 라인업. 마케팅(AD) · 홈페이지(W) · 전자차트(E) · 카톡 챗봇(K) · 태블릿 펜차트(T)를 하나의 생태계로 묶어, 환자 유치부터 내원·진료·사후관리까지 연결한다." },
         { src: "assets/projects/motion-e-waitboard.png", alt: "모션E 대기현황판", wide: true,
           caption: "모션E 대기현황판. 대기중 → 상담 → 세안·촬영 → 시술대기 → 마취까지 원내 동선을 단계별 보드로 배치해, 환자가 지금 어디에 있고 얼마나 기다렸는지 한 화면에서 파악한다. (환자 정보는 마스킹 처리)" },
       ],
