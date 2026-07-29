@@ -234,7 +234,7 @@
     const figs = items
       .map(
         (s) => `
-        <figure class="shot${s.wide ? " wide" : ""}">
+        <figure class="shot${s.wide ? " wide" : ""}${s.fit ? " fit" : ""}${s.tall ? " tall" : ""}">
           <img src="${esc(s.src)}" alt="${esc(s.alt || "")}" loading="lazy">
           <figcaption>${esc(s.caption)}</figcaption>
         </figure>`

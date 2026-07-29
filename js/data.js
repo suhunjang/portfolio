@@ -375,6 +375,10 @@ const PROJECTS = [
         "상담 단계에서 고객 맞춤 시술 추천을 보조하는 분석 기능으로 제품화",
         "차트·챗봇 등 기존 Motion 솔루션과 연계 가능한 방향으로 설계",
       ],
+      shots: [
+        { src: "assets/projects/motion-e-ai-diagnosis.png", alt: "모션E PRO의 AI 진단 화면", tall: true,
+          caption: "모션E PRO 고객 차트에 들어간 AI 진단 탭. 촬영과 비교를 두 갈래로 나눠, 시술 전·후 사진을 같은 기준으로 남기고 상담 때 바로 꺼내 보도록 설계했다. (고객 정보는 마스킹 처리)" },
+      ],
     },
   },
   {
@@ -421,9 +425,9 @@ const PROJECTS = [
         "대학병원·개원가 시장 진입, 약 3억 원 매출 달성",
       ],
       shots: [
-        { src: "assets/projects/vror_v200_1.png", alt: "VigoRight 검사 장비 구성",
+        { src: "assets/projects/vror_v200_1.png", alt: "VigoRight 검사 장비 구성", fit: true,
           caption: "VigoRight 검사 장비 구성. 이동형 카트에 검사자용 모니터와 VR HMD를 통합해 안진·안구운동·온도안진 검사를 한 자리에서 수행." },
-        { src: "assets/projects/vror_v300.png", alt: "임상 현장 적용 모습",
+        { src: "assets/projects/vror_v300.png", alt: "임상 현장 적용 모습", fit: true,
           caption: "임상 현장 적용 모습. 피검자는 HMD를 착용하고, 검사자는 별도 화면으로 실시간 시선·동공 데이터를 확인한다." },
         { src: "assets/projects/vror_7_ocular_torsion.png", alt: "OcularTorsion 회선 검사 화면",
           caption: "OcularTorsion(회선) 검사 화면. 좌우 안구 적외선 영상에서 동공 경계를 추적해 회전 각도를 정량화 — RANSAC 기하 정합과 CNN 회귀가 적용된 핵심 검사." },
@@ -431,7 +435,7 @@ const PROJECTS = [
           caption: "Visual Field(시야) 검사 화면. 중심 주시 상태에서 주변 자극 인지 여부를 기록하며, 이 시야 데이터가 뇌병변 판별 AI(NDI)의 입력이 된다." },
         { src: "assets/projects/vror_3_rapd.png", alt: "RAPD 상대구심성 동공결손 검사 화면",
           caption: "RAPD(상대구심성 동공결손) 검사 화면. 한쪽 눈에 광자극을 주고 양안 동공 반응을 동시에 추적해 좌우 비대칭을 판정." },
-        { src: "assets/projects/vror_v200_2.png", alt: "검사용 VR HMD",
+        { src: "assets/projects/vror_v200_2.png", alt: "검사용 VR HMD", fit: true,
           caption: "검사에 사용되는 VR HMD. 내장 Eye Tracker로 시선·동공·토션 데이터를 실시간 수집한다." },
       ],
     },
@@ -482,6 +486,10 @@ const PROJECTS = [
         "시야 검사만으로 뇌병변 판별이 가능한 알고리즘 개발",
         "기존 대비 검사 복잡도 감소 및 검사 비용 절감",
         "VR 시각 측정 장비(VigoRight)와 연계한 AI 진단 방향성 정립",
+      ],
+      shots: [
+        { src: "assets/projects/ndi-m2s-vr-brain-lesion.png", alt: "VR 기반 뇌병변 진단 장비", fit: true,
+          caption: "VR 기반 뇌병변 진단 장비. HMD로 수집한 시선·시야 데이터를 콘솔에서 분석해 3D 뇌 모델 위에 병변 추정 위치를 표시한다. (국내 최초 VR 기반 뇌병변 진단 의료기기 인증)" },
       ],
     },
   },
@@ -583,7 +591,7 @@ const PROJECTS = [
         "장비별 데이터 확인·이슈 공유로 협업 강화",
       ],
       shots: [
-        { src: "assets/projects/case-management-two-screens-onyx.jpg", alt: "AI-Hub Case Management 화면",
+        { src: "assets/projects/case-management-two-screens-onyx.jpg", alt: "AI-Hub Case Management 화면", fit: true,
           caption: "AI-Hub 운영 화면. Monitoring Case Summary 대시보드와 Case Management 테이블로 단지별 이슈를 한 화면에서 추적한다." },
       ],
     },
@@ -639,7 +647,7 @@ const PROJECTS = [
         "서비스 안정화·성능 개선으로 사용자 만족도 향상",
       ],
       shots: [
-        { src: "assets/projects/onyx-insight-fieldpro-two-phones.jpg", alt: "FieldPro 모바일 점검 앱",
+        { src: "assets/projects/onyx-insight-fieldpro-two-phones.jpg", alt: "FieldPro 모바일 점검 앱", fit: true,
           caption: "FieldPro 모바일 앱. 현장 엔지니어가 Inspection Checklist와 Drivetrain·Gearbox 점검 항목을 단말에서 바로 기록한다." },
         { src: "assets/projects/fieldpro-desktop-application-punch-list-screenshot-1024x566.jpg", alt: "FieldPro 데스크톱 Issue Punch List",
           caption: "FieldPro 데스크톱의 Issue Punch List. 현장에서 올라온 이슈를 단지 단위로 모아 상태별로 관리한다." },

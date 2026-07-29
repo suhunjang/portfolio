@@ -742,7 +742,7 @@ body.modal-open { overflow: hidden; }
 /* 실제 제품 화면 / 현장 사진 갤러리 */
 .shot-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 0.7rem;
 }
 .shot {
@@ -755,7 +755,8 @@ body.modal-open { overflow: hidden; }
 .shot img {
   display: block;
   width: 100%;
-  height: 168px;
+  /* 고정 px 대신 칸 너비에 비례 — 열이 넓어지면 사진도 같이 커진다 */
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   background: var(--bg-alt);
 }
@@ -770,8 +771,20 @@ body.modal-open { overflow: hidden; }
   grid-column: 1 / -1;
 }
 .shot.wide img {
+  aspect-ratio: auto;
   height: auto;
   object-fit: contain;
+}
+/* 제품컷 등 잘리면 안 되는 사진 — 칸 폭은 유지하고 전체가 보이도록 맞춘다 */
+.shot.fit img {
+  object-fit: contain;
+  padding: 0.5rem;
+}
+/* 세로로 긴 모바일 캡처 — 4:3에 맞추면 대부분 잘리므로 세로 비율을 준다 */
+.shot.tall img {
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  padding: 0.5rem;
 }
 .shot-credit {
   margin-top: 0.6rem;
@@ -779,7 +792,6 @@ body.modal-open { overflow: hidden; }
   color: var(--text-muted);
 }
 @media (max-width: 720px) {
-  .shot img { height: 150px; }
   .shot.wide img { height: auto; }
 }
 
