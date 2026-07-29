@@ -4,20 +4,20 @@
    ========================================================================== */
 
 :root {
-  /* 브랜드 액센트 (테마 공통) */
-  --accent: #7c5cff;          /* 바이올렛 */
-  --accent-2: #22d3ee;        /* 시안 */
-  --accent-soft: rgba(124, 92, 255, 0.14);
+  /* 브랜드 액센트 — 딥 잉크 블루 단일 계열 */
+  --accent: #1e3a5f;
+  --accent-2: #2c5580;        /* accent의 밝은 변주 (그라데이션 잔존 참조용) */
+  --accent-soft: rgba(30, 58, 95, 0.07);
 
-  /* 타이포 */
+  /* 타이포 — Inter 단일 (Space Grotesk는 data.js의 SVG 전용) */
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Space Grotesk", var(--font-sans);
+  --font-display: var(--font-sans);
 
   /* 레이아웃 */
   --container: 1100px;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.25);
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow: none;
 
   /* 모션 */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -26,36 +26,40 @@
 /* ---------- 라이트 테마 ---------- */
 :root,
 [data-theme="light"] {
-  --bg: #f7f8fc;
+  --bg: #fafafa;
   --bg-elev: #ffffff;
-  --bg-alt: #eef1f8;
-  --text: #15172b;
-  --text-muted: #5b607a;
-  --text-faint: #8a8fa8;
-  --border: rgba(20, 22, 43, 0.10);
-  --border-strong: rgba(20, 22, 43, 0.18);
-  --nav-bg: rgba(247, 248, 252, 0.72);
-  --tag-bg: rgba(124, 92, 255, 0.10);
-  --tag-text: #5b3df0;
-  --grid-line: rgba(20, 22, 43, 0.05);
-  --glow: rgba(124, 92, 255, 0.18);
-  --card-hover-border: rgba(124, 92, 255, 0.45);
+  --bg-alt: #f4f4f5;
+  --text: #18181b;
+  --text-muted: #52525b;
+  --text-faint: #8a8a93;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --nav-bg: rgba(250, 250, 250, 0.85);
+  --tag-bg: rgba(0, 0, 0, 0.045);
+  --tag-text: #52525b;
+  --grid-line: transparent;
+  --glow: transparent;
+  --card-hover-border: rgba(30, 58, 95, 0.35);
 }
 
 /* ---------- 다크 테마 ---------- */
 [data-theme="dark"] {
-  --bg: #0a0b14;
-  --bg-elev: #12131f;
-  --bg-alt: #0f1019;
-  --text: #eef0f8;
-  --text-muted: #a4a9c2;
-  --text-faint: #6c7191;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --nav-bg: rgba(10, 11, 20, 0.66);
-  --tag-bg: rgba(124, 92, 255, 0.16);
-  --tag-text: #c0b3ff;
-  --grid-line: rgba(255, 255, 255, 0.035);
-  --glow: rgba(124, 92, 255, 0.28);
-  --card-hover-border: rgba(124, 92, 255, 0.55);
+  --accent: #7ea8d8;
+  --accent-2: #9dbde4;
+  --accent-soft: rgba(126, 168, 216, 0.12);
+
+  --bg: #0d0f12;
+  --bg-elev: #16181c;
+  --bg-alt: #111316;
+  --text: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --text-faint: #71717a;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --nav-bg: rgba(13, 15, 18, 0.85);
+  --tag-bg: rgba(255, 255, 255, 0.06);
+  --tag-text: #a1a1aa;
+  --grid-line: transparent;
+  --glow: transparent;
+  --card-hover-border: rgba(126, 168, 216, 0.45);
 }

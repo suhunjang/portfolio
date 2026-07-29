@@ -139,9 +139,9 @@ const CAREER = [
  * makeVisual(accent, body) → 16:9 그라데이션 배경 + 컨셉 그래픽.
  */
 const VIS_ACCENT = {
-  violet: { a: "#7c5cff", b: "#a78bfa", glow: "#7c5cff" },
-  blue: { a: "#3b82f6", b: "#60a5fa", glow: "#3b82f6" },
-  cyan: { a: "#22d3ee", b: "#67e8f9", glow: "#06b6d4" },
+  violet: { a: "#8fa3bd", b: "#a8b8cd", glow: "#7e93b0" },
+  blue: { a: "#7fa0c4", b: "#9bb4d1", glow: "#6b8fb8" },
+  cyan: { a: "#84a8b5", b: "#9dbcc6", glow: "#6f9aa8" },
 };
 
 function makeVisual(accent, inner) {
