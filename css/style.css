@@ -521,9 +521,9 @@ img { max-width: 100%; display: block; }
   font-size: 2rem;
   color: #fff;
 }
-.thumb-violet { background: linear-gradient(135deg, #7c5cff, #b06cff); }
-.thumb-blue { background: linear-gradient(135deg, #3b82f6, #22d3ee); }
-.thumb-cyan { background: linear-gradient(135deg, #06b6d4, #34d399); }
+.thumb-violet { background: linear-gradient(135deg, #3d4a5c, #55637a); }
+.thumb-blue { background: linear-gradient(135deg, #2f4459, #456179); }
+.thumb-cyan { background: linear-gradient(135deg, #37505c, #4d6b77); }
 /* 코드 생성 SVG 비주얼: 그라데이션 배경 대신 SVG가 전체를 채움 */
 .project-thumb.has-visual {
   padding: 0;
