@@ -214,7 +214,7 @@
     return `<div class="modal-section"><h4>${esc(label)}</h4><ul>${lis}</ul></div>`;
   }
 
-  function lineupBlock(items) {
+  function lineupBlock(items, heading) {
     if (!items || !items.length) return "";
     const cards = items
       .map(
@@ -226,7 +226,7 @@
         </div>`
       )
       .join("");
-    return `<div class="modal-section"><h4>제품 구성</h4><div class="lineup-grid">${cards}</div></div>`;
+    return `<div class="modal-section"><h4>${esc(heading || "제품 구성")}</h4><div class="lineup-grid">${cards}</div></div>`;
   }
 
   function shotsBlock(items) {
@@ -264,7 +264,7 @@
       <h3 id="modalTitle" class="modal-title">${esc(p.title)}</h3>
       <div class="modal-meta">${metaHtml}</div>
       <p class="modal-blurb">${esc(p.blurb)}</p>
-      ${lineupBlock(d.lineup)}
+      ${lineupBlock(d.lineup, d.lineupHeading)}
       ${listBlock("담당 업무", d.work)}
       ${listBlock("주요 성과", d.results)}
       ${shotsBlock(d.shots)}

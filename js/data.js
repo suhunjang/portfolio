@@ -33,11 +33,13 @@ const PROFILE = {
 };
 
 // 핵심 지표 (Hero/About 영역의 강조 숫자)
+// 근거: 이력서 "경력 사항(총 15년 2개월)" · "□ 업무상 강점" 6개 항목.
+// ※ 연 2억(ONYX 에너지)과 연 1.2억(트라이업 인프라)은 회사·시기가 다르므로 합산하지 않는다.
 const STATS = [
   { value: "15년+", label: "Software & Leadership" },
-  { value: "₩2억", label: "연간 에너지 손실 절감 (AI)" },
-  { value: "80%", label: "마케팅 프로세스 단축" },
-  { value: "20%", label: "AI 챗봇 전환율 증가" },
+  { value: "50명", label: "4개 부문 통합 운영 (COO)" },
+  { value: "연 1.2억", label: "클라우드 인프라 비용 절감" },
+  { value: "80%", label: "AI 마케팅 프로세스 단축" },
 ];
 
 // 경력 / 창업 타임라인 (최신순)
@@ -171,6 +173,73 @@ function makeVisual(accent, inner) {
 // hero 필드(SVG)는 코드 생성 비주얼 — 저작권 안전.
 const PROJECTS = [
   {
+    title: "Motion-O (AI 오케스트레이션 플랫폼)",
+    blurb:
+      "Motion-W(웹)·Motion-AD(마케팅)·Motion-E(EMR)로 분리 운영되던 제품군을 하나의 AI 축에서 제어하는 오케스트레이션 플랫폼. 마케팅 성과 분석 → 이벤트 생성 → 문의 응대 → 예약 → 차트 연동까지 End-to-End 자동화를 설계 중.",
+    tags: ["Claude (AI Agent)", "자체 harness", "Next.js", "NestJS"],
+    links: { live: "", repo: "" },
+    accent: "cyan",
+    // 컨셉: 3개 제품(W·AD·E)이 중앙 AI 오케스트레이터로 수렴 → 자동화 루프로 순환
+    hero: makeVisual("cyan", (c) =>
+      // 중앙 오케스트레이터로 모이는 연결선
+      `<g stroke="${c.a}" stroke-width="2" fill="none" stroke-opacity="0.5">` +
+      `<path d="M170 110 C 250 130, 280 145, 320 160"/>` +
+      `<path d="M170 250 C 250 230, 280 180, 320 165"/>` +
+      `<path d="M530 180 C 470 180, 400 172, 350 165"/>` +
+      `</g>` +
+      // 자동화 순환 루프
+      `<circle cx="335" cy="160" r="86" fill="none" stroke="${c.b}" stroke-width="1.5"
+        stroke-opacity="0.35" stroke-dasharray="6 8"/>` +
+      // 제품 노드 3개
+      `<g font-family="Space Grotesk, sans-serif" text-anchor="middle" font-size="13">` +
+      `<g><rect x="100" y="88" width="72" height="42" rx="10" fill="#0d1326"
+        stroke="${c.a}" stroke-width="1.5"/>` +
+      `<text x="136" y="114" fill="${c.b}">Motion-W</text></g>` +
+      `<g><rect x="100" y="228" width="72" height="42" rx="10" fill="#0d1326"
+        stroke="${c.a}" stroke-width="1.5"/>` +
+      `<text x="136" y="254" fill="${c.b}">Motion-E</text></g>` +
+      `<g><rect x="520" y="158" width="76" height="42" rx="10" fill="#0d1326"
+        stroke="${c.a}" stroke-width="1.5"/>` +
+      `<text x="558" y="184" fill="${c.b}">Motion-AD</text></g>` +
+      `</g>` +
+      // 중앙 AI 코어
+      `<g><circle cx="335" cy="160" r="46" fill="${c.glow}" fill-opacity="0.16"
+        stroke="${c.b}" stroke-width="2"/>` +
+      `<text x="335" y="156" text-anchor="middle" font-family="Space Grotesk, sans-serif"
+        font-size="20" font-weight="700" fill="${c.b}">AI</text>` +
+      `<text x="335" y="176" text-anchor="middle" font-family="Space Grotesk, sans-serif"
+        font-size="11" fill="${c.b}" fill-opacity="0.8">Orchestrator</text></g>` +
+      // 순환 흐름 표식
+      `<g fill="${c.b}" fill-opacity="0.75">` +
+      `<circle cx="335" cy="74" r="4"/><circle cx="421" cy="160" r="4"/>` +
+      `<circle cx="335" cy="246" r="4"/><circle cx="249" cy="160" r="4"/></g>`
+    ),
+    detail: {
+      period: "2026.05 — 현재 (진행 중)",
+      company: "㈜트라이업",
+      role: "아키텍처 설계 · 총괄",
+      stack: ["Claude (AI Agent)", "자체 harness 프레임워크", "Node.js", "Next.js", "NestJS", "LLM·RAG", "Naver Cloud"],
+      work: [
+        "Motion-W(웹)·Motion-AD(마케팅)·Motion-E(EMR/CRM)로 분리 운영되던 제품군을 하나의 축에서 제어하는 오케스트레이션 아키텍처 설계",
+        "제품 전반의 데이터를 AI가 통합 판단하는 구조 설계 — 마케팅 성과를 분석해 이벤트를 자동 생성하고, 신규 문의 발생 시 자동 응대·예약까지 처리",
+        "예약 데이터를 차트(EMR)까지 연동하는 End-to-End 자동화 파이프라인 설계",
+        "AI 에이전트(Claude) 기반 개발을 위한 자체 harness 프레임워크 직접 설계·구축",
+      ],
+      results: [
+        "제품 통합(진행 중): 개별 판매되던 제품군을 하나의 AI 오케스트레이션 축으로 정렬하는 신규 성장 축 구축 추진",
+        "AI 기반 업무 전환(진행 중): 사람이 개입하던 마케팅 판단·고객 응대·예약·차트 입력 과정을 AI 주도 구조로 재설계 중",
+      ],
+      // harness에 직접 설계·구축한 AI 에이전트 스킬 (Motion 워크스페이스 SoT)
+      lineupHeading: "AI 에이전트 스킬",
+      lineup: [
+        { name: "harness", label: "phase/step 자동 실행 프레임워크", desc: "task를 자기완결적 step으로 쪼개 가드레일(PRD·ARCHITECTURE·ADR)을 주입하고, AC 검증 실패 시 3회 자가교정하는 실행기. 3개 앱에 공통 배치." },
+        { name: "run-stack", label: "3앱 dev 스택 일괄 기동", desc: "admin-api(4000)·web-admin(3100)·w-front(3000)와 docker(mysql·redis)를 한 번에 백그라운드 기동하고 HTTP healthcheck로 확인한다." },
+        { name: "make-issue", label: "이슈 → Jira 자동 등록", desc: "새 작업·버그를 앱별 규격에 맞는 이슈 파일로 작성하면, 커밋 시 jira-sync 훅이 해당 앱 에픽 아래 Jira task를 자동 생성한다." },
+        { name: "handoff", label: "세션 간 작업 인계", desc: "세션 종료 시 다음 세션이 끊김 없이 이어받도록 핸드오프 메모와 인덱스를 남긴다. resume 스킬과 짝을 이루는 컨텍스트 연속성 장치." },
+      ],
+    },
+  },
+  {
     title: "Motion AD",
     blurb:
       "GPT·Midjourney·n8n 기반 병의원 마케팅 자동화 SaaS. 콘텐츠 기획·생성·배포를 자동화해 운영 프로세스를 80% 단축하고 신규 수익 모델로 제품화.",
@@ -199,7 +268,7 @@ const PROJECTS = [
       period: "2025.06 — 현재",
       company: "㈜트라이업",
       role: "기획 · 구축 총괄",
-      stack: ["ChatGPT (GPTs)", "Midjourney", "n8n", "Notion API"],
+      stack: ["ChatGPT (GPTs)", "Claude", "Midjourney", "n8n", "Notion API"],
       work: [
         "병의원 전용 마케팅 솔루션 기획 및 구축",
         "GPT 기반 콘텐츠 기획 자동화 도구 개발",
@@ -255,7 +324,7 @@ const PROJECTS = [
       period: "2024.09 — 현재",
       company: "㈜트라이업",
       role: "통합 관리 · 고도화 총괄",
-      stack: ["Naver Cloud", "Node.js", "Express", "React", "AWS"],
+      stack: ["Naver Cloud", "Node.js", "Next.js", "NestJS", "Flutter", "Claude", "AWS"],
       // 브로셔 "의원급 올인원 솔루션" 제품 구성 (모션 브로셔 SoT)
       lineup: [
         { name: "모션E", label: "CRM 특화 전자차트(EMR/OCS)", desc: "미용·성형의원에 특화된 차트. 대시보드·대기현황판, 티켓·멤버십, 매출·예약 통계, 펜차트, 사전문진표·고객만족도까지 통합." },
@@ -377,7 +446,7 @@ const PROJECTS = [
       period: "2025 — 현재",
       company: "㈜트라이업",
       role: "기획 · 방향성 총괄 (아이디어 발의 · 개발은 개발팀)",
-      stack: ["Computer Vision", "병의원 SaaS", "AI 제품 기획"],
+      stack: ["Computer Vision", "Next.js", "NestJS", "Flutter", "AI 제품 기획"],
       work: [
         "AI 얼굴·피부 분석 기능의 아이디어 발의 및 제품 컨셉 정의",
         "상담·시술 추천 흐름에 분석 결과를 연결하는 방향성 설계",
@@ -429,7 +498,7 @@ const PROJECTS = [
       period: "2023.03 — 2024.07",
       company: "㈜Tenetus",
       role: "개발 운영 이사 · 개발 총괄",
-      stack: ["Python (Django)", "Node.js", "MongoDB", "PyTorch", "AWS"],
+      stack: ["Python (Django)", "Node.js", "MongoDB", "PyTorch", "Unity", "AWS"],
       work: [
         "안과·신경과 고식적 검사를 VR 환경으로 구현",
         "HMD Eye Tracker의 시선·토션(torsion) 데이터 실시간 분석",
@@ -493,7 +562,7 @@ const PROJECTS = [
       period: "2023.03 — 2024.07",
       company: "㈜Tenetus",
       role: "개발 운영 이사 · AI 개발 총괄",
-      stack: ["Python", "PyTorch", "Computer Vision", "Eye Tracking"],
+      stack: ["Python", "PyTorch", "Computer Vision", "Eye Tracking", "XAI", "Unity"],
       work: [
         "눈동자의 움직임을 다각도로 측정해 뇌병변을 측정하는 검사 방식 설계",
         "고려대 의료진과 협업해 시야 데이터 기반 뇌병변 판별 AI(NDI) 설계 총괄",
@@ -669,6 +738,163 @@ const PROJECTS = [
           caption: "FieldPro 모바일 앱. 현장 엔지니어가 Inspection Checklist와 Drivetrain·Gearbox 점검 항목을 단말에서 바로 기록한다." },
         { src: "assets/projects/fieldpro-desktop-application-punch-list-screenshot-1024x566.jpg", alt: "FieldPro 데스크톱 Issue Punch List", fit: true,
           caption: "FieldPro 데스크톱의 Issue Punch List. 현장에서 올라온 이슈를 단지 단위로 모아 상태별로 관리한다." },
+      ],
+    },
+  },
+  {
+    title: "FleetUp (차량 관리 시스템)",
+    blurb:
+      "실리콘밸리 스타트업의 차량 관리 SaaS. Front-end Technical Leader로 Spring 기반 레거시를 프론트-백엔드 분리 구조로 개편하고, e-commerce는 AWS Serverless로 재구축했다.",
+    tags: ["AngularJS2", "TypeScript", "AWS Lambda", "Spring"],
+    links: { live: "", repo: "" },
+    accent: "cyan",
+    // 컨셉: 차량 텔레메트리 — 경로 위 차량 + 대시보드 카드 + 서버리스 노드
+    hero: makeVisual("cyan", (c) =>
+      // 주행 경로
+      `<path d="M100 250 C 190 250, 210 150, 300 150 S 420 200, 520 130" fill="none" ` +
+      `stroke="${c.a}" stroke-width="2.5" stroke-opacity="0.55" stroke-dasharray="8 7"/>` +
+      // 경로 위 위치 핀 3개
+      `<g fill="${c.b}"><circle cx="150" cy="248" r="5"/><circle cx="300" cy="150" r="5"/>` +
+      `<circle cx="520" cy="130" r="5"/></g>` +
+      // 차량 아이콘 (경로 위)
+      `<g><rect x="272" y="118" width="56" height="24" rx="7" fill="#0d1326" stroke="${c.b}" stroke-width="2"/>` +
+      `<rect x="284" y="110" width="30" height="12" rx="4" fill="#0d1326" stroke="${c.b}" stroke-width="1.6"/>` +
+      `<circle cx="288" cy="144" r="5" fill="#0d1326" stroke="${c.b}" stroke-width="1.8"/>` +
+      `<circle cx="314" cy="144" r="5" fill="#0d1326" stroke="${c.b}" stroke-width="1.8"/></g>` +
+      // 텔레메트리 대시보드 카드
+      `<rect x="380" y="180" width="176" height="96" rx="10" fill="#0d1326" stroke="${c.a}" stroke-width="2"/>` +
+      `<text x="398" y="204" font-family="Space Grotesk" font-size="12" fill="${c.b}" fill-opacity="0.85">Fleet Dashboard</text>` +
+      `<g fill="${c.b}"><rect x="398" y="238" width="14" height="22" rx="2"/>` +
+      `<rect x="418" y="226" width="14" height="34" rx="2"/><rect x="438" y="216" width="14" height="44" rx="2"/>` +
+      `<rect x="458" y="232" width="14" height="28" rx="2" opacity="0.6"/></g>` +
+      `<polyline points="486,252 502,238 518,244 536,222" fill="none" stroke="${c.b}" stroke-width="2" stroke-opacity="0.8"/>` +
+      // Serverless 노드 체인
+      `<g stroke="${c.a}" stroke-width="1.5" stroke-opacity="0.5" fill="none">` +
+      `<path d="M120 110 h 60 M212 110 h 60"/></g>` +
+      `<g fill="#0d1326" stroke="${c.b}" stroke-width="2">` +
+      `<circle cx="110" cy="110" r="10"/><circle cx="196" cy="110" r="10"/></g>` +
+      `<text x="96" y="88" font-family="Space Grotesk" font-size="11" fill="${c.b}" fill-opacity="0.8">API GW → Lambda</text>`
+    ),
+    detail: {
+      period: "2016.12 — 2018.08",
+      company: "트루라이트 (Truelight) · 실리콘밸리",
+      role: "Senior Developer · Front-end Technical Leader",
+      stack: ["AngularJS2", "TypeScript", "Node.js", "Spring", "Java", "Oracle", "AWS Lambda", "AWS S3"],
+      work: [
+        "FleetUp Front-end Technical Leader — 기술 문제 해결, 사용 환경·성능 향상, 서비스 운영 개선 총괄",
+        "Spring 기반 FleetUp 서버 관리 및 Application 추가 개발, 대용량 데이터 쿼리 튜닝",
+        "기존 Web Page를 AngularJS·Bootstrap 기반 UI로 개편하고, UI 4.0에서 Frontend-Backend Decoupling 및 대시보드 시각화 차트 개발",
+        "AWS API Gateway·Lambda·S3 Serverless 구조로 e-commerce 페이지 구축, Salesforce(고객 관리 시스템) 연동",
+      ],
+      results: [
+        "Oracle DB 성능 향상 및 응답속도 개선",
+        "소스 모듈화로 렌더링 성능 향상, 독립 빌드·운영이 가능한 구조로 개선",
+        "Salesforce에서 처리하던 작업을 사용자가 직접 처리하는 시스템으로 개선",
+        "Node.js로 Lambda Turn-on Time 최적화",
+      ],
+    },
+  },
+  {
+    title: "삼성전자 PenUp Mobile Web App",
+    blurb:
+      "삼성전자 드로잉 SNS PenUp의 모바일 웹앱. MVC 구조와 템플릿·뷰 위젯 체계를 도입하고 애니메이션·페이지 전환을 개선해 Android 버전까지 확장했다.",
+    tags: ["JavaScript", "jQuery", "HTML5", "Hybrid App"],
+    links: { live: "", repo: "" },
+    accent: "violet",
+    // 컨셉: 모바일 단말 + 드로잉 캔버스 + 카드 그리드 + 페이지 전환
+    hero: makeVisual("violet", (c) =>
+      // 단말 프레임
+      `<rect x="240" y="60" width="170" height="220" rx="20" fill="#0d1326" stroke="${c.a}" stroke-width="2"/>` +
+      `<rect x="300" y="72" width="50" height="6" rx="3" fill="${c.a}" fill-opacity="0.5"/>` +
+      // 드로잉 스트로크 (펜)
+      `<path d="M264 190 C 292 138, 320 226, 348 158 S 384 118, 392 148" fill="none" ` +
+      `stroke="${c.b}" stroke-width="3" stroke-linecap="round"/>` +
+      // 펜촉
+      `<g stroke="${c.b}" stroke-width="2" fill="#0d1326">` +
+      `<path d="M392 148 l16 -22 l10 8 l-18 20 z"/></g>` +
+      // 카드 그리드 (갤러리)
+      `<g fill="none" stroke="${c.a}" stroke-opacity="0.55" stroke-width="1.6">` +
+      `<rect x="258" y="208" width="62" height="48" rx="7"/><rect x="330" y="208" width="62" height="48" rx="7"/></g>` +
+      `<g fill="${c.b}" fill-opacity="0.45">` +
+      `<circle cx="278" cy="228" r="7"/><path d="M266 250 l16 -16 l14 14 l10 -8 v10 z"/>` +
+      `<circle cx="350" cy="228" r="7"/><path d="M338 250 l16 -16 l14 14 l10 -8 v10 z"/></g>` +
+      // 페이지 전환 표식 (좌우 슬라이드)
+      `<g stroke="${c.b}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-opacity="0.8">` +
+      `<path d="M180 170 l-22 0 M166 160 l-12 10 l12 10"/>` +
+      `<path d="M470 170 l22 0 M486 160 l12 10 l-12 10"/></g>` +
+      // 뷰 위젯 스택 (좌측)
+      `<g fill="#0d1326" stroke="${c.a}" stroke-opacity="0.5" stroke-width="1.5">` +
+      `<rect x="100" y="96" width="90" height="20" rx="5"/><rect x="108" y="122" width="90" height="20" rx="5"/>` +
+      `<rect x="116" y="148" width="90" height="20" rx="5"/></g>` +
+      `<text x="100" y="86" font-family="Space Grotesk" font-size="11" fill="${c.b}" fill-opacity="0.8">View Widgets</text>`
+    ),
+    detail: {
+      period: "2014.02 — 2015.02",
+      company: "미라콤아이앤씨 · 삼성전자 프로젝트",
+      role: "모바일2팀 선임 · Web 개발",
+      stack: ["JavaScript", "jQuery", "HTML5", "CSS"],
+      work: [
+        "MVC 모델을 적용한 Hybrid App 개발",
+        "Template 구조화 및 View-Widget 구현",
+        "Animation 및 Page 전환 개선",
+      ],
+      results: [
+        "성능 향상 및 사용자 경험 개선",
+        "Post Blog Android Version으로 확장",
+      ],
+    },
+  },
+  {
+    title: "DRM · 콘텐츠 보안 모듈",
+    blurb:
+      "유료방송·음원·클라우드 콘텐츠를 보호하는 DRM 모듈. Melon Player 4.0의 멀티 디바이스 키 관리와 유니코드 지원을 맡았고, KT uCloud 패키저와 Mobile TV 보안 서버까지 담당했다.",
+    tags: ["C / Objective-C", "OMA DRM", "암·복호화", "iOS"],
+    links: { live: "", repo: "" },
+    accent: "blue",
+    // 컨셉: 자물쇠(암호화) + 키 + 멀티 디바이스 배포
+    hero: makeVisual("blue", (c) =>
+      // 중앙 자물쇠 (보호되는 콘텐츠)
+      `<g>` +
+      `<path d="M296 148 v-18 a24 24 0 0 1 48 0 v18" fill="none" stroke="${c.b}" stroke-width="3.5" stroke-linecap="round"/>` +
+      `<rect x="282" y="148" width="76" height="62" rx="10" fill="${c.glow}" fill-opacity="0.16" ` +
+      `stroke="${c.b}" stroke-width="2.5"/>` +
+      `<circle cx="320" cy="174" r="6" fill="${c.b}"/>` +
+      `<rect x="317" y="178" width="6" height="16" rx="3" fill="${c.b}"/></g>` +
+      // 암호화 스트림 (좌측 → 자물쇠)
+      `<g font-family="Space Grotesk" font-size="12" fill="${c.a}" fill-opacity="0.6">` +
+      `<text x="120" y="140">01001</text><text x="120" y="166">11010</text><text x="120" y="192">10110</text></g>` +
+      `<g stroke="${c.a}" stroke-width="1.5" stroke-opacity="0.45" fill="none">` +
+      `<path d="M186 136 h 76"/><path d="M186 162 h 76"/><path d="M186 188 h 76"/></g>` +
+      // 멀티 디바이스 (우측): 폰 · 태블릿 · TV
+      `<g fill="#0d1326" stroke="${c.a}" stroke-width="2">` +
+      `<rect x="424" y="96" width="38" height="60" rx="7"/>` +
+      `<rect x="480" y="88" width="56" height="76" rx="7"/>` +
+      `<rect x="424" y="186" width="112" height="66" rx="8"/></g>` +
+      `<g stroke="${c.b}" stroke-width="2" stroke-opacity="0.7"><line x1="452" y1="252" x2="508" y2="252"/></g>` +
+      // 자물쇠 → 디바이스 키 전달선
+      `<g stroke="${c.b}" stroke-width="1.8" stroke-opacity="0.6" fill="none" stroke-dasharray="5 5">` +
+      `<path d="M362 162 C 396 150, 400 128, 420 124"/>` +
+      `<path d="M362 182 C 396 196, 400 214, 420 218"/></g>` +
+      // 키 아이콘
+      `<g stroke="${c.b}" stroke-width="2" fill="none">` +
+      `<circle cx="392" cy="252" r="8"/><path d="M400 252 h 30 M424 252 v 8 M414 252 v 8"/></g>` +
+      `<text x="416" y="80" font-family="Space Grotesk" font-size="11" fill="${c.b}" fill-opacity="0.8">Multi Device</text>`
+    ),
+    detail: {
+      period: "2010.10 — 2013.07",
+      company: "디지캡 (DigiCAP)",
+      role: "DRM 개발팀 · 대리",
+      stack: ["C", "Objective-C", "C#", "Java JNI", "iOS", "OMA DRM 1.0"],
+      work: [
+        "Melon Player 4.0 Multi Device & Unicode — 멀티 디바이스 Key 관리 및 유니코드 지원 (2012.01~2012.05)",
+        "KT uCloud Storage Broker Service Framework — OMA 1.0 규격 기반 DRM Packager / Repackager / Depackager 구현",
+        "Mobile TV DRM Local Secure Server — QuickTime Player로 전송되는 M3U8 내 Encrypted Key 복호화 및 HTTPS 구현",
+        "SKT DRM(Android·iOS·eBook) 및 ARM TrustZone DRM, SKB Smart TV UI Application 개발",
+      ],
+      results: [
+        "Melon Player 다중 단말 지원 및 다국어 콘텐츠 호환성 확보",
+        "사용자 ID 기반 암·복호화 처리로 보안성 강화 및 안전한 업로드 환경 구축",
+        "HTTP → HTTPS 전환으로 통신 보안 강화",
       ],
     },
   },
