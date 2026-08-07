@@ -1050,3 +1050,144 @@ body.modal-open { overflow: hidden; }
   }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ==========================================================================
+   PRINT — PDF 첨부용 출력
+   ========================================================================== */
+@media print {
+  /* 라이트 테마 강제 — 다크 배경이 인쇄되지 않도록 */
+  :root,
+  html[data-theme="dark"],
+  html[data-theme="light"] {
+    --bg: #ffffff;
+    --bg-soft: #ffffff;
+    --bg-card: #ffffff;
+    --text: #16181d;
+    --text-muted: #3d434e;
+    --text-faint: #5b6270;
+    --border: #c9ced8;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #16181d !important;
+  }
+
+  /* 스크롤로 등장하는 요소를 모두 펼친다 — 없으면 섹션이 통째로 빈다 */
+  .reveal,
+  .reveal.in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* 화면 전용 UI·장식 제거 */
+  .navbar,
+  .menu-toggle,
+  .theme-toggle,
+  .nav-actions,
+  .bg-grid,
+  .bg-glow,
+  .modal,
+  .modal-backdrop,
+  .footer-top {
+    display: none !important;
+  }
+
+  /* 첫 장 맨 위에 포트폴리오 주소를 한 줄로 (hero 레이아웃 밖) */
+  .hero-inner::before {
+    content: "Portfolio · https://suhunjang.github.io/portfolio/";
+    display: block;
+    width: 100%;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #c9ced8;
+    font-size: 10pt;
+    font-weight: 600;
+    color: #1b56d6;
+    text-align: left;
+  }
+
+  /* 타이핑 애니메이션은 인쇄 시 글자가 잘린 채 굳으므로,
+     JS가 채우는 #typed를 숨기고 전체 문구를 CSS로 찍는다. */
+  .caret,
+  .scroll-hint { display: none !important; }
+  #typed { display: none !important; }
+  .hero-role::after {
+    content: "COO · CTO · Full-Stack & AI Leader";
+  }
+
+  /* 인쇄 시 상단 여백 보정 (navbar 제거분) + 빈 공간 압축 */
+  .hero {
+    padding-top: 0 !important;
+    padding-bottom: 0.8rem !important;
+    min-height: auto !important;
+    height: auto !important;
+    display: block !important;
+  }
+  section,
+  .section { padding: 1rem 0 !important; }
+
+  /* About 첫 문단은 hero 소개와 동일 텍스트 — 인쇄에서는 중복 제거 */
+  #aboutSummary { display: none !important; }
+
+  /* 카드가 페이지 경계에서 잘리지 않도록.
+     .timeline-item은 길어서 avoid를 걸면 페이지 하단이 크게 비므로 제외한다. */
+  .strength-card,
+  .project-card,
+  .about-card,
+  .skill-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* 경력은 카드 단위로만 보호 (항목 전체가 아니라) */
+  .timeline-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* 콘텐츠 폭을 지면 전체로 — 좁은 폭이 페이지 수를 늘리는 주원인 */
+  .container {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* 넓힌 폭에서 그리드가 1열로 무너지지 않도록 2열을 명시한다 */
+  .project-grid,
+  .strengths-grid,
+  .skills-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.7rem !important;
+  }
+
+  /* 세로 여백 압축 — 13p → 목표 9~10p */
+  .section-head { margin-bottom: 0.8rem !important; }
+  .timeline-item { margin-bottom: 0.9rem !important; }
+  .hero-stats { margin-top: 0.9rem !important; }
+  .hero-cta { margin: 0.8rem 0 !important; }
+  p { orphans: 3; widows: 3; }
+
+  h1, h2, h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* 링크는 주소를 함께 노출 (종이에서도 접근 가능하도록) */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8.5pt;
+    color: #5b6270;
+    word-break: break-all;
+  }
+  /* 단, 내부 앵커·중복 노출은 제외 */
+  .nav-link::after,
+  .brand::after {
+    content: "" !important;
+  }
+
+  @page {
+    margin: 14mm 12mm;
+  }
+}
