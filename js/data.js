@@ -896,6 +896,105 @@ const PROJECTS = [
         "사용자 ID 기반 암·복호화 처리로 보안성 강화 및 안전한 업로드 환경 구축",
         "HTTP → HTTPS 전환으로 통신 보안 강화",
       ],
+      // Melon DRM의 DCF 복호화·재생 흐름 (직접 담당한 구간을 강조).
+      // 외부 이미지 대신 코드 생성 SVG — 저작권 안전하고 2012년 당시 구조에 정확하다.
+      diagram: {
+        heading: "DCF 복호화 · 재생 흐름",
+        caption:
+          "암호화된 DCF(OMA DRM Content Format) 파일을 재생 가능한 상태로 푸는 경로. " +
+          "라이선스에서 콘텐츠 키를 꺼내 복호화한 뒤 디코더로 넘기며, 단말마다 다른 키를 " +
+          "관리해 같은 파일이 여러 기기에서 재생되게 했다. 유니코드 지원으로 다국어 " +
+          "메타데이터까지 처리한다.",
+        svg: makeVisual("blue", (c) =>
+          // ── 1. 암호화된 DCF 파일
+          `<g><rect x="34" y="112" width="92" height="106" rx="9" fill="#0d1326" ` +
+          `stroke="${c.a}" stroke-width="2"/>` +
+          // 파일 접힘 모서리
+          `<path d="M104 112 v20 h22" fill="none" stroke="${c.a}" stroke-width="1.6"/>` +
+          // 암호문 라인
+          `<g font-family="Space Grotesk, monospace" font-size="9" fill="${c.a}" fill-opacity="0.75">` +
+          `<text x="48" y="158">A3F1</text><text x="48" y="174">9C02</text>` +
+          `<text x="48" y="190">7E5B</text></g>` +
+          `<text x="80" y="236" text-anchor="middle" font-family="Space Grotesk" font-size="12" ` +
+          `fill="${c.b}">.dcf</text>` +
+          `<text x="80" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}" fill-opacity="0.85">암호화 파일</text></g>` +
+
+          // ── 2. 라이선스 · 키 획득 (상단 분기)
+          `<g><rect x="204" y="48" width="118" height="60" rx="9" ` +
+          `fill="${c.glow}" fill-opacity="0.14" stroke="${c.b}" stroke-width="1.8"/>` +
+          // 키 아이콘
+          `<g stroke="${c.b}" stroke-width="1.8" fill="none">` +
+          `<circle cx="228" cy="78" r="6.5"/><path d="M234 78 h 20 M249 78 v 6 M242 78 v 6"/></g>` +
+          `<text x="292" y="82" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}">콘텐츠 키</text>` +
+          `<text x="263" y="38" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}" fill-opacity="0.85">라이선스 획득</text></g>` +
+
+          // 키가 복호화 엔진으로 내려오는 경로
+          `<path d="M263 108 L263 132" fill="none" stroke="${c.b}" stroke-width="1.8" ` +
+          `stroke-dasharray="4 4" stroke-opacity="0.8"/>` +
+          `<path d="M258 128 l5 8 l5 -8" fill="${c.b}" fill-opacity="0.8"/>` +
+
+          // ── 3. 복호화 엔진 (본인 담당 구간 — 강조)
+          `<g><rect x="204" y="134" width="118" height="76" rx="9" fill="#101a30" ` +
+          `stroke="${c.b}" stroke-width="2.5"/>` +
+          // 자물쇠 열린 형태
+          `<path d="M250 168 v-9 a13 13 0 0 1 26 -2" fill="none" stroke="${c.b}" ` +
+          `stroke-width="2.4" stroke-linecap="round"/>` +
+          `<rect x="245" y="168" width="36" height="28" rx="5" fill="${c.glow}" ` +
+          `fill-opacity="0.22" stroke="${c.b}" stroke-width="2"/>` +
+          `<circle cx="263" cy="180" r="3" fill="${c.b}"/>` +
+          `<rect x="261.5" y="182" width="3" height="8" rx="1.5" fill="${c.b}"/>` +
+          `<text x="263" y="228" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}">복호화</text></g>` +
+
+          // 흐름: 파일 → 복호화
+          `<g stroke="${c.a}" stroke-width="2" fill="none" stroke-opacity="0.6">` +
+          `<path d="M126 165 h 62"/></g>` +
+          `<path d="M184 160 l8 5 l-8 5" fill="${c.a}" fill-opacity="0.7"/>` +
+
+          // 흐름: 복호화 → 디코더
+          `<g stroke="${c.a}" stroke-width="2" fill="none" stroke-opacity="0.6">` +
+          `<path d="M322 172 h 58"/></g>` +
+          `<path d="M376 167 l8 5 l-8 5" fill="${c.a}" fill-opacity="0.7"/>` +
+
+          // ── 4. 디코더 → 재생 (파형)
+          `<g><rect x="392" y="134" width="106" height="76" rx="9" fill="#0d1326" ` +
+          `stroke="${c.a}" stroke-width="2"/>` +
+          // 재생 파형
+          `<g stroke="${c.b}" stroke-width="2.6" stroke-linecap="round">` +
+          `<line x1="412" y1="172" x2="412" y2="172" stroke-opacity="0.9"/>` +
+          `<line x1="412" y1="162" x2="412" y2="182"/><line x1="424" y1="152" x2="424" y2="192"/>` +
+          `<line x1="436" y1="158" x2="436" y2="186"/><line x1="448" y1="146" x2="448" y2="198"/>` +
+          `<line x1="460" y1="160" x2="460" y2="184"/><line x1="472" y1="154" x2="472" y2="190"/>` +
+          `<line x1="484" y1="164" x2="484" y2="180"/></g>` +
+          `<text x="445" y="228" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}">재생</text></g>` +
+
+          // ── 5. 멀티 디바이스 키 관리 (우측)
+          `<g stroke="${c.b}" stroke-width="1.6" fill="none" stroke-opacity="0.55" ` +
+          `stroke-dasharray="5 5">` +
+          `<path d="M498 158 C 528 150, 536 132, 552 126"/>` +
+          `<path d="M498 172 h 54"/>` +
+          `<path d="M498 186 C 528 194, 536 212, 552 218"/></g>` +
+          `<g fill="#0d1326" stroke="${c.a}" stroke-width="1.8">` +
+          `<rect x="556" y="106" width="30" height="44" rx="5"/>` +
+          `<rect x="556" y="156" width="46" height="32" rx="5"/>` +
+          `<rect x="556" y="196" width="38" height="44" rx="5"/></g>` +
+          `<text x="578" y="94" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}" fill-opacity="0.85">멀티 디바이스</text>` +
+          `<text x="578" y="258" text-anchor="middle" font-family="sans-serif" font-size="10" ` +
+          `fill="${c.b}" fill-opacity="0.7">단말별 키 관리</text>` +
+
+          // 담당 구간 표시
+          `<g stroke="${c.b}" stroke-width="1.4" stroke-opacity="0.45" fill="none" ` +
+          `stroke-dasharray="3 4">` +
+          `<rect x="194" y="126" width="138" height="94" rx="12"/></g>` +
+          `<text x="263" y="284" text-anchor="middle" font-family="sans-serif" font-size="11" ` +
+          `fill="${c.b}" fill-opacity="0.8">↑ 직접 담당 구간</text>`
+        ),
+      },
     },
   },
 ];

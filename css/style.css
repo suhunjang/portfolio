@@ -816,6 +816,27 @@ body.modal-open { overflow: hidden; }
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+/* 코드 생성 SVG 다이어그램 — 사진(.shot)과 달리 잘리면 안 되므로 전체 폭에 비율 그대로 */
+.diagram {
+  margin: 0;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* viewBox(640×320)와 동일 — hero의 slice 크롭이 라벨을 자르지 않게 비율을 고정한다 */
+  aspect-ratio: 2 / 1;
+}
+.diagram figcaption {
+  padding: 0.6rem 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
 @media (max-width: 720px) {
   .shot.wide img { height: auto; }
 }

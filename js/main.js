@@ -243,6 +243,16 @@
     return `<div class="modal-section"><h4>화면 · 현장</h4><div class="shot-grid">${figs}</div></div>`;
   }
 
+  // 코드 생성 SVG 다이어그램 (외부 이미지 없이 구조를 설명). svg는 신뢰된 데이터라 그대로 삽입.
+  function diagramBlock(d) {
+    if (!d || !d.svg) return "";
+    const cap = d.caption
+      ? `<figcaption>${esc(d.caption)}</figcaption>`
+      : "";
+    return `<div class="modal-section"><h4>${esc(d.heading || "구조")}</h4>
+      <figure class="diagram">${d.svg}${cap}</figure></div>`;
+  }
+
   function openProjectModal(idx) {
     const p = PROJECTS[idx];
     if (!p || !p.detail || !modal || !modalBody) return;
@@ -267,6 +277,7 @@
       ${lineupBlock(d.lineup, d.lineupHeading)}
       ${listBlock("담당 업무", d.work)}
       ${listBlock("주요 성과", d.results)}
+      ${diagramBlock(d.diagram)}
       ${shotsBlock(d.shots)}
       ${stack ? `<div class="modal-section"><h4>기술 스택</h4><div class="modal-stack">${stack}</div></div>` : ""}
     `;
