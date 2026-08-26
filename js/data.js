@@ -23,7 +23,7 @@ const PROFILE = {
     "지금은 트라이업에서 50명 조직의 운영(COO)과 기술(CTO)을 함께 이끌며 기술을 매출로 연결합니다.",
   location: "경기 시흥, 대한민국",
   email: "jsslh@naver.com",
-  phone: "010-9999-6241",
+  phone: "",
   // 소셜/외부 링크 (없으면 빈 문자열 → 자동 숨김)
   social: {
     github: "", // TODO: GitHub URL이 있으면 입력
