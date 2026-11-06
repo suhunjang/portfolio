@@ -235,7 +235,9 @@
       .map(
         (s) => `
         <figure class="shot${s.wide ? " wide" : ""}${s.fit ? " fit" : ""}${s.tall ? " tall" : ""}">
-          <img src="${esc(s.src)}" alt="${esc(s.alt || "")}" loading="lazy">
+          <button type="button" class="shot-zoom" aria-label="확대해서 보기: ${esc(s.alt || "")}">
+            <img src="${esc(s.src)}" alt="${esc(s.alt || "")}" loading="lazy">
+          </button>
           <figcaption>${esc(s.caption)}</figcaption>
         </figure>`
       )
@@ -288,8 +290,58 @@
     if (closeBtn) closeBtn.focus();
   }
 
+  /* 갤러리 이미지 확대(lightbox) — 모달 위에 한 겹 더 띄워 원본 크기로 본다.
+     모달 폭(640px)에 눌려 글씨가 안 읽히는 가로 캡처용. body.modal-open은 건드리지 않는다. */
+  let lightbox = null;
+  let lightboxOpener = null;
+
+  function ensureLightbox() {
+    if (lightbox) return lightbox;
+    lightbox = document.createElement("div");
+    lightbox.className = "lightbox";
+    lightbox.hidden = true;
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-label", "이미지 확대 보기");
+    lightbox.innerHTML =
+      '<button class="modal-close" type="button" aria-label="닫기">✕</button><img alt="">';
+    // 이미지 바깥(배경·닫기 버튼)을 누르면 닫힌다
+    lightbox.addEventListener("click", (e) => {
+      if (e.target.tagName !== "IMG") closeLightbox();
+    });
+    // 포커스 가능한 요소가 닫기 버튼 하나뿐이라 Tab은 거기에 묶어 둔다
+    lightbox.addEventListener("keydown", (e) => {
+      if (e.key !== "Tab") return;
+      e.preventDefault();
+      $(".modal-close", lightbox).focus();
+    });
+    document.body.appendChild(lightbox);
+    return lightbox;
+  }
+
+  function openLightbox(btn) {
+    const src = $("img", btn);
+    if (!src) return;
+    const lb = ensureLightbox();
+    const img = $("img", lb);
+    img.src = src.currentSrc || src.src;
+    img.alt = src.alt;
+    lightboxOpener = btn;
+    lb.hidden = false;
+    $(".modal-close", lb).focus();
+  }
+
+  function closeLightbox() {
+    if (!lightbox || lightbox.hidden) return;
+    lightbox.hidden = true;
+    $("img", lightbox).removeAttribute("src");
+    if (lightboxOpener) lightboxOpener.focus();
+    lightboxOpener = null;
+  }
+
   function closeProjectModal() {
     if (!modal || modal.hidden) return;
+    closeLightbox();
     modal.hidden = true;
     document.body.classList.remove("modal-open");
     if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
@@ -309,10 +361,21 @@
       openProjectModal(Number(card.getAttribute("data-project")));
     });
     modal.addEventListener("click", (e) => {
+      const zoom = e.target.closest(".shot-zoom");
+      if (zoom) {
+        openLightbox(zoom);
+        return;
+      }
       if (e.target.hasAttribute("data-modal-close")) closeProjectModal();
     });
+    // Esc는 위에 떠 있는 것부터 하나씩 닫는다 (lightbox → 모달)
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeProjectModal();
+      if (e.key !== "Escape") return;
+      if (lightbox && !lightbox.hidden) {
+        closeLightbox();
+        return;
+      }
+      closeProjectModal();
     });
   }
 

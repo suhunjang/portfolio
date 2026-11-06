@@ -237,6 +237,17 @@ const PROJECTS = [
         { name: "make-issue", label: "이슈 → Jira 자동 등록", desc: "새 작업·버그를 앱별 규격에 맞는 이슈 파일로 작성하면, 커밋 시 jira-sync 훅이 해당 앱 에픽 아래 Jira task를 자동 생성한다." },
         { name: "handoff", label: "세션 간 작업 인계", desc: "세션 종료 시 다음 세션이 끊김 없이 이어받도록 핸드오프 메모와 인덱스를 남긴다. resume 스킬과 짝을 이루는 컨텍스트 연속성 장치." },
       ],
+      // 관리자 콘솔 캡처 (motion_o.pptx 원본 → 병원명·도메인·고객명 영역 크롭)
+      shots: [
+        { src: "assets/projects/motion-o-product.png", alt: "Motion-O 상품 카테고리 관리 화면", fit: true,
+          caption: "상품 관리. 상품 카테고리의 순서와 노출 여부를 관리하고, 원문 카테고리명을 다국어로 번역한다." },
+        { src: "assets/projects/motion-o-homepage.png", alt: "Motion-O 홈페이지 메인 배너 관리 화면", wide: true,
+          caption: "홈페이지 관리. 메인 배너를 PC·모바일 이미지로 따로 등록하고, 이미지 대체텍스트(alt)는 AI 버튼으로 채운다. (예시 이미지는 AI 생성)" },
+        { src: "assets/projects/motion-o-inbox.png", alt: "Motion-O 통합 인박스 상담 화면", fit: true,
+          caption: "통합 인박스(CRM). 외국어 문의를 번역해 보며 응대하고, 시술별 주의사항을 골라 답장에 바로 넣는다. AI 초안·빠른 답변 버튼을 함께 둔다." },
+        { src: "assets/projects/motion-o-seo.png", alt: "Motion-O GEO 진단 대시보드", wide: true,
+          caption: "SEO·GEO 진단 대시보드. 종합 GEO 점수와 영역별 점수를 산출하고, 병원이 직접 고칠 과제를 예상 회복 점수가 큰 순서로 제시한다." },
+      ],
     },
   },
   {

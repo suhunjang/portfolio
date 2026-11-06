@@ -811,6 +811,39 @@ body.modal-open { overflow: hidden; }
   object-fit: contain;
   padding: 0.5rem;
 }
+/* 확대 버튼 — 버튼 기본 스타일만 걷어내 기존 .shot img 레이아웃을 그대로 둔다 */
+.shot-zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.shot-zoom:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+/* 갤러리 이미지 확대 — 프로젝트 모달(z-index 100) 위에 원본 크기로 띄운다 */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(8, 9, 16, 0.88);
+  cursor: zoom-out;
+  animation: modalFade 0.2s var(--ease);
+}
+.lightbox[hidden] { display: none; }
+.lightbox img {
+  max-width: 95vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  cursor: default;
+}
 .shot-credit {
   margin-top: 0.6rem;
   font-size: 0.75rem;
@@ -847,7 +880,7 @@ body.modal-open { overflow: hidden; }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .modal-backdrop, .modal-dialog { animation: none; }
+  .modal-backdrop, .modal-dialog, .lightbox { animation: none; }
 }
 
 /* ---------- STRENGTHS ---------- */
@@ -1091,6 +1124,7 @@ body.modal-open { overflow: hidden; }
   .bg-glow,
   .modal,
   .modal-backdrop,
+  .lightbox,
   .footer-top {
     display: none !important;
   }
