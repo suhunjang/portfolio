@@ -1,73 +1,63 @@
-# Step 9 — print-pdf
+# Step 9 — focus-trap
 
-- 예상 시간: 15분
+- 예상 시간: 18분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~8 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 그것도 읽는다.
+1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2
 3. index.json에서 step 0~8이 completed인지 확인한다. 아니면 중단한다.
-4. 현재 코드에서 다음을 확인한다.
-   - `@media print`
-   - `ensureLightbox`
-   - `#heroFeatured`, `.subsection-title`, `#contact`
-5. 다음 경로는 read-only다.
-   - `CLAUDE.md`, `docs/**`, `phases/**`
-   - `.harness/**`, `.claude/**`, `.codex/**`
-   - `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. git과 Harness 운영 명령은 하네스만 실행한다. main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 모두 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+4. 현재 코드에서 모달·lightbox 함수, Tab 리스너, `:focus-visible`을 확인한다.
+5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
+6. 명령 권한
+   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - main 직접 변경, merge, deploy는 금지다.
+7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `css/style.css` (`@media print` 블록만)
-- `tests/specs/print.spec.js`
+- `js/main.js`
+- `css/style.css` (`:focus-visible` 규칙만)
+- `tests/specs/focus.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`
-- `tests/.npm-cache/**`
-- `tests/test-results/**`
-- `tests/playwright-report/**`
+- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- `index.html`, `js/*`, `css/themes.css`
-- 기존 tests
+- `index.html`, `js/data.js`, `css/themes.css`
+- fixtures, 기존 spec
 
 ## 작업 (TDD)
 
-### 1. `tests/specs/print.spec.js`
+### 1. `tests/specs/focus.spec.js` 먼저 작성
 
-desktop-dark, desktop-light에서만 실행한다.
+6개 project에서 실행한다.
 
-시나리오 A — 새 페이지를 print 상태로 확인
-- hero, `#heroFeatured`, `.section-title`이 visible이고 opacity 1이다.
-- 표시되는 `.reveal`은 모두 opacity 1, visible이며 내용이 있다.
-- toggle, menu, scroll-hint, `#projectModal`이 display none이다.
-- `.lightbox`는 count가 0이거나, 있으면 display none이다.
-- A4 PDF가 10240바이트를 넘고 `/Type /Page`가 1회 이상 나온다.
+- 모달: Tab과 Shift+Tab을 각각 20회 눌러도 포커스가 `.modal-dialog` 안에 머문다.
+- lightbox
+  - Tab과 Shift+Tab 각 10회 동안 포커스가 lightbox 안에 머문다.
+  - Esc를 누르면 포커스가 `.shot-zoom`으로 간다.
+  - 이어서 Tab 20회 동안 포커스가 모달 안에 머문다.
+  - Esc를 다시 누르면 포커스가 trigger로 간다.
+- 버튼이나 backdrop으로 닫아도 포커스가 trigger로 복귀한다.
+- 키보드 도달: toggle, nav, 대표 카드, project-card에 도달할 수 있고, outline이 none이 아니다.
 
-시나리오 B — 오버레이를 연 뒤 print로 전환
-1. screen 미디어에서 모달과 lightbox를 연다.
-2. `.lightbox` count가 1이고 visible인지 먼저 확인한다.
-3. print로 전환한다.
-4. `.lightbox`와 `#projectModal`이 display none인지 확인한다.
-5. 본문 가시성이 시나리오 A와 같은지 확인한다.
-6. PDF가 10240바이트를 넘는지 확인한다.
+### 2. `js/main.js`
 
-### 2. `@media print` 수정
-
-- `.reveal`: opacity 1, transform none, visibility visible
-- `#heroFeatured`를 인쇄에 포함한다.
-- `.modal`, `.lightbox`, toggle, menu, scroll-hint, `.navbar`: display none !important
-- `body.modal-open`의 스크롤 잠금을 해제한다.
-- 기존 `#typed`, `#aboutSummary` 숨김은 유지한다.
+- `trapFocus(container, { returnFocusTo } = {}): () => void`
+  - 스택 구조, Tab 핸들러는 1개만 둔다.
+  - `release()`는 여러 번 호출해도 안전하다.
+- 모달과 lightbox에 연결한다.
+- 기존 Tab 고정 리스너는 제거한다.
 
 ## 완료 기준 (AC)
 
 - `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
+- axe에서 새 key와 새 target이 0건이다.

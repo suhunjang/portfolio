@@ -1,128 +1,112 @@
-# Step 5 — hero-featured
+# Step 5 — axe-helper
 
 - 예상 시간: 20분
-- 실행 횟수: 테스트 2회(실패 확인 1회, 통과 1회), verify-scope 1회
+- 실행 횟수: 테스트 2회(합성 검증 포함), verify-scope 1회
 - 선행 step: 0~4 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`: 토큰, accent 제한, 그라데이션 금지
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md`: §5(대표 카드 phrasing-content 계약, 첫 화면 AC), §7, §8.3, §9
+   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (canonical target 식별, helper, 스키마, 회귀 판정)
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
-4. 현재 코드에서 다음을 확인한다.
-   - hero 마크업과 여백
-   - `.reveal` 전환
-   - `setText`, projectGrid
-   - `openProjectModal(idx)`, `lastFocused`, 이벤트 위임
-   - data.js의 index 1, 5, 7 `title:` 줄
-5. 빌더 read-only 경로
-   - `CLAUDE.md`, `docs/**`, `phases/**`
-   - `.harness/**`, `.claude/**`, `.codex/**`
-   - `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. git과 Harness 운영 명령은 하네스만 실행한다. main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 모두 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+4. 현재 코드에서 JS 렌더 영역 id, `data-project` 사용처, landmark 요소를 확인한다.
+5. 다음은 수정하지 않는다(read-only): `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
+6. 명령 권한
+   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - main 직접 변경, merge, deploy는 금지다.
+7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `index.html`: section#hero 내부만
-- `css/style.css`
-- `js/main.js`
-- `js/data.js`: `featured: true,` 3줄 추가만
-- `tests/specs/hero.spec.js`
+- `tests/helpers/axe.js`
+- `tests/specs/axe-helper.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`
-- `tests/.npm-cache/**`
-- `tests/test-results/**`
-- `tests/playwright-report/**`
+- `tests/.tmp/**` (합성 fixture 임시 파일 포함)
+- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- `css/themes.css`
-- 섹션 순서, nav
-- 기존 tests와 fixtures
+- `tests/` 밖의 모든 파일
+- 기존 tests 파일
+- `tests/fixtures/axe-baseline.json`과 `tests/specs/axe.spec.js` (다음 step에서 만든다)
 
-## 작업 (TDD)
+## 범위
 
-### 1. `tests/specs/hero.spec.js` 작성 → 실패 확인
+이 step은 helper, 스키마, canonical 식별, 회귀 판정, 합성 검증만 만든다. 실제 시나리오 수집과 fixture 생성은 하지 않는다.
 
-6개 project에서 실행한다.
+## 작업
 
-대표 카드 구조
-- `#heroFeatured [data-featured-card]`가 3개다.
-- 각 카드는 `button[type=button]`이고 `data-project`가 1, 5, 7이다.
-- phrasing-content 계약
-  - 각 카드에 `span.featured-title`과 `span.featured-blurb`가 정확히 1개씩 있다.
-  - `h1,h2,h3,h4,h5,h6,p,div,ul,ol,li,section,article` 자손이 0개다.
-- `.featured-title`의 텍스트는 데이터의 title, `.featured-blurb`의 텍스트는 blurb와 같다.
-- `.featured-title`, `.featured-blurb`의 computed display가 block이다.
-- `#heroTagline`이 `PROFILE.tagline`과 같다.
+### 1. `tests/helpers/axe.js`
 
-첫 화면 AC (desktop project만, 설계 §5)
-- 사전 조건
-  - `await page.evaluate(() => document.fonts.ready)`
-  - `expect(await page.evaluate(() => window.scrollY)).toBe(0)`
-- 대상: `#heroName`, `#heroTagline`, `#heroStats`, `.featured-title` 3개. 각각 다음을 만족해야 한다.
-  1. `await expect(locator).toBeVisible()`
-  2. `boundingBox()`가 존재하고 width > 0, height > 0이다.
-  3. 대상부터 `document.documentElement`까지 모든 조상의 computed `visibility === visible`, `opacity === 1`이다. `expect.poll`로 재시도한다.
-  4. 경계 안에 있다: `x >= 0`, `y >= 0`, `x + width <= 1280`, `y + height <= 800`
-- 이 AC는 통합 AC(`npm --prefix tests test`) 안에서 실행된다.
+import할 때 fixture를 읽지 않는다.
 
-모달 연동
-- 대표 카드마다 click으로 열고 button, backdrop, esc로 각각 닫는다. 매번 포커스가 그 카드로 돌아와야 한다.
-- Enter로 열고 esc로 닫아도 포커스가 돌아와야 한다.
-- `#modalTitle`이 카드 title과 일치한다.
+- `canonicalTargetInPage`: 브라우저에서 실행하는 함수. 요소를 받아 §8.3 규칙의 `{ anchor, text }`를 반환한다.
+  - anchor 우선순위: `featured:N` → `project:N` → `#id` → landmark → `document`
+  - text
+    - norm(textContent)를 쓴다. 비어 있으면 aria-label, alt, title, src 파일명 순으로 대체한다.
+    - 숫자는 `#`으로 바꾼다.
+    - 80자까지만 쓴다.
+    - 고정 alias 표를 적용한다.
+- `canonicalFromDescriptor({ ruleId, anchor, text }): string`
+  - 순수 함수. `{ruleId}::{anchor}::{textSig}`를 반환한다.
+- `runAxe(page, { include })`
+  - AxeBuilder(wcag2a, wcag2aa)로 serious·critical 위반만 모은다.
+  - 각 node의 selector로 같은 page에서 `canonicalTargetInPage`를 실행한다.
+  - 반환: `{ ruleId, impact, selectors, targets }[]`. targets는 중복을 제거한 canonical key다.
+- `COLLECT_DIR`, `EXPECTED_FILES`(10개)
+- `writeCollected(scenario, project, violations)`
+- `mergeCollected()`: 수집 파일이 정확히 10개가 아니면 throw한다.
+- `validateBaseline(entries): string[]`: target별 `fixes` 스키마를 검사한다.
+- `checkRegression(violations, baseline, scenario, project): string[]`
+  - 새 key나 새 canonical target은 오류다.
+  - 사라진 것은 허용한다.
+  - baseline을 수정하지 않는다.
+- `loadBaseline()`
+- CLI: `--reset`, `--merge`, `--assert-empty [path]`
+  - `--assert-empty`의 기본 path는 `tests/fixtures/axe-baseline.json`이다.
+  - 정확히 빈 JSON 배열이면 exit 0이다.
+  - 없음, 파싱 실패, 배열 아님, 원소가 1개 이상이면 exit 1이다.
 
-기타
-- CTA: primary는 프로젝트 보기, ghost는 연락하기
-- eyebrow와 `#typed`가 유지된다.
-- `.featured-card`의 background-image가 none이다.
+### 2. `tests/specs/axe-helper.spec.js` (합성 검증, desktop-dark만)
 
-### 2. `js/data.js`
+canonical 안정성: `page.setContent`로 실제 axe를 돌려 확인한다.
+- a) 같은 color-contrast canonical key가 나온다.
+  - 변경 전: `section#career` 안 `h3`의 저대비 텍스트 `01 — Career`
+  - 변경 후: `main`으로 감싸 이동하고 `span`으로 바꾼 뒤 텍스트를 `04 — Career`로 변경
+- b) `[data-project=5]` 안의 같은 텍스트는 div에서 p로 바뀌어도 key가 같다.
+- c) 텍스트가 다르면 key가 다르다.
+- d) `project:5`와 `featured:5`는 서로 다른 key다.
+- e) alias: `05 — Stack & Contact`와 `05 — Contact`는 같은 key다.
 
-- index 1, 5, 7의 `title:` 다음 줄에 `featured: true,`를 넣는다.
+스키마
+- 통과: 혼합 color-contrast
+- 거부
+  - 합집합 불일치
+  - fix 누락
+  - targets 밖의 target
+  - 비어 있지 않은 text-change
+  - 알 수 없는 fixKind
 
-### 3. `index.html`
+회귀 판정
+- 새 canonical target은 오류다.
+- 사라진 target은 오류가 아니다.
+- 판정 후 baseline 객체가 바뀌지 않는다.
 
-hero 순서를 다음과 같이 바꾼다.
-1. eyebrow
-2. h1
-3. `p.hero-tagline#heroTagline`
-4. h2.hero-role
-5. summary
-6. CTA
-7. `#heroStats`
-8. `div#heroFeatured`
-
-### 4. `js/main.js`
-
-- `setText(heroTagline, PROFILE.tagline)`
-- `renderFeaturedProjects(): void`
-  - 설계 §5 마크업만 쓴다. 즉 `button` 안에 `span.featured-title`과 `span.featured-blurb`만 둔다.
-  - 텍스트는 `esc()`로 이스케이프한다.
-- `openProjectModal(projectIndex, triggerElement = document.activeElement)`
-- projectGrid에서 `openProjectModal(idx, card)`로 호출한다.
-- `#heroFeatured`에 click 위임을 단다.
-
-### 5. `css/style.css`
-
-- `.featured-title`, `.featured-blurb`는 `display: block`이다.
-  - 제목은 굵기와 크기로 위계를 둔다.
-  - blurb는 2줄 clamp를 허용한다.
-- 첫 화면 AC를 만족하도록 다음을 조정한다. 문구는 줄이지 않는다.
-  - 히어로 세로 여백을 줄인다.
-  - eyebrow와 typing을 축소한다.
-  - 카드 높이를 낮추고 썸네일은 넣지 않는다.
-- STATS: 4열, 720px 이하에서 2×2
-- `#heroFeatured`: 3열, 1024px 이하 2열, 720px 이하 1열
-- 기존 토큰만 쓴다.
+`--assert-empty`
+- `child_process`로 node를 실행한다. 테스트 프로세스가 이미 래퍼 환경 안이다.
+- `tests/.tmp` 아래 임시 파일로 확인한다.
+  - `[]` → 0
+  - `[{}]` → 1
+  - `{}` → 1
+  - 잘못된 JSON → 1
+  - 파일 없음 → 1
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다. 첫 화면 AC와 phrasing-content 계약 검사도 여기에 포함된다.
-- content와 interaction에 회귀가 없다.
-- axe에서 baseline 밖의 새 key와 새 target이 0건이다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 통과한다.
+- axe-helper.spec.js의 합성 검증이 모두 통과한다.
