@@ -4,7 +4,7 @@
 - BASE: `d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d`
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
-- 리뷰 반영: 1차 Astra `1432c5274b33`(12건, 승인 1574220980048634010), 2차 `570513f95a2f`(7), 3차 `9e8c69018dc0`(4), 4차 `8014bc034fb4`(3), 5차 `9277e222d6c3`(4), 6차 `5331b1167a3c`(6), 7차 `e849940ab365`(6), 8차 `77397ef36423`(6), 9차 `1890a28bd4a9`(7), 10차 `754f651120b1`(4), 11차 `2e850c809ca8`(5), 12차 `a26257befcd4`(4), 13차 `b2608d1436cb`(3), 14차 `acc631d51b74`(3), 15차 `927fc70c685a`(2), 16차 `0c7077b8904f`(2), 17차 `6632b4fe978d`(3), 18차 `496edfe61841`(4), 19차 `a37a0eca1d41`(3), 20차 `review-resume-central-a97eb68a108c-v16`(2: 최상위 token scanner·중복 key 거부, 비runtime symlink 거부), 21차 `review-resume-central-010809c8ba59-v17`(2: 조상·leaf 유형 선검사와 안전 읽기·after.z 안전 쓰기, 특수 파일 검증 step 추가), 22차 `review-resume-central-d4a339666282-v18`(2: 기록 대상 unsafe 시 after.z 미접촉 즉시 exit 1, projectRoot 자체 lstat 검사), 23차 `review-resume-central-c43fb5bca873-v19`(2: 과대 step 분할만 수행 — 옛 step 1을 경로 유형(step 1)·파서(step 2)·loader(step 3)로, 옛 step 5를 identity·순수 판정(step 7)·after.z 쓰기·runCheck·CLI(step 8)·C·CLI 통합 parity와 산출물 보존 검증(step 9)으로 나눔. 기능 범위는 그대로이고 이후 step 번호가 4씩 밀림), 24차 `review-resume-central-424c9c49debe-v20`(1: step 9 parity 사례 (v)의 준비 절차를 수정 전용 상태 ` M`에서 시작 snapshot을 만든 뒤 같은 내용으로 stage해 `M `이 되도록 고정), 25차 `review-resume-central-054873db1a99-v21`(2: step 9의 모든 합성 저장소가 초기 commit에 루트 `.gitignore` `tests/.tmp/`를 포함하고 snapshot·after.z 생성 직후 status에 두 runtime 경로가 보이지 않음을 assert, step 5 사례 (e)의 사본 경로를 별도 번호 `tests/.tmp/start-snapshot-parity-{숫자}.json`으로 바꾸어 symlink target으로 쓰고 finally에서 삭제), 26차 `review-resume-central-98766da66482-v22`(1: §12 index.html 속성 변경 제한에 step 32의 정확한 예외 두 가지 — 기존 `.scroll-hint` `href`를 `#career`로 변경, §6 표에 따른 section `class`의 `section-alt` 변경 — 를 명시하고 step 32 허용 범위에 같은 예외를 기록. 그 밖 속성 변경은 remediation 그룹 step만 허용). 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
+- 리뷰 반영: 1차 Astra `1432c5274b33`(12건, 승인 1574220980048634010), 2차 `570513f95a2f`(7), 3차 `9e8c69018dc0`(4), 4차 `8014bc034fb4`(3), 5차 `9277e222d6c3`(4), 6차 `5331b1167a3c`(6), 7차 `e849940ab365`(6), 8차 `77397ef36423`(6), 9차 `1890a28bd4a9`(7), 10차 `754f651120b1`(4), 11차 `2e850c809ca8`(5), 12차 `a26257befcd4`(4), 13차 `b2608d1436cb`(3), 14차 `acc631d51b74`(3), 15차 `927fc70c685a`(2), 16차 `0c7077b8904f`(2), 17차 `6632b4fe978d`(3), 18차 `496edfe61841`(4), 19차 `a37a0eca1d41`(3), 20차 `review-resume-central-a97eb68a108c-v16`(2: 최상위 token scanner·중복 key 거부, 비runtime symlink 거부), 21차 `review-resume-central-010809c8ba59-v17`(2: 조상·leaf 유형 선검사와 안전 읽기·after.z 안전 쓰기, 특수 파일 검증 step 추가), 22차 `review-resume-central-d4a339666282-v18`(2: 기록 대상 unsafe 시 after.z 미접촉 즉시 exit 1, projectRoot 자체 lstat 검사), 23차 `review-resume-central-c43fb5bca873-v19`(2: 과대 step 분할만 수행 — 옛 step 1을 경로 유형(step 1)·파서(step 2)·loader(step 3)로, 옛 step 5를 identity·순수 판정(step 7)·after.z 쓰기·runCheck·CLI(step 8)·C·CLI 통합 parity와 산출물 보존 검증(step 9)으로 나눔. 기능 범위는 그대로이고 이후 step 번호가 4씩 밀림), 24차 `review-resume-central-424c9c49debe-v20`(1: step 9 parity 사례 (v)의 준비 절차를 수정 전용 상태 ` M`에서 시작 snapshot을 만든 뒤 같은 내용으로 stage해 `M `이 되도록 고정), 25차 `review-resume-central-054873db1a99-v21`(2: step 9의 모든 합성 저장소가 초기 commit에 루트 `.gitignore` `tests/.tmp/`를 포함하고 snapshot·after.z 생성 직후 status에 두 runtime 경로가 보이지 않음을 assert, step 5 사례 (e)의 사본 경로를 별도 번호 `tests/.tmp/start-snapshot-parity-{숫자}.json`으로 바꾸어 symlink target으로 쓰고 finally에서 삭제), 26차 `review-resume-central-98766da66482-v22`(1: §12 index.html 속성 변경 제한에 step 32의 정확한 예외 두 가지 — 기존 `.scroll-hint` `href`를 `#career`로 변경, §6 표에 따른 section `class`의 `section-alt` 변경 — 를 명시하고 step 32 허용 범위에 같은 예외를 기록. 그 밖 속성 변경은 remediation 그룹 step만 허용), 27차 `review-resume-central-dcb5f89422a3-v23`(1: 저장소 상대 경로 계약 추가 — 고정 S·inline C 본문과 JS loader·parser·CLI 계약이 snapshot `files`의 모든 key(C는 `xy` key 포함)와 status parser가 산출하는 path·origPath를 파일시스템 접근 전에 검증하고, 빈 문자열·NUL·런타임 path API 기준 절대 경로·빈/`.`/`..` 구성요소를 외부·대상 파일 open/read/write 없이 즉시 거부. step 2 단위 검증, step 3 `../outside.txt`·절대 경로 거부 테스트, step 9 C·CLI parity 사례 (vi) 추가). 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`이 고정): sourceCommit `cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae`, manifestHash `287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a`, distributionVersion 2.0.0
 
 ## 1. 의도
@@ -223,7 +223,7 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 
 ### 11.6 통합 AC
 - 모든 step: 첫 동작 §11.7 시작 snapshot, 종료 시 기본 testCommand 통과(환경변수 없음, §8.3 분류 대기 계약), AC 마지막 §11.7 범위 gate.
-- 종료 gate의 경로 유형·identity 경유(필수): CLI가 완성되기 전인 step 0~8은 `python3 -I tests/scripts/start-snapshot.py step{N}`(`reused` = projectRoot 유형 + 경로 유형 검사 + strict schema + 현재 identity 대조) 직후 inline C(projectRoot 유형 + 경로 유형 검사 + 변경 판정). step 8에서 CLI가 완성되고 step 9에서 C와의 parity가 검증된 뒤부터(step 9 이후) 모두 CLI `scope-snapshot.mjs --check`이며, CLI가 projectRoot 유형 → snapshot 경로 유형 → strict schema → lock 경로 유형·현재 identity 대조 → 현재 상태 수집(경로 유형; unsafe면 after.z를 건드리지 않고 즉시 exit 1) → after.z 안전 쓰기 → 변경 판정 순서로 실행한다. identity가 하나라도 다르거나 경로 유형 검사가 실패하면 어떤 파일도 쓰지 않고 exit 1.
+- 종료 gate의 경로 유형·identity 경유(필수): CLI가 완성되기 전인 step 0~8은 `python3 -I tests/scripts/start-snapshot.py step{N}`(`reused` = projectRoot 유형 + 경로 유형 검사 + strict schema(저장소 상대 경로 계약 포함) + 현재 identity 대조) 직후 inline C(projectRoot 유형 + 저장소 상대 경로 계약 + 경로 유형 검사 + 변경 판정). step 8에서 CLI가 완성되고 step 9에서 C와의 parity가 검증된 뒤부터(step 9 이후) 모두 CLI `scope-snapshot.mjs --check`이며, CLI가 projectRoot 유형 → snapshot 경로 유형 → strict schema(저장소 상대 경로 계약 포함) → lock 경로 유형·현재 identity 대조 → 현재 상태 수집(경로 유형; unsafe면 after.z를 건드리지 않고 즉시 exit 1) → after.z 안전 쓰기 → 변경 판정 순서로 실행한다. identity가 하나라도 다르거나 경로 계약·경로 유형 검사가 실패하면 어떤 파일도 쓰지 않고 exit 1.
 - step 11 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate.
 - step 39·40은 `--assert-empty`. step 40은 screenshots 단독 → 전체 → `verify-scope -- --final` → gate.
 
@@ -232,14 +232,15 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 규칙:
 - RUNTIME 접두어: §11.1 runtime 7개 디렉터리. SKIP 접두어 = RUNTIME + `.git/` + `.venv/`(하네스 venv, 인터프리터 symlink를 포함): 이 디렉터리 안으로는 걷지 않고 그 아래 경로는 hash·기록하지 않는다. EXEMPT: `.harness/`, `.venv/`, `phases/HOO-81-portfolio-redesign/` (GUARDED `.harness/harness.lock.json`, `.harness/policy.json`은 면제 아님).
 - 기록 대상 = status의 path·origPath ∪ `git ls-files -z` ∪ projectRoot walk에서 얻은 `tests/` 아래 파일(C·takeCurrent는 시작 snapshot의 files 키도 포함) − SKIP. 추적·미추적·ignore 무관. 경로별 값: regular file이면 sha256, 경로가 없으면 null. null은 '경로 없음'만 뜻하며 다른 유형을 null로 축약하지 않는다.
+- 저장소 상대 경로 계약(모든 파일시스템 접근 전, Python `rel_ok(p)` = JS `isRepoRelative(p)`): 문자열이고, 비어 있지 않고, NUL 문자가 없고, 해당 런타임 path API 기준 절대 경로가 아니며(Python `os.path.isabs(p)`가 거짓이고 `os.path.splitdrive(p)[0]`이 빈 문자열, Node `path.isAbsolute(p)`가 거짓이고 `path.parse(p).root`가 빈 문자열), `/`로 나눈 각 구성요소가 비어 있지 않고 `.`·`..`가 아니어야 한다. 적용 대상: snapshot `files`의 모든 key(C는 `xy` key도), 그리고 status parser(S `parse_status`, C의 status 해석, JS `parseStatusZ`)가 산출하는 모든 path·origPath. 위반은 그 경로나 외부 대상을 lstat·open·read·write하지 않고 즉시 거부한다: S 생성 분기는 `bad git status`, S 재사용 분기·JS loader는 `bad start snapshot: paths: <snapshot>`(statusZHex 안 경로 위반 포함), C는 snapshot key 위반 `bad start snapshot: paths: <snapshot>`·현재 status 위반 `bad git status`, CLI·`runCheck`는 loader 오류를 그대로 code 1로 낸다. 어느 경우에도 snapshot·after.z를 만들거나 바꾸지 않는다.
 - projectRoot 유형(모든 하위 접근보다 먼저): S·C는 `git rev-parse --show-toplevel`이 준 경로 문자열을, JS는 `root` 인자를 그대로 lstat해 `dir`인지 확인한다. symlink면 `symlink:{root}`, 없으면 `missing:{root}`, 그 밖이면 `non-regular:{root}`로 즉시 실패하고 projectRoot 아래 어떤 경로도 lstat·walk·open하지 않으며 산출물을 만들지 않는다. 그다음에 별도로 realpath(projectRoot)와 realpath(cwd)가 같은지 비교한다. realpath 비교는 유형 검사를 대신하지 않는다.
 - 경로 유형 계약(lstat 전용, 링크를 따라가지 않음): `kind(p)` ∈ `missing`·`file`·`dir`·`symlink`·`other`(FIFO·socket·device 등). `check(p, 허용 leaf 유형)`은 projectRoot 기준 상대 경로 p의 조상을 앞에서부터 모두 lstat한다. 조상이 없으면 leaf를 `missing`으로 보고, 조상이 `dir`가 아니면 `symlink:{조상}` 또는 `non-regular:{조상}`이다. leaf 유형이 허용 목록 밖이면 `symlink:{p}`, `missing:{p}`, 그 밖(`dir`·`other`)은 `non-regular:{p}`.
 - 경로별 허용 leaf: 기록 대상 `missing|file`; `.harness/harness.lock.json` `file`; S의 `tests/.tmp`는 `missing|dir`, S의 snapshot 파일은 `missing|file`; C·loader·CLI의 snapshot 파일은 `file`(조상 `tests`, `tests/.tmp`는 `dir`); after.z는 `missing|file`.
 - 읽기: 위 검사를 통과한 경로만 `O_RDONLY | O_NOFOLLOW | O_NONBLOCK`으로 열고, 연 fd의 `fstat`가 regular가 아니면 `unsafe path: non-regular:{p}`로 실패한다(FIFO에서 멈추지 않고, 검사 뒤 경쟁 교체도 거부). 쓰기: 새 snapshot은 `O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW`, after.z는 기록 대상 unsafe가 없을 때만 쓰기 직전 `check` 재실행 후 `O_WRONLY | O_CREAT | O_TRUNC | O_NOFOLLOW | O_NONBLOCK`. 그 밖의 파일은 쓰지 않는다.
 - symlink 금지(보수적): projectRoot부터 `lstat` 기준으로 트리 전체를 걷는다. 링크를 따라가지 않고 SKIP 디렉터리 내부는 들어가지 않는다. 추적·ignore 여부와 관계없이 발견한 모든 symlink 엔트리(파일·디렉터리·깨진 링크, SKIP 디렉터리 엔트리 자체 포함)는 `symlink:{p}`. allow·EXEMPT·GUARDED 어느 것도 면제하지 않는다. SKIP 내부(예: npm이 만드는 `tests/node_modules/.bin` 링크)는 걷지 않으므로 판정 대상이 아니다. symlink 대상은 resolve·readlink·open·read하지 않는다. realpath는 projectRoot 자체 비교에만 쓴다.
 - 실행 순서
-  - S: step id → `git rev-parse --show-toplevel` → projectRoot 유형 → realpath·cwd 비교 → walk → `git status`·`git ls-files`(Git 읽기) → 기록 대상 전체·lock·`tests/.tmp`·snapshot 경로 유형 검사 → 하나라도 실패면 `unsafe path: {정렬 목록}`으로 exit 1(이 시점까지 프로젝트 파일을 open·read·write·생성하지 않음) → `rev-parse --verify BASE` → lock 읽기 → identity → 재사용(snapshot 읽기·검증) 또는 생성(hash → `tests/.tmp` 생성 → exclusive create).
-  - C: `git rev-parse --show-toplevel` → projectRoot 유형 → realpath·cwd 비교 → snapshot·after.z 경로 유형 검사(실패면 즉시 exit 1) → snapshot 읽기 → status → walk → 기록 대상 유형 검사 → unsafe가 없을 때만 hash → unsafe가 하나라도 있으면 after.z를 만들거나 덮어쓰지 않고 snapshot-not-first·정렬 unsafe를 stderr로 즉시 exit 1 → 변경 판정 → after.z 재검사(실패면 쓰지 않고 exit 1) → after.z 쓰기 → 결과.
+  - S: step id → `git rev-parse --show-toplevel` → projectRoot 유형 → realpath·cwd 비교 → walk → `git status`(파싱 시 저장소 상대 경로 계약)·`git ls-files`(Git 읽기) → 기록 대상 전체·lock·`tests/.tmp`·snapshot 경로 유형 검사 → 하나라도 실패면 `unsafe path: {정렬 목록}`으로 exit 1(이 시점까지 프로젝트 파일을 open·read·write·생성하지 않음) → `rev-parse --verify BASE` → lock 읽기 → identity → 재사용(snapshot 읽기·검증, `files` key 경로 계약 포함) 또는 생성(hash → `tests/.tmp` 생성 → exclusive create).
+  - C: `git rev-parse --show-toplevel` → projectRoot 유형 → realpath·cwd 비교 → snapshot·after.z 경로 유형 검사(실패면 즉시 exit 1) → snapshot 읽기 → 키·`files`·`xy` 형식과 모든 `files`·`xy` key의 저장소 상대 경로 계약(위반이면 즉시 exit 1) → status(경로 계약, 위반이면 즉시 exit 1) → walk → 기록 대상 유형 검사 → unsafe가 없을 때만 hash → unsafe가 하나라도 있으면 after.z를 만들거나 덮어쓰지 않고 snapshot-not-first·정렬 unsafe를 stderr로 즉시 exit 1 → 변경 판정 → after.z 재검사(실패면 쓰지 않고 exit 1) → after.z 쓰기 → 결과.
   - loader·CLI: 아래 비교 도구 계약.
 - 판정(시작·현재 합집합 p, allow·EXEMPT 제외): hash 다르면 tests 안 `tests-changed:{p}`, 밖 `outside-tests:{p}`(같은 ` M`에서 내용만 바뀜, 삭제, 시작 시 수정 상태의 원복 모두 거부). hash 같고 xy 다르면 `status-changed:{p}`. 시작에 없던 RUNTIME 경로가 status에 보이면 `runtime-visible:{p}`. `--require-absent` 경로가 시작 기록에 있으면 `snapshot-not-first:{p}`. 순서: snapshot-not-first → 정렬된 unsafe(있으면 이후 판정과 after.z 쓰기 생략) → 경로 오름차순 변경 → runtime-visible.
 - Git은 `status`, `ls-files`, `rev-parse` 읽기만. python3 표준 라이브러리만.
@@ -249,10 +250,11 @@ schema (strict, schemaVersion 1) — 생성·재사용·loader가 모두 같은 
 - 키 집합 정확히 `schemaVersion, stepId, projectRoot, head, base, harness, statusZHex, xy, files`.
 - `schemaVersion`: 최상위 키로 정확히 한 번 있고 값의 lexical token이 정수 리터럴 `1`. Python은 `type(v) is int and v == 1`(중복 key를 거부한 상태에서 Python이 int 1을 만드는 JSON 토큰은 `1`뿐이므로 lexical 판정과 같다. true·1.0·1e0 거부). JS는 `Number.isInteger(v) && v === 1` 그리고 `scanJsonTopLevel` 결과에서 key가 `schemaVersion`인 항목이 정확히 1개이고 그 token이 정확히 `'1'`. 전역 정규식 검색은 쓰지 않으며 중첩 객체·문자열 안의 `schemaVersion`은 판정에 쓰지 않는다.
 - stepId는 `step{N}` | `axe-remediation-{id}` | 테스트 전용 `parity-{숫자}`, 파일은 `tests/.tmp/start-snapshot-{stepId}.json`. projectRoot = `git rev-parse --show-toplevel` realpath(유형 검사 통과 후, cwd가 다르면 실패). head = `git rev-parse HEAD`. base = BASE(`rev-parse --verify BASE^{commit}` 성공 필요). harness = 중앙 identity 3값 + `.harness/harness.lock.json` sha256(`lockSha256`), lock 내용에 3값이 모두 있어야 한다.
-- `statusZHex`: 문자열, 짝수 길이, 소문자 hex만. 디코드한 bytes를 NUL 레코드로 엄격 파싱(각 레코드 길이 ≥ 4, 세 번째 바이트 공백, R/C면 비어 있지 않은 다음 필드가 origPath)한다.
+- `statusZHex`: 문자열, 짝수 길이, 소문자 hex만. 디코드한 bytes를 NUL 레코드로 엄격 파싱(각 레코드 길이 ≥ 4, 세 번째 바이트 공백, R/C면 비어 있지 않은 다음 필드가 origPath)한다. 파싱된 path·origPath가 저장소 상대 경로 계약을 어기면 `paths`.
 - `xy`: 파싱 결과(path와 origPath 모두 → xy)와 정확히 같아야 한다.
-- `files`: 객체, 값은 소문자 64자리 hex SHA-256 또는 null(경로 없음). 파싱된 status의 비SKIP 경로는 모두 `files`의 key여야 한다.
-- 검증 실패 메시지: `bad start snapshot: {keys|schemaVersion|statusZHex|status parse|xy|files|files/status|invalid json}: <path>`, identity 차이 `start snapshot identity mismatch: {field}`, 경로 유형 `unsafe path: {symlink:p|non-regular:p|missing:p, ...}`.
+- `files`: 객체, 값은 소문자 64자리 hex SHA-256 또는 null(경로 없음)(위반 `files`). 모든 key는 저장소 상대 경로 계약을 통과해야 한다(위반 `paths`). 파싱된 status의 비SKIP 경로는 모두 `files`의 key여야 한다(위반 `files/status`).
+- 검사 순서(S 재사용·loader 공통): invalid json → keys → schemaVersion → (loader만 stepId) → statusZHex → status parse/paths → xy → files → paths → files/status.
+- 검증 실패 메시지: `bad start snapshot: {keys|schemaVersion|statusZHex|status parse|paths|xy|files|files/status|invalid json}: <path>`, identity 차이 `start snapshot identity mismatch: {field}`, 경로 유형 `unsafe path: {symlink:p|non-regular:p|missing:p, ...}`.
 
 `scanJsonTopLevel(rawText) → Array<{ key, token }>` (JS, step 2, `JSON.parse`가 성공한 텍스트에만 호출):
 - 위치 i를 앞에서부터 한 번 훑는다. 공백(space, tab, LF, CR)은 건너뛴다. 큰따옴표를 만나면 백슬래시 다음 1문자를 건너뛰며 닫는 큰따옴표까지를 문자열 slice로 읽는다(문자열 안의 괄호·쉼표·콜론은 구조로 보지 않는다).
@@ -285,6 +287,10 @@ def git(*args):
     return subprocess.run(['git', *args], check=True, capture_output=True).stdout
 def unsafe(items):
     sys.exit('unsafe path: ' + ','.join(items))
+def rel_ok(p):
+    if not isinstance(p, str) or p == '' or chr(0) in p or os.path.isabs(p) or os.path.splitdrive(p)[0]:
+        return False
+    return all(c not in ('', '.', '..') for c in p.split('/'))
 def kind(p):
     try:
         mode = os.lstat(p).st_mode
@@ -352,11 +358,17 @@ def parse_status(raw):
         if len(rec) < 4 or rec[2:3] != b' ':
             raise ValueError('bad status record')
         code = rec[:2].decode()
-        xy[rec[3:].decode()] = code
+        p = rec[3:].decode()
+        if not rel_ok(p):
+            raise ValueError('bad path')
+        xy[p] = code
         if code[0] in 'RC' or code[1] in 'RC':
             if i >= len(recs) or not recs[i]:
                 raise ValueError('bad status record')
-            xy[recs[i].decode()] = code
+            o = recs[i].decode()
+            if not rel_ok(o):
+                raise ValueError('bad path')
+            xy[o] = code
             i += 1
     return xy
 def fail(what):
@@ -410,12 +422,14 @@ if kind(OUT) == 'file':
         fail('statusZHex')
     try:
         parsed = parse_status(bytes.fromhex(hx))
-    except ValueError:
-        fail('status parse')
+    except ValueError as e:
+        fail('paths' if str(e) == 'bad path' else 'status parse')
     if parsed != oxy:
         fail('xy')
     if not isinstance(ofiles, dict) or any(not (v is None or (isinstance(v, str) and HEX64.fullmatch(v))) for v in ofiles.values()):
         fail('files')
+    if not all(rel_ok(p) for p in ofiles):
+        fail('paths')
     if any(p not in ofiles for p in parsed if not p.startswith(SKIP)):
         fail('files/status')
     for k in sorted(ident):
@@ -447,6 +461,10 @@ allow = {p for p in sys.argv[2].split(',') if p}
 absent = {p for p in sys.argv[3].split(',') if p}
 def git(*args):
     return subprocess.run(['git', *args], check=True, capture_output=True).stdout
+def rel_ok(p):
+    if not isinstance(p, str) or p == '' or chr(0) in p or os.path.isabs(p) or os.path.splitdrive(p)[0]:
+        return False
+    return all(c not in ('', '.', '..') for c in p.split('/'))
 def kind(p):
     try:
         mode = os.lstat(p).st_mode
@@ -493,8 +511,10 @@ pre = [r for r in (check(START, ('file',)), check(AFTER, ('missing', 'file'))) i
 if pre:
     sys.exit('unsafe path: ' + ','.join(sorted(set(pre))))
 start = json.loads(read(START).decode('utf-8'), object_pairs_hook=no_dup)
-if not isinstance(start, dict) or set(start) != KEYS or start['stepId'] != STEP:
+if not isinstance(start, dict) or set(start) != KEYS or start['stepId'] != STEP or not isinstance(start['files'], dict) or not isinstance(start['xy'], dict):
     sys.exit('bad start snapshot: ' + START)
+if not all(rel_ok(p) for p in list(start['files']) + list(start['xy'])):
+    sys.exit('bad start snapshot: paths: ' + START)
 status = git('status', '--porcelain=v1', '-z', '--untracked-files=all')
 recs = status.split(bytes(1))
 xy = {}
@@ -509,6 +529,8 @@ while i < len(recs):
     if code[0] in 'RC' or code[1] in 'RC':
         xy[recs[i].decode()] = code
         i += 1
+if not all(rel_ok(p) for p in xy):
+    sys.exit('bad git status')
 unsafe, found = [], []
 for top_dir, dirs, names in os.walk('.'):
     rel = '' if top_dir == '.' else top_dir[2:] + '/'
@@ -563,9 +585,9 @@ S·C exec harness(테스트 전용, step 1): `python3 -I -c '<harness>'`가 S �
 
 비교 도구 `tests/scripts/scope-snapshot.mjs` (S·C와 같은 판정·문자열·순서). step별로 추가만 하고 앞 step 함수의 동작은 바꾸지 않는다:
 - step 1 (경로 유형·안전 읽기): 상수 `RUNTIME_PREFIXES`, `SKIP_PREFIXES`, `EXEMPT_PREFIXES`, `GUARDED_PATHS`, `LOCK_PATH`, `SNAPSHOT_KEYS`, `STEP_ID_RE`, `HEX64_RE`, `BASE`, `HARNESS_IDENTITY`(3값), `STATUS_ARGS = ['status','--porcelain=v1','-z','--untracked-files=all']`, `LS_FILES_ARGS = ['ls-files','-z']`. `UnsafePathError`(`.item`). `checkRoot({ fs, root })`(`lstatSync(root)` 1회, dir가 아니면 `UnsafePathError('symlink:{root}' | 'missing:{root}' | 'non-regular:{root}')`). `pathKind(p, { fs, root })`(`lstatSync`만). `checkPath(p, leafKinds, { fs, root }) → string | null`(먼저 `checkRoot`, 그다음 S의 `check`와 같은 조상·leaf 규칙과 문자열). `readRegular(p, { fs, root })`(`openSync(abs, O_RDONLY | O_NOFOLLOW | O_NONBLOCK)` → `fstatSync().isFile()` 아니면 `UnsafePathError('non-regular:{p}')` → 읽기 → close).
-- step 2 (파싱, 순수): `parseStatusZ(raw) → { xy, path, origPath }[]`(S의 `parse_status`와 같은 엄격 규칙, 오류 `Error('bad status record: ...')`). `statusXyMap(entries)`(path·origPath 모두). `scanJsonTopLevel(rawText)`(위 정의). `isSchemaVersion1(value, token)` = `Number.isInteger(value) && value === 1 && token === '1'`.
-- step 3 (loader): `loadStartSnapshot(file, { fs, root } = {})` 순서: `checkPath(file, ['file'])`(root 검사 포함) 실패면 `Error('unsafe path: {item}')`(open·read 없음) → `readRegular` → `JSON.parse` 실패 `invalid json` → `scanJsonTopLevel`의 duplicate key `invalid json` → 키 집합 `keys` → 최상위 `schemaVersion` 항목 정확히 1개 && `isSchemaVersion1` 아니면 `schemaVersion` → stepId 형식·파일명 일치 → statusZHex → status parse → xy → files(64hex|null) → files/status(비SKIP). 오류는 `Error('bad start snapshot: {범주}: {file}')`, 반환 `{ stepId, identity: { schemaVersion, projectRoot, head, base, harness }, entries, xy, files }`.
-- step 4 (상태 수집): `scanProject({ fs, root }) → { unsafe, testsFiles }`(먼저 `checkRoot`; root부터 `readdirSync(withFileTypes)`·`lstatSync`만, SKIP 디렉터리 미진입이나 그 엔트리 자체가 symlink면 기록, 정렬). `hashPath(p, { fs, root }) → string | null`(`pathKind` missing → null; file → `readRegular` sha256; 그 밖 `UnsafePathError`). `takeCurrent(start | null, { git, fs, root = process.cwd() }) → { entries, xy, files, unsafe }`(scanProject unsafe + 기록 대상마다 `checkPath(p, ['missing','file'])` 결과를 unsafe에 모음; unsafe가 하나라도 있으면 hash하지 않고 `files: {}`; 없으면 hashPath, 경쟁으로 생긴 UnsafePathError도 unsafe에 모으고 `files: {}`; 시작 경로는 status에서 사라져도 다시 hash).
+- step 2 (파싱, 순수): `isRepoRelative(p)` = `typeof p === 'string' && p !== '' && !p.includes(String.fromCharCode(0)) && !path.isAbsolute(p) && path.parse(p).root === '' && p.split('/').every((c) => c !== '' && c !== '.' && c !== '..')`(Node `path` 모듈, 위 저장소 상대 경로 계약과 같은 판정). `parseStatusZ(raw) → { xy, path, origPath }[]`(S의 `parse_status`와 같은 엄격 규칙, 형식 오류 `Error('bad status record: ...')`, path·origPath가 `isRepoRelative` 위반이면 `Error('bad path: ...')`). `statusXyMap(entries)`(path·origPath 모두). `scanJsonTopLevel(rawText)`(위 정의). `isSchemaVersion1(value, token)` = `Number.isInteger(value) && value === 1 && token === '1'`.
+- step 3 (loader): `loadStartSnapshot(file, { fs, root } = {})` 순서: `checkPath(file, ['file'])`(root 검사 포함) 실패면 `Error('unsafe path: {item}')`(open·read 없음) → `readRegular` → `JSON.parse` 실패 `invalid json` → `scanJsonTopLevel`의 duplicate key `invalid json` → 키 집합 `keys` → 최상위 `schemaVersion` 항목 정확히 1개 && `isSchemaVersion1` 아니면 `schemaVersion` → stepId 형식·파일명 일치 → statusZHex → status parse(`bad path`면 `paths`, 그 밖 `status parse`) → xy → files(객체, 값 64hex|null) → paths(모든 `files` key `isRepoRelative`) → files/status(비SKIP). 오류는 `Error('bad start snapshot: {범주}: {file}')`, 반환 `{ stepId, identity: { schemaVersion, projectRoot, head, base, harness }, entries, xy, files }`. snapshot 파일 외 어떤 경로도 lstat·open하지 않는다.
+- step 4 (상태 수집): `scanProject({ fs, root }) → { unsafe, testsFiles }`(먼저 `checkRoot`; root부터 `readdirSync(withFileTypes)`·`lstatSync`만, SKIP 디렉터리 미진입이나 그 엔트리 자체가 symlink면 기록, 정렬). `hashPath(p, { fs, root }) → string | null`(`pathKind` missing → null; file → `readRegular` sha256; 그 밖 `UnsafePathError`). `takeCurrent(start | null, { git, fs, root = process.cwd() }) → { entries, xy, files, unsafe }`(start가 있으면 먼저 그 `files`·`xy` key를 `isRepoRelative`로 검사해 위반이면 fs 접근 없이 `Error('bad start snapshot: paths')`; 현재 status는 `parseStatusZ`로 경로 계약 적용; scanProject unsafe + 기록 대상마다 `checkPath(p, ['missing','file'])` 결과를 unsafe에 모음; unsafe가 하나라도 있으면 hash하지 않고 `files: {}`; 없으면 hashPath, 경쟁으로 생긴 UnsafePathError도 unsafe에 모으고 `files: {}`; 시작 경로는 status에서 사라져도 다시 hash).
 - step 5·6: 코드 추가 없음. 합성 저장소·runtime 경로에서 symlink(step 5)와 특수 파일·조상 symlink(step 6) 거부를 S·C·JS로 실행 검증한다.
 - step 7 (identity·순수 판정, 파일 쓰기 없음):
   - `computeIdentity({ git, fs, root = process.cwd() }) → { schemaVersion: 1, projectRoot, head, base, harness }` — `checkRoot` → `git rev-parse --show-toplevel` realpath가 root realpath와 다르면 throw → `checkPath(LOCK_PATH, ['file'])` 실패면 `UnsafePathError`(BASE 확인·lock 읽기 전) → `git rev-parse HEAD` → `git rev-parse --verify BASE^{commit}` 실패 시 throw → `readRegular(LOCK_PATH)`에 3값 포함 확인 → `lockSha256`.
@@ -573,9 +595,9 @@ S·C exec harness(테스트 전용, step 1): `python3 -I -c '<harness>'`가 S �
   - `diffAgainstStart(start, current) → Change[]`(`{ path, kind: new|deleted|content-changed|status-changed, xyBefore, xyAfter(null 허용) }`, 순수). `classifyChanges(changes, { allow })`. `checkRuntimeVisible(start, current)`. `checkSnapshotFirst(start, paths)`. `evaluateGate(start, current, { allow, requireAbsent })`(current.unsafe가 있으면 snapshot-not-first 다음 정렬된 unsafe만 반환하고 변경 판정 생략; allow는 unsafe를 면제하지 않음).
 - step 8 (after.z 쓰기·runCheck·CLI):
   - `writeAfterZ(startFile, statusBytes, { fs, root })`: after 경로 = snapshot 이름의 `.json`을 `-after.z`로. `checkPath(after, ['missing','file'])` 실패면 쓰지 않고 `UnsafePathError` → `openSync(abs, O_WRONLY | O_CREAT | O_TRUNC | O_NOFOLLOW | O_NONBLOCK, 0o644)` → `fstatSync().isFile()` 확인 → 쓰기.
-  - `runCheck({ startFile, allow, requireAbsent }, { git, fs, root }) → { code, stdout, stderr }` 실행 순서: (0) `checkRoot` → (1) `loadStartSnapshot`(경로 유형 + strict schema) → (2) `computeIdentity` + `checkIdentity` — (0)~(2) 실패면 `unsafe path: …` / `bad start snapshot: …` / `start snapshot identity mismatch: {field}`로 code 1, 어떤 파일도 쓰지 않는다 → (3) `takeCurrent` — `unsafe`가 하나라도 있으면 snapshot-not-first·정렬 unsafe를 stderr로 code 1, `writeAfterZ`를 호출하지 않는다(after.z 생성·덮어쓰기 없음) → (4) `writeAfterZ`(실패면 `unsafe path: …`, code 1) → (5) `evaluateGate`; 위반이면 code 1, 아니면 stdout `scope-snapshot: OK`, code 0. snapshot을 만들거나 고치지 않는다.
+  - `runCheck({ startFile, allow, requireAbsent }, { git, fs, root }) → { code, stdout, stderr }` 실행 순서: (0) `checkRoot` → (1) `loadStartSnapshot`(경로 유형 + strict schema + 저장소 상대 경로 계약) → (2) `computeIdentity` + `checkIdentity` — (0)~(2) 실패면 `unsafe path: …` / `bad start snapshot: …`(`paths` 포함) / `start snapshot identity mismatch: {field}`로 code 1, 어떤 파일도 쓰지 않는다 → (3) `takeCurrent` — `unsafe`가 하나라도 있으면 snapshot-not-first·정렬 unsafe를 stderr로 code 1, `writeAfterZ`를 호출하지 않는다(after.z 생성·덮어쓰기 없음) → (4) `writeAfterZ`(실패면 `unsafe path: …`, code 1) → (5) `evaluateGate`; 위반이면 code 1, 아니면 stdout `scope-snapshot: OK`, code 0. snapshot을 만들거나 고치지 않는다.
   - CLI `--check <start.json> --allow <list> [--require-absent <list>]`는 실제 git·fs·`process.cwd()`로 `runCheck`를 호출해 stdout·stderr·exit code를 그대로 낸다. 인자 오류는 stderr usage + exit 2.
-- step 9: 코드 추가 없음. inline C와 `runCheck`·CLI의 통합 parity, 기록 대상 unsafe 시 after.z 보존, CLI의 identity·runtime 링크 거부를 실행 검증한다. 이 검증을 통과한 뒤부터 종료 gate는 CLI다.
+- step 9: 코드 추가 없음. inline C와 `runCheck`·CLI의 통합 parity(저장소 상대 경로 계약 위반 거부 포함), 기록 대상 unsafe 시 after.z 보존, CLI의 identity·runtime 링크 거부를 실행 검증한다. 이 검증을 통과한 뒤부터 종료 gate는 CLI다.
 
 테스트 격리 규칙:
 - 실제 저장소에 쓰는 테스트 산출물은 runtime 경로만 쓴다: snapshot 테스트는 `tests/.tmp/start-snapshot-parity-{숫자}.json`(거부 테스트용 symlink·FIFO·디렉터리 포함)과 그 `-after.z`, retry probe는 정확히 `tests/.tmp/snapshot-probes/__retry_probe.txt`. 실제 저장소의 비runtime 경로에 파일·symlink·FIFO를 만들지 않는다.
@@ -597,14 +619,14 @@ S·C exec harness(테스트 전용, step 1): `python3 -I -c '<harness>'`가 S �
 |---|---|---|---|---|
 | 0 | tests-env-bootstrap | 18 | 없음 | S reused + C |
 | 1 | scope-snapshot-paths | 17 | 0 | S reused + C |
-| 2 | scope-snapshot-parse | 15 | 0~1 | S reused + C |
-| 3 | scope-snapshot-loader | 18 | 0~2 | S reused + C |
+| 2 | scope-snapshot-parse | 16 | 0~1 | S reused + C |
+| 3 | scope-snapshot-loader | 19 | 0~2 | S reused + C |
 | 4 | scope-snapshot-state | 19 | 0~3 | S reused + C |
 | 5 | scope-snapshot-symlink | 18 | 0~4 | S reused + C |
 | 6 | scope-snapshot-special-files | 19 | 0~5 | S reused + C |
 | 7 | scope-snapshot-identity | 18 | 0~6 | S reused + C |
 | 8 | scope-snapshot-cli | 17 | 0~7 | S reused + C |
-| 9 | scope-snapshot-parity | 19 | 0~8 | CLI |
+| 9 | scope-snapshot-parity | 20 | 0~8 | CLI |
 | 10 | tests-browser-smoke | 15 | 0~9 | CLI |
 | 11 | scope-paths | 19 | 0~10 | CLI |
 | 12 | scope-content | 19 | 0~11 | CLI |
@@ -651,4 +673,4 @@ S·C exec harness(테스트 전용, step 1): `python3 -I -c '<harness>'`가 S �
 5. 첫 동작: 어떤 파일도 쓰기 전에 §11.7 시작 snapshot(`python3 -I tests/scripts/start-snapshot.py step{N}`, step 0은 heredoc S). 출력이 `created` 또는 `reused`가 아니면(`unsafe path` 포함) 중단·보고. 재시도도 같은 명령으로 최초 baseline을 재사용한다.
 6. runtime 쓰기 기본 R0: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`. step이 추가 경로를 명시할 수 있다.
 7. 공통 수정 금지: tests 밖 파일(step이 사이트 파일을 명시한 경우 그 범위만), step 허용 목록 밖 tests 파일, 이전 step이 만든 함수의 동작, 시작 snapshot, 비runtime 경로의 symlink·특수 파일 생성.
-8. 종료 조건: 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 환경변수 없이 통과하고, AC 마지막 §11.7 범위 gate(§13 표의 종류)가 projectRoot·경로 유형 검사와 identity 대조를 거쳐 통과한다(`--allow` = step의 tracked 허용 파일 목록).
+8. 종료 조건: 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 환경변수 없이 통과하고, AC 마지막 §11.7 범위 gate(§13 표의 종류)가 projectRoot·저장소 상대 경로 계약·경로 유형 검사와 identity 대조를 거쳐 통과한다(`--allow` = step의 tracked 허용 파일 목록).
