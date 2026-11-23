@@ -71,7 +71,10 @@
     {
       "step": 6,
       "name": "scope-snapshot-special-files",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:52:40+0900",
+      "completed_at": "2026-11-24T08:55:37+0900",
+      "summary": "step6 시작 snapshot(created→reused), scope-snapshot-special.spec.js(desktop-dark 전용, 코드 추가 없음) 작성: 합성 저장소에서 사례 전후 대상·외부 디렉터리 inventory(목록·유형·sha256·mtime, FIFO 미오픈) 불변 검사와 함께 S (a) snapshot FIFO·(b) 디렉터리 → non-regular, (c) tests/specs/p.fifo·(d) tracked.txt 디렉터리 → non-regular(tests/.tmp 미생성), (e) lib→outside → symlink:lib(sentinel 미출력), (f) tests/.tmp→outside/tmpdir → symlink:tests/.tmp(외부 불변) — 모두 stderr 정확히 'unsafe path: <항목>'·BASE 오류보다 먼저; C (g) 외부 tmp 링크·(h) after.z FIFO·(i) after.z 외부 symlink·(j) snapshot FIFO → exit 1·정확한 unsafe 한 줄·after.z 미생성; JS loader 외부 tmp 링크 시 lstat root·tests·tests/.tmp 3회만, FIFO·디렉터리 snapshot open 없음; takeCurrent (c)(d)(e) unsafe [항목]·files {}·open/read 없음; 실제 저장소 parity-<m> FIFO·디렉터리 S 거부·다른 parity sha256/mtime 불변·finally 삭제. 모든 subprocess timeout 10초. 테스트만 추가라 처음부터 통과(RED 없음). AC1(spec 12 passed·전체 48 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 7,
