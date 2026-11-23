@@ -31,7 +31,10 @@
     {
       "step": 1,
       "name": "scope-snapshot-paths",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:38:02+0900",
+      "completed_at": "2026-11-24T08:40:54+0900",
+      "summary": "step1 시작 snapshot(created→reused), scope-snapshot.mjs step1 API(상수·UnsafePathError·checkRoot·pathKind·checkPath·readRegular, fs 주입·쓰기/CLI 없음)와 scope-snapshot-paths.spec.js(가짜 fs 호출 기록 검사, 합성 projectRoot <pid>-link/<pid>-file에서 JS·S·C exec harness 모두 root lstat 1회로 symlink:/non-regular: 거부·하위 접근·산출물 없음·정리) 작성, AC1(spec 7 passed·전체 12 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 2,
