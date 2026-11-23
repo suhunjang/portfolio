@@ -1,7 +1,7 @@
-# Step 10 — axe-classify
+# Step 10 — axe-collect
 
-- 예상 시간: 20분 이하. 산정 결과 이를 넘으면 즉시 재계획한다.
-- 실행 횟수: 조사 스크립트 수회(`tests/.tmp`), 테스트 1회, `--check-plan` 1회, verify-scope 1회
+- 예상 시간: 15분
+- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, 일반 테스트 1회, verify-scope 1회
 - 선행 step: 0~9 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (fixture, 분류, plan, 단계)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (실행 모드, 수집 명령 순서, step 10)
 3. index.json에서 step 0~9가 completed인지 확인한다. 아니면 중단한다.
-4. `tests/fixtures/axe-collected.json`이 있는지 확인한다.
+4. axe helper API를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,49 +21,48 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/axe-baseline.json` (신규)
-- `tests/fixtures/axe-remediation-plan.json` (신규)
+- `tests/specs/axe.spec.js` (신규)
+- `tests/fixtures/axe-collected.json` (병합 결과)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`
+- `tests/.tmp/**` (실제 `COLLECT_DIR` 포함)
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- 사이트 파일 전부
-- helper, spec, `axe-collected.json`, 그 밖의 tests 파일
+- `tests/` 밖 전부
+- helper와 그 밖의 tests 파일
+- `axe-baseline.json`, plan
 
 ## 작업
 
-1. 시간 산정 (가장 먼저)
-   - target을 묶음으로 나눈다.
-   - 예상 시간 = 묶음마다 (2분 + target 수 × 1분)을 합하고 5분을 더한다.
-   - 결과를 로그에 남긴다.
-   - 20분을 넘으면 즉시 중단한다. 파일은 쓰지 않는다. 묶음을 보고하고 재계획을 요청한다.
-   - 위반이 0건이면 baseline `[]`, plan `{ groups: [] }`를 쓰고 6번으로 간다.
-2. target 조사: `tests/.tmp`의 임시 Playwright 스크립트를 래퍼로 실행해 출처를 판별한다.
-   - computed 색상
-   - `var(--토큰)` 출처
-   - JS 렌더 영역 여부
-   - 정적 속성 여부
-3. `axe-baseline.json`: §8.3 스키마를 따른다.
-   - target마다 fixes 1개
-   - 항목 fixFiles는 합집합
-   - selectors 보존
-4. `axe-remediation-plan.json`
-   - (같은 fixFiles, 난이도) 기준으로 그룹을 만든다.
-   - 그룹마다 다음을 채운다.
-     - `id`: 소문자 kebab-case, 고유. 예: `contrast-token-1`
-     - `difficulty`
-     - `estMinutes`: 20 이하. 넘으면 그룹을 분할한다.
-     - `fixFiles`, `blocked`, `reason`
-   - 모든 target이 정확히 한 그룹에 속해야 한다.
-5. 금지
-   - 수집 결과에 없는 target을 추가하지 않는다.
-   - 자동으로 편입하지 않는다.
-6. 일반 모드로 확인한다.
+### 1. `axe.spec.js`
+
+- 시나리오 10개를 만든다. collector는 고정 순서로 쓴다.
+- 수집 모드: `writeCollected`만 한다.
+- 일반 모드
+  - 맨 앞에서 `resolveBaselineMode()`를 호출한다. baseline이 없으면 기본적으로 throw하므로 실패한다.
+  - check: `checkRegression`, `validateBaseline`(desktop-dark에서 1회), plan이 있으면 `validateRemediationPlan`(coverage false)
+  - skip(`AXE_ALLOW_MISSING_BASELINE=1`일 때): `test.skip`, 사유 `baseline 미생성(step 10 최초 수집 전용)`
+
+### 2. 수집 (순차, 병렬 금지)
+
+1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
+   - helper 합성 검증과 실제 디렉터리 보존 증명
+2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
+3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
+4. 1과 3이 모두 성공한 뒤에 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge`를 실행해 `tests/fixtures/axe-collected.json`을 만든다.
+5. 로그에 key 수, 고유 target 수, ruleId별 분포를 남긴다.
+
+### 3. 최초 일반 실행
+
+- `AXE_ALLOW_MISSING_BASELINE=1` 옵션은 이 명령 하나에서만 쓴다: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
+- 이 시점에 옵션 없이 기본 실행하면 실패한다. 기본 누락 실패 계약에 따른 의도된 결과다.
+- 하네스는 이 step을 아래 AC로 검증한다.
+- step 11에서 baseline이 생기면 기본 testCommand가 다시 통과한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --coverage && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge` → exit 0
+- `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

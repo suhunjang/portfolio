@@ -1,7 +1,7 @@
-# Step 15 — axe-remediation-gate
+# Step 15 — section-layout
 
-- 예상 시간: 12분
-- 실행 횟수: 수집 1회, 병합 1회, `--check-plan` 1회, 테스트 1회, verify-scope 1회
+- 예상 시간: 15분
+- 실행 횟수: layout spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~14 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 15 gate, 재계획 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §9
 3. index.json에서 step 0~14가 completed인지 확인한다. 아니면 중단한다.
-4. `axe-baseline.json`과 `axe-remediation-plan.json`을 확인한다.
+4. 섹션 CSS, timeline 구조, 그리드 규칙을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,41 +21,37 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/axe-remediation-plan.json`: 사라진 target과 빈 그룹을 제거하는 것만 허용한다. 추가는 금지다.
+- `css/style.css` (섹션 여백, Career, 그리드, `.subsection-title` 규칙만)
+- `tests/specs/layout.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (실제 `COLLECT_DIR`, `axe-current.json`)
-- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- 사이트 파일 전부
-- `axe-baseline.json`, `axe-collected.json`, helper, spec
+- `index.html`, `js/*`, `css/themes.css`
+- fixtures, helper, 기존 spec
 
-## 작업 (gate 절차 — step 16에서 그대로 다시 실행한다)
+## 작업 (TDD)
 
-1. 재수집
-   - `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-   - `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js axe-helper.spec.js`
-   - `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json`
-2. 회귀 검사: 현재 결과의 모든 위반에 `checkRegression`을 적용한다. 오류가 있으면 즉시 중단하고 보고한다.
-3. plan 재생성
-   - 현재 결과에 없는 target을 제거한다.
-   - 빈 그룹을 삭제한다.
-   - 남은 그룹의 fixFiles를 다시 계산한다. 기존 값의 부분집합이어야 한다.
-   - id는 바꾸지 않는다.
-4. 로그에 결과를 남긴다.
-   - groups가 `[]`이면: `remediation 불필요`
-   - 그룹이 남아 있으면: `Harness 재계획 필요`와 그룹별 id, targets, fixFiles, difficulty, estMinutes, blocked
-5. 재계획 계약 (하네스가 수행한다)
-   - 그룹마다 `axe-remediation-{id}` step을 step 15와 16 사이에 추가한다.
-   - allowedPaths는 해당 그룹의 fixFiles다.
-   - 각 step은 20분 이하다.
-   - 이 target 수정 step들은 plan 파일을 수정하지 않는다.
-   - AC는 해당 그룹의 target이 사라지는 것이다.
-   - blocked 그룹은 담당 구현 step을 재개한다.
+1. `layout.spec.js`를 먼저 작성한다. 6개 project에서 실행한다.
+   - 가로 스크롤이 없다.
+   - projectGrid와 strengthsGrid의 열: 1280에서 3, 768에서 2, 375에서 1
+   - Career
+     - 375에서는 세로로 쌓인다.
+     - 768·1280에서는 가로다(card.left >= period.right - 1, top 차이 < 24).
+   - 375에서 highlights가 보인다.
+   - section gap: career~contact의 padding-top이 모두 같다.
+   - `.subsection-title`의 font-weight가 h2 이하다.
+2. style.css
+   - 섹션 여백을 통일한다.
+   - Career: 721px 이상에서 2열, 그 이하에서 1열
+   - 그리드: 3열, 1024px 이하 2열, 720px 이하 1열
+   - `.subsection-title` 스타일을 추가한다.
+   - 기존 토큰만 쓴다.
+3. axe 새 target은 step 12와 같은 규칙을 따른다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- layout.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

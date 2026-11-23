@@ -1,7 +1,7 @@
-# Step 13 — focus-trap
+# Step 13 — hero-first-screen
 
 - 예상 시간: 18분
-- 실행 횟수: 테스트 2회, verify-scope 1회
+- 실행 횟수: hero spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~12 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5 (히어로 순서, 첫 화면 AC), §9
 3. index.json에서 step 0~12가 completed인지 확인한다. 아니면 중단한다.
-4. 현재 코드에서 모달·lightbox 함수, Tab 리스너, `:focus-visible`을 확인한다.
+4. hero 마크업, reveal, 여백, `#heroFeatured`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,9 +21,10 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `js/main.js`
-- `css/style.css` (`:focus-visible` 규칙만)
-- `tests/specs/focus.spec.js`
+- `index.html` (section#hero 내부만)
+- `js/main.js` (tagline `setText` 1줄만)
+- `css/style.css` (hero, `#heroStats`, `#heroFeatured` 배치 규칙만)
+- `tests/specs/hero.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -31,22 +32,34 @@
 
 ## 수정 금지
 
-- `index.html`, `js/data.js`, `css/themes.css`
-- fixtures, helper, 기존 spec
+- `js/data.js`, `css/themes.css`
+- 대표 카드 렌더링과 모달 로직
+- 섹션, nav
+- 기존 tests, fixtures, helper
 
 ## 작업 (TDD)
 
-1. `focus.spec.js`를 먼저 작성한다.
-   - 모달 트랩
-   - lightbox 중첩
-   - 닫기 경로별 포커스 복귀
-   - 키보드로 도달 가능한지, outline이 보이는지
-2. main.js
-   - `trapFocus`: 스택 구조, Tab 핸들러는 1개, release는 여러 번 호출해도 안전
-   - 모달과 lightbox에 연결한다.
-   - 기존 Tab 고정 리스너는 제거한다.
+1. `hero.spec.js`를 먼저 작성하고 실패를 확인한다. 6개 project에서 실행하고 collector는 고정 순서로 쓴다.
+   - hero DOM 순서가 §5 1~8과 같다.
+   - tagline이 맞다.
+   - CTA가 맞다.
+   - eyebrow와 typed가 유지된다.
+   - STATS 열: 375에서 2×2, 768·1280에서 4×1
+   - featured 열: 375에서 1, 768에서 2, 1280에서 3
+   - 첫 화면 AC (desktop, 실제 폰트)
+     - `document.fonts.ready`를 기다린다.
+     - scrollY가 0이다.
+     - 대상 6개 각각: visible, 크기 > 0, 조상 체인까지 visibility와 opacity 확인(`expect.poll`), 1280×800 경계 안
+2. index.html: hero 순서를 바꾸고 `p.hero-tagline#heroTagline`을 추가한다.
+3. main.js: `setText(heroTagline, PROFILE.tagline)`
+4. style.css
+   - eyebrow와 typing을 줄인다.
+   - 세로 여백을 조정한다.
+   - STATS와 featured를 반응형으로 바꾼다.
+   - blurb에 2줄 clamp를 건다.
+   - 기존 토큰만 쓴다. 문구는 줄이지 않는다.
+5. axe 새 target은 step 12와 같은 규칙을 따른다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
-- axe에 새 key·새 target이 0건이다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

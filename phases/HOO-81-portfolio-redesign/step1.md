@@ -6,7 +6,7 @@
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
+1. 저장소 지침 `CLAUDE.md`(중앙 Harness 계약)와 `README.md`를 읽는다. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
    - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §11.1, §11.5(경로 정책), §12
@@ -15,14 +15,14 @@
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 빌더와 검증 스크립트에 허용된다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
 - `tests/scripts/verify-scope.mjs` (신규)
-- `tests/package.json` (`verify-scope`, `verify-scope:selftest` script 추가만 허용)
+- `tests/package.json` (`verify-scope`, `verify-scope:selftest` script 추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -30,23 +30,21 @@
 
 ## 수정 금지
 
-- `tests/` 밖의 모든 파일
+- `tests/` 밖 전부
 - 위 목록 외 tests 파일
 
 ## 작업
 
-1. `export const GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`를 정의한다.
+1. `export const GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`
 2. `export function collectInput()`
-   - 세 층(committed, index, worktree + untracked)의 경로를 `GIT_DIFF_PATH_ARGS`로 수집한다.
+   - 세 층(committed, index, worktree+untracked)을 `GIT_DIFF_PATH_ARGS`로 수집한다.
    - `uncommittedHarness`도 `--no-renames`로 수집한다.
-   - data.js diff 4종: `--no-renames --unified=0`. 구간은 BASE→HEAD, BASE→index, BASE→worktree, index→worktree.
-   - index.html blob 3종, tests/.gitignore blob 2종을 읽는다.
-   - 추적 중인 runtime 경로를 수집한다.
-   - 루트 package.json이 있는지 확인한다.
+   - data.js diff 4종은 `--no-renames --unified=0`으로 수집한다.
+   - 함께 수집할 것: index.html blob 3종, gitignore blob 2종, 추적 중인 runtime 경로, 루트 package.json 존재 여부
 3. `export function evaluatePaths(input): string[]`: §11.5 경로 정책을 구현한다.
 4. CLI
-   - 인자 없음: 경로 검사를 실행한다. 위반이 있으면 exit 1, 없으면 `verify-scope: OK (paths)`를 출력한다.
-   - `--self-test` 사례
+   - 인자 없이 실행하면 경로를 검사한다. 위반이 있으면 exit 1, 없으면 `verify-scope: OK (paths)`를 출력한다.
+   - `--self-test`
      - 정상 → 0
      - 위반이어야 하는 경우
        - worktree `docs/other.md`
@@ -58,16 +56,16 @@
        - `.harness/harness.lock.json` 미커밋
      - 허용되어야 하는 경우
        - committed에만 있는 `scripts/harness.py`
-       - `.harness/runtime/x.json` untracked
-       - `phases/HOO-81-portfolio-redesign/index.json` worktree
-     - rename 우회 (`--no-renames` 형태 입력) → 모두 위반
-       - committed: `README.md` → `tests/fixtures/x.md`
-       - index: `assets/favicon.svg` → `tests/fixtures/f.svg`
-       - worktree: `docs/superpowers/plans/2026-07-29-quiet-executive-redesign.md` → `tests/fixtures/p.md`
-       - index: `.claude/settings.json` → `tests/fixtures/s.json`
-     - `GIT_DIFF_PATH_ARGS`에 `--no-renames`가 포함되어 있는지
+       - untracked `.harness/runtime/x.json`
+       - worktree의 phases index
+     - rename 우회(`--no-renames` 형태)는 모두 위반
+       - committed: README → tests/fixtures/x.md
+       - index: assets/favicon.svg → tests/fixtures/f.svg
+       - worktree: docs/superpowers/plans/... → tests/fixtures/p.md
+       - index: .claude/settings.json → tests/fixtures/s.json
+     - `GIT_DIFF_PATH_ARGS`에 `--no-renames`가 들어 있다.
 5. scripts를 추가한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test` → 모두 exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test`가 모두 exit 0

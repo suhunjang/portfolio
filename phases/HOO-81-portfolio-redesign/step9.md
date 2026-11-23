@@ -1,7 +1,7 @@
-# Step 9 — axe-collect
+# Step 9 — axe-group-done
 
-- 예상 시간: 15분
-- 실행 횟수: 수집 1회, 병합 1회, 테스트 1회, verify-scope 1회
+- 예상 시간: 12분
+- 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~8 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (실행 모드, 단계)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 9 그룹 완료 판정, 재계획 그룹 step 계약)
 3. index.json에서 step 0~8이 completed인지 확인한다. 아니면 중단한다.
-4. axe helper API를 확인한다.
+4. axe.js의 `MergedEntry`, `Plan`, `GROUP_ID_RE`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,43 +21,44 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/specs/axe.spec.js` (신규)
-- `tests/fixtures/axe-collected.json` (병합 결과)
+- `tests/helpers/axe.js` (추가만)
+- `tests/specs/axe-helper.spec.js` (추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (실제 `COLLECT_DIR` 포함)
+- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- `tests/` 밖의 모든 파일
-- helper와 그 밖의 tests 파일
-- `axe-baseline.json`, plan
+- `tests/` 밖 전부
+- 그 밖의 tests 파일, fixtures
+- step 5~8에서 만든 동작
 
 ## 작업
 
-### 1. `axe.spec.js`
-
-시나리오 10개(page 6, modal 2, lightbox 2)를 만든다. collector는 고정 순서로 쓴다.
-
-- 수집 모드: `writeCollected(scenario, project.name, violations)`만 한다. 저장 위치는 `resolveCollectDir()`를 따른다.
-- 일반 모드
-  - `baselineExists()`가 false이면 `test.skip`한다. 사유: `baseline 미생성(step 10 이전)`
-  - baseline이 있으면 `checkRegression`이 `[]`여야 한다.
-  - desktop-dark에서 1회 `validateBaseline`을 실행한다.
-  - plan이 있으면 `validateRemediationPlan(..., { coverage: false })`가 `[]`여야 한다.
-
-### 2. 수집
-
-1. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-2. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js axe-helper.spec.js`
-   - helper 테스트는 자기 독립 디렉터리만 쓰므로 실제 수집 파일을 건드리지 않는다.
-3. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge`
-   - 10개 파일을 검증하고 `tests/fixtures/axe-collected.json`에 쓴다.
-4. 로그에 key 수, 고유 target 수, ruleId별 수를 남긴다.
+1. axe.js
+   - `checkGroupDone(collected, plan, groupId) → { done, remaining }`
+     - 순수 함수다.
+     - collected가 배열이 아니면 `Error('invalid collected')`
+     - groupId 형식이 틀리거나 plan에 없으면 `Error('unknown group id: {id}')`
+   - CLI: `--check-group-done <id> [--collected <f>] [--plan <f>]`
+     - collected 기본값: `tests/.tmp/axe-current.json`
+     - done이면 0
+     - remaining이 있거나 오류면 1. remaining은 stderr에 출력한다.
+2. axe-helper.spec.js (desktop-dark)
+   - 그룹 target이 어느 시나리오에도 없으면 `done: true`
+   - 한 target이 lightbox 시나리오에만 남아 있으면 `done: false`이고, remaining에 해당 key와 target이 들어간다.
+   - 다른 그룹의 target이 남아 있는 것은 결과에 영향을 주지 않는다.
+   - unknown id와 형식 오류 id는 throw한다.
+   - collected가 `{}`이면 throw한다.
+   - 입력이 바뀌지 않는다.
+   - subprocess (독립 디렉터리 파일 사용)
+     - done → 0
+     - remaining 있음 → 1
+     - unknown id → 1
+     - collected 파일 없음 → 1
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge` → exit 0
-- `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

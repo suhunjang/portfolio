@@ -37,37 +37,31 @@
 1. `checkGitignore(text): string[]`
    - null이면 위반이다.
    - 끝의 `\n` 1개만 제거한다.
-   - 결과가 7줄과 정확히 일치해야 한다.
+   - 나머지가 정확히 7줄과 일치해야 한다.
 2. `checkDataJsDiff(diffText, { requireExactly3 }): string[]`
-   - 삭제 줄이 있으면 위반이다.
-   - `featured: true,`가 아닌 추가 줄이 있으면 위반이다.
-   - 추가 줄이 3줄을 넘으면 위반이다.
-   - `requireExactly3`이면 추가 줄이 정확히 3줄이 아닐 때 위반이다.
-3. `evaluateContent(input, { final }): string[]`
-   - data.js
-     - BASE→HEAD, BASE→index, BASE→worktree: `checkDataJsDiff(d, { requireExactly3: final })`
-     - index→worktree: 항상 `checkDataJsDiff(d, { requireExactly3: false })`
-   - index.html 3종: `Space+Grotesk`가 있어야 한다.
-   - gitignore 2종: `checkGitignore`를 적용한다.
-4. `evaluateScope(input, opts) = [...evaluatePaths, ...evaluateContent]`
+   - 다음은 위반이다.
+     - 삭제 줄
+     - `featured: true,`가 아닌 추가 줄
+     - 3줄을 넘는 추가
+   - `requireExactly3`이면 정확히 3줄이어야 한다.
+3. `evaluateContent(input, { final })`
+   - BASE→HEAD, BASE→index, BASE→worktree: `requireExactly3: final`
+   - index→worktree: 항상 `requireExactly3: false`
+   - index.html 3종과 gitignore 2종을 검사한다.
+4. `evaluateScope = [...evaluatePaths, ...evaluateContent]`
    - CLI 기본 동작으로 쓴다. 통과하면 `verify-scope: OK`를 출력한다.
    - `--final`을 지원한다.
-5. self-test 추가 (기존 경로·rename 사례는 유지)
-   - data.js
-     - 삭제 줄
-     - featured 외 줄
-     - featured 4줄
-     - stage한 뒤 worktree만 원복
+5. self-test 추가 (기존 사례는 유지)
+   - data.js 위반: 삭제 줄, featured 외 줄, featured 4줄, stage한 뒤 worktree만 원복
    - final
-     - 정상 final 통과: BASE→HEAD 3줄, BASE→index 3줄, BASE→worktree 3줄, index→worktree 0줄 → 위반 0
-     - BASE→HEAD 0줄(미커밋) → 위반
+     - BASE→HEAD/index/worktree 각 3줄이고 index→worktree 0줄이면 위반 0
+     - BASE→HEAD 0줄 → 위반
      - BASE→index 2줄 → 위반
-     - index→worktree에 featured 외 1줄 → 위반
-   - Space Grotesk 제거를 stage한 뒤 worktree만 원복
+     - index→worktree에 featured 외 줄 → 위반
+   - Space Grotesk 제거를 stage한 뒤 worktree만 원복 → 위반
    - gitignore
-     - 추가 줄, 중복 줄, 빈 줄, 순서 변경, 주석, CRLF → 위반
-     - 끝 개행 없음 → 통과
-     - index 버전만 잘못됨 → 위반
+     - 위반: 추가 줄, 중복 줄, 빈 줄, 순서 변경, 주석, CRLF, index 버전만 잘못됨
+     - 통과: 끝 개행 없음
 
 ## 완료 기준 (AC)
 

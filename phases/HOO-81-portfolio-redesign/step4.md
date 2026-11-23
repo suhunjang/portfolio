@@ -1,7 +1,7 @@
 # Step 4 — interaction-regression
 
 - 예상 시간: 18분
-- 실행 횟수: 테스트 1~2회, verify-scope 1회
+- 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~3 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -12,7 +12,7 @@
    - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §11.4
 3. index.json에서 step 0~3이 completed인지 확인한다. 아니면 중단한다.
 4. 현재 코드에서 다음을 확인한다.
-   - 모달, lightbox, 이벤트 위임, Esc 처리
+   - 모달, lightbox, 이벤트 위임, Esc
    - THEME_KEY, 메뉴, 스크롤스파이, reveal
    - Motion-O의 shots
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
@@ -34,7 +34,7 @@
 
 ## 수정 금지
 
-- `tests/` 밖의 모든 파일
+- `tests/` 밖 전부
 - 기존 tests 파일
 
 ## 작업
@@ -43,15 +43,15 @@
    - `openFirstProjectByClick`, `openFirstProjectByEnter`
    - `closeVia(page, how)`: button, backdrop({x:5, y:5}), esc
    - `expectFocused`
-2. `interaction.spec.js` (6개 project, collector는 고정 순서로)
-   - 테마: 토글, reload 후 유지, localStorage 값
-   - 모달: 닫기 경로별 결과와 포커스 복귀, Enter로 열기, 제목, `modal-open` 클래스
-   - lightbox: Esc 2단계 닫기
+2. `interaction.spec.js` (6개 project, collector 고정 순서)
+   - 테마
+   - 모달: 닫기 경로별 동작과 포커스 복귀, Enter로 열기, 제목, `modal-open`
+   - lightbox: Esc 2단계
    - 메뉴 (mobile)
-   - 스크롤스파이 (desktop): `const link = page.locator(.nav-link[href="#projects"])` 클릭 후 `await expect(link).toHaveClass(/active/)`
+   - 스크롤스파이 (desktop): `const link = page.locator(.nav-link[href="#projects"])`를 클릭하고 `await expect(link).toHaveClass(/active/)`
    - typing, reduced motion
-3. `first-visit.spec.js`: fixture를 쓰지 않고 desktop-dark에서만 실행한다. light와 dark를 각각 확인한다.
+3. `first-visit.spec.js`: fixture 없이 desktop-dark에서 light와 dark를 각각 확인한다.
 
 ## 완료 기준 (AC)
 
-- BASE 사이트에서 `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
+- BASE 사이트에서 `sh tests/scripts/with-env.sh npm --prefix tests test -- interaction.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.

@@ -1,7 +1,7 @@
-# Step 18 — final-verification
+# Step 18 — axe-remediation-gate
 
-- 예상 시간: 12분
-- 실행 횟수: self-test 1회, `--assert-empty` 1회, 테스트 1회, verify-scope `--final` 1회
+- 예상 시간: 14분
+- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, `--check-plan` 1회, 테스트 1회, verify-scope 1회
 - 선행 step: 0~17 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,43 +9,55 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` 전체
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (수집 명령 순서, step 18 gate, 재계획 그룹 step 계약)
 3. index.json에서 step 0~17이 completed인지 확인한다. 아니면 중단한다.
-4. 다음이 있는지 확인한다.
-   - specs: smoke, content, interaction, first-visit, axe-helper, axe, hero, layout, focus, print
-   - fixtures: axe-baseline, axe-remediation-plan, axe-collected
+4. `axe-baseline.json`과 `axe-remediation-plan.json`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
    - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다. PR 준비까지만 한다.
+   - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/specs/screenshots.spec.js`
+- `tests/fixtures/axe-remediation-plan.json`: 사라진 target과 빈 그룹을 제거하는 것만 허용한다. 추가는 금지다.
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`, `tests/screenshots/**`
+- `tests/.tmp/**` (실제 `COLLECT_DIR`, `axe-current.json`)
+- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
 - 사이트 파일 전부
-- 기존 spec, helper, fixtures, scripts, `tests/.gitignore`
-- 검증이 실패해도 고치지 않는다. 원인이 된 step을 보고하고 중단한다.
+- `axe-baseline.json`, `axe-collected.json`, helper, spec
 
-## 작업
+## 작업 (gate 절차 — step 19가 그대로 다시 실행한다)
 
-1. `screenshots.spec.js`
-   - 6개 project의 page 스크린샷
-   - desktop에서는 대표 모달 3개, lightbox, print 화면
-   - 모달 SVG text가 Space Grotesk로 렌더링되는지 확인
-2. 아래 AC 명령을 실행하고 결과를 로그로 요약한다.
+1. 순차 재수집 (병렬 금지)
+   1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
+   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
+   3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
+   4. 1과 3이 모두 성공한 뒤 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json`
+2. 회귀 검사: `checkRegression`을 적용한다. 오류가 있으면 즉시 중단하고 보고한다.
+3. plan 재생성
+   - 사라진 target을 제거한다.
+   - 빈 그룹을 삭제한다.
+   - fixFiles를 다시 계산한다(기존 값의 부분집합).
+   - id는 유지한다.
+4. 결과 로그
+   - groups가 `[]`이면 `remediation 불필요`
+   - 그룹이 남아 있으면 `Harness 재계획 필요`와 그룹별 상세를 남긴다.
+5. 재계획 계약 (하네스가 수행, 설계 §8.3)
+   - 그룹마다 `axe-remediation-{id}` step을 step 18과 19 사이에 둔다.
+   - 소스 allowedPaths는 그룹 fixFiles만이다.
+   - runtime 쓰기 경로: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+   - plan은 수정하지 않는다.
+   - 각 그룹 step의 AC (순차)
+     - `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-group-done {id} --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope -- --final`가 모두 exit 0
-- final에서 data.js 판정
-  - BASE→HEAD, BASE→index, BASE→worktree: 각각 정확히 3줄
-  - index→worktree: 0~3줄
+- 작업 1의 순차 체인이 exit 0이다.
+- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 통과한다.
