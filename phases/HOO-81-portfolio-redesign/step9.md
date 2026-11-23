@@ -1,6 +1,6 @@
-# Step 9 — axe-remediation-plan-schema
+# Step 9 — axe-collect-tooling
 
-- 예상 시간: 16분
+- 예상 시간: 18분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~8 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 9 계약, plan 규칙)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key와 병합 단위, step 9 계약, 수집 명령 순서)
 3. index.json에서 step 0~8이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js의 `BaselineEntry`와 `validateBaseline`을 확인한다.
+4. axe.js에 이미 있는 API를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -26,38 +26,46 @@
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
+- `tests/.tmp/axe-helper-test-*/**` (테스트 전용 독립 디렉터리)
+- `tests/.tmp/**`의 실행 부산물
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- 실제 `COLLECT_DIR`에는 쓰지 않는다.
 
 ## 수정 금지
 
 - `tests/` 밖 전부
-- 그 밖의 tests 파일, fixtures
-- step 6~8의 동작
+- 그 밖의 tests 파일
+- step 7의 동작
 
 ## 작업
 
 1. axe.js에 step 9 계약을 구현한다.
-   - `PLAN_PATH`, `GROUP_ID_RE`, `loadPlan`
-   - `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`. target 부분집합 판정은 baseline 모든 entry의 canonical target 합집합 기준이다.
-   - CLI: `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`
-2. axe-helper.spec.js (desktop-dark)
-   - id 형식
-     - 통과: `color-token-1`, `a`, `x2`
-     - 거부: `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열
-   - 중복 id는 거부한다.
-   - 기타 규칙
-     - 정상 plan은 통과한다.
-     - 같은 canonical target이 baseline 두 entry(다른 project)에 있어도 plan에는 한 그룹에 한 번만 두면 coverage 통과
-     - 거부: estMinutes 21, estMinutes 0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상값, coverage 누락
-   - `requireEmpty`
-     - 빈 groups → 통과
-     - 그룹 1개 → 오류
-   - subprocess (독립 디렉터리 파일 사용)
-     - 정상 → 0
-     - 다음은 모두 1: plan 없음, JSON 오류, 대문자 id, 중복 id, coverage 누락, baseline 없음
-     - `--require-empty`: 빈 groups → 0, 그룹 1개 → 1
-     - schema는 정상이지만 그룹이 남은 경우 `--require-empty` → 1
+   - `makeEntryKey({ scenario, project, ruleId })` → `${scenario}:${project}:${ruleId}`. 빈 값이나 `:` 포함 시 throw
+   - `COLLECT_DIR`, `EXPECTED_FILES`
+   - `resolveCollectDir`, `resetCollected`, `writeCollected`
+   - `mergeCollected`: (scenario, project, ruleId)마다 entry 1개, targets·selectors 중복 제거·정렬, entries는 key 정렬, `key = makeEntryKey(entry)`
+   - CLI: `--reset [--dir]`, `--merge [--dir] [--out]`
+2. axe-helper.spec.js에 추가한다 (desktop-dark, 각 테스트는 독립 디렉터리 사용 후 삭제).
+   - `makeEntryKey`
+     - `{page, desktop-dark, color-contrast}` → `page:desktop-dark:color-contrast`
+     - 빈 ruleId, `:`가 들어간 project → throw
+   - 병합 단위
+     - 한 파일에 같은 ruleId violation 2개, 같은 target 중복 → entry 1개, targets 중복 제거·오름차순
+     - 같은 canonical target이 `page-desktop-dark`와 `page-desktop-light`에 있음 → entry 2개로 보존, 각각 key가 다름
+     - 같은 target이 `page-desktop-dark`와 `modal-desktop-dark`에 있음 → entry 2개
+     - 모든 entry에서 `key === makeEntryKey(entry)`
+   - `resolveCollectDir`: 우선순위가 맞는지, `tests/.tmp` 밖 경로를 거부하는지
+   - `reset` 후 디렉터리가 비어 있는지
+   - `write`: 10개 기록, 잘못된 scenario면 throw
+   - `merge`: 10개 → 성공, 9개 → missing, 여분 1개 → extra
+   - subprocess CLI (모두 `--dir`/`--out` 지정)
+     - reset → 0
+     - merge 정상 → 0
+     - merge 9개 → 1
+     - `--dir tests/fixtures` → 1
+   - 실제 수집 디렉터리 보존
+     - 실행 전후 `COLLECT_DIR`의 스냅샷(존재 여부, 목록, 크기, mtime)이 같다.
+     - `tests/fixtures/axe-collected.json`이 바뀌지 않는다.
 
 ## 완료 기준 (AC)
 

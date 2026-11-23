@@ -1,7 +1,7 @@
-# Step 12 — axe-collect
+# Step 12 — axe-remediation-plan-schema
 
-- 예상 시간: 15분
-- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, 일반 테스트 1회, verify-scope 1회
+- 예상 시간: 16분
+- 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~11 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (entry key 계약, 실행 모드, 수집 명령 순서, step 12)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 12 계약, plan 규칙)
 3. index.json에서 step 0~11이 completed인지 확인한다. 아니면 중단한다.
-4. axe helper API를 확인한다.
+4. axe.js의 `BaselineEntry`와 `validateBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,40 +21,44 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/specs/axe.spec.js` (신규)
-- `tests/fixtures/axe-collected.json`
+- `tests/helpers/axe.js` (추가만)
+- `tests/specs/axe-helper.spec.js` (추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (실제 `COLLECT_DIR` 포함)
+- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
 - `tests/` 밖 전부
-- helper와 그 밖의 tests 파일
-- `axe-baseline.json`, plan
+- 그 밖의 tests 파일, fixtures
+- step 7~11의 동작
 
 ## 작업
 
-1. `axe.spec.js`
-   - 10개 시나리오를 작성한다. collector는 고정 순서로 사용한다.
-   - 수집 모드에서는 `writeCollected(scenario, testInfo.project.name, violations)`만 실행한다.
-   - 일반 모드에서는 `resolveBaselineMode()`를 먼저 호출한다. baseline이 없으면 기본적으로 throw로 실패한다.
-     - check일 때: `checkRegression(violations, baseline, scenario, project)`, `validateBaseline`(desktop-dark 1회), plan이 있으면 `validateRemediationPlan`(coverage false)
-     - skip일 때: `test.skip`
-2. 수집 (순차, 병렬 금지)
-   1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
-   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-   3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
-   4. 1과 3이 성공한 뒤 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge`
-   5. entry 수, (key, target) 수, ruleId별 분포를 로그로 남긴다. 모든 entry가 `key === makeEntryKey(entry)`인지 확인한다.
-3. 최초 일반 실행
-   - 옵션은 이 명령에서만 사용한다: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
-   - 옵션 없는 기본 실행이 이 시점에 실패하는 것은 의도된 결과다.
-   - 하네스는 아래 AC로 검증한다.
+1. axe.js에 step 12 계약을 구현한다.
+   - `PLAN_PATH`, `GROUP_ID_RE`, `loadPlan`
+   - `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`. target 부분집합 판정은 baseline 모든 entry의 canonical target 합집합 기준이다.
+   - CLI: `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`
+2. axe-helper.spec.js (desktop-dark)
+   - id 형식
+     - 통과: `color-token-1`, `a`, `x2`
+     - 거부: `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열
+   - 중복 id는 거부한다.
+   - 기타 규칙
+     - 정상 plan은 통과한다.
+     - 같은 canonical target이 baseline 두 entry(다른 project)에 있어도 plan에는 한 그룹에 한 번만 두면 coverage 통과
+     - 거부: estMinutes 21, estMinutes 0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상값, coverage 누락
+   - `requireEmpty`
+     - 빈 groups → 통과
+     - 그룹 1개 → 오류
+   - subprocess (독립 디렉터리 파일 사용)
+     - 정상 → 0
+     - 다음은 모두 1: plan 없음, JSON 오류, 대문자 id, 중복 id, coverage 누락, baseline 없음
+     - `--require-empty`: 빈 groups → 0, 그룹 1개 → 1
+     - schema는 정상이지만 그룹이 남은 경우 `--require-empty` → 1
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge` → exit 0
-- `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

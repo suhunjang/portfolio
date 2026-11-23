@@ -1,6 +1,6 @@
-# Step 10 — axe-current-checks
+# Step 10 — axe-baseline-regression
 
-- 예상 시간: 16분
+- 예상 시간: 18분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~9 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 10 현재 수집 결과 판정, gate, recheck, finalize, 재계획 그룹 step 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 10: 스키마, 회귀, 누락 정책, `FIX_FILES_BY_KIND`)
 3. index.json에서 step 0~9가 completed인지 확인한다. 아니면 중단한다.
-4. axe.js에서 `MergedEntry`, `makeEntryKey`, `Plan`, `GROUP_ID_RE`를 확인한다.
+4. axe.js의 `Violation`, `MergedEntry`, `makeEntryKey`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -33,41 +33,38 @@
 
 - `tests/` 밖 전부
 - 그 밖의 tests 파일, fixtures
-- step 6~9에서 만든 동작
+- step 7·9에서 만든 동작 (`makeEntryKey` 포함)
 
 ## 작업
 
 1. axe.js에 step 10 계약을 구현한다.
-   - `checkGroupDone(collected, plan, groupId) → { done, remaining }`
-   - `checkCollectedCoverage(collected, plan) → { ok, uncovered }`: plan에 없는 target을 자동으로 편입하지 않는다.
-   - `countCollectedTargets(collected) → number`: (key, target) 쌍 개수
-   - CLI (`--collected` 기본값은 `tests/.tmp/axe-current.json`)
-     - `--check-group-done <id>`
-     - `--check-coverage`: uncovered가 있으면 `재계획 필요: plan 밖 잔여 target`을 출력하고 exit 1
-     - `--assert-no-violations`: 0이 아니면 exit 1
-2. axe-helper.spec.js (desktop-dark, 파일은 독립 디렉터리에 둔다)
-   - `checkGroupDone`
-     - 그룹 target이 사라짐 → done
-     - lightbox 시나리오에만 남음 → remaining 1건 (key는 `lightbox:desktop-*:*`)
-     - 다른 그룹의 잔여 target은 결과에 영향을 주지 않는다.
-     - unknown id, 형식 오류 id → throw
-     - collected가 `{}` → throw
-   - `checkCollectedCoverage`
-     - 모든 target이 groups에 포함됨 → ok
-     - plan에 없는 target 1개 → uncovered 1건
-     - groups가 비어 있는데 target이 1개 남음 → uncovered
-     - 입력이 변경되지 않음
-   - `countCollectedTargets`
+   - 상수: `BASELINE_PATH`, `FIX_FILES_BY_KIND`
+   - 함수: `baselineExists`, `loadBaseline`, `resolveBaselineMode`, `validateBaseline`, `checkRegression`, `assertEmptyFile`
+   - `validateBaseline`: `key === makeEntryKey(항목)`, key 고유, targets 중복 없음·정렬을 추가로 확인한다.
+   - `checkRegression(violations, baseline, scenario, project)`: key는 `makeEntryKey({ scenario, project, ruleId })`로 만든다.
+   - CLI: `--assert-empty [path]`
+2. axe-helper.spec.js에 테스트를 추가한다 (desktop-dark).
+   - `validateBaseline`
+     - 통과: 혼합 color-contrast, js-render `[js/main.js]`, static-markup `[index.html]`, text-change `[]`
+     - 거부(key): key가 `makeEntryKey`와 다름, 중복 key, targets 중복, targets 미정렬
+     - 거부(파일 오대응): css-token에 `[css/style.css]`, css-rule에 `[css/themes.css]`, js-render에 `[index.html]`, static-markup에 `[js/main.js]`, text-change에 `[index.html]`
+     - 거부(빈 배열): css-token·css-rule·js-render·static-markup에 `[]`
+     - 거부(파일 여분): js-render에 `[js/main.js, index.html]`
+     - 거부(기타): 합집합 불일치, fix 누락, targets 밖의 target, 알 수 없는 kind
+   - `checkRegression`
+     - 새 key 또는 새 target은 오류다.
+     - 사라진 항목은 허용한다.
+     - 같은 canonical target이 baseline의 `page:desktop-dark:*`에만 있을 때 `page:desktop-light`에서 나타나면 `new-key` 또는 `new-target`으로 잡힌다(다른 entry로 취급).
+     - 입력을 변경하지 않는다.
+   - `resolveBaselineMode`
+     - 파일 있음 → check
+     - 파일 없음, env `{}` → throw
+     - 파일 없음, `AXE_ALLOW_MISSING_BASELINE` = `'1'` → skip
+     - 파일 없음, 값이 `'true'` → throw
+   - `loadBaseline`: 파일 없음, 잘못된 JSON, `{}`에서 throw
+   - subprocess `--assert-empty`
      - `[]` → 0
-     - target 2개인 entry 1개와 1개인 entry 1개 → 3
-     - 같은 canonical target이 `page:desktop-dark:r`과 `page:desktop-light:r` 두 entry에 있음 → 2
-   - subprocess
-     - `--check-group-done`: done → 0, remaining → 1, unknown → 1, 파일 없음 → 1
-     - `--check-coverage`: 완전 포함 → 0, 잔여 → 1, 파일 없음 → 1
-     - `--assert-no-violations`: `[]` → 0, target 1개 → 1, 파일 없음 → 1
-     - 회귀 허점 사례
-       - baseline에 target이 남아 있고 수집 결과에도 같은 target이 남아 있는 경우
-       - `checkRegression`은 `[]`를 반환해도 `--assert-no-violations`는 1이어야 한다.
+     - `[{}]`, `{}`, 잘못된 JSON, 파일 없음 → 1
 
 ## 완료 기준 (AC)
 

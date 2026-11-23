@@ -1,7 +1,7 @@
-# Step 19 — focus-trap-lightbox
+# Step 19 — hero-first-screen
 
-- 예상 시간: 16분
-- 실행 횟수: focus-lightbox spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 18분
+- 실행 횟수: hero spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~18 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2 (step 19 범위)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5 (히어로 순서, tagline 계약, 첫 화면 AC), §9
 3. index.json에서 step 0~18이 completed인지 확인한다. 아니면 중단한다.
-4. step 18의 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 고정 리스너, `.shot-zoom`, `:focus-visible` 규칙을 확인한다.
+4. hero 마크업, reveal, 여백, `#heroFeatured`, `setText` 시그니처를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,9 +21,10 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `js/main.js`: lightbox 열기·닫기의 trap 연결과 기존 lightbox Tab 리스너 제거만
-- `css/style.css`: `:focus-visible` 규칙만
-- `tests/specs/focus-lightbox.spec.js` (신규)
+- `index.html` (section#hero 내부만. `#heroFeatured`의 마크업은 그대로 둔다)
+- `js/main.js`: 정확히 `setText('heroTagline', PROFILE.tagline);` 1줄만 추가
+- `css/style.css` (hero, `#heroStats`, `#heroFeatured` 배치 규칙만)
+- `tests/specs/hero.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -31,22 +32,37 @@
 
 ## 수정 금지
 
-- `index.html`, `js/data.js`, `css/themes.css`
-- `trapFocus` 시그니처와 모달 연결(step 18)
-- fixtures, helper, 기존 spec(`focus-modal.spec.js` 포함)
+- `js/data.js`, `css/themes.css`
+- 대표 카드 렌더링·모달 로직
+- `#heroFeatured`의 속성
+- 섹션, nav
+- 기존 tests, fixtures, helper
 
 ## 작업 (TDD)
 
-1. `focus-lightbox.spec.js`를 먼저 작성해 실패를 확인한다 (desktop-dark/light).
-   - 중첩: Motion-O 모달 → `.shot-zoom`으로 lightbox 열기 → Tab/Shift+Tab이 lightbox 안에서만 순환한다(모달 trap 일시정지).
-   - 해제·재개: Esc 1회 → lightbox 닫힘, 포커스가 `.shot-zoom`으로 복귀, 이후 Tab이 다시 모달 경계 안에서 순환한다. Esc 2회째 → 모달 닫힘, 트리거로 복귀.
-   - 기존 리스너 제거: lightbox를 3회 열고 닫은 뒤에도 Tab 1회가 정확히 한 칸만 이동한다.
-   - outline: 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 computed `outline-style`이 `none`이 아니다.
-2. main.js
-   - lightbox 열 때 push(returnFocusTo = `.shot-zoom`), 닫을 때 release.
-   - 기존 lightbox Tab 고정 리스너를 제거한다.
-3. style.css: `:focus-visible` outline을 유지·보강한다(토큰만 사용).
+1. `hero.spec.js`를 먼저 작성해 실패를 확인한다. 6개 project에서 실행하고 collector는 고정 순서로 쓴다.
+   - hero DOM 순서가 §5 1~8과 같다.
+   - tagline
+     - `p.hero-tagline`의 id가 `heroTagline`이다.
+     - `document.getElementById('heroTagline').textContent`가 `PROFILE.tagline`과 같다.
+   - CTA가 맞고, eyebrow·typed가 유지된다.
+   - `#heroFeatured`의 `role=region`과 `aria-label`이 유지된다.
+   - STATS: 375에서 2×2, 768·1280에서 4×1
+   - featured: 375 1열, 768 2열, 1280 3열
+   - 첫 화면 AC (desktop, 실제 폰트)
+     - `document.fonts.ready`를 기다린다.
+     - scrollY는 0이다.
+     - 대상 6개 모두: visible, 크기 > 0, 조상까지 visibility·opacity(`expect.poll`), 1280×800 경계 안
+2. index.html: hero 순서를 바꾸고 `p.hero-tagline#heroTagline`을 추가한다.
+3. main.js: 정확히 `setText('heroTagline', PROFILE.tagline);`를 추가한다.
+4. style.css
+   - eyebrow와 typing을 줄인다.
+   - 여백을 조정한다.
+   - STATS와 featured를 반응형으로 만든다.
+   - blurb는 2줄 clamp
+   - 토큰만 쓴다. 문구는 줄이지 않는다.
+5. axe 새 target은 step 18과 같은 규칙을 따른다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

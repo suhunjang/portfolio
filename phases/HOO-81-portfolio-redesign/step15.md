@@ -1,7 +1,7 @@
-# Step 15 — hero-first-screen
+# Step 15 — axe-regression-prune
 
 - 예상 시간: 18분
-- 실행 횟수: hero spec 2회, 전체 테스트 1회, verify-scope 1회
+- 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~14 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5 (히어로 순서, tagline 계약, 첫 화면 AC), §9
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 15 회귀 gate와 plan 정리 도구, REGRESSION_GATE, gate/recheck 절차)
 3. index.json에서 step 0~14가 completed인지 확인한다. 아니면 중단한다.
-4. hero 마크업, reveal, 여백, `#heroFeatured`, `setText` 시그니처를 확인한다.
+4. axe.js의 `checkRegression`, `loadBaseline`, `loadPlan`, `validateRemediationPlan`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,48 +21,49 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `index.html` (section#hero 내부만. `#heroFeatured`의 마크업은 그대로 둔다)
-- `js/main.js`: 정확히 `setText('heroTagline', PROFILE.tagline);` 1줄만 추가
-- `css/style.css` (hero, `#heroStats`, `#heroFeatured` 배치 규칙만)
-- `tests/specs/hero.spec.js`
+- `tests/helpers/axe.js` (추가만)
+- `tests/specs/axe-helper.spec.js` (추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
+- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- 실제 `tests/fixtures/axe-remediation-plan.json`에는 쓰지 않는다(아직 없음). 테스트는 독립 디렉터리 사본만 쓴다.
 
 ## 수정 금지
 
-- `js/data.js`, `css/themes.css`
-- 대표 카드 렌더링·모달 로직
-- `#heroFeatured`의 속성
-- 섹션, nav
-- 기존 tests, fixtures, helper
+- `tests/` 밖 전부
+- 그 밖의 tests 파일, fixtures
+- step 7~14에서 만든 동작
 
-## 작업 (TDD)
+## 작업
 
-1. `hero.spec.js`를 먼저 작성해 실패를 확인한다. 6개 project에서 실행하고 collector는 고정 순서로 쓴다.
-   - hero DOM 순서가 §5 1~8과 같다.
-   - tagline
-     - `p.hero-tagline`의 id가 `heroTagline`이다.
-     - `document.getElementById('heroTagline').textContent`가 `PROFILE.tagline`과 같다.
-   - CTA가 맞고, eyebrow·typed가 유지된다.
-   - `#heroFeatured`의 `role=region`과 `aria-label`이 유지된다.
-   - STATS: 375에서 2×2, 768·1280에서 4×1
-   - featured: 375 1열, 768 2열, 1280 3열
-   - 첫 화면 AC (desktop, 실제 폰트)
-     - `document.fonts.ready`를 기다린다.
-     - scrollY는 0이다.
-     - 대상 6개 모두: visible, 크기 > 0, 조상까지 visibility·opacity(`expect.poll`), 1280×800 경계 안
-2. index.html: hero 순서를 바꾸고 `p.hero-tagline#heroTagline`을 추가한다.
-3. main.js: 정확히 `setText('heroTagline', PROFILE.tagline);`를 추가한다.
-4. style.css
-   - eyebrow와 typing을 줄인다.
-   - 여백을 조정한다.
-   - STATS와 featured를 반응형으로 만든다.
-   - blurb는 2줄 clamp
-   - 토큰만 쓴다. 문구는 줄이지 않는다.
-5. axe 새 target은 step 14와 같은 규칙을 따른다.
+1. axe.js에 step 15 계약을 구현한다.
+   - `checkCollectedRegression(collected, baseline) → string[]` (`bad-key:`, `new-key:`, `new-target:`)
+   - `prunePlan(plan, collected, baseline) → Plan` (순수, 제거만, 추가 없음, fixFiles 재계산은 부분집합)
+   - CLI
+     - `--check-regression [--collected <f>] [--baseline <f>]`
+     - `--prune-plan [--collected <f>] [--baseline <f>] [--plan <f>]`: 읽기 실패 또는 회귀 오류면 쓰지 않고 exit 1. 통과하면 `JSON.stringify(plan, null, 2) + '\n'`으로 쓴다.
+2. axe-helper.spec.js (desktop-dark, 독립 디렉터리)
+   - `checkCollectedRegression`
+     - baseline과 같은 entry → `[]`
+     - baseline에 없는 key → `new-key:`
+     - baseline key에 없는 target → `new-target:`
+     - `key`가 `makeEntryKey(entry)`와 다른 entry → `bad-key:`
+     - target이 사라진 경우 → `[]`
+   - `prunePlan`
+     - 사라진 target 제거, 빈 그룹 삭제, fixFiles 부분집합, id 유지
+     - collected에 plan 밖 target이 있어도 추가하지 않는다.
+     - blocked 값을 바꾸지 않는다.
+     - 입력이 변경되지 않는다.
+   - subprocess `--check-regression`: 회귀 없음 → 0, new-target → 1, baseline 없음 → 1, collected 없음 → 1
+   - subprocess `--prune-plan` (plan 파일 bytes 보존 self-test)
+     - 실행 전 plan 파일의 sha256과 mtime을 기록한다.
+     - 회귀 오류(new-target)가 있으면 → exit 1, sha256·mtime 불변
+     - collected 파일 없음, baseline JSON 오류 → exit 1, sha256 불변
+     - 순차 체인 `sh -c 'node axe.js --check-regression ... && node axe.js --prune-plan ...'`에서 회귀가 실패하면 → exit 1, sha256 불변
+     - 회귀 없음 + 사라진 target 1개 → exit 0, 결과 plan에서 그 target이 빠지고 `validateRemediationPlan`(coverage false) 통과
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

@@ -1,7 +1,7 @@
-# Step 5 — interaction-regression
+# Step 5 — modal-regression
 
-- 예상 시간: 18분
-- 실행 횟수: 테스트 2회, verify-scope 1회
+- 예상 시간: 16분
+- 실행 횟수: modal-regression spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~4 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,12 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §6(스크롤스파이 locator 예시), §11.4
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(모달, lightbox), §7.4(modal.js 계약), §11.4
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
-4. 다음을 확인한다.
-   - 모달·lightbox·위임·Esc 처리
-   - THEME_KEY, 메뉴, 스크롤스파이, reveal
-   - Motion-O shots
+4. 다음을 확인한다: 모달 열기·닫기 위임, `modal-open`, 모달 제목 요소, `.shot-zoom`이 있는 프로젝트, `ensureLightbox`, Esc 처리 순서
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -24,9 +21,8 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/specs/interaction.spec.js`
-- `tests/specs/first-visit.spec.js`
-- `tests/helpers/modal.js`
+- `tests/helpers/modal.js` (신규)
+- `tests/specs/modal-regression.spec.js` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -36,25 +32,22 @@
 
 - `tests/` 밖 전부
 - 기존 tests 파일
+- 테마·메뉴·scrollspy·typing·reduced-motion 검사 (step 6에서 한다)
 
 ## 작업
 
-1. `modal.js`
+1. `modal.js` (§7.4 계약)
    - `openFirstProjectByClick`, `openFirstProjectByEnter`
    - `closeVia(page, how)`: button, backdrop({x:5, y:5}), esc
    - `expectFocused`
-2. `interaction.spec.js` (6개 project, collector 고정 순서)
-   - 테마
-   - 모달: 닫기 경로별 동작과 포커스 복귀, Enter로 열기, 제목, `modal-open`
-   - lightbox: Esc 2단계
-   - 메뉴 (mobile)
-   - 스크롤스파이 (desktop), 정확히 다음 문법을 쓴다:
-     - `const link = page.locator('.nav-link[href="#projects"]');`
-     - `await link.click();`
-     - `await expect(link).toHaveClass(/active/);`
-   - typing, reduced motion
-3. `first-visit.spec.js`: fixture 없이 desktop-dark에서 실행한다. light와 dark를 각각 확인한다.
+   - `modalTitle(page)`
+   - `findProjectWithShots(page)`
+2. `modal-regression.spec.js` (6개 project, collector 고정 순서)
+   - 모달: click으로 열기, Enter로 열기, 제목이 데이터와 같음, body `modal-open`
+   - 닫기: button·backdrop·esc 각 경로로 닫히고 포커스가 트리거 카드로 돌아온다. 닫힌 뒤 `modal-open`이 없다.
+   - lightbox (desktop만): `findProjectWithShots`가 index를 반환하고, 그 모달에서 `.shot-zoom`으로 lightbox가 열린다.
+   - Esc 2단계: 1회째 lightbox만 닫히고 모달은 열려 있다. 2회째 모달이 닫힌다.
 
 ## 완료 기준 (AC)
 
-- BASE 사이트에서 다음이 모두 통과한다: `sh tests/scripts/with-env.sh npm --prefix tests test -- interaction.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
+- BASE 사이트에서 다음이 모두 통과한다: `sh tests/scripts/with-env.sh npm --prefix tests test -- modal-regression.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`

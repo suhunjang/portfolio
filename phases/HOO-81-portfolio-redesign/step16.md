@@ -1,7 +1,7 @@
-# Step 16 — section-structure
+# Step 16 — axe-collect
 
-- 예상 시간: 18분
-- 실행 횟수: structure spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 16분
+- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, 일반 테스트 1회, verify-scope 1회
 - 선행 step: 0~15 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5(컨테이너 마크업), §6(스크롤스파이 locator 예시 포함), §7, §8.3(canonical 안정성 범위, entry key, 회귀), §11.4
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (entry key 계약, 실행 모드, 수집 명령 순서, step 16), §8.4
 3. index.json에서 step 0~15가 completed인지 확인한다. 아니면 중단한다.
-4. 섹션, nav, scroll-hint, 스크롤스파이, skillsGrid, content-exceptions final, baseline canonical을 확인한다.
+4. `axe.js`와 `axe-prepare.js` API를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,46 +21,41 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `index.html` (hero 밖의 섹션, nav, scroll-hint)
-- `js/main.js` (스크롤스파이 배열과 skill-group h4만)
-- `tests/specs/structure.spec.js`
+- `tests/specs/axe.spec.js` (신규)
+- `tests/fixtures/axe-collected.json`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.tmp/**` (실제 `COLLECT_DIR` 포함)
+- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- `css/*`, `js/data.js`
-- hero 내부(`#heroFeatured` 포함)
-- fixtures, helper, 기존 spec
-- 섹션 표에 없는 문구
+- `tests/` 밖 전부
+- helper와 그 밖의 tests 파일
+- `axe-baseline.json`, plan
 
-## 작업 (TDD)
+## 작업
 
-1. `structure.spec.js`를 먼저 작성한다 (6개 project).
-   - 섹션, nav, kicker, h2가 §6과 일치한다.
-   - subsection h3가 1개다.
-   - skillsGrid는 about 안에 있고 h4를 쓴다.
-   - contact와 scroll-hint가 맞다.
-   - heading 계층이 올바르다.
-   - 섹션을 이동한 뒤에도 `#heroFeatured`가 `div[role=region][aria-label=대표 프로젝트]`로 유지된다.
-   - 스크롤스파이 (desktop), 정확히 다음 문법을 쓴다:
-     - `const link = page.locator('.nav-link[href="#about"]');`
-     - `await link.click();`
-     - `await expect(link).toHaveClass(/active/);`
-2. index.html
-   - 섹션 subtree를 통째로 이동해 anchor를 보존한다.
-   - kicker를 바꾼다.
-   - Stack &amp; Contact를 분리한다.
-   - nav, scroll-hint, section-alt를 맞춘다.
-3. main.js: 스크롤스파이 배열, skill-group h4
-4. axe canonical 점검 (필수)
-   - 식별을 잃은 경우: 즉시 중단하고 보고한 뒤 재계획을 요청한다.
-   - 새로 만든 요소의 신규 위반: 허용 파일 안에서 고친다.
-   - 자동 편입은 금지다.
+1. `axe.spec.js`
+   - 10개 시나리오를 작성한다. collector는 고정 순서로 사용한다.
+   - 두 모드 공통: 각 시나리오에서 `const prep = await prepareForAxe(page, { scenario })`를 호출한 뒤 `runAxe(page, { include: prep.include })`를 실행한다. 준비가 reject하면 테스트는 실패한다.
+   - 수집 모드에서는 `writeCollected(scenario, testInfo.project.name, violations)`만 실행한다.
+   - 일반 모드에서는 `resolveBaselineMode()`를 먼저 호출한다. baseline이 없으면 기본적으로 throw로 실패한다.
+     - check일 때: `checkRegression(violations, baseline, scenario, project)`, `validateBaseline`(desktop-dark 1회), plan이 있으면 `validateRemediationPlan`(coverage false)
+     - skip일 때: 준비 절차까지만 실행하고 axe 판정은 `test.skip`
+2. 수집 (순차, 병렬 금지)
+   1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
+   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
+   3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
+   4. 1과 3이 성공한 뒤 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge`
+   5. entry 수, (key, target) 수, ruleId별 분포를 로그로 남긴다. 모든 entry가 `key === makeEntryKey(entry)`인지 확인한다.
+3. 최초 일반 실행
+   - 옵션은 이 명령에서만 사용한다: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
+   - 옵션 없는 기본 실행이 이 시점에 실패하는 것은 의도된 결과다.
+   - 하네스는 아래 AC로 검증한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
-- content-static.spec에서 final 상태가 성립한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge` → exit 0
+- `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

@@ -1,6 +1,6 @@
-# Step 11 — axe-regression-prune
+# Step 11 — axe-baseline-projection
 
-- 예상 시간: 18분
+- 예상 시간: 16분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~10 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 11 회귀 gate와 plan 정리 도구, REGRESSION_GATE, gate/recheck 절차)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 11 투영·양방향 일치, fixture)
 3. index.json에서 step 0~10이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js의 `checkRegression`, `loadBaseline`, `loadPlan`, `validateRemediationPlan`을 확인한다.
+4. axe.js의 `MergedEntry`, `BaselineEntry`, `makeEntryKey`, `loadBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -28,40 +28,37 @@
 
 - `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-- 실제 `tests/fixtures/axe-remediation-plan.json`에는 쓰지 않는다(아직 없음). 테스트는 독립 디렉터리 사본만 쓴다.
 
 ## 수정 금지
 
 - `tests/` 밖 전부
 - 그 밖의 tests 파일, fixtures
-- step 6~10에서 만든 동작
+- step 7~10에서 만든 동작
 
 ## 작업
 
 1. axe.js에 step 11 계약을 구현한다.
-   - `checkCollectedRegression(collected, baseline) → string[]` (`bad-key:`, `new-key:`, `new-target:`)
-   - `prunePlan(plan, collected, baseline) → Plan` (순수, 제거만, 추가 없음, fixFiles 재계산은 부분집합)
-   - CLI
-     - `--check-regression [--collected <f>] [--baseline <f>]`
-     - `--prune-plan [--collected <f>] [--baseline <f>] [--plan <f>]`: 읽기 실패 또는 회귀 오류면 쓰지 않고 exit 1. 통과하면 `JSON.stringify(plan, null, 2) + '\n'`으로 쓴다.
+   - `PROJECTION_FIELDS`, `projectEntry`, `compareCollectedBaseline`
+   - CLI: `--check-baseline-match [--collected <f>] [--baseline <f>]` (`--collected` 기본 `tests/fixtures/axe-collected.json`)
 2. axe-helper.spec.js (desktop-dark, 독립 디렉터리)
-   - `checkCollectedRegression`
-     - baseline과 같은 entry → `[]`
-     - baseline에 없는 key → `new-key:`
-     - baseline key에 없는 target → `new-target:`
-     - `key`가 `makeEntryKey(entry)`와 다른 entry → `bad-key:`
-     - target이 사라진 경우 → `[]`
-   - `prunePlan`
-     - 사라진 target 제거, 빈 그룹 삭제, fixFiles 부분집합, id 유지
-     - collected에 plan 밖 target이 있어도 추가하지 않는다.
-     - 입력이 변경되지 않는다.
-   - subprocess `--check-regression`: 회귀 없음 → 0, new-target → 1, baseline 없음 → 1, collected 없음 → 1
-   - subprocess `--prune-plan` (plan 파일 bytes 보존 self-test)
-     - 실행 전 plan 파일의 sha256과 mtime을 기록한다.
-     - 회귀 오류(new-target)가 있으면 → exit 1, sha256·mtime 불변
-     - collected 파일 없음, baseline JSON 오류 → exit 1, sha256 불변
-     - 순차 체인 `sh -c 'node axe.js --check-regression ... && node axe.js --prune-plan ...'`에서 회귀가 실패하면 → exit 1, sha256 불변
-     - 회귀 없음 + 사라진 target 1개 → exit 0, 결과 plan에서 그 target이 빠지고 `validateRemediationPlan`(coverage false) 통과
+   - `projectEntry`
+     - baseline 항목에서 `fixes`, `fixFiles`를 버리고 7개 필드만 남긴다.
+     - 미정렬·중복 targets/selectors를 정렬·중복 제거한다.
+     - key 불일치, 필드 누락 → throw
+   - `compareCollectedBaseline`
+     - 같은 내용(baseline은 fixes 포함) → `ok`
+     - collected에만 있는 entry → `missingEntries`에 key 1건, `ok` false
+     - baseline에만 있는 entry → `extraEntries`에 key 1건, `ok` false
+     - 같은 key에서 collected에만 있는 target → `missingTargets` 1건
+     - 같은 key에서 baseline에만 있는 target → `extraTargets` 1건
+     - impact 다름 → `fieldMismatches`에 `{key, field: 'impact'}`
+     - selectors 다름 → `fieldMismatches`에 `{key, field: 'selectors'}`
+     - 한쪽에 중복 key → throw
+     - 두 입력이 변경되지 않는다.
+   - subprocess `--check-baseline-match`
+     - 일치 → 0
+     - missing entry, extra entry, missing target, extra target, impact 불일치 각각 → 1
+     - collected 파일 없음, baseline JSON 오류 → 1
 
 ## 완료 기준 (AC)
 
