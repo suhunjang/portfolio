@@ -1,0 +1,16 @@
+# python
+__pycache__/
+.pytest_cache/
+
+# repo-local interpreter (scripts/bootstrap_venv.py)
+.venv/
+
+# 하네스 로컬 상태 — 커밋하지 않는다.
+# (.harness/policy.json·.harness/install-state.json은 프로젝트가 커밋한다)
+/.harness/runtime/
+/.harness/transactions/
+/.harness/install.lock
+/.harness/policy.local.json
+
+# cross-review 마지막 리뷰 시점의 워킹트리 지문 (nudge hook이 비교한다)
+.claude/.cross-review-state

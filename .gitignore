@@ -26,3 +26,13 @@ desktop.ini
 *~
 .vscode/
 .idea/
+
+# Python / repo-local harness runtime
+__pycache__/
+.pytest_cache/
+.venv/
+/.harness/runtime/
+/.harness/transactions/
+/.harness/install.lock
+/.harness/policy.local.json
+.claude/.cross-review-state
