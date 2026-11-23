@@ -1,19 +1,19 @@
-# Step 9 — content-static-baseline
+# Step 9 — content-data-baseline
 
-- 목적: 정적 본문 추출과 허용 예외 판정.
-- 예상 17분 / 선행 0~8 / 공통 절차 설계 §15
-- read-first: 설계 §6, §7.2, §7.3; 셀렉터 `.nav-link`, `.hero-eyebrow`, `.hero-cta .btn`, `.section-kicker`, `.section-title`, `.section-sub`, `.about-text p`, `.about-points li`, `.about-meta dt`, `.contact-text`, `.footer-note`, `.footer-top`
-- tracked 허용(exact): `tests/fixtures/content-exceptions.json`(신규), `tests/helpers/content.js`(`extractStatic` 추가만), `tests/specs/content-static.spec.js`(신규)
+- 목적: BASE data·index fixture 생성과 데이터 보존 검사.
+- 예상 16분 / 선행 0~8 / 공통 절차 설계 §15
+- read-first: 설계 §3, §7.1, §7.2-1, §7.3
+- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` script 추가만)
 - runtime: R0
-- 금지: §15.7, fixture 생성 스크립트·baseline 파일·content-data.spec, content.js 기존 함수
+- 금지: §15.7, `extractStatic`(step 10)
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step9`
-2. `content-exceptions.json`: `kickers.base/final`, `titles.base/final`, `featured.indexes` [1,5,7], `subsectionTitleFinal`.
-3. `extractStatic(page)`: 모두 norm, `navLabels`만 정렬.
-4. `content-static.spec.js`(6 project): baseline-index.html을 `javaScriptEnabled: false` context `setContent`로 추출해 현재 `/index.html`과 비교. kickers·sectionTitles는 base 또는 final과 순서까지 일치, final이면 subsection h3 기술 스택 1개, 나머지 필드는 BASE와 같다. 예외 판정 합성: base 통과, final 통과, 혼합 거부, 한 글자 차이 거부.
+2. `make-fixtures.mjs`: `git show BASE:js/data.js`를 vm 평가 → `baseline-data.json`, `git show BASE:index.html` → `baseline-index.html`(step 10용). `fixtures` script 추가 후 실행.
+3. `content.js`: `norm`, `readLiveData`, `normalizeFeatured`(structuredClone, index 1·5·7만, 그 밖·true 아님은 throw), JSDoc typedef.
+4. `content-data.spec.js`(6 project, collector 고정 순서): normalizeFeatured 입력 불변·금지 index throw; `normalizeFeatured(await readLiveData(page))` = baseline deep-equal; featured 없음 또는 1·5·7만; email·phone·social 빈 값; 렌더 개수 stats 4, timeline = CAREER 길이, project-card 13, strengths 6, project-title 배열 = baseline.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-static.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step9.json --allow tests/fixtures/content-exceptions.json,tests/helpers/content.js,tests/specs/content-static.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step9.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0

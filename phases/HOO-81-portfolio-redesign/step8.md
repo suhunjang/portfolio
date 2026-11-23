@@ -1,19 +1,18 @@
-# Step 8 — content-data-baseline
+# Step 8 — scope-content
 
-- 목적: BASE data·index fixture 생성과 데이터 보존 검사.
-- 예상 16분 / 선행 0~7 / 공통 절차 설계 §15
-- read-first: 설계 §3, §7.1, §7.2-1, §7.3
-- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` script 추가만)
+- 목적: verify-scope 내용 판정(data.js patch, Space Grotesk, gitignore)과 `--final`.
+- 예상 19분 / 선행 0~7 / 공통 절차 설계 §15
+- read-first: 설계 §11.1, §11.5(내용 판정, final, 합성)
+- tracked 허용(exact): `tests/scripts/verify-scope.mjs`
 - runtime: R0
-- 금지: §15.7, `extractStatic`(step 9)
+- 금지: §15.7, 두 diff 인자 상수 값
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step8`
-2. `make-fixtures.mjs`: `git show BASE:js/data.js`를 vm 평가 → `baseline-data.json`, `git show BASE:index.html` → `baseline-index.html`(step 9용). `fixtures` script 추가 후 실행.
-3. `content.js`: `norm`, `readLiveData`, `normalizeFeatured`(structuredClone, index 1·5·7만, 그 밖·true 아님은 throw), JSDoc typedef.
-4. `content-data.spec.js`(6 project, collector 고정 순서): normalizeFeatured 입력 불변·금지 index throw; `normalizeFeatured(await readLiveData(page))` = baseline deep-equal; featured 없음 또는 1·5·7만; email·phone·social 빈 값; 렌더 개수 stats 4, timeline = CAREER 길이, project-card 13, strengths 6, project-title 배열 = baseline.
+2. `checkGitignore(text)`(null 위반, 끝 `\n` 1개 제거 후 7줄 정확), `checkDataJsDiff(patch, { requireExactly3 })`, `evaluateContent(input, { final })`(4구간 patch 그대로 전달, BASE→HEAD/index/worktree는 `requireExactly3: final`, index→worktree는 false, index.html 3종·gitignore 2종), `evaluateScope = [...evaluatePaths, ...evaluateContent]`(CLI 기본, `verify-scope: OK`, `--final`).
+3. self-test 추가(기존 유지): patch 전달 합성(가짜 git: PATCH 인자+data.js면 `featured: true,` 3줄 patch, `--name-only`면 이름만) → final 위반 0; `+    title: 'x',` 추가 → 위반; name-only 수집기 → final 3줄 미달 위반. data.js 위반: 삭제 줄, featured 외 줄, 4줄, stage 후 worktree 원복. final: 각 3줄·index→worktree 0 → 0; BASE→HEAD 0줄, BASE→index 2줄, index→worktree featured 외 줄 → 위반. Space Grotesk 제거 stage 후 원복 → 위반. gitignore 위반: 추가 줄, 중복, 빈 줄, 순서, 주석, CRLF, index만 잘못됨; 끝 개행 없음은 통과.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step8.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step8.json --allow tests/scripts/verify-scope.mjs` → exit 0

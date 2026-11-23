@@ -1,18 +1,18 @@
-# Step 16 — axe-collect-tooling
+# Step 16 — axe-prepare-lightbox
 
-- 목적: entry key와 수집 파일 관리(reset/write/merge).
+- 목적: lightbox 준비와 결합 진입점 `prepareForAxe`.
 - 예상 19분 / 선행 0~15 / 공통 절차 설계 §15
-- read-first: 설계 §8.3(entry key, step 16, COLLECT_CHAIN)
-- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(테스트는 `tests/.tmp/axe-helper-test-*/` 독립 디렉터리만, 실제 COLLECT_DIR에 쓰지 않음)
-- 금지: §15.7, step 12 동작
+- read-first: 설계 §3(lightbox), §7.4, §8.4(step 16, 오류 코드, 합성 fixture)
+- tracked 허용(exact): `tests/helpers/axe-prepare.js`(추가만: `prepareLightbox`, `prepareOverlay`, `prepareForAxe`), `tests/specs/axe-prepare-lightbox.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, step 14·15 함수 동작, 기존 spec·helper(import만)
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step16`
-2. 설계 §8.3 step 16 계약 구현.
-3. spec(desktop-dark): makeEntryKey 형식·빈 ruleId·`:` 포함 throw; 같은 ruleId 2개·중복 target → entry 1개 정렬; 같은 target이 page-desktop-dark/light → entry 2개, page/modal → 2개; 모든 key = makeEntryKey; resolveCollectDir 우선순위·`tests/.tmp` 밖 거부; reset 후 비어 있음; write 10개·잘못된 scenario throw; merge 10개 성공·9개 missing·여분 extra; CLI(`--dir`/`--out` 지정) reset 0, merge 0, 9개 1, `--dir tests/fixtures` 1; 실행 전후 실제 COLLECT_DIR(존재·목록·크기·mtime)과 `tests/fixtures/axe-collected.json` 불변.
+2. 설계 §8.4 step 16 계약 구현.
+3. spec(desktop-dark/light): 실제 사이트 page → `body`·null, modal → `#projectModal`, lightbox → `.lightbox`·img 로딩·포커스 내부(본문 텍스트 없어도 통과); shots 없는 grid index로 lightbox → `lightbox-not-open`; `page.route`로 이미지 abort → `content-not-loaded:img`; `scenario: 'x'`, `prepareOverlay({ scenario: 'page' })` → `unknown-scenario`; no-shots fixture(grid 0·1 shots 없음 + 대표 버튼 0) → `findProjectWithShots` null·`__opens === 2`·`__closes === 2`·`modal-open` 없음·대표 click 0, lightbox → `no-shots-project`; shots fixture(1에만 `.shot-zoom` + 대표 버튼 1) → 1·opens/closes 2·대표 0; `.modal-section` 안 깨진 src img → `content-not-loaded:img`, 0×0 svg → `content-not-loaded:svg`.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step16.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-lightbox.spec.js axe-prepare-modal.spec.js axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step16.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-lightbox.spec.js` → exit 0

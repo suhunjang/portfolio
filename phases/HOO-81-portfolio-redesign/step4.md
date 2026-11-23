@@ -1,35 +1,29 @@
-# Step 4 — scope-snapshot-gate
+# Step 4 — scope-snapshot-special-files
 
-- 목적: 현재 identity 대조, 변경 판정, exact allowedPaths/runtime 정책 분류, unsafe 우선 판정, CLI gate를 완성한다. 이 step부터 모든 종료 검사는 identity 대조와 경로 안전을 경유하는 완성 CLI.
-- 예상 20분 / 선행 0~3 / 공통 절차 설계 §15
-- read-first: 설계 §11.1, §11.5(런타임 면제), §11.6(identity 경유), §11.7(규칙, 경로 안전 계약, schema, C, 비교 도구 step 4)
-- tracked 허용(exact): `tests/scripts/scope-snapshot.mjs`(추가만), `tests/specs/scope-snapshot-gate.spec.js`(신규)
-- runtime: R0(합성 저장소 포함)
-- 금지: §15.7, step 1·2 함수 동작, 기존 spec·helper(import만)
+- 목적: 고정 S·C와 JS loader가 snapshot·기록 대상·after.z의 특수 파일(FIFO·디렉터리)과 조상 symlink(`tests/.tmp` 외부 디렉터리 링크 포함)를 open/read/write 전에 거부하고, 실패 시 기존 bytes와 산출물이 바뀌지 않음을 실행 검증한다. 코드 추가 없이 테스트만.
+- 예상 19분 / 선행 0~3 / 공통 절차 설계 §15
+- read-first: 설계 §11.7(경로 유형 계약, 실행 순서, S, C, 비교 도구 step 1·2, 설계 블록 추출 규칙, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`
+- tracked 허용(exact): `tests/specs/scope-snapshot-special.spec.js`(신규)
+- runtime: R0(합성 저장소, `<pid>-outside/`, 실제 저장소 `tests/.tmp/start-snapshot-parity-{숫자}.json` 위치의 FIFO·디렉터리)
+- 금지: §15.7, `scope-snapshot.mjs`·`start-snapshot.py`·helper 수정, 실제 저장소 비runtime 경로에 symlink·FIFO 생성, 권한 변경
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step4`
-2. `scope-snapshot.mjs`에 step 4 API(`computeIdentity`, `checkIdentity`, `diffAgainstStart`, `classifyChanges`, `checkRuntimeVisible`, `checkSnapshotFirst`, `evaluateGate`, CLI `--check`) 추가. CLI 순서는 설계 §11.7(schema → identity → 상태 수집 → 판정)이며 identity 실패 시 어떤 파일도 쓰지 않는다. 판정 문자열·순서는 C와 같다.
-3. `scope-snapshot-gate.spec.js` (node 전용, desktop-dark만)
-   - `checkIdentity`(순수): 같음 → `[]`; projectRoot·head·base·harness.sourceCommit·harness.manifestHash·harness.distributionVersion·harness.lockSha256 각각 다름 → 해당 `identity-mismatch:{field}`; 여러 필드 → 지정 순서
-   - `computeIdentity`(실제 저장소 읽기 전용): `parity-<pid>` snapshot identity와 같음, 다른 root(`tests/.tmp`) → throw
-   - 변경 판정(가짜 current, h0·h1·h2 서로 다름)
-     - `CLAUDE.md` 시작 ` M`/h1: 그대로 → 0; 원복(status 없음, h0) → `{content-changed, ' M', null}`·`outside-tests:CLAUDE.md`; 삭제(` D`, null) → `deleted`·`outside-tests:`; 같은 ` M`에서 h2 → `outside-tests:`
-     - `tests/playwright.config.js` 시작 ` M`/h1(allow 밖): 그대로 → 0; h2 → `tests-changed:`; 삭제·원복 → `tests-changed:`; allow에 있으면 → 0
-     - 깨끗한 `tests/helpers/theme.js` → ` M`/h' → `tests-changed:`; `?? tests/specs/wip.spec.js` 사라짐 → `tests-changed:`; walk 전용 `tests/fixtures/local.json` h1→h2 → `tests-changed:`
-     - `README.md` hash 같고 xy 없음→`M ` → `status-changed:README.md`; 새 `?? docs/x.md` → `outside-tests:`
-     - `?? .harness/runtime/a.json`, `phases/HOO-81-portfolio-redesign/step5.md` 변경 → 0; `.harness/policy.json`·`.harness/harness.lock.json` 변경 → `outside-tests:`
-     - `?? tests/node_modules/x/index.js` → `runtime-visible:`; 새 `tests/specs/other.spec.js` → `tests-changed:`; `R  tests/x.js`←`README.md` → `outside-tests:README.md`와 `tests-changed:tests/x.js`
-     - unsafe 우선: current.unsafe `['symlink:b','symlink:a']` + 다른 변경 + require-absent 위반 → 정확히 `snapshot-not-first:…`, `symlink:a`, `symlink:b`(변경 판정 없음), allow에 `a`가 있어도 같음
-     - `checkSnapshotFirst`, `evaluateGate` 순서, 입력 불변
-   - 합성 종료 gate: step 3 사례 (a) ignored symlink와 (b) 수정된 tracked symlink의 target 재변경을 `makeSyntheticRepo()`로 재현해 `evaluateGate(start, takeCurrent(start, { root: dir }), { allow: [링크 경로] })` → 각각 `symlink:{p}` 포함, 위반 ≥ 1
-   - CLI subprocess(실제 저장소, `parity-{숫자}` 사용 후 삭제)
-     - 없는 파일·schemaVersion `1.0` → exit 1
-     - 방금 만든 parity snapshot + `--allow ''` → exit 0·`scope-snapshot: OK`
-     - identity 거부(schema 정상): `projectRoot`=`/tmp/other`, `head`=40자 0, `base`=40자 f, `harness.sourceCommit`, `harness.manifestHash`, `harness.distributionVersion`=`9.9.9`, `harness.lockSha256`=64자 0 중 하나씩만 바꾼 별도 `parity-<n>` → 각각 exit 1, stderr `start snapshot identity mismatch: {field}`, snapshot sha256 불변, `<snapshot>-after.z` 미생성, 실행 전후 `git status --porcelain=v1 -z --untracked-files=all` 출력과 `git ls-files`의 tests 밖 파일 sha256 불변
-     - 모든 실행 전후 snapshot sha256 불변
+2. `scope-snapshot-special.spec.js` (node 전용, desktop-dark만, 모든 S·C subprocess timeout 10초 — timeout은 실패로 판정, 각 사례 전후로 대상 디렉터리의 파일 목록·각 regular 파일 sha256·FIFO/디렉터리 유형을 기록해 비교). FIFO는 `os.mkfifo`(python3 -I -c) 또는 `mkfifo`로 만든다.
+   - S 합성(cwd `dir`, BASE 없음 → 유형 검사 실패가 BASE 오류보다 먼저 나와야 함)
+     - (a) snapshot FIFO: `tests/.tmp/start-snapshot-parity-1.json`이 FIFO → exit ≠ 0, stderr `unsafe path:`에 `non-regular:tests/.tmp/start-snapshot-parity-1.json`, 멈추지 않음, FIFO 유지, 새 파일 없음
+     - (b) snapshot 디렉터리: 같은 경로가 디렉터리(안에 파일 1개) → `non-regular:…`, 디렉터리 내용 불변
+     - (c) 기록 대상 FIFO: `tests/.tmp`가 없는 상태에서 `tests/specs/p.fifo` FIFO → `non-regular:tests/specs/p.fifo`, `tests/.tmp` 미생성, 다른 파일 sha256 불변
+     - (d) 기록 대상 디렉터리: commit된 `tracked.txt`를 지우고 같은 이름 디렉터리(안에 `x`) 생성 → `non-regular:tracked.txt`, `tests/.tmp` 미생성
+     - (e) 조상 symlink: commit된 `lib/x.txt`가 있는 `lib`를 `<outside>`(안에 sentinel `x.txt`) 링크로 교체 → `symlink:lib`, sentinel 미출력
+     - (f) `tests/.tmp` 외부 디렉터리 symlink: `tests/.tmp → <outside>/tmpdir`(안에 sentinel 파일과 정상 형식 snapshot 사본) → `symlink:tests/.tmp`, 외부 디렉터리 목록·bytes·mtime 불변
+   - S 실제 저장소(재사용 분기, 실제 BASE): `tests/.tmp/start-snapshot-parity-<m>.json`이 FIFO, 디렉터리인 경우 각각 exit ≠ 0·`non-regular:`·멈추지 않음, 다른 parity 파일 sha256 불변. 끝나면 삭제
+   - C 합성(cwd `dir`, `designBlock('inline 범위 검사 C')`): (g) (f)와 같은 `tests/.tmp` 외부 링크 → exit 1, stderr `unsafe path: symlink:tests/.tmp`, `<outside>/tmpdir`에 `-after.z` 미생성, 외부 bytes·mtime 불변; (h) 정상 start 파일 + `…-after.z`가 FIFO → exit 1, `non-regular:…-after.z`, FIFO 유지, 멈추지 않음; (i) after.z가 외부 파일 symlink → `symlink:…-after.z`, 외부 파일 bytes 불변; (j) snapshot 자체가 FIFO → `non-regular:`, 멈추지 않음
+   - JS loader 합성: (f) 상태에서 `loadStartSnapshot('tests/.tmp/start-snapshot-parity-1.json', { root: dir, fs: 기록용 fs })` → `unsafe path: symlink:tests/.tmp` throw, 기록은 `tests`·`tests/.tmp`에 대한 `lstatSync`뿐(외부 대상에 대한 open·read·stat·readlink·realpath 없음); snapshot FIFO·디렉터리 → `non-regular:` throw, open 없음
+   - JS `takeCurrent` 합성: (c)·(d)·(e) 각각 `unsafe`에 같은 항목, `files` `{}`, 해당 경로 open 없음
 
-## AC
+## AC (모두 exit 0)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- scope-snapshot-gate.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step4 && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step4.json --allow tests/scripts/scope-snapshot.mjs,tests/specs/scope-snapshot-gate.spec.js --require-absent tests/specs/scope-snapshot-gate.spec.js` → exit 0 (마지막 명령은 schema → 현재 identity → 경로 안전 → 판정을 거친다)
+1. `sh tests/scripts/with-env.sh npm --prefix tests test -- scope-snapshot-special.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step4` (마지막은 `reused`)
+2. 범위 gate: `python3 -I - step4 'tests/specs/scope-snapshot-special.spec.js' 'tests/specs/scope-snapshot-special.spec.js' <<'PY'` + 설계 §11.7 C 코드 블록 본문(그대로) + `PY`

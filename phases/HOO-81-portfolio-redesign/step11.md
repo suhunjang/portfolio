@@ -1,18 +1,18 @@
-# Step 11 — ui-regression
+# Step 11 — modal-regression
 
-- 목적: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion 회귀(BASE 사이트에서 통과).
-- 예상 17분 / 선행 0~10 / 공통 절차 설계 §15
-- read-first: 설계 §3(기타), §6(locator 문법), §7.4, §11.4
-- tracked 허용(exact): `tests/specs/ui-regression.spec.js`, `tests/specs/first-visit.spec.js`
+- 목적: modal.js helper와 모달·lightbox 회귀(BASE 사이트에서 통과).
+- 예상 18분 / 선행 0~10 / 공통 절차 설계 §15
+- read-first: 설계 §3(모달, lightbox), §5(같은 data-project), §7.4, §11.4
+- tracked 허용(exact): `tests/helpers/modal.js`(신규), `tests/specs/modal-regression.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 모달·lightbox 검사
+- 금지: §15.7, 테마·메뉴·scrollspy·typing·reduced-motion(step 12)
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step11`
-2. `ui-regression.spec.js`(6 project): 테마 토글 시 `data-theme`·`THEME_KEY` 변경 후 새로고침 유지; mobile 메뉴 `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#projects"]'); await link.click(); await expect(link).toHaveClass(/active/);`; typing 텍스트 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`.
-3. `first-visit.spec.js`: fixture 없이 desktop-dark, colorScheme light·dark 각각 저장값 없으면 시스템 따름.
+2. `modal.js`: 설계 §7.4 계약 그대로(`GRID_CARD`, `gridCard`, `openFirstProjectByClick/Enter`, `closeVia`, `expectFocused`, `modalTitle`, `findProjectWithShots`).
+3. `modal-regression.spec.js`(6 project): click·Enter로 열기, 제목 일치, `modal-open`; button·backdrop·esc 닫기 후 트리거 포커스 복귀·`modal-open` 해제; desktop lightbox: `findProjectWithShots` index 반환·탐색 후 닫힘·그 카드에서 `.shot-zoom`으로 열림; Esc 1회 lightbox만, 2회 모달.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- ui-regression.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step11.json --allow tests/specs/ui-regression.spec.js,tests/specs/first-visit.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- modal-regression.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step11.json --allow tests/helpers/modal.js,tests/specs/modal-regression.spec.js` → exit 0

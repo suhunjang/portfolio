@@ -1,17 +1,17 @@
-# Step 19 — axe-remediation-plan-schema
+# Step 19 — axe-baseline-projection
 
-- 목적: remediation plan 스키마 검증.
+- 목적: collected↔baseline 투영과 양방향 일치 검사.
 - 예상 17분 / 선행 0~18 / 공통 절차 설계 §15
-- read-first: 설계 §8.3(step 19, plan 규칙)
+- read-first: 설계 §8.3(entry key, step 19, fixture)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 12·16~18 동작, 실제 fixtures
+- 금지: §15.7, step 13·17·18 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step19`
-2. 설계 §8.3 step 19 계약 구현(target 부분집합은 baseline 전체 canonical 합집합 기준).
-3. spec(desktop-dark): id 통과 `color-token-1`, `a`, `x2` / 거부 `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열; 중복 id 거부; 정상 통과; 다른 project의 같은 target을 한 그룹에 한 번 → coverage 통과; 거부 estMinutes 21·0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상, coverage 누락; requireEmpty 빈 통과·그룹 1개 오류; CLI 정상 0, plan 없음·JSON 오류·대문자 id·중복 id·coverage 누락·baseline 없음 1, `--require-empty` 빈 0·그룹 1개 1.
+2. 설계 §8.3 step 19 계약 구현.
+3. spec(desktop-dark): projectEntry 7필드만·정렬·중복 제거·key 불일치/누락 throw; compareCollectedBaseline 같은 내용 ok, collected만 entry → missingEntries, baseline만 → extraEntries, missingTargets, extraTargets, impact·selectors 차이 → fieldMismatches, 중복 key throw, 입력 불변; CLI 일치 0, 다섯 불일치 각각 1, collected 없음·baseline JSON 오류 1.
 
 ## AC
 

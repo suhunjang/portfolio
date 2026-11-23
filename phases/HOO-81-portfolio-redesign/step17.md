@@ -1,17 +1,17 @@
-# Step 17 — axe-baseline-regression
+# Step 17 — axe-collect-tooling
 
-- 목적: baseline 스키마·회귀 판정·분류 대기 baseline 계약.
+- 목적: entry key와 수집 파일 관리(reset/write/merge).
 - 예상 19분 / 선행 0~16 / 공통 절차 설계 §15
-- read-first: 설계 §8.3(entry key, step 17, 실행 모드)
+- read-first: 설계 §8.3(entry key, step 17, COLLECT_CHAIN)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 12·16 동작, 실제 fixtures
+- runtime: R0(테스트는 `tests/.tmp/axe-helper-test-*/` 독립 디렉터리만, 실제 COLLECT_DIR에 쓰지 않음)
+- 금지: §15.7, step 13 동작
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step17`
-2. 설계 §8.3 step 17 계약 구현(`resolveBaselineMode`는 환경변수를 읽지 않는다).
-3. spec(desktop-dark, 경로는 모두 독립 디렉터리): validateBaseline 통과(혼합 color-contrast, js-render, static-markup, text-change `[]`); 거부 — key 불일치·중복·targets 중복·미정렬, kind별 파일 오대응 5종, 비-text-change 빈 배열, js-render 여분 파일, 합집합 불일치, fix 누락, targets 밖 target, 알 수 없는 kind; checkRegression 새 key/target 오류·사라짐 허용·`page:desktop-dark`에만 있는 target이 `page:desktop-light`에 나오면 new-key/new-target·입력 불변; resolveBaselineMode — baseline 있음 → `check`, baseline 없음+collected 있음+plan 없음 → `pending`, baseline 없음+collected 없음 → throw, baseline 없음+collected 있음+plan 있음 → throw, `process.env.AXE_ALLOW_MISSING_BASELINE='1'`을 설정해도 collected 없으면 throw; loadBaseline 없음·잘못된 JSON·`{}` throw; CLI `--assert-empty` `[]` 0, `[{}]`·`{}`·잘못된 JSON·없음 1.
+2. 설계 §8.3 step 17 계약 구현.
+3. spec(desktop-dark): makeEntryKey 형식·빈 ruleId·`:` 포함 throw; 같은 ruleId 2개·중복 target → entry 1개 정렬; 같은 target이 page-desktop-dark/light → entry 2개, page/modal → 2개; 모든 key = makeEntryKey; resolveCollectDir 우선순위·`tests/.tmp` 밖 거부; reset 후 비어 있음; write 10개·잘못된 scenario throw; merge 10개 성공·9개 missing·여분 extra; CLI(`--dir`/`--out` 지정) reset 0, merge 0, 9개 1, `--dir tests/fixtures` 1; 실행 전후 실제 COLLECT_DIR(존재·목록·크기·mtime)과 `tests/fixtures/axe-collected.json` 불변.
 
 ## AC
 

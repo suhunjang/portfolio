@@ -1,17 +1,17 @@
-# Step 20 — axe-plan-executable
+# Step 20 — axe-remediation-plan-schema
 
-- 목적: blocked·text-change·빈 fixFiles 그룹에서 중단하는 실행 가능성 검사.
-- 예상 15분 / 선행 0~19 / 공통 절차 설계 §15
-- read-first: 설계 §7.2, §8.3(step 20, gate, 재계획 생성 조건)
+- 목적: remediation plan 스키마 검증.
+- 예상 17분 / 선행 0~19 / 공통 절차 설계 §15
+- read-first: 설계 §8.3(step 20, plan 규칙)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 12·16~19 동작, 실제 fixtures
+- 금지: §15.7, step 13·17~19 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step20`
-2. 설계 §8.3 step 20 계약 구현.
-3. spec(desktop-dark): `{ groups: [] }` → `[]`; css-token 실행 가능 → `[]`; blocked css-rule → `blocked-group`; text-change 그룹(blocked, `[]`) → blocked-group·text-change·empty-fixfiles 모두; 정상+blocked 혼합 → blocked 오류만·길이 ≥ 1; 입력 불변; CLI 빈 0, 실행 가능만 0, blocked 1(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`), fixFiles `[]` 1, plan 없음·baseline JSON 오류 1.
+2. 설계 §8.3 step 20 계약 구현(target 부분집합은 baseline 전체 canonical 합집합 기준).
+3. spec(desktop-dark): id 통과 `color-token-1`, `a`, `x2` / 거부 `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열; 중복 id 거부; 정상 통과; 다른 project의 같은 target을 한 그룹에 한 번 → coverage 통과; 거부 estMinutes 21·0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상, coverage 누락; requireEmpty 빈 통과·그룹 1개 오류; CLI 정상 0, plan 없음·JSON 오류·대문자 id·중복 id·coverage 누락·baseline 없음 1, `--require-empty` 빈 0·그룹 1개 1.
 
 ## AC
 

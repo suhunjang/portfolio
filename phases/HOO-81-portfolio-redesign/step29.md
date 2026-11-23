@@ -1,18 +1,18 @@
-# Step 29 — focus-trap-modal
+# Step 29 — section-layout
 
-- 목적: `trapFocus` 구현과 모달 연결.
-- 예상 17분 / 선행 0~28 / 공통 절차 설계 §15
-- read-first: 설계 §8.2(step 29); `openProjectModal`, `closeProjectModal`, `lastFocused`, 모달 포커스 요소, lightbox 코드 위치(수정 금지)
-- tracked 허용(exact): `js/main.js`(`trapFocus` 추가와 모달 열기·닫기 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
+- 목적: 섹션 여백·Career·그리드 반응형.
+- 예상 16분 / 선행 0~28 / 공통 절차 설계 §15
+- read-first: 설계 §6, §9; 섹션 CSS, timeline, 그리드
+- tracked 허용(exact): `css/style.css`(섹션 여백, Career, 그리드, `.subsection-title`만), `tests/specs/layout.spec.js`
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 관련 코드
+- 금지: §15.7, `index.html`, `js/*`, `css/themes.css`
 
 ## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step29`
-2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 마지막→Tab→첫, 첫→Shift+Tab→마지막, 모달 밖으로 나가지 않음; button·backdrop·esc 닫기 후 트리거 복귀; `#heroFeatured`·`#projectGrid` 트리거 양쪽; 연속 2회 열고 닫아도 Tab 한 칸만 이동.
-3. main.js: §8.2 계약 그대로, 열 때 push(trigger)·닫을 때 release.
+2. `layout.spec.js`(6 project): 가로 스크롤 없음, projectGrid·strengthsGrid 3/2/1열, Career 375 세로·768/1280 가로, 375 highlights 보임, career~contact padding-top 동일, `.subsection-title` font-weight ≤ h2.
+3. style.css(토큰만). axe 새 target은 step 26 규칙.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step29.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- layout.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step29.json --allow css/style.css,tests/specs/layout.spec.js` → exit 0
