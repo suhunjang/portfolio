@@ -1,17 +1,17 @@
-# Step 21 — axe-plan-executable
+# Step 21 — axe-collect-tooling
 
-- 목적: blocked·text-change·빈 fixFiles 그룹에서 중단하는 실행 가능성 검사.
-- 예상 15분 / 선행 0~20 / 공통 절차 설계 §15
-- read-first: 설계 §7.2, §8.3(step 21, gate, 재계획 생성 조건)
+- 목적: entry key와 수집 파일 관리(reset/write/merge).
+- 예상 19분 / 선행 0~20 / 공통 절차 설계 §15
+- read-first: 설계 §8.3(entry key, step 21, COLLECT_CHAIN)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 13·17~20 동작, 실제 fixtures
+- runtime: R0(테스트는 `tests/.tmp/axe-helper-test-*/` 독립 디렉터리만, 실제 COLLECT_DIR에 쓰지 않음)
+- 금지: §15.7, step 17 동작
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step21`
 2. 설계 §8.3 step 21 계약 구현.
-3. spec(desktop-dark): `{ groups: [] }` → `[]`; css-token 실행 가능 → `[]`; blocked css-rule → `blocked-group`; text-change 그룹(blocked, `[]`) → blocked-group·text-change·empty-fixfiles 모두; 정상+blocked 혼합 → blocked 오류만·길이 ≥ 1; 입력 불변; CLI 빈 0, 실행 가능만 0, blocked 1(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`), fixFiles `[]` 1, plan 없음·baseline JSON 오류 1.
+3. spec(desktop-dark): makeEntryKey 형식·빈 ruleId·`:` 포함 throw; 같은 ruleId 2개·중복 target → entry 1개 정렬; 같은 target이 page-desktop-dark/light → entry 2개, page/modal → 2개; 모든 key = makeEntryKey; resolveCollectDir 우선순위·`tests/.tmp` 밖 거부; reset 후 비어 있음; write 10개·잘못된 scenario throw; merge 10개 성공·9개 missing·여분 extra; CLI(`--dir`/`--out` 지정) reset 0, merge 0, 9개 1, `--dir tests/fixtures` 1; 실행 전후 실제 COLLECT_DIR(존재·목록·크기·mtime)과 `tests/fixtures/axe-collected.json` 불변.
 
 ## AC
 

@@ -1,19 +1,18 @@
-# Step 26 — featured-projects
+# Step 26 — axe-current-checks
 
-- 목적: 대표 프로젝트 3개 카드와 모달 연결.
-- 예상 19분 / 선행 0~25 / 공통 절차 설계 §15
-- read-first: 설계 §5(컨테이너·카드·함수·data.js), §7, §8.3(회귀); projectGrid 렌더, `openProjectModal`, `lastFocused`, 위임, data.js 1·5·7
-- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤에 정확한 `#heroFeatured` 마크업 추가만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, `#heroFeatured` 위임만), `css/style.css`(`.featured-card`, `.featured-title`, `.featured-blurb`만), `tests/specs/featured.spec.js`
-- runtime: R0
-- 금지: §15.7, `css/themes.css`, hero의 그 밖 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
+- 목적: 현재 수집 결과 판정(group done, coverage, 위반 0).
+- 예상 17분 / 선행 0~25 / 공통 절차 설계 §15
+- read-first: 설계 §8.3(entry key, step 26, gate·recheck·finalize·재계획 계약)
+- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- runtime: R0(독립 디렉터리)
+- 금지: §15.7, step 17·21~25 동작, 실제 fixtures
 
-## 작업 (TDD)
+## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step26`
-2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드별 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter 열고 esc 닫기 복귀; 대표 카드가 생긴 뒤에도 `findProjectWithShots`와 `prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용(닫은 뒤 복귀 대상이 grid 카드).
-3. data.js 3줄, index.html 마크업, main.js(`esc()` 이스케이프 span만, 그리드 직후 호출, `(idx, card)` 호출, 위임), style.css(토큰만).
-4. axe 새 target: 이 step 마크업 때문이면 허용 파일 안에서 고치고, 식별 손실이면 중단·재계획.
+2. 설계 §8.3 step 26 계약 구현.
+3. spec(desktop-dark): checkGroupDone 사라짐 done, lightbox에만 남음 remaining 1(`lightbox:desktop-*:*`), 다른 그룹 잔여 무영향, unknown·형식 오류 id throw, collected `{}` throw; checkCollectedCoverage 전부 포함 ok, plan 밖 1개 uncovered, 빈 groups + 잔여 uncovered, 입력 불변; countCollectedTargets `[]` 0, 2+1 → 3, 같은 target 두 entry → 2; CLI group-done done 0·remaining 1·unknown 1·없음 1, coverage 포함 0·잔여 1·없음 1, assert-no-violations `[]` 0·1개 1·없음 1; baseline과 수집에 같은 target이 남으면 checkRegression `[]`이어도 `--assert-no-violations` 1.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step26.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step26.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0

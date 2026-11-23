@@ -1,18 +1,19 @@
-# Step 14 — axe-prepare-page
+# Step 14 — content-static-baseline
 
-- 목적: 준비 helper 공통 오류 계약과 page 준비.
-- 예상 15분 / 선행 0~13 / 공통 절차 설계 §15
-- read-first: 설계 §3(reveal), §8.4(step 14)
-- tracked 허용(exact): `tests/helpers/axe-prepare.js`(신규: `PREPARE_PREFIX`, `prepareError`, `withPrepareCode`, `preparePage`만), `tests/specs/axe-prepare-page.spec.js`(신규)
+- 목적: 정적 본문 추출과 허용 예외 판정.
+- 예상 17분 / 선행 0~13 / 공통 절차 설계 §15
+- read-first: 설계 §6, §7.2, §7.3; 셀렉터 `.nav-link`, `.hero-eyebrow`, `.hero-cta .btn`, `.section-kicker`, `.section-title`, `.section-sub`, `.about-text p`, `.about-points li`, `.about-meta dt`, `.contact-text`, `.footer-note`, `.footer-top`
+- tracked 허용(exact): `tests/fixtures/content-exceptions.json`(신규), `tests/helpers/content.js`(`extractStatic` 추가만), `tests/specs/content-static.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 콘텐츠 로딩·modal·lightbox·prepareForAxe(step 15·16)
+- 금지: §15.7, fixture 생성 스크립트·baseline 파일·content-data.spec, content.js 기존 함수
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step14`
-2. 설계 §8.4 step 14 계약 구현.
-3. spec(desktop-dark, desktop-light, mobile-dark): 실제 사이트 `revealChecked` = `.reveal` 개수 > 0, 모두 `.in`, 반환 후 scrollY 0, scrollSteps ≥ 1; `.in`이 안 붙는 `.reveal` 1개 + `timeoutMs: 500` → `prepareForAxe: reveal-hidden:1`·code 일치; `prepareError('x')` message·code; `withPrepareCode('fonts-not-ready', reject boom)` → message·cause; `withPrepareCode('a', reject prepareError('b'))` → 코드 b 유지; 호출 전후 data-theme·reduced-motion 불변.
+2. `content-exceptions.json`: `kickers.base/final`, `titles.base/final`, `featured.indexes` [1,5,7], `subsectionTitleFinal`.
+3. `extractStatic(page)`: 모두 norm, `navLabels`만 정렬.
+4. `content-static.spec.js`(6 project): baseline-index.html을 `javaScriptEnabled: false` context `setContent`로 추출해 현재 `/index.html`과 비교. kickers·sectionTitles는 base 또는 final과 순서까지 일치, final이면 subsection h3 기술 스택 1개, 나머지 필드는 BASE와 같다. 예외 판정 합성: base 통과, final 통과, 혼합 거부, 한 글자 차이 거부.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step14.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-page.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-static.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step14.json --allow tests/fixtures/content-exceptions.json,tests/helpers/content.js,tests/specs/content-static.spec.js` → exit 0

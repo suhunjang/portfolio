@@ -1,18 +1,18 @@
-# Step 12 — ui-regression
+# Step 12 — scope-content
 
-- 목적: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion 회귀(BASE 사이트에서 통과).
-- 예상 17분 / 선행 0~11 / 공통 절차 설계 §15
-- read-first: 설계 §3(기타), §6(locator 문법), §7.4, §11.4
-- tracked 허용(exact): `tests/specs/ui-regression.spec.js`, `tests/specs/first-visit.spec.js`
+- 목적: verify-scope 내용 판정(data.js patch, Space Grotesk, gitignore)과 `--final`.
+- 예상 19분 / 선행 0~11 / 공통 절차 설계 §15
+- read-first: 설계 §11.1, §11.5(내용 판정, final, 합성)
+- tracked 허용(exact): `tests/scripts/verify-scope.mjs`
 - runtime: R0
-- 금지: §15.7, 모달·lightbox 검사
+- 금지: §15.7, 두 diff 인자 상수 값
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step12`
-2. `ui-regression.spec.js`(6 project): 테마 토글 시 `data-theme`·`THEME_KEY` 변경 후 새로고침 유지; mobile 메뉴 `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#projects"]'); await link.click(); await expect(link).toHaveClass(/active/);`; typing 텍스트 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`.
-3. `first-visit.spec.js`: fixture 없이 desktop-dark, colorScheme light·dark 각각 저장값 없으면 시스템 따름.
+2. `checkGitignore(text)`(null 위반, 끝 `\n` 1개 제거 후 7줄 정확), `checkDataJsDiff(patch, { requireExactly3 })`, `evaluateContent(input, { final })`(4구간 patch 그대로 전달, BASE→HEAD/index/worktree는 `requireExactly3: final`, index→worktree는 false, index.html 3종·gitignore 2종), `evaluateScope = [...evaluatePaths, ...evaluateContent]`(CLI 기본, `verify-scope: OK`, `--final`).
+3. self-test 추가(기존 유지): patch 전달 합성(가짜 git: PATCH 인자+data.js면 `featured: true,` 3줄 patch, `--name-only`면 이름만) → final 위반 0; `+    title: 'x',` 추가 → 위반; name-only 수집기 → final 3줄 미달 위반. data.js 위반: 삭제 줄, featured 외 줄, 4줄, stage 후 worktree 원복. final: 각 3줄·index→worktree 0 → 0; BASE→HEAD 0줄, BASE→index 2줄, index→worktree featured 외 줄 → 위반. Space Grotesk 제거 stage 후 원복 → 위반. gitignore 위반: 추가 줄, 중복, 빈 줄, 순서, 주석, CRLF, index만 잘못됨; 끝 개행 없음은 통과.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- ui-regression.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step12.json --allow tests/specs/ui-regression.spec.js,tests/specs/first-visit.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step12.json --allow tests/scripts/verify-scope.mjs` → exit 0

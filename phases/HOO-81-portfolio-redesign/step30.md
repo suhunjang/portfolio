@@ -1,18 +1,19 @@
-# Step 30 — focus-trap-modal
+# Step 30 — featured-projects
 
-- 목적: `trapFocus` 구현과 모달 연결.
-- 예상 17분 / 선행 0~29 / 공통 절차 설계 §15
-- read-first: 설계 §8.2(step 30); `openProjectModal`, `closeProjectModal`, `lastFocused`, 모달 포커스 요소, lightbox 코드 위치(수정 금지)
-- tracked 허용(exact): `js/main.js`(`trapFocus` 추가와 모달 열기·닫기 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
+- 목적: 대표 프로젝트 3개 카드와 모달 연결.
+- 예상 19분 / 선행 0~29 / 공통 절차 설계 §15
+- read-first: 설계 §5(컨테이너·카드·함수·data.js), §7, §8.3(회귀); projectGrid 렌더, `openProjectModal`, `lastFocused`, 위임, data.js 1·5·7
+- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤에 정확한 `#heroFeatured` 마크업 추가만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, `#heroFeatured` 위임만), `css/style.css`(`.featured-card`, `.featured-title`, `.featured-blurb`만), `tests/specs/featured.spec.js`
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 관련 코드
+- 금지: §15.7, `css/themes.css`, hero의 그 밖 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
 
 ## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step30`
-2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 마지막→Tab→첫, 첫→Shift+Tab→마지막, 모달 밖으로 나가지 않음; button·backdrop·esc 닫기 후 트리거 복귀; `#heroFeatured`·`#projectGrid` 트리거 양쪽; 연속 2회 열고 닫아도 Tab 한 칸만 이동.
-3. main.js: §8.2 계약 그대로, 열 때 push(trigger)·닫을 때 release.
+2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드별 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter 열고 esc 닫기 복귀; 대표 카드가 생긴 뒤에도 `findProjectWithShots`와 `prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용(닫은 뒤 복귀 대상이 grid 카드).
+3. data.js 3줄, index.html 마크업, main.js(`esc()` 이스케이프 span만, 그리드 직후 호출, `(idx, card)` 호출, 위임), style.css(토큰만).
+4. axe 새 target: 이 step 마크업 때문이면 허용 파일 안에서 고치고, 식별 손실이면 중단·재계획.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step30.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step30.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0

@@ -1,17 +1,17 @@
-# Step 22 — axe-current-checks
+# Step 22 — axe-baseline-regression
 
-- 목적: 현재 수집 결과 판정(group done, coverage, 위반 0).
-- 예상 17분 / 선행 0~21 / 공통 절차 설계 §15
-- read-first: 설계 §8.3(entry key, step 22, gate·recheck·finalize·재계획 계약)
+- 목적: baseline 스키마·회귀 판정·분류 대기 baseline 계약.
+- 예상 19분 / 선행 0~21 / 공통 절차 설계 §15
+- read-first: 설계 §8.3(entry key, step 22, 실행 모드)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 13·17~21 동작, 실제 fixtures
+- 금지: §15.7, step 17·21 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step22`
-2. 설계 §8.3 step 22 계약 구현.
-3. spec(desktop-dark): checkGroupDone 사라짐 done, lightbox에만 남음 remaining 1(`lightbox:desktop-*:*`), 다른 그룹 잔여 무영향, unknown·형식 오류 id throw, collected `{}` throw; checkCollectedCoverage 전부 포함 ok, plan 밖 1개 uncovered, 빈 groups + 잔여 uncovered, 입력 불변; countCollectedTargets `[]` 0, 2+1 → 3, 같은 target 두 entry → 2; CLI group-done done 0·remaining 1·unknown 1·없음 1, coverage 포함 0·잔여 1·없음 1, assert-no-violations `[]` 0·1개 1·없음 1; baseline과 수집에 같은 target이 남으면 checkRegression `[]`이어도 `--assert-no-violations` 1.
+2. 설계 §8.3 step 22 계약 구현(`resolveBaselineMode`는 환경변수를 읽지 않는다).
+3. spec(desktop-dark, 경로는 모두 독립 디렉터리): validateBaseline 통과(혼합 color-contrast, js-render, static-markup, text-change `[]`); 거부 — key 불일치·중복·targets 중복·미정렬, kind별 파일 오대응 5종, 비-text-change 빈 배열, js-render 여분 파일, 합집합 불일치, fix 누락, targets 밖 target, 알 수 없는 kind; checkRegression 새 key/target 오류·사라짐 허용·`page:desktop-dark`에만 있는 target이 `page:desktop-light`에 나오면 new-key/new-target·입력 불변; resolveBaselineMode — baseline 있음 → `check`, baseline 없음+collected 있음+plan 없음 → `pending`, baseline 없음+collected 없음 → throw, baseline 없음+collected 있음+plan 있음 → throw, `process.env.AXE_ALLOW_MISSING_BASELINE='1'`을 설정해도 collected 없으면 throw; loadBaseline 없음·잘못된 JSON·`{}` throw; CLI `--assert-empty` `[]` 0, `[{}]`·`{}`·잘못된 JSON·없음 1.
 
 ## AC
 

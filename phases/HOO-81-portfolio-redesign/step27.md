@@ -1,26 +1,18 @@
-# Step 27 — hero-first-screen
+# Step 27 — axe-regression-prune
 
-- 목적: 히어로 순서·tagline·반응형과 첫 화면 AC(지표 item 4개 개별 검사 포함).
-- 예상 20분 / 선행 0~26 / 공통 절차 설계 §15
-- read-first: 설계 §3(렌더링), §5(히어로 순서, tagline, 첫 화면 AC), §9; main.js `#heroStats` 렌더 코드에서 지표 item·수치·label 셀렉터와 대응 STATS 필드명
-- tracked 허용(exact): `index.html`(section#hero 내부만, `#heroFeatured` 마크업 유지), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄 추가만), `css/style.css`(hero, `#heroStats`, `#heroFeatured` 배치만), `tests/specs/hero.spec.js`
-- runtime: R0
-- 금지: §15.7, `js/data.js`, `css/themes.css`, 대표 카드·모달·`#heroStats` 렌더 로직, `#heroFeatured` 속성, 섹션·nav
+- 목적: plan 수정 전 회귀 gate와 plan 정리 도구.
+- 예상 19분 / 선행 0~26 / 공통 절차 설계 §15
+- read-first: 설계 §8.3(entry key, step 27, REGRESSION_GATE, gate/recheck)
+- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- runtime: R0(독립 디렉터리 사본만, 실제 plan 파일에 쓰지 않음)
+- 금지: §15.7, step 17·21~26 동작, 실제 fixtures
 
-## 작업 (TDD)
+## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step27`
-2. `hero.spec.js`(6 project) 먼저 실패 확인
-   - 상단 상수 `STAT_ITEM`, `STAT_VALUE`, `STAT_LABEL`
-   - hero DOM 순서 §5 1~8; `p.hero-tagline` id `heroTagline`, 텍스트 = `PROFILE.tagline`; CTA·eyebrow·typed 유지; `#heroFeatured` role·aria-label 유지
-   - 배치: STATS item 375 2×2, 768·1280 4×1; featured 1/2/3열
-   - 첫 화면(desktop-dark/light, fonts.ready, scrollY 0): helper `expectInFirstScreen(locator)` = `toBeVisible()`, bbox w·h > 0, 자신과 `document.documentElement`까지 모든 조상 visibility `visible`·opacity `1`(`expect.poll`), left x ≥ 0, top y ≥ 0, right x+w ≤ 1280, bottom y+h ≤ 800
-   - 적용: `#heroName`, `#heroTagline`, `#heroStats`, `.featured-title` 3개 각각
-   - 지표: `#heroStats` 안 `STAT_ITEM` 개수 정확히 4. i = 0..3마다 item, item 안 `STAT_VALUE`(정확히 1개), `STAT_LABEL`(정확히 1개) 각각 `expectInFirstScreen`; VALUE 텍스트(norm) = `STATS[i]` 수치 필드, LABEL 텍스트(norm) = `STATS[i]` label 필드
-3. index.html 순서 변경과 tagline 추가, main.js 1줄, style.css(eyebrow·typing 축소, 여백, STATS·featured 반응형, blurb 2줄 clamp, 토큰만, 문구 축소 금지).
-4. axe 새 target은 step 26과 같은 규칙.
+2. 설계 §8.3 step 27 계약 구현.
+3. spec(desktop-dark): checkCollectedRegression 같음 `[]`, 새 key `new-key:`, 새 target `new-target:`, key 불일치 `bad-key:`, 사라짐 `[]`; prunePlan 사라진 target 제거·빈 그룹 삭제·fixFiles 부분집합·id 유지·plan 밖 target 추가 없음·blocked 불변·입력 불변; CLI check-regression 0/1(new-target, baseline 없음, collected 없음); prune-plan 전 sha256·mtime 기록 → new-target이면 exit 1·불변, collected 없음·baseline JSON 오류 exit 1·불변, `sh -c 'node axe.js --check-regression ... && node axe.js --prune-plan ...'` 회귀 실패 시 exit 1·불변, 회귀 없음+사라진 target 1개 exit 0·target 제거·`validateRemediationPlan`(coverage false) 통과.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow index.html,js/main.js,css/style.css,tests/specs/hero.spec.js` → exit 0
-- hero.spec.js 단독 실행에 지표 item 4개 × (item, 수치, label)의 텍스트·가시성·크기·조상 visibility/opacity·viewport 네 경계 assertion이 포함되어 통과한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
