@@ -63,7 +63,10 @@
     {
       "step": 5,
       "name": "scope-snapshot-symlink",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:50:03+0900",
+      "completed_at": "2026-11-24T08:52:40+0900",
+      "summary": "step5 시작 snapshot(created→reused), scope-snapshot-symlink.spec.js(desktop-dark 전용, 코드 추가 없음) 작성: 사례마다 새 합성 저장소(lock·.gitignore 골격, outside/secret.txt 고유 sentinel)에서 JS takeCurrent(기록 fs: unsafe [기대 항목]·files {}·링크/대상 경로에 lstat 외 접근 없음·open 없음)·S 생성 분기(exit≠0, stderr 정확히 'unsafe path: <항목>', snapshot 미생성)·S 재사용 분기(정상 형식 snapshot bytes 불변)·inline C(키 집합만 맞춘 start, allow 비움/링크 경로 모두 exit 1·symlink 항목 있음·변경 판정 줄 없음·after.z 미생성) 실행, 출력·생성 파일에 sentinel 없음; (a) ignored link-ignored, (b) tracked-link a→b.txt(' M')→c.txt 두 단계, (c) docs-link 디렉터리 링크 내부 미진입, (d) 링크 없는 대조(JS unsafe []·C symlink 항목 없음), (e) 실제 저장소 parity-<A> 생성→사본 <k>→symlink <m>에서 S·loader 'unsafe path: symlink:tests/.tmp/start-snapshot-parity-<m>.json' 거부·사본 sha 불변·finally 삭제. 테스트만 추가하는 step이라 처음 실행부터 통과(RED 없음). AC1(spec 5 passed·전체 36 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 6,
