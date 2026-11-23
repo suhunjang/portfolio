@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(모달, lightbox), §5(대표 카드와 grid 카드의 같은 data-project), §7.4(modal.js 계약), §11.4
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(모달 마크업, lightbox), §5(대표 카드와 grid 카드의 같은 data-project), §7.4(modal.js 계약), §11.4
 3. index.json에서 step 0~5가 completed인지 확인한다. 아니면 중단한다.
-4. 다음을 확인한다: `#projectGrid` 카드 셀렉터, 모달 열기·닫기 위임, `modal-open`, 모달 제목 요소, `[data-modal-close]`, `.shot-zoom`이 있는 프로젝트, `ensureLightbox`, Esc 처리 순서
+4. 다음을 확인한다: `#projectGrid` 카드 셀렉터, `#projectModal`·`#modalBody`·`#modalTitle`·`.modal-close[data-modal-close]` 마크업, 모달 열기·닫기 위임, `modal-open`, `.shot-zoom`이 있는 프로젝트, `ensureLightbox`, Esc 처리 순서
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -39,12 +39,12 @@
 1. `modal.js` (§7.4 계약)
    - `GRID_CARD`, `gridCard(page, N)` — 정확히 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`
    - `openFirstProjectByClick`, `openFirstProjectByEnter` — `GRID_CARD` 범위만 사용
-   - `closeVia(page, how)`: button(`[data-modal-close]` 중 visible한 첫 요소), backdrop({x:5, y:5}), esc
+   - `closeVia(page, how)`: button(`#projectModal .modal-close[data-modal-close]`), backdrop({x:5, y:5}), esc
    - `expectFocused`
-   - `modalTitle(page)`
+   - `modalTitle(page)` — 정확히 `page.locator('#projectModal #modalTitle')`
    - `findProjectWithShots(page)` — `#projectGrid .project-card[data-project]`만 탐색한다. 카드마다 열기 → `modal-open` 확인 → `.shot-zoom` 확인 → `closeVia(page, 'button')` → `modal-open` 해제 확인 순서를 지킨다.
 2. `modal-regression.spec.js` (6개 project, collector 고정 순서)
-   - 모달: click으로 열기, Enter로 열기, 제목이 데이터와 같음, body `modal-open`
+   - 모달: click으로 열기, Enter로 열기, `modalTitle` 텍스트가 데이터와 같음, body `modal-open`
    - 닫기: button·backdrop·esc 각 경로로 닫히고 포커스가 트리거 카드로 돌아온다. 닫힌 뒤 `modal-open`이 없다.
    - lightbox (desktop만): `findProjectWithShots`가 index를 반환하고, 탐색이 끝난 뒤 모달이 닫혀 있다. 그 index의 `gridCard` 모달에서 `.shot-zoom`으로 lightbox가 열린다.
    - Esc 2단계: 1회째 lightbox만 닫히고 모달은 열려 있다. 2회째 모달이 닫힌다.

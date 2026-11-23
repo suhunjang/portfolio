@@ -32,7 +32,7 @@
 
 - `tests/` 밖 전부
 - 기존 tests 파일
-- modal·lightbox 준비, `prepareForAxe` (step 10·11에서 한다)
+- 콘텐츠 로딩 검사, modal·lightbox 준비, `prepareForAxe` (step 10·11에서 한다)
 
 ## 작업
 

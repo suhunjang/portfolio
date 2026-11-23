@@ -23,6 +23,7 @@
   - 12차 `a26257befcd4`: 4건 (axe 준비 절차, 회귀 spec 분할, blocked 그룹 중단, collected↔baseline 양방향 일치)
   - 13차 `b2608d1436cb`: 3건 (grid 카드 클릭 범위 고정, 준비 helper page/overlay 분할, screenshots 단독 AC)
   - 14차 `acc631d51b74`: 3건 (no-shots 합성 fixture 완비, overlay 준비 modal/lightbox 분할, 시작 snapshot 범위 검사)
+  - 15차 `927fc70c685a`: 2건 (`assertContentLoaded` textLocator 계약, 보호 경로 hash를 포함한 immutable 시작 snapshot)
   - 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`이 고정)
   - sourceCommit: `cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae`
@@ -81,12 +82,15 @@
 - 프로젝트 카드: `article.project-card.has-detail[data-project=idx][tabindex=0][role=button]`
 
 ### 모달
+- 정적 마크업(index.html): `div.modal#projectModal[hidden]` > `.modal-backdrop[data-modal-close]` + `.modal-dialog` > (`button.modal-close[data-modal-close]` + `div.modal-body#modalBody`)
+- `#modalBody`에 렌더링되는 내용(main.js): 시각 요소(`.modal-visual` 또는 `.modal-thumb`), `h3#modalTitle.modal-title`, `.modal-meta`, `p.modal-blurb`, `.modal-section`(여러 개, 화면 갤러리의 `.shot-zoom` 포함)
+- 제목은 `#modalTitle`이고 닫기 버튼(`.modal-close`)은 `#modalBody` 밖에 있다. 제목·닫기 버튼을 제외한 본문 텍스트는 `#modalBody .modal-blurb`와 `#modalBody .modal-section`이다.
 - `openProjectModal(idx)`는 `lastFocused = document.activeElement`를 저장한 뒤 닫기 버튼에 포커스한다. 열리면 body에 `modal-open` 클래스가 붙는다.
 - 열기: `#projectGrid`의 click/keydown 위임
 - 닫기: `[data-modal-close]` 또는 Esc. lightbox가 열려 있으면 Esc는 lightbox부터 닫는다.
 
 ### lightbox
-- `ensureLightbox()`를 처음 호출할 때만 `.lightbox`가 생성된다. 모달 안의 `.shot-zoom`으로 연다.
+- `ensureLightbox()`를 처음 호출할 때만 `.lightbox[role=dialog]`가 생성된다. 내용은 `button.modal-close`와 `img` 하나다. 모달 안의 `.shot-zoom`으로 연다.
 - lightbox에는 Tab 고정 리스너가 있다. 모달에는 포커스 트랩이 없다.
 
 ### 기타
@@ -228,9 +232,9 @@
   - `gridCard(page, N): Locator` → 정확히 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`
   - `openFirstProjectByClick(page): Promise<Locator>` — 첫 `GRID_CARD`를 click으로 열고 그 카드를 반환
   - `openFirstProjectByEnter(page): Promise<Locator>`
-  - `closeVia(page, how: 'button'|'backdrop'|'esc'): Promise<void>` (button은 `[data-modal-close]` 중 visible한 첫 요소, backdrop은 `{x:5, y:5}` 클릭)
+  - `closeVia(page, how: 'button'|'backdrop'|'esc'): Promise<void>` (button은 `#projectModal .modal-close[data-modal-close]`, backdrop은 `{x:5, y:5}` 클릭)
   - `expectFocused(page, locator): Promise<void>`
-  - `modalTitle(page): Locator` — 열린 모달의 제목 요소
+  - `modalTitle(page): Locator` → 정확히 `page.locator('#projectModal #modalTitle')`
   - `findProjectWithShots(page): Promise<number | null>`
     - `#projectGrid .project-card[data-project]` 카드만 DOM 순서로 탐색한다. `#heroFeatured` 등 grid 밖의 같은 `data-project` 요소는 열거·클릭하지 않는다.
     - 각 grid 카드를 `gridCard(page, N)`로 click해 열고 body `modal-open`을 확인한다. 모달 안에 `.shot-zoom`이 있는지 본 뒤 `closeVia(page, 'button')`으로 닫고 `modal-open`이 사라졌는지 확인한다.
@@ -554,6 +558,22 @@ preparePage(page, { timeoutMs = 10000 } = {}): Promise<{ revealChecked: number, 
 3. 모든 `.reveal`에 대해 `.in` 클래스, computed `visibility === 'visible'`, `opacity === '1'`을 `expect.poll`(timeout = `timeoutMs`)로 확인한다. 실패 코드 `reveal-hidden:{숨은 개수}`. 확인한 개수는 `revealChecked`.
 - 테마·reduced-motion 설정은 바꾸지 않는다.
 
+#### 콘텐츠 로딩 검사 (step 10에서 구현)
+
+```
+MODAL_ROOT = '#projectModal'
+MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section'
+
+assertContentLoaded(locator: Locator, timeoutMs: number, { textLocator = null }: { textLocator?: Locator | null } = {}): Promise<void>
+```
+
+- `locator` 범위 안의 모든 `img`가 `complete && naturalWidth > 0`이어야 한다. 실패 코드 `content-not-loaded:img`.
+- `locator` 범위 안의 모든 `svg`의 bounding box width·height가 0보다 커야 한다. 실패 코드 `content-not-loaded:svg`.
+- `textLocator`가 null이 아니면: 일치하는 요소가 1개 이상이고, 그 요소들의 `innerText`를 이어 `norm`한 길이가 0보다 커야 한다. 실패 코드 `content-not-loaded:text`.
+- `textLocator`가 null이면 텍스트 검사를 하지 않는다.
+- 모든 검사는 `expect.poll`(timeout = `timeoutMs`)로 하고 `withPrepareCode`로 코드를 붙인다.
+- 제목(`#modalTitle`)과 닫기 버튼(`.modal-close`)은 `MODAL_BODY_TEXT`에 포함되지 않는다. 제목만 채워지고 본문이 비면 `content-not-loaded:text`로 실패해야 한다.
+
 #### modal 준비 (step 10)
 
 ```
@@ -564,10 +584,7 @@ prepareModal(page, { projectIndex = 0, timeoutMs = 10000 } = {}):
 - 클릭 대상은 정확히 `gridCard(page, N)`, 즉 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`이다. 개수가 정확히 1이 아니면 `project-card-not-found:{N}`. 같은 `data-project`를 가진 `#heroFeatured` 버튼 등 grid 밖 요소는 클릭하지 않는다.
 - 열림: body `modal-open`, `#projectModal` visible, computed opacity `1`. 실패 코드 `modal-not-open`.
 - 표시: `modalTitle(page)` 텍스트가 `norm(PROJECTS[N].title)`과 같다. 실패 코드 `modal-not-open`.
-- 콘텐츠 로딩 (공통 helper `assertContentLoaded(locator, timeoutMs)`, step 10에서 text 검사만 구현하고 step 11에서 img·svg 검사를 추가한다)
-  - 본문 텍스트 길이 > 0 → 실패 `content-not-loaded:text`
-  - 모든 `img`가 `complete && naturalWidth > 0` → 실패 `content-not-loaded:img` (step 11)
-  - 모든 `svg`의 bounding box width·height > 0 → 실패 `content-not-loaded:svg` (step 11)
+- 콘텐츠 로딩: `assertContentLoaded(page.locator(MODAL_ROOT), timeoutMs, { textLocator: page.locator(MODAL_BODY_TEXT) })` — 전체 모달의 img·svg와 본문 텍스트를 검사한다.
 
 #### lightbox 준비·결합 진입점 (step 11)
 
@@ -586,7 +603,7 @@ prepareForAxe(page, { scenario, projectIndex?, timeoutMs = 10000 }):
   - `projectIndex` 기본값: `findProjectWithShots(page)`(grid 카드만 열고 닫으며 탐색). null이면 `no-shots-project`.
   - `prepareModal`로 모달을 연 뒤 첫 `.shot-zoom`을 click한다. `.shot-zoom`이 없거나 lightbox가 열리지 않으면 `lightbox-not-open`.
   - 열림: `.lightbox` 1개, visible, computed opacity `1`, `document.activeElement`가 `.lightbox` 안. 실패 코드 `lightbox-not-open`.
-  - 콘텐츠 로딩: `.lightbox` 안 img·svg를 `assertContentLoaded`로 확인한다.
+  - 콘텐츠 로딩: `assertContentLoaded(page.locator('.lightbox'), timeoutMs, { textLocator: null })` — img·svg만 검사한다.
 - `prepareOverlay`: `modal` → `prepareModal`, `lightbox` → `prepareLightbox`, 그 밖 → `unknown-scenario`
 - `prepareForAxe`
   1. `scenario`가 `page|modal|lightbox`가 아니면 즉시 `unknown-scenario`로 reject한다.
@@ -595,11 +612,17 @@ prepareForAxe(page, { scenario, projectIndex?, timeoutMs = 10000 }):
 
 #### 오류 코드 전체
 - 공통(step 9): `fonts-not-ready`, `reveal-hidden:{n}`
-- modal(step 10): `project-card-not-found:{N}`, `modal-not-open`, `content-not-loaded:text`
-- lightbox·결합(step 11): `unknown-scenario`, `lightbox-not-open`, `no-shots-project`, `content-not-loaded:img`, `content-not-loaded:svg`
+- modal·콘텐츠(step 10 구현): `project-card-not-found:{N}`, `modal-not-open`, `content-not-loaded:text`, `content-not-loaded:img`, `content-not-loaded:svg` (img·svg 합성 검증은 step 11)
+- lightbox·결합(step 11): `unknown-scenario`, `lightbox-not-open`, `no-shots-project`
 
 #### 합성 fixture 규칙 (step 10·11)
-- 동작 모달 fixture(`setContent`): `window.PROJECTS`(합성 title), `#projectGrid .project-card[data-project="N"]` 카드들, `#projectModal`(현행 마크업 중 `modalTitle`이 가리키는 제목 요소와 같은 셀렉터의 제목, 비어 있지 않은 본문, `[data-modal-close]` 닫기 버튼)을 둔다. grid 카드 click handler는 제목·본문을 채우고 모달을 보이게 하며 body에 `modal-open`을 붙인다. 닫기 handler(`[data-modal-close]` click, Esc)는 모달을 숨기고 `modal-open`을 뗀다. 열기·닫기 횟수와 요소별 click 수를 `window.__opens`, `window.__closes`, `window.__clicks`에 기록한다.
+- 동작 모달 fixture(`setContent`): 현행 마크업(§3 모달)을 최소 복제한다.
+  - `window.PROJECTS`(합성 title)
+  - `#projectGrid .project-card[data-project="N"]` 카드들
+  - `div.modal#projectModal[hidden]` > `.modal-backdrop[data-modal-close]` + `.modal-dialog` > (`button.modal-close[data-modal-close]` + `div.modal-body#modalBody`)
+  - grid 카드 click handler는 `#modalBody` 안에 `h3#modalTitle.modal-title`(제목), `p.modal-blurb`(본문), 필요하면 `.modal-section`을 채우고, 모달을 보이게 하며 body에 `modal-open`을 붙인다.
+  - 닫기 handler(`[data-modal-close]` click, Esc)는 모달을 숨기고 `modal-open`을 뗀다.
+  - 열기·닫기 횟수와 요소별 click 수를 `window.__opens`, `window.__closes`, `window.__clicks`에 기록한다.
 - handler 없는 fixture: click handler가 없는 grid 카드만 둔다(`modal-not-open` 전용). 동작 모달 fixture와 섞지 않는다.
 
 ## 9. 반응형
@@ -734,46 +757,96 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 - 합성 테스트: 주입한 가짜 git이 `GIT_DIFF_PATCH_ARGS` 호출에만 patch를, `GIT_DIFF_PATH_ARGS` 호출에는 이름 목록을 돌려준다. data.js 4구간이 patch 인자로 호출되었고 그 patch 문자열이 `checkDataJsDiff`까지 전달되어 판정에 쓰이는지 확인한다.
 
 ### 11.6 통합 AC
-- step 0·1: §11.7 시작 snapshot 범위 검사(`scope-snapshot.mjs --check`)를 AC 마지막에 둔다.
+- step 0·1: §11.7 시작 snapshot을 step 첫 동작으로 만들고, AC 마지막에 `scope-snapshot.mjs --check`로 비교한다.
 - step 2 이후 기본: `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
 - step 19: 일반 실행에 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
 - step 30·31: `--assert-empty`를 추가한다.
 - step 31: `screenshots.spec.js` 단독 실행을 먼저 하고 성공 후 전체 테스트, `verify-scope -- --final`을 `&&`로 잇는다.
 - 각 step은 자기 spec을 먼저 단독으로 실행한 뒤 전체 회귀를 돌린다.
 
-### 11.7 시작 snapshot 범위 검사 (`tests/scripts/scope-snapshot.mjs`, step 0·1)
+### 11.7 시작 snapshot 범위 검사 (step 0·1)
 
-목적: verify-scope가 생기기 전(step 0·1)에 tests 밖의 새 변경과 노출된 runtime 경로를 잡는다. 시작 전에 이미 있던 Harness migration·계획 변경은 시작 snapshot 기준으로 허용하고, 그 뒤 새로 생긴 변화만 판정한다.
+목적: verify-scope가 생기기 전(step 0·1)에 tests 밖의 새 변경·삭제·원복과 노출된 runtime 경로를 잡는다. 시작 전에 이미 있던 Harness migration·계획 변경은 시작 snapshot의 내용 그대로 유지되는 한 허용하고, 그 뒤 생긴 변화만 판정한다.
 
-시작 명령 (step의 첫 동작, 어떤 파일을 쓰기보다 먼저):
+#### 시작 snapshot (immutable, 단일 명령)
+
+- step의 **첫 동작**이다. `tests/scripts/with-env.sh`, `tests/scripts/scope-snapshot.mjs`를 포함해 어떤 구현 파일보다 먼저 실행한다. 비교 도구가 아직 없어도 동작하도록 python3 표준 라이브러리만 쓴다.
+- 한 번의 실행이 다음 두 가지를 동시에 기록한다.
+  1. `git status --porcelain=v1 -z --untracked-files=all` 원문 (hex로 저장)
+  2. 보호 경로 전체의 존재 여부와 내용 hash
+- 보호 경로 = `tests/`로 시작하지 않는 경로 중 (시작 status에 나온 모든 path·origPath) ∪ (`git ls-files -z`의 추적 파일 전체)
+- hash는 파일 바이트의 sha256 hex다. 일반 파일이 아니거나 없으면 null이다.
+- 출력 파일은 `open(..., 'x')`로 만든다. 이미 있으면 실패한다(immutable). 이후 어떤 명령도 이 파일을 다시 쓰지 않는다.
+- 실행하는 Git 명령은 `status`, `ls-files` 두 읽기 명령뿐이다.
+
+명령 (`{N}`은 step 번호, step 0은 `0`, step 1은 `1`):
 
 ```
-mkdir -p tests/.tmp && git status --porcelain=v1 -z --untracked-files=all > tests/.tmp/step{N}-status-before.z
+mkdir -p tests/.tmp && python3 -I - <<'PY'
+import hashlib, json, os, subprocess, sys
+OUT = 'tests/.tmp/start-snapshot-step{N}.json'
+if os.path.exists(OUT):
+    sys.exit('start snapshot already exists: ' + OUT)
+def git(*args):
+    return subprocess.run(['git', *args], check=True, capture_output=True).stdout
+status = git('status', '--porcelain=v1', '-z', '--untracked-files=all')
+recs = status.split(bytes(1))
+paths = set()
+i = 0
+while i < len(recs):
+    rec = recs[i]
+    i += 1
+    if not rec:
+        continue
+    paths.add(rec[3:].decode())
+    if rec[0:1] in (b'R', b'C') or rec[1:2] in (b'R', b'C'):
+        paths.add(recs[i].decode())
+        i += 1
+paths.update(p.decode() for p in git('ls-files', '-z').split(bytes(1)) if p)
+protected = {}
+for p in sorted(paths):
+    if p.startswith('tests/'):
+        continue
+    protected[p] = hashlib.sha256(open(p, 'rb').read()).hexdigest() if os.path.isfile(p) else None
+with open(OUT, 'x') as f:
+    json.dump({'statusZHex': status.hex(), 'protected': protected}, f, indent=1, sort_keys=True)
+PY
 ```
 
-함수 계약
+#### 비교 도구 (`tests/scripts/scope-snapshot.mjs`, step 0에서 시작 snapshot 뒤에 작성)
+
 - `STATUS_ARGS = ['status', '--porcelain=v1', '-z', '--untracked-files=all']`
 - `parseStatusZ(raw: Buffer | string): StatusEntry[]`
   - `StatusEntry = { xy: string, path: string, origPath: string | null }`
   - NUL로 레코드를 나눈다. 각 레코드는 `XY` 2글자 + 공백 + 경로다. X 또는 Y가 `R`/`C`이면 다음 NUL 필드를 `origPath`로 소비한다.
   - 빈 입력은 `[]`. 형식이 맞지 않으면 `Error('bad status record: ...')`를 던진다.
-- `takeSnapshot({ git = runGit, statusRaw } = {}): Snapshot`
-  - `Snapshot = { entries: StatusEntry[], hashes: Record<string, string | null> }`
-  - `statusRaw`가 있으면 그것을 파싱하고, 없으면 `git(STATUS_ARGS)`를 실행한다.
-  - `tests/` 밖의 모든 `path`와 `origPath`에 대해 `git hash-object -- <path>`(`-w` 없음, 읽기 전용)로 작업트리 내용 해시를 구한다. 파일이 없으면 null.
-- `diffSnapshots(before: Snapshot, after: Snapshot): Change[]`
-  - `Change = { path, kind: 'new' | 'status-changed' | 'content-changed', xyBefore: string | null, xyAfter: string }`
-  - after에만 있는 path → `new`. xy가 다르면 → `status-changed`. `tests/` 밖에서 xy가 같고 해시가 다르면 → `content-changed`. before에만 있고 사라진 path는 무시한다.
+- `loadStartSnapshot(file: string): StartSnapshot`
+  - `StartSnapshot = { entries: StatusEntry[], protected: Record<string, string | null> }` (`statusZHex`를 디코드해 `parseStatusZ`)
+  - 파일 없음, JSON 오류, 필드 누락이면 `Error('bad start snapshot: ...')`를 던진다.
+- `hashPath(path: string, { fs } = {}): string | null` — 파일 바이트의 sha256 hex. 일반 파일이 아니면 null (시작 snapshot과 같은 규칙)
+- `takeCurrent(start: StartSnapshot, { git, fs } = {}): CurrentState`
+  - `CurrentState = { entries: StatusEntry[], hashes: Record<string, string | null> }`
+  - `git(STATUS_ARGS)`로 현재 status를 얻는다.
+  - hash 대상 = `start.protected`의 모든 key ∪ 현재 status의 `tests/` 밖 path·origPath ∪ 현재 `git ls-files -z`의 `tests/` 밖 경로
+- `diffAgainstStart(start: StartSnapshot, current: CurrentState): Change[]`
+  - `Change = { path, kind: 'new' | 'status-changed' | 'content-changed' | 'deleted', xyBefore: string | null, xyAfter: string | null }`
+  - 시작 보호 경로: `start.protected[p]`와 `current.hashes[p]`가 다르면 변경이다. 현재 값이 null이면 `deleted`, 아니면 `content-changed`. 현재 status에서 사라졌어도(원복 포함) 다시 hash해서 판정하며, 이때 `xyAfter`는 null이다.
+  - 시작 보호 경로가 아닌 `tests/` 밖 경로가 현재 status 또는 추적 목록에 있으면 `new`
+  - `tests/` 안 경로: 시작 status에 없던 항목은 `new`, xy가 달라진 항목은 `status-changed`. 사라진 항목은 무시한다.
   - rename/copy 항목은 `path`와 `origPath` 모두를 변경 경로로 다룬다.
   - 입력을 바꾸지 않는다.
 - `classifyChanges(changes: Change[], { allow }: { allow: string[] }): string[]`
-  - `tests/` 밖이고 하네스 런타임 면제(§11.5: `.harness/**` 중 `harness.lock.json`·`policy.json` 제외, `.venv/**`, `phases/HOO-81-portfolio-redesign/**`)가 아니면 → `outside-tests:{path}`
+  - `tests/` 밖이고 하네스 런타임 면제(§11.5: `.harness/**` 중 `harness.lock.json`·`policy.json` 제외, `.venv/**`, `phases/HOO-81-portfolio-redesign/**`)가 아니면 → `outside-tests:{path}` (kind와 무관)
   - `tests/` 안의 runtime 경로(§11.1 runtime 목록) → `runtime-visible:{path}`
   - `tests/` 안에서 runtime이 아니고 `allow`에 없는 경로 → `unexpected-tests:{path}`
+- `checkSnapshotFirst(start: StartSnapshot, paths: string[]): string[]` — 시작 status에 `paths` 중 하나라도 있으면 `snapshot-not-first:{path}` (snapshot이 그 파일보다 먼저 만들어졌다는 증명)
 
-CLI (`sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs ...`, Git 읽기 명령만 실행)
-- `--save <out.json> --status-raw <raw.z>`: raw를 파싱하고 해시를 계산해 JSON으로 저장한다. 실패하면 exit 1
-- `--check <before.json> --allow <p1,p2,...>`: 새 `git status`를 실행해 `tests/.tmp/<before 이름>-after.z`로 저장하고, 새 snapshot과 비교해 분류한다. 위반이 있으면 목록을 stderr에 출력하고 exit 1, 없으면 `scope-snapshot: OK`를 출력하고 exit 0. before 파일이 없거나 파싱에 실패하면 exit 1
+CLI (`sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs ...`, Git 읽기 명령과 파일 읽기만 실행)
+- `--check <start.json> --allow <p1,p2,...> [--require-absent <p1,p2,...>]`
+  - 현재 status 원문을 `tests/.tmp/<start 이름>-after.z`로 저장한다.
+  - `checkSnapshotFirst` + `diffAgainstStart` + `classifyChanges` 결과에 위반이 있으면 목록을 stderr에 출력하고 exit 1, 없으면 `scope-snapshot: OK`를 출력하고 exit 0
+  - start 파일이 없거나 형식이 틀리면 exit 1
+- 시작 snapshot 파일은 이 도구가 만들거나 고치지 않는다.
 
 ## 12. 변경 허용 경로와 운영 경계
 
@@ -789,7 +862,7 @@ CLI (`sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs ...`, G
 - `css/themes.css`: remediation 그룹 step만
 
 ### 명령 권한
-- Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object)은 빌더와 검증 스크립트에 허용한다.
+- Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object)과 §11.7 시작 snapshot 명령은 빌더와 검증 스크립트에 허용한다.
 - 하네스만 실행
   - Git 상태 변경 명령: init, checkout, switch, add, commit, push, reset, stash, merge, rebase, tag 등
   - Harness 운영 명령: `harness --project-root . check`, `plan-session`, `review-plan`, `approval`, `runner`
@@ -801,7 +874,7 @@ CLI (`sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs ...`, G
 
 | # | name | 예상 | 선행 |
 |---|---|---|---|
-| 0 | tests-env-bootstrap | 18분 | 없음 |
+| 0 | tests-env-bootstrap | 19분 | 없음 |
 | 1 | tests-browser-smoke | 14분 | 0 |
 | 2 | scope-paths | 18분 | 0~1 |
 | 3 | scope-content | 18분 | 0~2 |
@@ -811,7 +884,7 @@ CLI (`sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs ...`, G
 | 7 | ui-regression | 16분 | 0~6 |
 | 8 | axe-canonical | 18분 | 0~7 |
 | 9 | axe-prepare-page | 14분 | 0~8 |
-| 10 | axe-prepare-modal | 16분 | 0~9 |
+| 10 | axe-prepare-modal | 17분 | 0~9 |
 | 11 | axe-prepare-lightbox | 18분 | 0~10 |
 | 12 | axe-collect-tooling | 18분 | 0~11 |
 | 13 | axe-baseline-regression | 18분 | 0~12 |
