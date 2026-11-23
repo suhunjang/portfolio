@@ -4,7 +4,7 @@
 - 예상 18분 / 선행 0~4 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
 - read-first: 설계 §11.7(경로 유형 계약, 실행 순서, S, C, 설계 블록 추출 규칙, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`
 - tracked 허용(exact): `tests/specs/scope-snapshot-symlink.spec.js`(신규)
-- runtime: R0(합성 저장소와 `<pid>-outside/`, 실제 저장소 `tests/.tmp/start-snapshot-parity-{숫자}.json` 위치의 symlink)
+- runtime: R0(합성 저장소와 `<pid>-outside/`, 실제 저장소 `tests/.tmp/start-snapshot-parity-{숫자}.json` 위치의 symlink와 사본)
 - 금지: §15.7, `scope-snapshot.mjs`·`start-snapshot.py`·helper 수정, 실제 저장소 비runtime 경로에 symlink 생성, 권한 변경
 
 ## 작업
@@ -20,7 +20,7 @@
    - (b) 이미 수정된 tracked symlink의 target 변경: 초기 commit에 `tracked-link → a.txt` 포함(`add -A`) → 링크를 `b.txt`로 교체(status ` M`) 상태에서 세 경로 모두 `symlink:tracked-link`로 실패 → 다시 `c.txt`로 교체해도 세 경로 모두 실패
    - (c) symlink 디렉터리 `docs-link → <outside>`: `symlink:docs-link`, 내부 미진입(`docs-link/secret.txt` 항목 없음)
    - (d) 대조: 링크 없는 같은 구조에서 JS `unsafe` `[]`, C는 symlink 항목 없음
-   - (e) snapshot 파일 자체 symlink(실제 저장소 runtime 경로): S로 정상 `parity-<A>`를 만들고 그 사본 `tests/.tmp/parity-copy-<pid>.json`을 둔 뒤 `tests/.tmp/start-snapshot-parity-<m>.json`을 사본을 가리키는 symlink로 만든다 → S exit ≠ 0·stderr `unsafe path: symlink:tests/.tmp/start-snapshot-parity-<m>.json`, loader `unsafe path: symlink:` throw, 사본 sha256 불변. 끝나면 링크·사본·parity 삭제
+   - (e) snapshot 파일 자체 symlink(실제 저장소 runtime 경로, 번호 `<A>`·`<k>`·`<m>`은 서로 다른 숫자): S로 정상 `tests/.tmp/start-snapshot-parity-<A>.json`을 만들고 그 bytes를 별도 번호의 사본 `tests/.tmp/start-snapshot-parity-<k>.json`으로 복사한 뒤, `tests/.tmp/start-snapshot-parity-<m>.json`을 사본 경로 `tests/.tmp/start-snapshot-parity-<k>.json`을 target으로 하는 symlink로 만든다 → `python3 -I tests/scripts/start-snapshot.py parity-<m>` exit ≠ 0·stderr `unsafe path: symlink:tests/.tmp/start-snapshot-parity-<m>.json`, loader `loadStartSnapshot('tests/.tmp/start-snapshot-parity-<m>.json')` `unsafe path: symlink:` throw, 사본 sha256 불변. finally에서 링크 `parity-<m>`, 사본 `parity-<k>`, 원본 `parity-<A>`를 모두 삭제(실제 저장소에는 테스트 격리 규칙의 `tests/.tmp/start-snapshot-parity-{숫자}.json` 경로만 쓴다)
    - runtime 디렉터리 `tests/.tmp` 자체 symlink는 step 6이 검증한다
 
 ## AC (모두 exit 0)
