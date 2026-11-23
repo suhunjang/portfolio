@@ -3,6 +3,7 @@
 // step 2: 저장소 상대 경로 판정, status parser, 최상위 JSON token scanner, schemaVersion 판정 (순수).
 // step 3: strict schema loader (loadStartSnapshot).
 // step 4: 현재 상태 수집 (scanProject, hashPath, takeCurrent). Git 읽기만, 쓰기 없음.
+// step 7: identity(computeIdentity, checkIdentity), 순수 판정(diffAgainstStart … evaluateGate). 쓰기 없음.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import nodeFs from 'node:fs';
@@ -405,4 +406,121 @@ export function takeCurrent(start, { git, fs = nodeFs, root = process.cwd() } = 
     if (unsafe.length) files = {};
   }
   return { entries, xy, files, unsafe: sortedUnique(unsafe) };
+}
+
+// ---- step 7: identity 계산·대조, 순수 변경·정책 판정 (파일 쓰기·CLI 없음) ---------------------------
+
+const gitText = (out) => Buffer.from(out).toString('utf8').trim();
+
+// 현재 identity. checkRoot → toplevel realpath = root realpath → lock 경로 유형 → HEAD → BASE 확인 → lock 읽기.
+export function computeIdentity({ git, fs = nodeFs, root = process.cwd() } = {}) {
+  const readGit = git ?? ((args) => runGit(args, root));
+  checkRoot({ fs, root });
+  const top = gitText(readGit(['rev-parse', '--show-toplevel']));
+  const projectRoot = fs.realpathSync(top);
+  if (projectRoot !== fs.realpathSync(root)) throw new Error(`run from project root: ${top}`);
+  const item = checkPath(LOCK_PATH, ['file'], { fs, root });
+  if (item) throw new UnsafePathError(item);
+  const head = gitText(readGit(['rev-parse', 'HEAD']));
+  try {
+    readGit(['rev-parse', '--verify', `${BASE}^{commit}`]);
+  } catch (e) {
+    throw new Error(`base commit not found: ${BASE} (${e?.message ?? e})`);
+  }
+  const lock = readRegular(LOCK_PATH, { fs, root });
+  if (!Object.values(HARNESS_IDENTITY).every((v) => lock.includes(Buffer.from(v, 'utf8')))) {
+    throw new Error(`harness identity mismatch: ${LOCK_PATH}`);
+  }
+  return {
+    schemaVersion: 1,
+    projectRoot,
+    head,
+    base: BASE,
+    harness: { ...HARNESS_IDENTITY, lockSha256: createHash('sha256').update(lock).digest('hex') },
+  };
+}
+
+const IDENTITY_FIELDS = Object.freeze(['schemaVersion', 'projectRoot', 'head', 'base']);
+const HARNESS_FIELDS = Object.freeze(['sourceCommit', 'manifestHash', 'distributionVersion', 'lockSha256']);
+const identityOf = (o) => (isPlainObject(o) && isPlainObject(o.identity) ? o.identity : o ?? {});
+
+// identity 차이 → identity-mismatch:{field} (schemaVersion, projectRoot, head, base, harness.* 순서). 순수.
+export function checkIdentity(start, current) {
+  const a = identityOf(start);
+  const b = identityOf(current);
+  const out = IDENTITY_FIELDS.filter((f) => a[f] !== b[f]).map((f) => `identity-mismatch:${f}`);
+  const ha = isPlainObject(a.harness) ? a.harness : {};
+  const hb = isPlainObject(b.harness) ? b.harness : {};
+  for (const f of HARNESS_FIELDS) {
+    if (!hasOwn(ha, f) || !hasOwn(hb, f) || ha[f] !== hb[f]) out.push(`identity-mismatch:harness.${f}`);
+  }
+  return out;
+}
+
+const getOr = (o, k) => (o && hasOwn(o, k) ? o[k] : null);
+
+// 시작·현재 files 합집합 경로별 변경(경로 오름차순). hash 다르면 new|deleted|content-changed, 같고 xy 다르면 status-changed.
+export function diffAgainstStart(start, current) {
+  const sf = start?.files ?? {};
+  const cf = current?.files ?? {};
+  const sx = start?.xy ?? {};
+  const cx = current?.xy ?? {};
+  const out = [];
+  for (const p of sortedUnique([...Object.keys(sf), ...Object.keys(cf)])) {
+    const before = getOr(sf, p);
+    const after = getOr(cf, p);
+    const xyBefore = getOr(sx, p);
+    const xyAfter = getOr(cx, p);
+    let kind = null;
+    if (before !== after) {
+      if (before === null) kind = 'new';
+      else if (after === null) kind = 'deleted';
+      else kind = 'content-changed';
+    } else if (xyBefore !== xyAfter) {
+      kind = 'status-changed';
+    }
+    if (kind) out.push({ path: p, kind, xyBefore, xyAfter });
+  }
+  return out;
+}
+
+const isExempt = (p) => EXEMPT_PREFIXES.some((s) => p.startsWith(s)) && !GUARDED_PATHS.includes(p);
+
+// 변경 → 판정 문자열 (allow·EXEMPT 제외, GUARDED는 면제 아님). 입력 순서 유지.
+export function classifyChanges(changes, { allow = [] } = {}) {
+  const allowed = new Set(allow);
+  const out = [];
+  for (const c of changes) {
+    if (allowed.has(c.path) || isExempt(c.path)) continue;
+    if (c.kind === 'status-changed') out.push(`status-changed:${c.path}`);
+    else out.push(`${c.path.startsWith('tests/') ? 'tests-changed:' : 'outside-tests:'}${c.path}`);
+  }
+  return out;
+}
+
+// 시작에 없던 RUNTIME 경로가 현재 status에 보이면 runtime-visible (정렬)
+export function checkRuntimeVisible(start, current) {
+  const sx = start?.xy ?? {};
+  return Object.keys(current?.xy ?? {}).sort()
+    .filter((p) => RUNTIME_PREFIXES.some((s) => p.startsWith(s)) && !hasOwn(sx, p))
+    .map((p) => `runtime-visible:${p}`);
+}
+
+// --require-absent 경로가 시작 기록(files·xy)에 있으면 snapshot-not-first (정렬·중복 제거)
+export function checkSnapshotFirst(start, paths = []) {
+  const sf = start?.files ?? {};
+  const sx = start?.xy ?? {};
+  return sortedUnique(paths).filter((p) => hasOwn(sf, p) || hasOwn(sx, p)).map((p) => `snapshot-not-first:${p}`);
+}
+
+// 전체 판정: snapshot-not-first → (unsafe면 정렬 unsafe만, 변경 판정 생략) → 경로 오름차순 변경 → runtime-visible
+export function evaluateGate(start, current, { allow = [], requireAbsent = [] } = {}) {
+  const bad = checkSnapshotFirst(start, requireAbsent);
+  const unsafe = current?.unsafe ?? [];
+  if (unsafe.length) return [...bad, ...sortedUnique(unsafe)];
+  return [
+    ...bad,
+    ...classifyChanges(diffAgainstStart(start, current), { allow }),
+    ...checkRuntimeVisible(start, current),
+  ];
 }
