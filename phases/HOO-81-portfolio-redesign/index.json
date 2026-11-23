@@ -55,7 +55,10 @@
     {
       "step": 4,
       "name": "scope-snapshot-state",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:46:32+0900",
+      "completed_at": "2026-11-24T08:50:03+0900",
+      "summary": "step4 시작 snapshot(created→reused), scope-snapshot.mjs에 step4 API(scanProject: checkRoot 후 readdirSync(withFileTypes)로 walk·SKIP 미진입·SKIP 엔트리 symlink 보고·정렬; hashPath: lstat file만 readRegular sha256·missing null·그 밖 UnsafePathError; takeCurrent(start,{git,fs,root}): start files·xy key 경로 계약을 fs·git 전 검사(bad start snapshot: paths)→checkRoot→status parseStatusZ(위반 bad git status)→scan→ls-files→기록 대상 checkPath→unsafe 없을 때만 hash, 반환 {entries,xy,files,unsafe}) 추가(step1~3 함수 불변), tests/helpers/synthetic-repo.js(makeSyntheticRepo {dir,outside,link,file,git,cleanup}: init -q/add -A·정확 경로/고정 commit만 허용·GIT_* env 제거, designBlock, runPython/runNode 10초 timeout, runHarness S·C exec harness)와 scope-snapshot-state.spec.js(desktop-dark 전용: 가짜 fs hashPath·scanProject·takeCurrent 경로 계약/bad git status/unsafe 시 files {}, helper 허용 인자·설계 블록·exec harness, 합성 저장소 추적·수정·ignore hash·runtime 제외·fs rename R 상태(a null, b sha)·runtime 내부 링크 비unsafe, 실제 저장소 S parity-<pid> xy·files 일치·unsafe [] 후 삭제) 작성. RED(export 없음) 확인 후 GREEN, AC1(2개 spec 13 passed·전체 31 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 5,
