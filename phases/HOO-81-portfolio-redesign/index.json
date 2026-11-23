@@ -1,1 +1,244 @@
-{"project":"suhunjang/portfolio","phase":"HOO-81-portfolio-redesign","baseBranch":"main","designDoc":"docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md","allowedPaths":["index.html","css/style.css","css/themes.css","js/main.js","js/data.js","tests/"],"testCommand":["sh","tests/scripts/with-env.sh","npm","--prefix","tests","test"],"steps":[{"step":0,"name":"tests-env-bootstrap","status":"pending"},{"step":1,"name":"scope-snapshot-paths","status":"pending"},{"step":2,"name":"scope-snapshot-parse","status":"pending"},{"step":3,"name":"scope-snapshot-loader","status":"pending"},{"step":4,"name":"scope-snapshot-state","status":"pending"},{"step":5,"name":"scope-snapshot-symlink","status":"pending"},{"step":6,"name":"scope-snapshot-special-files","status":"pending"},{"step":7,"name":"scope-snapshot-identity","status":"pending"},{"step":8,"name":"scope-snapshot-cli","status":"pending"},{"step":9,"name":"scope-snapshot-parity-core","status":"pending"},{"step":10,"name":"scope-snapshot-parity-paths","status":"pending"},{"step":11,"name":"scope-snapshot-parity-artifacts","status":"pending"},{"step":12,"name":"tests-browser-smoke","status":"pending"},{"step":13,"name":"scope-paths","status":"pending"},{"step":14,"name":"scope-content","status":"pending"},{"step":15,"name":"content-data-baseline","status":"pending"},{"step":16,"name":"content-static-baseline","status":"pending"},{"step":17,"name":"modal-regression","status":"pending"},{"step":18,"name":"ui-regression","status":"pending"},{"step":19,"name":"axe-canonical","status":"pending"},{"step":20,"name":"axe-prepare-page","status":"pending"},{"step":21,"name":"axe-prepare-modal","status":"pending"},{"step":22,"name":"axe-prepare-lightbox","status":"pending"},{"step":23,"name":"axe-collect-tooling","status":"pending"},{"step":24,"name":"axe-baseline-regression","status":"pending"},{"step":25,"name":"axe-baseline-projection","status":"pending"},{"step":26,"name":"axe-remediation-plan-schema","status":"pending"},{"step":27,"name":"axe-plan-executable","status":"pending"},{"step":28,"name":"axe-current-checks","status":"pending"},{"step":29,"name":"axe-regression-prune","status":"pending"},{"step":30,"name":"axe-collect","status":"pending"},{"step":31,"name":"axe-classify","status":"pending"},{"step":32,"name":"featured-projects","status":"pending"},{"step":33,"name":"hero-first-screen","status":"pending"},{"step":34,"name":"section-structure","status":"pending"},{"step":35,"name":"section-layout","status":"pending"},{"step":36,"name":"focus-trap-modal","status":"pending"},{"step":37,"name":"focus-trap-lightbox","status":"pending"},{"step":38,"name":"print-pdf","status":"pending"},{"step":39,"name":"axe-remediation-gate","status":"pending"},{"step":40,"name":"axe-remediation-recheck","status":"pending"},{"step":41,"name":"axe-finalize","status":"pending"},{"step":42,"name":"final-verification","status":"pending"}]}
+{
+  "project": "suhunjang/portfolio",
+  "phase": "HOO-81-portfolio-redesign",
+  "baseBranch": "main",
+  "designDoc": "docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md",
+  "allowedPaths": [
+    "index.html",
+    "css/style.css",
+    "css/themes.css",
+    "js/main.js",
+    "js/data.js",
+    "tests/"
+  ],
+  "testCommand": [
+    "sh",
+    "tests/scripts/with-env.sh",
+    "npm",
+    "--prefix",
+    "tests",
+    "test"
+  ],
+  "steps": [
+    {
+      "step": 0,
+      "name": "tests-env-bootstrap",
+      "status": "completed",
+      "started_at": "2026-11-24T08:35:36+0900",
+      "completed_at": "2026-11-24T08:38:02+0900",
+      "summary": "tests 환경 bootstrap: step0 시작 snapshot(created→reused), with-env.sh·start-snapshot.py(설계 S 바이트 동일)·package.json/lock·.gitignore 7줄·직렬 playwright.config.js(workers 1, 6 projects)·bootstrap.spec.js(config/래퍼/S 생성·재사용·identity·schemaVersion·잘못된 id 거부) 작성, AC1(spec·전체 테스트·S reused)·AC2(inline C scope-snapshot: OK) 통과"
+    },
+    {
+      "step": 1,
+      "name": "scope-snapshot-paths",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "scope-snapshot-parse",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "scope-snapshot-loader",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "scope-snapshot-state",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "scope-snapshot-symlink",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "scope-snapshot-special-files",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "scope-snapshot-identity",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "scope-snapshot-cli",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "scope-snapshot-parity-core",
+      "status": "pending"
+    },
+    {
+      "step": 10,
+      "name": "scope-snapshot-parity-paths",
+      "status": "pending"
+    },
+    {
+      "step": 11,
+      "name": "scope-snapshot-parity-artifacts",
+      "status": "pending"
+    },
+    {
+      "step": 12,
+      "name": "tests-browser-smoke",
+      "status": "pending"
+    },
+    {
+      "step": 13,
+      "name": "scope-paths",
+      "status": "pending"
+    },
+    {
+      "step": 14,
+      "name": "scope-content",
+      "status": "pending"
+    },
+    {
+      "step": 15,
+      "name": "content-data-baseline",
+      "status": "pending"
+    },
+    {
+      "step": 16,
+      "name": "content-static-baseline",
+      "status": "pending"
+    },
+    {
+      "step": 17,
+      "name": "modal-regression",
+      "status": "pending"
+    },
+    {
+      "step": 18,
+      "name": "ui-regression",
+      "status": "pending"
+    },
+    {
+      "step": 19,
+      "name": "axe-canonical",
+      "status": "pending"
+    },
+    {
+      "step": 20,
+      "name": "axe-prepare-page",
+      "status": "pending"
+    },
+    {
+      "step": 21,
+      "name": "axe-prepare-modal",
+      "status": "pending"
+    },
+    {
+      "step": 22,
+      "name": "axe-prepare-lightbox",
+      "status": "pending"
+    },
+    {
+      "step": 23,
+      "name": "axe-collect-tooling",
+      "status": "pending"
+    },
+    {
+      "step": 24,
+      "name": "axe-baseline-regression",
+      "status": "pending"
+    },
+    {
+      "step": 25,
+      "name": "axe-baseline-projection",
+      "status": "pending"
+    },
+    {
+      "step": 26,
+      "name": "axe-remediation-plan-schema",
+      "status": "pending"
+    },
+    {
+      "step": 27,
+      "name": "axe-plan-executable",
+      "status": "pending"
+    },
+    {
+      "step": 28,
+      "name": "axe-current-checks",
+      "status": "pending"
+    },
+    {
+      "step": 29,
+      "name": "axe-regression-prune",
+      "status": "pending"
+    },
+    {
+      "step": 30,
+      "name": "axe-collect",
+      "status": "pending"
+    },
+    {
+      "step": 31,
+      "name": "axe-classify",
+      "status": "pending"
+    },
+    {
+      "step": 32,
+      "name": "featured-projects",
+      "status": "pending"
+    },
+    {
+      "step": 33,
+      "name": "hero-first-screen",
+      "status": "pending"
+    },
+    {
+      "step": 34,
+      "name": "section-structure",
+      "status": "pending"
+    },
+    {
+      "step": 35,
+      "name": "section-layout",
+      "status": "pending"
+    },
+    {
+      "step": 36,
+      "name": "focus-trap-modal",
+      "status": "pending"
+    },
+    {
+      "step": 37,
+      "name": "focus-trap-lightbox",
+      "status": "pending"
+    },
+    {
+      "step": 38,
+      "name": "print-pdf",
+      "status": "pending"
+    },
+    {
+      "step": 39,
+      "name": "axe-remediation-gate",
+      "status": "pending"
+    },
+    {
+      "step": 40,
+      "name": "axe-remediation-recheck",
+      "status": "pending"
+    },
+    {
+      "step": 41,
+      "name": "axe-finalize",
+      "status": "pending"
+    },
+    {
+      "step": 42,
+      "name": "final-verification",
+      "status": "pending"
+    }
+  ],
+  "reviewBaseSha": "d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d",
+  "created_at": "2026-11-24T08:33:53+0900"
+}
