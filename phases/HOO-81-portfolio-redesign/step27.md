@@ -1,7 +1,7 @@
-# Step 27 — print-pdf
+# Step 27 — focus-trap-lightbox
 
-- 예상 시간: 15분
-- 실행 횟수: print spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 17분
+- 실행 횟수: 시작 snapshot 1회, focus-lightbox spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
 - 선행 step: 0~26 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,20 +9,22 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2 (step 27 범위), §11.7
 3. index.json에서 step 0~26이 completed인지 확인한다. 아니면 중단한다.
-4. `@media print`와 `ensureLightbox`를 확인한다.
+4. step 26의 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 고정 리스너, `.shot-zoom`, `:focus-visible` 규칙을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step27.json`이다. 어떤 파일도 쓰기 전에 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `css/style.css` (`@media print` 블록만)
-- `tests/specs/print.spec.js`
+- `js/main.js`: lightbox 열기·닫기의 trap 연결과 기존 lightbox Tab 리스너 제거만
+- `css/style.css`: `:focus-visible` 규칙만
+- `tests/specs/focus-lightbox.spec.js` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -30,33 +32,22 @@
 
 ## 수정 금지
 
-- `index.html`, `js/*`, `css/themes.css`
-- 기존 tests
-- PDF 파서 의존성 추가
+- `index.html`, `js/data.js`, `css/themes.css`
+- `trapFocus` 시그니처와 모달 연결(step 26)
+- fixtures, helper, 기존 spec(`focus-modal.spec.js` 포함)
 
 ## 작업 (TDD)
 
-1. `print.spec.js` (desktop-dark/light)
-   - helper: `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length`
-     - 자체 검증: `/Pages`만 있으면 0, `/Page`가 있으면 1, 공백 없는 `/Type/Page`도 1
-   - 시나리오 A (새 페이지)
-     - 본문과 featured가 보이고 opacity 1이다.
-     - reveal이 비어 있지 않다.
-     - 인터랙션 요소와 modal이 숨겨져 있다.
-     - lightbox는 없거나, 있으면 display none이다.
-     - PDF 크기 > 10240바이트, `pdfPageCount` >= 1
-   - 시나리오 B (overlay 열림)
-     - screen에서 lightbox 1개가 visible인지 먼저 확인한다.
-     - print로 바꾸면 lightbox와 modal이 display none이 된다.
-     - 본문 가시성은 A와 같다.
-     - PDF 크기 > 10240바이트, `pdfPageCount` >= 1
-2. `@media print`
-   - reveal을 보이게 한다.
-   - featured를 포함한다.
-   - overlay와 인터랙션 요소를 숨긴다.
-   - modal-open 잠금을 해제한다.
-   - 기존 숨김 규칙은 유지한다.
+1. `focus-lightbox.spec.js`를 먼저 작성해 실패를 확인한다 (desktop-dark/light).
+   - 중첩: `findProjectWithShots`로 찾은 grid 카드 모달 → `.shot-zoom`으로 lightbox 열기 → Tab/Shift+Tab이 lightbox 안에서만 순환한다(모달 trap 일시정지).
+   - 해제·재개: Esc 1회 → lightbox 닫힘, 포커스가 `.shot-zoom`으로 복귀, 이후 Tab이 다시 모달 경계 안에서 순환한다. Esc 2회째 → 모달 닫힘, 트리거로 복귀.
+   - 기존 리스너 제거: lightbox를 3회 열고 닫은 뒤에도 Tab 1회가 정확히 한 칸만 이동한다.
+   - outline: 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 computed `outline-style`이 `none`이 아니다.
+2. main.js
+   - lightbox 열 때 push(returnFocusTo = `.shot-zoom`), 닫을 때 release.
+   - 기존 lightbox Tab 고정 리스너를 제거한다.
+3. style.css: `:focus-visible` outline을 유지·보강한다(토큰만 사용).
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- print.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → 모두 통과

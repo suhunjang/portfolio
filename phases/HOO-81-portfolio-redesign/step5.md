@@ -1,29 +1,34 @@
-# Step 5 — content-static-baseline
+# Step 5 — content-data-baseline
 
 - 예상 시간: 16분
-- 실행 횟수: content-static spec 2회, 전체 테스트 1회, verify-scope 1회
-- 선행 step: 0~4 completed (`baseline-index.html`과 `content.js`가 있어야 한다)
+- 실행 횟수: 시작 snapshot 1회, fixture 생성 1회, content-data spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
+- 선행 step: 0~4 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §7.2, §7.3 (`StaticContent`, `extractStatic`)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §7.1, §7.2-1, §7.3 (readLiveData, normalizeFeatured), §11.7
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
-4. index.html 정적 본문 셀렉터를 확인한다: `.nav-link`, `.hero-eyebrow`, `.hero-cta .btn`, `.section-kicker`, `.section-title`, `.section-sub`, `.about-text p`, `.about-points li`, `.about-meta dt`, `.contact-text`, `.footer-note`, `.footer-top`
+4. data.js 전역 const 목록을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+7. BASE = `d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d`
+8. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+9. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step5.json`이다. 어떤 파일도 쓰기 전에 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/content-exceptions.json` (신규)
-- `tests/helpers/content.js` (`extractStatic` 추가만)
-- `tests/specs/content-static.spec.js` (신규)
+- `tests/scripts/make-fixtures.mjs`
+- `tests/fixtures/baseline-data.json`
+- `tests/fixtures/baseline-index.html`
+- `tests/helpers/content.js`: 신규. `norm`, `readLiveData`, `normalizeFeatured`만 둔다.
+- `tests/specs/content-data.spec.js`
+- `tests/package.json`: `fixtures` script 추가만
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -31,31 +36,38 @@
 
 ## 수정 금지
 
-- `tests/` 밖 전부
-- fixture 생성 스크립트, `baseline-data.json`, `baseline-index.html`, `content-data.spec.js`
-- `content.js`의 기존 함수
+- `tests/` 밖의 모든 파일
+- 그 밖의 tests 파일
+- `extractStatic`과 정적 본문 비교 (step 6에서 한다)
 
 ## 작업
 
-1. `content-exceptions.json`에 §7.2 값을 넣는다.
-   - `kickers.base`, `kickers.final`
-   - `titles.base`, `titles.final`
-   - `featured.indexes` [1, 5, 7]
-   - `subsectionTitleFinal`
-2. `content.js`에 `extractStatic(page): Promise<StaticContent>`를 추가한다.
-   - 모든 필드에 norm을 적용한다.
-   - `navLabels`만 정렬하고, 나머지는 DOM 순서를 유지한다.
-3. `content-static.spec.js` (6개 project, collector 고정 순서)
-   - baseline-index.html을 `javaScriptEnabled: false` context에서 `setContent`로 열고 extractStatic을 실행한다. 그 결과를 현재 `/index.html`의 결과와 비교한다.
-   - `kickers`와 `sectionTitles`는 base 또는 final과 순서까지 정확히 같아야 한다.
-   - final이면 `h3.subsection-title` 기술 스택이 정확히 1개 있어야 한다.
-   - 나머지 필드는 BASE와 같아야 한다.
-   - 허용 예외 판정 함수에 대한 합성 검증
-     - base 배열 → 통과
-     - final 배열 → 통과
-     - 두 배열이 섞인 경우 → 거부
-     - 한 글자라도 다르면 → 거부
+1. `make-fixtures.mjs`
+   - `git show BASE:js/data.js`를 vm으로 평가해 `baseline-data.json`에 저장한다.
+   - `git show BASE:index.html`을 `baseline-index.html`에 저장한다. 이 파일은 step 6에서 쓴다.
+   - `fixtures` script를 추가하고 실행한다.
+2. `content.js`
+   - `norm`
+   - `readLiveData(page): Promise<BaselineData>`
+   - `normalizeFeatured(data): BaselineData`
+     - 입력을 바꾸지 않는다(structuredClone).
+     - featured는 index 1, 5, 7에서만 허용한다.
+     - 다른 index에 있거나 값이 true가 아니면 throw한다.
+   - JSDoc typedef를 단다.
+3. `content-data.spec.js` (6개 project, collector 고정 순서)
+   - normalizeFeatured
+     - 호출 후 입력이 그대로인지 deep copy와 비교한다.
+     - 금지 index에 featured가 있으면 throw하는지 확인한다.
+   - `normalizeFeatured(await readLiveData(page))`가 `baseline-data.json`과 deep-equal이다.
+   - featured는 없거나 정확히 1, 5, 7에만 있다.
+   - email·phone·social이 빈 값이다.
+   - 렌더 개수
+     - stats 4
+     - timeline = CAREER 길이
+     - project-card 13
+     - strengths 6
+     - project-title 배열 = baseline
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-static.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과 (전체 회귀는 6개 project 모두에서 돌린다)
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step5.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → 모두 통과

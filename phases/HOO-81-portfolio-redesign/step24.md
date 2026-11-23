@@ -1,7 +1,7 @@
-# Step 24 — section-layout
+# Step 24 — section-structure
 
-- 예상 시간: 15분
-- 실행 횟수: layout spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 19분
+- 실행 횟수: 시작 snapshot 1회, structure spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
 - 선행 step: 0~23 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,20 +9,22 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §9
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5(컨테이너 마크업), §6(스크롤스파이 locator 예시 포함), §7, §8.3(canonical 안정성 범위, entry key, 회귀), §11.4, §11.7
 3. index.json에서 step 0~23이 completed인지 확인한다. 아니면 중단한다.
-4. 섹션 CSS, timeline, 그리드 규칙을 확인한다.
+4. 섹션, nav, scroll-hint, 스크롤스파이, skillsGrid, content-exceptions final, baseline canonical을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step24.json`이다. 어떤 파일도 쓰기 전에 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `css/style.css` (섹션 여백, Career, 그리드, `.subsection-title`만)
-- `tests/specs/layout.spec.js`
+- `index.html` (hero 밖의 섹션, nav, scroll-hint)
+- `js/main.js` (스크롤스파이 배열과 skill-group h4만)
+- `tests/specs/structure.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -30,26 +32,36 @@
 
 ## 수정 금지
 
-- `index.html`, `js/*`, `css/themes.css`
+- `css/*`, `js/data.js`
+- hero 내부(`#heroFeatured` 포함)
 - fixtures, helper, 기존 spec
+- 섹션 표에 없는 문구
 
 ## 작업 (TDD)
 
-1. `layout.spec.js`를 먼저 작성한다 (6개 project).
-   - 가로 스크롤이 없다.
-   - projectGrid와 strengthsGrid 열: 1280에서 3, 768에서 2, 375에서 1
-   - Career: 375에서 세로, 768·1280에서 가로
-   - 375에서 highlights가 보인다.
-   - section gap: career부터 contact까지 padding-top이 모두 같다.
-   - `.subsection-title`의 font-weight가 h2 이하다.
-2. style.css
-   - 섹션 여백
-   - Career 2열/1열
-   - 그리드 3/2/1열
-   - `.subsection-title`
-   - 토큰만 사용
-3. axe 새 target은 step 21과 같은 규칙을 따른다.
+1. `structure.spec.js`를 먼저 작성한다 (6개 project).
+   - 섹션, nav, kicker, h2가 §6과 일치한다.
+   - subsection h3가 1개다.
+   - skillsGrid는 about 안에 있고 h4를 쓴다.
+   - contact와 scroll-hint가 맞다.
+   - heading 계층이 올바르다.
+   - 섹션을 이동한 뒤에도 `#heroFeatured`가 `div[role=region][aria-label=대표 프로젝트]`로 유지된다.
+   - 스크롤스파이 (desktop), 정확히 다음 문법을 쓴다:
+     - `const link = page.locator('.nav-link[href="#about"]');`
+     - `await link.click();`
+     - `await expect(link).toHaveClass(/active/);`
+2. index.html
+   - 섹션 subtree를 통째로 이동해 anchor를 보존한다.
+   - kicker를 바꾼다.
+   - Stack &amp; Contact를 분리한다.
+   - nav, scroll-hint, section-alt를 맞춘다.
+3. main.js: 스크롤스파이 배열, skill-group h4
+4. axe canonical 점검 (필수)
+   - 식별을 잃은 경우: 즉시 중단하고 보고한 뒤 재계획을 요청한다.
+   - 새로 만든 요소의 신규 위반: 허용 파일 안에서 고친다.
+   - 자동 편입은 금지다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- layout.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step24.json --allow index.html,js/main.js,tests/specs/structure.spec.js` → 모두 통과
+- content-static.spec에서 final 상태가 성립한다.

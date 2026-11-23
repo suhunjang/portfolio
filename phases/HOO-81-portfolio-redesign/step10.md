@@ -1,7 +1,7 @@
-# Step 10 — axe-prepare-modal
+# Step 10 — axe-prepare-page
 
-- 예상 시간: 17분
-- 실행 횟수: modal·page spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 15분
+- 실행 횟수: 시작 snapshot 1회, axe-prepare-page spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
 - 선행 step: 0~9 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,20 +9,21 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(모달 마크업), §5(같은 data-project), §7.4(modal.js `gridCard`, `modalTitle`), §8.4(콘텐츠 로딩 검사, modal 준비, 오류 코드, 합성 fixture 규칙)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(reveal), §8.4(공통 오류 계약, page 준비), §11.7
 3. index.json에서 step 0~9가 completed인지 확인한다. 아니면 중단한다.
-4. `modal.js`의 `gridCard`, `modalTitle`, `closeVia`와 `axe-prepare.js`의 `prepareError`, `withPrepareCode`를 확인한다. 현행 `#modalBody` 렌더 구조(`#modalTitle`, `.modal-blurb`, `.modal-section`)와 `.modal-close` 위치를 확인한다.
+4. reveal의 IntersectionObserver 동작과 `.reveal`/`.in` 클래스를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
+8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step10.json`이다. 어떤 파일도 쓰기 전에 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/helpers/axe-prepare.js` (추가만: `MODAL_ROOT`, `MODAL_BODY_TEXT`, `assertContentLoaded`, `prepareModal`)
-- `tests/specs/axe-prepare-modal.spec.js` (신규)
+- `tests/helpers/axe-prepare.js` (신규: `PREPARE_PREFIX`, `prepareError`, `withPrepareCode`, `preparePage`만)
+- `tests/specs/axe-prepare-page.spec.js` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -31,34 +32,24 @@
 ## 수정 금지
 
 - `tests/` 밖 전부
-- 기존 tests 파일 (`modal.js`, `axe.js`, `axe-prepare-page.spec.js` 포함 — import만 한다)
-- step 9 함수의 동작
-- lightbox 준비, `prepareOverlay`, `prepareForAxe` (step 11에서 한다)
+- 기존 tests 파일
+- 콘텐츠 로딩 검사, modal·lightbox 준비, `prepareForAxe` (step 11·12에서 한다)
 
 ## 작업
 
-1. `axe-prepare.js`에 추가한다.
-   - `MODAL_ROOT = '#projectModal'`
-   - `MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section'` (제목 `#modalTitle`과 닫기 버튼 `.modal-close` 제외)
-   - `assertContentLoaded(locator, timeoutMs, { textLocator = null } = {})` — §8.4 계약 그대로: locator 안 img(`content-not-loaded:img`)·svg(`content-not-loaded:svg`) 검사, textLocator가 있으면 비어 있지 않은 텍스트 검사(`content-not-loaded:text`), null이면 텍스트 검사 생략
-   - `prepareModal(page, { projectIndex = 0, timeoutMs = 10000 } = {})`
-     - `gridCard(page, N)` count가 1이 아니면 `project-card-not-found:{N}`
-     - grid 카드 click → body `modal-open`, `#projectModal` visible·opacity 1 (`modal-not-open`)
-     - `modalTitle(page)` 텍스트 = `norm(PROJECTS[N].title)` (`modal-not-open`)
-     - `assertContentLoaded(page.locator(MODAL_ROOT), timeoutMs, { textLocator: page.locator(MODAL_BODY_TEXT) })`
-     - `{ include: '#projectModal', projectIndex: N }` 반환
-2. `axe-prepare-modal.spec.js` (desktop-dark, desktop-light)
-   - 실제 사이트: `prepareModal(page)` → `include === '#projectModal'`, body `modal-open`, 제목이 `PROJECTS[0].title`과 같고, `MODAL_BODY_TEXT` 텍스트가 비어 있지 않다.
-   - grid 범위·중복 data-project (동작 모달 fixture, §8.4 규칙)
-     - `#heroFeatured` 안 `<button data-featured-card data-project="1">`과 `#projectGrid .project-card[data-project="1"]`를 함께 둔다.
-     - `prepareModal({ projectIndex: 1 })` 성공, grid 카드 click 1, 대표 버튼 click 0, `__opens === 1`
-   - `project-card-not-found`: grid 밖 `<button data-featured-card data-project="3">`만 있는 fixture → `prepareForAxe: project-card-not-found:3`, 대표 버튼 click 0
-   - `modal-not-open`: click handler가 없는 `#projectGrid .project-card[data-project="0"]`만 있는 별도 fixture, `timeoutMs: 500` → `prepareForAxe: modal-not-open`
-   - `content-not-loaded:text`: 동작 모달 fixture에서 handler가 `#modalTitle`은 정상 제목으로 채우고 `.modal-blurb`는 빈 문자열, `.modal-section`은 0개로 둔다. `timeoutMs: 500` → 제목 검사는 통과하고 `prepareForAxe: content-not-loaded:text`로 실패한다.
-   - `assertContentLoaded` 단위
-     - 텍스트 없는 `div` + `textLocator: null` → 통과 (텍스트 검사 생략)
-     - 같은 `div`를 `textLocator`로 주면 → `prepareForAxe: content-not-loaded:text`
+1. `axe-prepare.js`
+   - `PREPARE_PREFIX = 'prepareForAxe: '`
+   - `prepareError(code, cause?)`: message `prepareForAxe: {code}`, `.code`, `.cause`
+   - `withPrepareCode(code, fn)`: fn 실패를 `prepareError(code, 원인)`로 바꾼다. 이미 `prepareForAxe: `로 시작하는 오류는 그대로 전달한다.
+   - `preparePage(page, { timeoutMs = 10000 } = {})`: fonts.ready + `status === 'loaded'`(`fonts-not-ready`) → 순회 스크롤(`innerHeight × 0.8`, 단계마다 2 frame) → `scrollTo(0, 0)` → 모든 `.reveal`의 `.in`·visibility·opacity를 `expect.poll`로 확인(`reveal-hidden:{n}`). `{ revealChecked, scrollSteps }` 반환
+2. `axe-prepare-page.spec.js` (desktop-dark, desktop-light, mobile-dark)
+   - 실제 사이트: `revealChecked === await page.locator('.reveal').count()`이고 0보다 크다, 모든 `.reveal`이 `.in`, 반환 후 `scrollY === 0`, `scrollSteps >= 1`
+   - `setContent`로 `.in`이 붙지 않는 `.reveal` 1개 페이지, `timeoutMs: 500` → `prepareForAxe: reveal-hidden:1`, `err.code === 'reveal-hidden:1'`
+   - `prepareError('x')`의 message·code
+   - `withPrepareCode('fonts-not-ready', () => Promise.reject(new Error('boom')))` → message `prepareForAxe: fonts-not-ready`, `cause.message === 'boom'`
+   - `withPrepareCode('a', () => Promise.reject(prepareError('b')))` → 코드 `b`가 그대로 유지된다.
+   - 호출 전후 `data-theme`과 `matchMedia('(prefers-reduced-motion: reduce)').matches`가 같다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-modal.spec.js axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step10.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-page.spec.js` → 모두 통과
