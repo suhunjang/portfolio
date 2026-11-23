@@ -5,7 +5,7 @@
 - read-first: 설계 §8.3(entry key, step 19, gate·recheck·finalize·재계획 계약)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 10·14~18 동작, fixtures
+- 금지: §15.7, step 10·14~18 동작, 실제 fixtures
 
 ## 작업
 

@@ -5,7 +5,7 @@
 - read-first: 설계 §8.3(entry key, step 20, REGRESSION_GATE, gate/recheck)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리 사본만, 실제 plan 파일에 쓰지 않음)
-- 금지: §15.7, step 10·14~19 동작, fixtures
+- 금지: §15.7, step 10·14~19 동작, 실제 fixtures
 
 ## 작업
 

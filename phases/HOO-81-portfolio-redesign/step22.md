@@ -1,8 +1,8 @@
 # Step 22 — axe-classify
 
-- 목적: baseline과 remediation plan 확정.
+- 목적: baseline과 remediation plan 확정. 이후 axe.spec.js는 `check` 모드.
 - 예상 20분 이하(초과 산정 시 즉시 재계획) / 선행 0~21 / 공통 절차 설계 §15
-- read-first: 설계 §7.2, §8.3(step 16 투영, step 18 실행 가능성, fixture, FIX_FILES_BY_KIND, step 22); `axe-collected.json` 존재
+- read-first: 설계 §7.2, §8.3(분류 대기 계약, step 16 투영, step 18 실행 가능성, fixture, FIX_FILES_BY_KIND, step 22); `axe-collected.json` 존재
 - tracked 허용(exact): `tests/fixtures/axe-baseline.json`(신규), `tests/fixtures/axe-remediation-plan.json`(신규)
 - runtime: R0
 - 금지: §15.7, 사이트 파일, helper·spec·axe-collected.json
@@ -17,4 +17,4 @@
 
 ## AC
 
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-baseline-match --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --coverage && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step22.json --allow tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json` → exit 0 (기본 testCommand가 옵션 없이 통과)
+- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-baseline-match --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --coverage && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step22.json --allow tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json` → exit 0 (기본 testCommand가 `check` 모드로 통과)

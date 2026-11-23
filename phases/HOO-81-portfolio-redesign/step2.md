@@ -19,7 +19,7 @@
    - `?? .harness/runtime/a.json`, `phases/HOO-81-portfolio-redesign/step3.md` 변경 → 0; `.harness/policy.json`·`.harness/harness.lock.json` 변경 → 각각 `outside-tests:`
    - `?? tests/node_modules/x/index.js` → `runtime-visible:`; 새 allow spec → 0; 새 `tests/specs/other.spec.js` → `tests-changed:`; `R  tests/x.js`←`README.md`(README null) → `outside-tests:README.md`와 `tests-changed:tests/x.js`
    - `checkSnapshotFirst`, `evaluateGate` 순서, 입력 불변
-   - CLI subprocess(`parity-{숫자}` snapshot 사용 후 삭제): 없는 파일·깨진 JSON·stepId≠파일명 → exit 1; 방금 만든 parity snapshot + `--allow ''` → exit 0·`scope-snapshot: OK`; 모든 실행 전후 snapshot sha256 불변
+   - CLI subprocess(`parity-{숫자}` snapshot 사용 후 삭제): 없는 파일·깨진 JSON·stepId≠파일명·statusZHex 손상 → exit 1; 방금 만든 parity snapshot + `--allow ''` → exit 0·`scope-snapshot: OK`; 모든 실행 전후 snapshot sha256 불변
 
 ## AC
 

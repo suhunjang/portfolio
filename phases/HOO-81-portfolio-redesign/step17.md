@@ -5,7 +5,7 @@
 - read-first: 설계 §8.3(step 17, plan 규칙)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 10·14~16 동작, fixtures
+- 금지: §15.7, step 10·14~16 동작, 실제 fixtures
 
 ## 작업
 
