@@ -1,7 +1,7 @@
-# Step 8 — axe-classify
+# Step 8 — axe-remediation-plan-schema
 
-- 예상 시간: 20분 이하. 아래 산정에서 초과가 예상되면 즉시 재계획한다.
-- 실행 횟수: 조사 스크립트 수회(`tests/.tmp`), 테스트 1회, `--check-plan` 1회, verify-scope 1회
+- 예상 시간: 16분
+- 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~7 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (fixture, 분류, remediation plan, 단계)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 8 plan 계약, remediation plan 규칙)
 3. index.json에서 step 0~7이 completed인지 확인한다. 아니면 중단한다.
-4. `tests/fixtures/axe-collected.json`이 있는지 확인한다.
+4. axe.js의 `BaselineEntry`와 `validateBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,46 +21,60 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/axe-baseline.json` (신규)
-- `tests/fixtures/axe-remediation-plan.json` (신규)
+- `tests/helpers/axe.js` (추가만)
+- `tests/specs/axe-helper.spec.js` (추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (조사용 임시 스크립트와 출력)
+- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- 사이트 파일 전부
-- helper, spec, `axe-collected.json`, 그 밖의 tests 파일
+- `tests/` 밖의 모든 파일
+- 그 밖의 tests 파일, fixtures
+- step 5~7의 동작
 
 ## 작업
 
-1. 시간 산정 (가장 먼저 한다)
-   - 고유 canonical target을 (ruleId, 추정 출처 파일) 묶음으로 나눈다.
-   - 묶음별 예상 시간 = 2분 + target 수 × 1분
-   - 전체 예상 시간 = 묶음 합계 + 검증 5분
-   - 결과를 로그에 남긴다.
-   - 20분을 넘으면 즉시 중단한다. 파일은 쓰지 않는다. 묶음 목록을 보고하고 Harness 재계획(묶음별 classify step으로 분할)을 요청한다.
-   - 위반이 0건이면 baseline은 `[]`, plan은 `{ groups: [] }`로 쓰고 6번으로 건너뛴다.
-2. target을 조사한다.
-   - `tests/.tmp`에 임시 Playwright 스크립트를 두고 래퍼로 실행한다.
-   - 각 target의 computed color/background, `var(--토큰)` 출처, JS 렌더 영역 포함 여부, 정적 속성 여부를 확인한다.
-3. `axe-baseline.json`을 만든다.
-   - §8.3 스키마를 따른다.
-   - target마다 `fixes`를 하나씩 둔다.
-   - `fixFiles`는 합집합이다.
-   - `selectors`를 보존한다.
-4. `axe-remediation-plan.json`을 만든다.
-   - target을 (fixFiles 동일, 난이도) 기준으로 그룹으로 묶는다.
-   - 그룹마다 difficulty, estMinutes(20 이하, 넘으면 그룹을 분할), fixFiles, blocked(text-change가 있으면 true), reason을 적는다.
-   - 모든 baseline target이 정확히 한 그룹에 속해야 한다.
-5. 금지 사항
-   - 수집 결과에 없는 target은 추가하지 않는다.
-   - 이후 step에서 나올 target을 미리 넣지 않는다(자동 편입 금지).
-6. 일반 모드로 확인한다.
+### 1. axe.js에 추가 (§8.3 step 8 계약)
+
+- `PLAN_PATH`
+- `GROUP_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/`
+- `loadPlan(path = PLAN_PATH): Plan`
+  - 파일 없음, JSON 오류, 객체 아님, `groups`가 배열 아님 → throw
+- `validateRemediationPlan(plan, baseline, { coverage } = {}): string[]`
+  - id 형식이 `GROUP_ID_RE`에 맞는지
+  - id가 고유한지
+  - target이 baseline의 부분집합이고 그룹 사이에 중복이 없는지
+  - fixFiles가 합집합과 같은지
+  - estMinutes가 1~20 정수인지
+  - difficulty가 열거값인지
+  - text-change가 있으면 blocked인지
+  - coverage를 요구하면 모든 baseline target이 포함되는지
+  - 오류 메시지 형식은 `group[{i}].{field}: {이유}`
+- CLI: `--check-plan [--coverage] [--plan <f>] [--baseline <f>]`
+  - 파일 없음, 파싱 실패, 오류가 1개 이상이면 exit 1
+
+### 2. axe-helper.spec.js에 추가 (desktop-dark)
+
+- id 형식
+  - 통과: `color-token-1`, `a`, `x2`
+  - 거부: `Group-1`(대문자), `a--b`, `-a`, `a-`, `a_b`, 빈 문자열
+- id 중복: 두 그룹이 같은 id를 쓰면 거부한다.
+- 나머지 규칙
+  - 통과: 정상 plan
+  - 거부: estMinutes 21, estMinutes 0, fixFiles 불일치, 그룹 간 target 중복, text-change인데 blocked가 false, difficulty 이상값, coverage 누락
+- subprocess 실패 사례: 모든 파일을 독립 디렉터리에 두고 `--plan`과 `--baseline`으로 지정한다.
+  - 정상 → 0
+  - plan 파일 없음 → 1
+  - plan JSON 오류 → 1
+  - 대문자 id → 1
+  - 중복 id → 1
+  - `--coverage`에서 누락 → 1
+  - baseline 파일 없음 → 1
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --coverage && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
-- 이 단계부터 일반 모드에서 실제 스키마와 canonical 회귀 판정이 함께 실행된다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

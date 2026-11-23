@@ -1,6 +1,6 @@
-# Step 12 — print-pdf
+# Step 12 — section-order-layout
 
-- 예상 시간: 15분
+- 예상 시간: 20분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~11 completed
 
@@ -9,9 +9,12 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §7, §8.3(canonical 안정성 보장 범위, 회귀), §9, §11.4
 3. index.json에서 step 0~11이 completed인지 확인한다. 아니면 중단한다.
-4. 현재 코드에서 `@media print`와 `ensureLightbox`를 확인한다.
+4. 현재 코드에서 다음을 확인한다.
+   - 섹션, nav, scroll-hint, 스크롤스파이, skillsGrid, timeline
+   - content-exceptions의 final
+   - baseline canonical 목록
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,8 +24,10 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `css/style.css` (`@media print` 블록만)
-- `tests/specs/print.spec.js`
+- `index.html`
+- `css/style.css`
+- `js/main.js`
+- `tests/specs/layout.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -30,42 +35,56 @@
 
 ## 수정 금지
 
-- `index.html`, `js/*`, `css/themes.css`
-- 기존 tests
-- PDF 파서 의존성 추가
+- `js/data.js`, `css/themes.css`
+- fixtures, helper, 기존 spec
+- 섹션 표 밖의 문구
 
 ## 작업 (TDD)
 
-### 1. `print.spec.js` (desktop-dark/light)
+### 1. `layout.spec.js` 먼저 작성 (6개 project)
 
-공통 helper: `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length`
-- `\b` 덕분에 `/Pages`는 세지 않는다.
-- helper 자체 검증
-  - 합성 `<< /Type /Pages /Count 1 >>`만 있으면 0
-  - `<< /Type /Page >>`가 있으면 1
-  - `/Type/Page`(공백 없음)도 1
+- 구조
+  - 섹션 순서가 §6 표와 같다.
+  - subsection, skill-group h4, contact, scroll-hint
+- 레이아웃
+  - 가로 스크롤이 없다.
+  - 그리드 열 수
+  - STATS: 375에서 2×2, 768·1280에서 4×1
+  - Career: 375에서 세로, 768·1280에서 가로
+  - highlights가 보인다.
+- 스크롤스파이 (desktop)
+  - `const link = page.locator(.nav-link[href="#about"])`를 클릭한다.
+  - `await expect(link).toHaveClass(/active/)`
+- heading 계층
 
-시나리오 A: 새 페이지, print
-- 본문과 `#heroFeatured`가 visible이고 opacity 1
-- 보이는 `.reveal`에 내용이 있다.
-- 인터랙션 요소와 `#projectModal`이 숨겨져 있다.
-- `.lightbox`는 count 0이거나, 있으면 display none
-- PDF가 10240바이트를 넘고 `pdfPageCount` >= 1
+### 2. `index.html`
 
-시나리오 B: overlay를 연 상태
-- screen에서 `.lightbox`가 1개이고 visible인지 먼저 확인한다.
-- print로 전환하면 `.lightbox`와 `#projectModal`이 display none
-- 본문 가시성은 A와 같다.
-- PDF가 10240바이트를 넘고 `pdfPageCount` >= 1
+- 섹션은 subtree 전체를 통째로 옮긴다. 그래야 anchor(`section[id]`)가 유지된다.
+- kicker를 바꾼다.
+- Stack &amp; Contact를 분리한다.
+- nav, scroll-hint, section-alt를 바꾼다.
 
-### 2. `@media print`
+### 3. `main.js`
 
-- reveal 요소를 보이게 한다.
-- `#heroFeatured`를 포함한다.
-- overlay와 인터랙션 요소를 숨긴다.
-- modal-open 잠금을 해제한다.
-- 기존 숨김 규칙은 유지한다.
+- 스크롤스파이 배열을 바꾼다.
+- skill-group 제목을 h4로 바꾼다.
+
+### 4. `style.css`
+
+- 섹션 여백, Career, 그리드, subsection-title
+
+### 5. axe canonical 점검 (필수)
+
+일반 모드로 회귀 판정을 실행한다. 새 key나 target이 나오면 원인에 따라 처리한다.
+
+- 식별 상실: 같은 요소·같은 규칙인데 key만 바뀐 경우다. 예를 들어 요소가 anchor 경계 밖으로 이동한 경우.
+  - 즉시 중단한다.
+  - key와 selector를 보고한다.
+  - 재계획을 요청한다.
+- 이 step에서 새로 만든 요소의 실제 신규 위반: 허용 파일 안에서 고친다.
+- 어떤 경우에도 baseline에 자동 편입하지 않는다.
 
 ## 완료 기준 (AC)
 
 - `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
+- content.spec에서 final이 성립한다.

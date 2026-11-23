@@ -11,7 +11,7 @@
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
    - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §6, §7
 3. index.json에서 step 0~2가 completed인지 확인한다. 아니면 중단한다.
-4. data.js 전역 const와 index.html 정적 본문 셀렉터를 확인한다.
+4. data.js의 전역 const와 index.html 정적 본문 셀렉터를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -36,29 +36,24 @@
 
 ## 수정 금지
 
-- `tests/` 밖 전부
+- `tests/` 밖의 모든 파일
 - 그 밖의 tests 파일
 
 ## 작업
 
 1. `make-fixtures.mjs`
-   - BASE data.js를 vm으로 평가해 `baseline-data.json`으로 저장한다.
-   - BASE index.html을 `baseline-index.html`로 저장한다.
+   - BASE의 data.js를 vm으로 평가해 `baseline-data.json`에 저장한다.
+   - BASE의 index.html을 `baseline-index.html`로 저장한다.
    - `fixtures` script를 추가한다.
-2. `content-exceptions.json`: §7.2 값을 그대로 담는다.
-3. `content.js`: §7.3 계약대로 만든다.
-   - `norm`, `readLiveData`, `normalizeFeatured`(입력 불변), `extractStatic`
-   - JSDoc typedef를 단다.
-4. `content.spec.js`: 6개 project에서 실행하고, collector는 고정 순서로 쓴다.
-   - normalizeFeatured: 입력이 바뀌지 않는지, 지정 외 index에서 throw하는지 확인한다.
-   - deep-equal
-   - featured가 지정 index에만 있는지
-   - email·phone·social이 비어 있는지
-   - 정적 본문 비교
-     - kickers와 titles는 base 또는 final과 정확히 같아야 한다.
-     - final이면 subsection이 1개다.
-     - 나머지는 BASE와 같아야 한다.
-   - 렌더 개수
+2. `content-exceptions.json`: §7.2 값을 넣는다.
+3. `content.js`: §7.3 계약대로 만들고 JSDoc을 단다.
+4. `content.spec.js` (6개 project, collector는 고정 순서로)
+   - normalizeFeatured: 입력을 바꾸지 않는지, 잘못된 입력이면 throw하는지 확인한다.
+   - deep-equal로 비교한다.
+   - featured가 정해진 index에만 있는지 확인한다.
+   - 연락처가 비어 있는지 확인한다.
+   - 정적 본문을 §7.2 예외 규칙에 따라 비교한다.
+   - 렌더된 항목 개수를 확인한다.
 5. `sh tests/scripts/with-env.sh npm --prefix tests run fixtures`를 실행한다.
 
 ## 완료 기준 (AC)

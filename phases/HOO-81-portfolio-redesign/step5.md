@@ -9,7 +9,7 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (canonical target 식별)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (canonical 식별, 안정성 보장 범위, helper 계약 중 step 5)
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
 4. 현재 코드에서 JS 렌더 영역, `data-project`, landmark를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
@@ -30,34 +30,31 @@
 
 ## 수정 금지
 
-- `tests/` 밖 전부
+- `tests/` 밖의 모든 파일
 - 기존 tests 파일
-- 이 step은 식별만 다룬다. 스키마, 회귀 판정, 수집 CLI는 step 6에서 다룬다.
+- 이 step은 식별만 다룬다. 수집, 스키마, plan은 step 6~8에서 한다.
 
 ## 작업
 
-### 1. `tests/helpers/axe.js`
-
-- `ALIASES`: §8.3의 고정 alias 2개
-- `canonicalTargetInPage(el)` (브라우저에서 실행)
-  - `{ anchor, text }`를 반환한다.
-  - anchor 우선순위: featured → project → id → landmark → document
-  - text: norm 적용, 비면 대체 속성 사용, 숫자는 `#`, 80자 제한, alias 적용
-- `canonicalFromDescriptor({ ruleId, anchor, text }): string`
-- `runAxe(page, { include })`
-  - wcag2a·wcag2aa의 serious/critical 위반만 다룬다.
-  - node마다 같은 page에서 canonical을 계산한다.
-  - 반환: `{ ruleId, impact, selectors, targets }[]`. targets는 중복을 제거한다.
-
-### 2. `tests/specs/axe-helper.spec.js` (desktop-dark)
-
-`page.setContent`로 실제 axe를 실행해 DOM 이동 안정성을 확인한다.
-
-- a) 같은 key: `section#career`의 `h3` 안 `01 — Career`를 `main`으로 이동하고 `span`으로 바꾼 뒤 텍스트를 `04 — Career`로 변경해도 color-contrast key가 같다.
-- b) 같은 key: `[data-project=5]` 안에서 div를 p로 바꿔도 같다.
-- c) 텍스트가 다르면 key가 다르다.
-- d) `project:5`와 `featured:5`는 서로 다른 key다.
-- e) alias가 적용되면 같은 key다.
+1. `axe.js` (설계 §8.3 step 5 계약)
+   - `ALIASES`
+   - `canonicalTargetInPage(el) → { anchor, text }`
+   - `canonicalFromDescriptor({ ruleId, anchor, text }) → string`
+   - `runAxe(page, { include }) → Violation[]`
+     - wcag2a·wcag2aa 기준, serious·critical만 다룬다.
+     - node마다 canonical을 계산하고 중복을 제거한다.
+2. `axe-helper.spec.js` (desktop-dark, `page.setContent`로 실제 axe 실행)
+   - a) anchor를 유지한 채 이동 → 같은 key
+     - `section#career` subtree 전체를 `main` 아래 다른 위치로 옮긴다. 안에는 저대비 `h3` 01 — Career가 있다.
+     - 그 안에서 `h3`를 `span`으로 바꾸고 텍스트를 `04 — Career`로 바꾼다.
+     - 이동 전후 color-contrast key가 같아야 한다.
+   - a2) anchor 경계 밖으로 이동 → 다른 key
+     - 같은 저대비 `h3`만 `section#career` 밖(`body` 직속)으로 옮긴다.
+     - anchor가 `document`로 바뀌므로 key가 달라야 한다.
+   - b) `[data-project=5]` 안에서 div를 p로 바꿔도 key가 같다.
+   - c) 텍스트가 다르면 key가 다르다.
+   - d) `project:5`와 `featured:5`는 서로 다른 key다.
+   - e) alias가 적용되면 key가 같다.
 
 ## 완료 기준 (AC)
 

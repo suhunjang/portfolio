@@ -1,17 +1,17 @@
-# Step 14 — axe-finalize
+# Step 14 — print-pdf
 
-- 예상 시간: 10분
-- 실행 횟수: `--assert-empty` 1회, 테스트 1회, verify-scope 1회
-- 선행 step: 0~13 completed, 그리고 재계획으로 추가된 `axe-remediation-*` step이 있다면 모두 completed
+- 예상 시간: 15분
+- 실행 횟수: 테스트 2회, verify-scope 1회
+- 선행 step: 0~13 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 14 finalize)
-3. index.json에서 선행 step이 모두 completed인지 확인한다. 재계획으로 추가된 remediation step도 포함한다. 아니면 중단한다.
-4. 전제 조건: `tests/fixtures/axe-remediation-plan.json`의 groups가 `[]`여야 한다. 아니면 중단하고 재계획을 요청한다.
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10
+3. index.json에서 step 0~13이 completed인지 확인한다. 아니면 중단한다.
+4. 현재 코드에서 `@media print`와 `ensureLightbox`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,7 +21,8 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/axe-baseline.json` (`[]`로 바꾸는 것만 허용)
+- `css/style.css` (`@media print` 블록만)
+- `tests/specs/print.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -29,15 +30,39 @@
 
 ## 수정 금지
 
-- 사이트 파일 전부, helper, spec, 다른 fixture
+- `index.html`, `js/*`, `css/themes.css`
+- 기존 tests
+- PDF 파서 의존성 추가
 
-## 작업
+## 작업 (TDD)
 
-1. `axe-baseline.json`을 `[]`로 바꾼다.
-2. 일반 모드로 axe 전체를 실행한다. baseline이 비었으므로 위반이 하나라도 있으면 실패한다.
-3. 실패하면 baseline을 되돌리지 않는다. 실패한 key와 target을 보고하고 중단한 뒤 재계획을 요청한다.
+### 1. `print.spec.js` (desktop-dark/light)
+
+helper
+- `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length`
+- 자체 검증: `/Pages`만 있으면 0, `/Page` 1개면 1, 공백 없는 `/Type/Page`도 1
+
+시나리오 A: 새 페이지를 print 미디어로
+- 본문과 featured가 visible이고 opacity 1
+- reveal에 내용이 있음
+- 인터랙션 요소와 modal이 숨겨짐
+- lightbox가 없거나, 있으면 display none
+- PDF 크기 > 10240바이트, `pdfPageCount` ≥ 1
+
+시나리오 B: overlay를 연 상태
+- screen에서 lightbox가 1개이고 visible인지 먼저 확인한다.
+- print로 바꾼 뒤 lightbox와 modal이 display none
+- 본문 가시성은 A와 같다.
+- PDF 크기 > 10240바이트, `pdfPageCount` ≥ 1
+
+### 2. `@media print`
+
+- reveal을 보이게 한다.
+- featured를 포함한다.
+- overlay와 인터랙션 요소를 숨긴다.
+- modal-open 잠금을 해제한다.
+- 기존 숨김 규칙은 유지한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 exit 0이다.
-- 즉 빈 배열 검증과 일반 axe 전체 검사가 모두 성공해야 한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
