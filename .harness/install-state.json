@@ -1,59 +1,57 @@
 {
   "distributionName": "discord-claude-harness",
-  "distributionVersion": "1.0.0",
+  "distributionVersion": "2.0.0",
   "files": {
     ".claude/commands/harness.md": {
-      "installedHash": "228209aba60a0896dccb45cc1260b7fe434fa441acc84f45f10ef1e67503b535",
-      "ownership": "managed",
-      "sourceHash": "228209aba60a0896dccb45cc1260b7fe434fa441acc84f45f10ef1e67503b535"
-    },
-    ".claude/commands/review.md": {
-      "installedHash": "7ba306a7c24c722d3bc5e1a1f694f0a52e830e5d6238e361acae1a892b4e101c",
-      "ownership": "managed",
-      "sourceHash": "7ba306a7c24c722d3bc5e1a1f694f0a52e830e5d6238e361acae1a892b4e101c"
-    },
-    ".claude/settings.json": {
-      "hash": "027e724ccb3a2d2819eabaadfaf05fefdee7316ae74738388ccd3836da128299",
+      "hash": "c8c9ebdb7833980136c777070f4ad730a35f4588f315c8302fff879b3aefbb54",
       "ownership": "merge-required",
       "requirementsVersion": 1,
       "status": "created"
     },
+    ".claude/commands/review.md": {
+      "hash": "460138196ab959ba704189582cadb50b9890a9dddb3e3a0a78c62edd093bdbad",
+      "ownership": "merge-required",
+      "requirementsVersion": 1,
+      "status": "created"
+    },
+    ".claude/settings.json": {
+      "hash": "f6a4f3592208b696a5ef874eb1b1b87ce644fa838166e588e80267dad3aa5716",
+      "ownership": "merge-required",
+      "requirementsVersion": 2,
+      "status": "adopted"
+    },
     ".claude/skills/cross-review/SKILL.md": {
-      "installedHash": "0d68b76b8548957fefbdfcb3a9525d441387a656e592da23c83e0eaf1a759737",
-      "ownership": "managed",
-      "sourceHash": "0d68b76b8548957fefbdfcb3a9525d441387a656e592da23c83e0eaf1a759737"
+      "hash": "3193ca7f3d93fab428bc18d5817b6d63719436ff7327ab27322bad8f43b14e30",
+      "ownership": "merge-required",
+      "requirementsVersion": 1,
+      "status": "created"
     },
     ".codex/hooks.json": {
-      "installedHash": "2ba9a83835ebfaaa1b1e66d533bd28c96cd4d9bbb1c43bef9f3950c640a76cf6",
-      "ownership": "managed",
-      "sourceHash": "2ba9a83835ebfaaa1b1e66d533bd28c96cd4d9bbb1c43bef9f3950c640a76cf6"
-    },
-    ".gitattributes": {
-      "installedHash": "0c51eb3f92db0d3ba4cff5f2184e8749099869899fac0b081281e4cc699e3b36",
-      "ownership": "managed",
-      "sourceHash": "0c51eb3f92db0d3ba4cff5f2184e8749099869899fac0b081281e4cc699e3b36"
+      "hash": "59fb1b6a4ac697bb09047abe0bfe3b3683105ebd874d97892e99ccbd30daf8f2",
+      "ownership": "merge-required",
+      "requirementsVersion": 1,
+      "status": "created"
     },
     ".gitignore": {
       "hash": "bf61ebf16c9da59d480e2e521bbf554ac87071953c6c8674c45d273a75dcbe68",
       "ownership": "merge-required",
-      "requirementsVersion": 1,
+      "requirementsVersion": 2,
       "status": "adopted"
+    },
+    ".harness/harness.lock.json": {
+      "hash": "457ddfd8763dc5988b643ad6ead8961e21247cd239e15843fde523fab290bb2d",
+      "ownership": "config"
     },
     ".harness/policy.json": {
       "hash": "5636b30756b48dc05a059b47573378c6efa335382397a6e5356e2062398aafc2",
       "ownership": "seed",
       "status": "created"
     },
-    ".python-version": {
-      "installedHash": "7651ce7dab58e5733ba35597459414699ca339dde25a68aac3d8a89a0c89e5c6",
-      "ownership": "managed",
-      "sourceHash": "7651ce7dab58e5733ba35597459414699ca339dde25a68aac3d8a89a0c89e5c6"
-    },
     "CLAUDE.md": {
-      "hash": "6598649e3d92d2d88bf47ff0dfd43fe214f34fc1c164022ab6ceaaa1376bff25",
+      "hash": "b63e8c71bea72313c7ae312c6c5582e6fd1ccc98b122d2f4ade46f09e65cb8aa",
       "ownership": "merge-required",
-      "requirementsVersion": 1,
-      "status": "created"
+      "requirementsVersion": 2,
+      "status": "adopted"
     },
     "docs/PRD.md": {
       "hash": "ec48f2bd6bb83ea7ff17e3fa6a0ca101acb4e7ca35e66aa3a11753031400cde9",
@@ -65,196 +63,23 @@
       "ownership": "seed",
       "status": "created"
     },
-    "harness-manifest.json": {
-      "installedHash": "03049192615fc0cb03e348f0fe0ee24acd0b0c515cbc6e80c1fd0226a05cd80b",
-      "ownership": "managed",
-      "sourceHash": "03049192615fc0cb03e348f0fe0ee24acd0b0c515cbc6e80c1fd0226a05cd80b"
-    },
     "phases/index.json": {
       "hash": "dcea305a1fdfeface9fb924da658bedbc3bbc88187d832a3fcd4f5c71adc1197",
       "ownership": "seed",
       "status": "created"
-    },
-    "pytest.ini": {
-      "installedHash": "6824ddfa3f16183db5b040f2c67f6bbc8bc8e5ecdf800c69737aa3c99e0e5bee",
-      "ownership": "managed",
-      "sourceHash": "6824ddfa3f16183db5b040f2c67f6bbc8bc8e5ecdf800c69737aa3c99e0e5bee"
-    },
-    "scripts/approval.py": {
-      "installedHash": "6ede8f65be8a1ba51d5e145cb6c99a3d35594d50c93e70e8428458f9b28766b8",
-      "ownership": "managed",
-      "sourceHash": "6ede8f65be8a1ba51d5e145cb6c99a3d35594d50c93e70e8428458f9b28766b8"
-    },
-    "scripts/bootstrap_venv.py": {
-      "installedHash": "fa27b25afa9eff72ed33b111e27fa6ed5bf6cec7e616a94e19acc0f165d8a56a",
-      "ownership": "managed",
-      "sourceHash": "fa27b25afa9eff72ed33b111e27fa6ed5bf6cec7e616a94e19acc0f165d8a56a"
-    },
-    "scripts/conftest.py": {
-      "installedHash": "2e65abd566c7533f119051201093815a1822196846cd7ce98a6dff35972f319e",
-      "ownership": "managed",
-      "sourceHash": "2e65abd566c7533f119051201093815a1822196846cd7ce98a6dff35972f319e"
-    },
-    "scripts/cross_review.py": {
-      "installedHash": "20b9871b10e0e820b8b310b500df0d5fdb5fa43b9d6553748026f800cc381ecf",
-      "ownership": "managed",
-      "sourceHash": "20b9871b10e0e820b8b310b500df0d5fdb5fa43b9d6553748026f800cc381ecf"
-    },
-    "scripts/execute.py": {
-      "installedHash": "356823013626054163d09ba1beda5f5f120c8469a2c4ce3ee1cbfbff1a1c73c9",
-      "ownership": "managed",
-      "sourceHash": "356823013626054163d09ba1beda5f5f120c8469a2c4ce3ee1cbfbff1a1c73c9"
-    },
-    "scripts/harness.py": {
-      "installedHash": "071bfe4764c39911ea319ba9d25882a688b765c4b8a83a6ad58a37e31b9f2923",
-      "ownership": "managed",
-      "sourceHash": "071bfe4764c39911ea319ba9d25882a688b765c4b8a83a6ad58a37e31b9f2923"
-    },
-    "scripts/hooks/block-dangerous.sh": {
-      "installedHash": "f6fe304b0aa3705c169a1a7796b9c53c5b9d409a88a6d474b1cd17224cdf8547",
-      "ownership": "managed",
-      "sourceHash": "f6fe304b0aa3705c169a1a7796b9c53c5b9d409a88a6d474b1cd17224cdf8547"
-    },
-    "scripts/hooks/cross-review-nudge.sh": {
-      "installedHash": "4410179de39c43375a52c526afcbcbb6271702f508afe86bf77405737bd00f55",
-      "ownership": "managed",
-      "sourceHash": "4410179de39c43375a52c526afcbcbb6271702f508afe86bf77405737bd00f55"
-    },
-    "scripts/hooks/tdd-guard.sh": {
-      "installedHash": "31bdb28e0e08eac683394e0eba29971439539ac557aba7aa2dd2afe234f44078",
-      "ownership": "managed",
-      "sourceHash": "31bdb28e0e08eac683394e0eba29971439539ac557aba7aa2dd2afe234f44078"
-    },
-    "scripts/hooks/test_hooks.py": {
-      "installedHash": "d1a6102f13f7b465140f9a25b66a4387514b1f4e9099a9f9497f2620ca5de6a4",
-      "ownership": "managed",
-      "sourceHash": "d1a6102f13f7b465140f9a25b66a4387514b1f4e9099a9f9497f2620ca5de6a4"
-    },
-    "scripts/plan_manifest.py": {
-      "installedHash": "02d4edb5c150d509603b68cb90132603fccab1ecd1a989fc58a2d35499e2fa0c",
-      "ownership": "managed",
-      "sourceHash": "02d4edb5c150d509603b68cb90132603fccab1ecd1a989fc58a2d35499e2fa0c"
-    },
-    "scripts/plan_session.py": {
-      "installedHash": "1e05170b71d15fd5e5313327ee19db7d0d4fc1821bf4cfda8e1326578283d1b1",
-      "ownership": "managed",
-      "sourceHash": "1e05170b71d15fd5e5313327ee19db7d0d4fc1821bf4cfda8e1326578283d1b1"
-    },
-    "scripts/project_init.py": {
-      "installedHash": "eb1bf2127dc84a5de2cc2b0904b365c1b731a612d835e6980a89e246feb5dde2",
-      "ownership": "managed",
-      "sourceHash": "eb1bf2127dc84a5de2cc2b0904b365c1b731a612d835e6980a89e246feb5dde2"
-    },
-    "scripts/review_plan.py": {
-      "installedHash": "52a0c5637fc6a9003f9f7b38431dc442fb4ef5369f2cfd3fd8b14c96fa11ba85",
-      "ownership": "managed",
-      "sourceHash": "52a0c5637fc6a9003f9f7b38431dc442fb4ef5369f2cfd3fd8b14c96fa11ba85"
-    },
-    "scripts/runner.py": {
-      "installedHash": "99e3c3bafe3052f92bc4996d7a4ae595f6430e55a5548a7a90ea4dd3a8f914c1",
-      "ownership": "managed",
-      "sourceHash": "99e3c3bafe3052f92bc4996d7a4ae595f6430e55a5548a7a90ea4dd3a8f914c1"
-    },
-    "scripts/runtime.py": {
-      "installedHash": "1d9f741cdfc0da0d0f7e7d2093ef59fb6d52f1b5cd164abcce2cb88870ef5b2f",
-      "ownership": "managed",
-      "sourceHash": "1d9f741cdfc0da0d0f7e7d2093ef59fb6d52f1b5cd164abcce2cb88870ef5b2f"
-    },
-    "scripts/test_approval.py": {
-      "installedHash": "e7b2df53d957b5c7ca4baae9f57d94d1bd25d76a8d5f8367d6b20c34c72ca182",
-      "ownership": "managed",
-      "sourceHash": "e7b2df53d957b5c7ca4baae9f57d94d1bd25d76a8d5f8367d6b20c34c72ca182"
-    },
-    "scripts/test_cross_review.py": {
-      "installedHash": "7488abe1c1e81f92fc0c1be35b3271af3a6985ee35fa9f3c801b9a0345c034e5",
-      "ownership": "managed",
-      "sourceHash": "7488abe1c1e81f92fc0c1be35b3271af3a6985ee35fa9f3c801b9a0345c034e5"
-    },
-    "scripts/test_distribution_contract.py": {
-      "installedHash": "0b7a9fb43689ccf3c589525ddacdf4c261577cb5b9b0f412eb21cc6631f04d58",
-      "ownership": "managed",
-      "sourceHash": "0b7a9fb43689ccf3c589525ddacdf4c261577cb5b9b0f412eb21cc6631f04d58"
-    },
-    "scripts/test_execute.py": {
-      "installedHash": "a1adf7c95393aeb89238dc8b1e84ad5dbcb402b574b43e2ff40a176a098364fb",
-      "ownership": "managed",
-      "sourceHash": "a1adf7c95393aeb89238dc8b1e84ad5dbcb402b574b43e2ff40a176a098364fb"
-    },
-    "scripts/test_execute_gates.py": {
-      "installedHash": "32ab19d14fcb74a6566fc338eb2657a7f1332b98771900480b72a93b96193a04",
-      "ownership": "managed",
-      "sourceHash": "32ab19d14fcb74a6566fc338eb2657a7f1332b98771900480b72a93b96193a04"
-    },
-    "scripts/test_plan_manifest.py": {
-      "installedHash": "b6b48bb059de59b153d74e83a8172181731a05396d1dbee388785f10e14d713f",
-      "ownership": "managed",
-      "sourceHash": "b6b48bb059de59b153d74e83a8172181731a05396d1dbee388785f10e14d713f"
-    },
-    "scripts/test_plan_session.py": {
-      "installedHash": "af9f7f184da562919b5d0bf288690bc5dfdf5e03b56aaee9a42021576b3b8492",
-      "ownership": "managed",
-      "sourceHash": "af9f7f184da562919b5d0bf288690bc5dfdf5e03b56aaee9a42021576b3b8492"
-    },
-    "scripts/test_project_init.py": {
-      "installedHash": "dd9385bb995d0c2e9fa028c4236e6dc08353629370eb46b811c542dac87398a8",
-      "ownership": "managed",
-      "sourceHash": "dd9385bb995d0c2e9fa028c4236e6dc08353629370eb46b811c542dac87398a8"
-    },
-    "scripts/test_review_plan.py": {
-      "installedHash": "f5df23456603cc3f1d6cfbe6ae6da248f494e20525693d19ba06ddbd6b7a91b8",
-      "ownership": "managed",
-      "sourceHash": "f5df23456603cc3f1d6cfbe6ae6da248f494e20525693d19ba06ddbd6b7a91b8"
-    },
-    "scripts/test_runner.py": {
-      "installedHash": "2591955395a56a6aa2040468f65bc8bd2c82cad02e83ff76395c8bf4698cdac0",
-      "ownership": "managed",
-      "sourceHash": "2591955395a56a6aa2040468f65bc8bd2c82cad02e83ff76395c8bf4698cdac0"
-    },
-    "scripts/test_runtime.py": {
-      "installedHash": "0f31eeb13e6b17c34be97b8b56e5e434836c106a26e3b086d7bc141058a9235c",
-      "ownership": "managed",
-      "sourceHash": "0f31eeb13e6b17c34be97b8b56e5e434836c106a26e3b086d7bc141058a9235c"
-    },
-    "templates/project/.harness/policy.json": {
-      "installedHash": "5636b30756b48dc05a059b47573378c6efa335382397a6e5356e2062398aafc2",
-      "ownership": "managed",
-      "sourceHash": "5636b30756b48dc05a059b47573378c6efa335382397a6e5356e2062398aafc2"
-    },
-    "templates/project/CLAUDE.md.template": {
-      "installedHash": "6598649e3d92d2d88bf47ff0dfd43fe214f34fc1c164022ab6ceaaa1376bff25",
-      "ownership": "managed",
-      "sourceHash": "6598649e3d92d2d88bf47ff0dfd43fe214f34fc1c164022ab6ceaaa1376bff25"
-    },
-    "templates/project/claude-settings.json.template": {
-      "installedHash": "027e724ccb3a2d2819eabaadfaf05fefdee7316ae74738388ccd3836da128299",
-      "ownership": "managed",
-      "sourceHash": "027e724ccb3a2d2819eabaadfaf05fefdee7316ae74738388ccd3836da128299"
-    },
-    "templates/project/docs/PRD.md": {
-      "installedHash": "ec48f2bd6bb83ea7ff17e3fa6a0ca101acb4e7ca35e66aa3a11753031400cde9",
-      "ownership": "managed",
-      "sourceHash": "ec48f2bd6bb83ea7ff17e3fa6a0ca101acb4e7ca35e66aa3a11753031400cde9"
-    },
-    "templates/project/docs/UI_GUIDE.md": {
-      "installedHash": "1ace245c84947a0f703f700bddeedeb3ec1de890032b21f888289632092c1be7",
-      "ownership": "managed",
-      "sourceHash": "1ace245c84947a0f703f700bddeedeb3ec1de890032b21f888289632092c1be7"
-    },
-    "templates/project/gitignore.template": {
-      "installedHash": "a42490160be275c544414448ccdbd8620c179844529f2ccfc0c71b9b816bc33c",
-      "ownership": "managed",
-      "sourceHash": "a42490160be275c544414448ccdbd8620c179844529f2ccfc0c71b9b816bc33c"
-    },
-    "templates/project/phases/index.json": {
-      "installedHash": "dcea305a1fdfeface9fb924da658bedbc3bbc88187d832a3fcd4f5c71adc1197",
-      "ownership": "managed",
-      "sourceHash": "dcea305a1fdfeface9fb924da658bedbc3bbc88187d832a3fcd4f5c71adc1197"
     }
   },
-  "manifestHash": "03049192615fc0cb03e348f0fe0ee24acd0b0c515cbc6e80c1fd0226a05cd80b",
+  "manifestHash": "287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a",
+  "migration": {
+    "fromDistributionVersion": "1.0.0",
+    "fromManifestHash": "03049192615fc0cb03e348f0fe0ee24acd0b0c515cbc6e80c1fd0226a05cd80b",
+    "fromSourceCommit": "002edcd97da4bd55d412409c15cbb3659a72b233",
+    "fromStateSha": "0301b58d403a39125c99b7f817f8314e5eda303749c2502ca93fa481b8700781",
+    "transaction": "20261123T143910292356Z-370e674a"
+  },
   "profile": "ui",
-  "schemaVersion": 1,
-  "sourceCommit": "002edcd97da4bd55d412409c15cbb3659a72b233",
-  "stateHash": "6e51d59ca6b092421485f7450eb2425165e1ae9083dbfcd35e36bfe6751f4b6b",
-  "updatedAt": "2026-11-23T06:10:57.773593+00:00"
+  "schemaVersion": 2,
+  "sourceCommit": "cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae",
+  "stateHash": "9446ea5f36aa2c44a8e5337fbab7832fa75986083cd0121d6a3f5b0c4f0d7cdd",
+  "updatedAt": "2026-11-23T14:39:10.292529+00:00"
 }

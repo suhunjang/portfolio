@@ -1,10 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./.venv/bin/python scripts/harness.py:*)",
-      "Bash(./.venv/bin/python -m pytest:*)",
-      "Bash(./.venv/bin/python scripts/cross_review.py:*)",
-      "Bash(bash scripts/hooks/cross-review-nudge.sh)",
+      "Bash(harness --project-root .:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)"
@@ -24,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/cross-review-nudge.sh\""
+            "command": "harness hook cross-review-nudge --project-root \"$CLAUDE_PROJECT_DIR\""
           }
         ]
       }
@@ -35,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/block-dangerous.sh\""
+            "command": "harness hook block-dangerous --project-root \"$CLAUDE_PROJECT_DIR\" || exit 2"
           }
         ]
       },
@@ -44,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/tdd-guard.sh\""
+            "command": "harness hook tdd-guard --project-root \"$CLAUDE_PROJECT_DIR\""
           }
         ]
       }

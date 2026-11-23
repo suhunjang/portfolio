@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/hooks/block-dangerous.sh"
+            "command": "harness hook block-dangerous --project-root . || exit 2"
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/hooks/tdd-guard.sh"
+            "command": "harness hook tdd-guard --project-root ."
           }
         ]
       }
