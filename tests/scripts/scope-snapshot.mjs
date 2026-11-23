@@ -2,6 +2,9 @@
 // step 1: 상수, 경로 유형 검사, 안전 읽기. 파일 쓰기·CLI 없음.
 // step 2: 저장소 상대 경로 판정, status parser, 최상위 JSON token scanner, schemaVersion 판정 (순수).
 // step 3: strict schema loader (loadStartSnapshot).
+// step 4: 현재 상태 수집 (scanProject, hashPath, takeCurrent). Git 읽기만, 쓰기 없음.
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import nodeFs from 'node:fs';
 import path from 'node:path';
 
@@ -313,4 +316,93 @@ export function loadStartSnapshot(file, { fs = nodeFs, root = process.cwd() } = 
     xy: oxy,
     files,
   };
+}
+
+// ---- step 4: 현재 상태 수집 (Git 읽기만, 링크를 따라가거나 읽지 않음, 쓰기 없음) ------------------
+
+const isSkipped = (p) => SKIP_PREFIXES.some((s) => p.startsWith(s));
+const sortedUnique = (items) => [...new Set(items)].sort();
+
+// projectRoot부터 readdirSync(withFileTypes)로 걷는다(S의 scan과 같은 판정).
+// symlink 엔트리(SKIP 디렉터리 엔트리 자체 포함)는 unsafe, SKIP 디렉터리 안은 들어가지 않는다.
+export function scanProject({ fs = nodeFs, root = process.cwd() } = {}) {
+  checkRoot({ fs, root });
+  const unsafe = [];
+  const testsFiles = [];
+  const walk = (rel) => {
+    const abs = rel ? path.join(root, rel) : root;
+    for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+      const p = rel ? `${rel}/${ent.name}` : ent.name;
+      if (ent.isSymbolicLink()) {
+        unsafe.push(`symlink:${p}`);
+      } else if (ent.isDirectory()) {
+        if (!isSkipped(`${p}/`)) walk(p);
+      } else if (p.startsWith('tests/')) {
+        testsFiles.push(p);
+      }
+    }
+  };
+  walk('');
+  return { unsafe: sortedUnique(unsafe), testsFiles: sortedUnique(testsFiles) };
+}
+
+// regular file이면 sha256, 경로가 없으면 null, 그 밖의 유형은 UnsafePathError (leaf lstat 후 file일 때만 open)
+export function hashPath(p, { fs = nodeFs, root = process.cwd() } = {}) {
+  const k = pathKind(p, { fs, root });
+  if (k === 'missing') return null;
+  if (k !== 'file') throw new UnsafePathError(label(k, p));
+  return createHash('sha256').update(readRegular(p, { fs, root })).digest('hex');
+}
+
+// 기본 Git 읽기 (status·ls-files만 호출된다)
+function runGit(args, root) {
+  const r = spawnSync('git', args, { cwd: root, maxBuffer: 256 * 1024 * 1024 });
+  if (r.error) throw r.error;
+  if (r.status !== 0) throw new Error(`git ${args.join(' ')} failed: ${String(r.stderr).trim()}`);
+  return r.stdout;
+}
+
+// 현재 status + 기록 대상 hash. start가 있으면 그 files·xy key를 먼저 경로 계약으로 검사한다(fs·git 접근 전).
+// unsafe가 하나라도 있으면 hash하지 않고 files는 {}.
+export function takeCurrent(start, { git, fs = nodeFs, root = process.cwd() } = {}) {
+  const startFiles = start ? Object.keys(start.files ?? {}) : [];
+  if (start) {
+    const keys = [...startFiles, ...Object.keys(start.xy ?? {})];
+    if (!keys.every((p) => isRepoRelative(p))) throw new Error('bad start snapshot: paths');
+  }
+  const readGit = git ?? ((args) => runGit(args, root));
+  checkRoot({ fs, root });
+
+  let entries;
+  try {
+    entries = parseStatusZ(readGit([...STATUS_ARGS]));
+  } catch (e) {
+    if (/^bad (status record|path)/.test(String(e?.message))) throw new Error('bad git status');
+    throw e;
+  }
+  const xy = statusXyMap(entries);
+  const scan = scanProject({ fs, root });
+  const listed = Buffer.from(readGit([...LS_FILES_ARGS])).toString('utf8')
+    .split(String.fromCharCode(0)).filter((p) => p !== '');
+
+  const targets = sortedUnique([...Object.keys(xy), ...startFiles, ...scan.testsFiles, ...listed])
+    .filter((p) => !isSkipped(p));
+  const unsafe = [...scan.unsafe];
+  for (const p of targets) {
+    const r = checkPath(p, ['missing', 'file'], { fs, root });
+    if (r) unsafe.push(r);
+  }
+  let files = {};
+  if (unsafe.length === 0) {
+    for (const p of targets) {
+      try {
+        files[p] = hashPath(p, { fs, root });
+      } catch (e) {
+        if (!(e instanceof UnsafePathError)) throw e;
+        unsafe.push(e.item);
+      }
+    }
+    if (unsafe.length) files = {};
+  }
+  return { entries, xy, files, unsafe: sortedUnique(unsafe) };
 }
