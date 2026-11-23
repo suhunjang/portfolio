@@ -1,6 +1,7 @@
 // 범위 비교 도구 (설계 §11.7). S·C와 같은 판정·문자열·순서를 쓴다.
 // step 1: 상수, 경로 유형 검사, 안전 읽기. 파일 쓰기·CLI 없음.
 // step 2: 저장소 상대 경로 판정, status parser, 최상위 JSON token scanner, schemaVersion 판정 (순수).
+// step 3: strict schema loader (loadStartSnapshot).
 import nodeFs from 'node:fs';
 import path from 'node:path';
 
@@ -207,4 +208,109 @@ export function scanJsonTopLevel(rawText) {
 // 값이 정수 1이고 lexical token이 정확히 '1'
 export function isSchemaVersion1(value, token) {
   return Number.isInteger(value) && value === 1 && token === '1';
+}
+
+// ---- step 3: strict schema loader (쓰기 없음, snapshot 파일 경로 외 접근 없음) -------------------
+
+const UTF8_STRICT = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
+function utf8Ok(bytes) {
+  try {
+    UTF8_STRICT.decode(bytes);
+    return true;
+  } catch {
+    return false;
+  }
+}
+const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+// statusZHex 디코드 bytes를 S parse_status와 같은 범주로 판정한다.
+// S는 레코드를 앞에서부터 decode하므로 첫 비UTF-8 레코드 앞에서 생긴 bad path만 paths, 그 밖은 status parse.
+function parseSnapshotStatus(bytes) {
+  const recs = [];
+  let from = 0;
+  for (let i = 0; i < bytes.length; i += 1) {
+    if (bytes[i] === 0) {
+      recs.push(bytes.subarray(from, i));
+      from = i + 1;
+    }
+  }
+  recs.push(bytes.subarray(from));
+  const badUtf8 = recs.findIndex((r) => !utf8Ok(r));
+  const input = badUtf8 < 0 ? bytes : Buffer.concat(recs.slice(0, badUtf8).flatMap((r) => [r, Buffer.alloc(1)]));
+  let entries;
+  try {
+    entries = parseStatusZ(input);
+  } catch (e) {
+    return { error: String(e.message).startsWith('bad path') ? 'paths' : 'status parse' };
+  }
+  return badUtf8 < 0 ? { entries } : { error: 'status parse' };
+}
+
+// 시작 snapshot을 strict schema(설계 §11.7 검사 순서)로 읽는다. 오류는 throw.
+export function loadStartSnapshot(file, { fs = nodeFs, root = process.cwd() } = {}) {
+  const item = checkPath(file, ['file'], { fs, root });
+  if (item) throw new UnsafePathError(item);
+  const raw = readRegular(file, { fs, root });
+  const fail = (what) => new Error(`bad start snapshot: ${what}: ${file}`);
+
+  let obj;
+  let top;
+  try {
+    const text = UTF8_STRICT.decode(raw);
+    obj = JSON.parse(text);
+    top = scanJsonTopLevel(text);
+  } catch {
+    throw fail('invalid json');
+  }
+  if (!isPlainObject(obj)) throw fail('keys');
+  if (Object.keys(obj).length !== SNAPSHOT_KEYS.length || !SNAPSHOT_KEYS.every((k) => hasOwn(obj, k))) {
+    throw fail('keys');
+  }
+
+  const sv = top.filter((m) => m.key === 'schemaVersion');
+  if (sv.length !== 1 || !isSchemaVersion1(obj.schemaVersion, sv[0].token)) throw fail('schemaVersion');
+
+  const { stepId } = obj;
+  if (typeof stepId !== 'string' || !STEP_ID_RE.test(stepId) || file !== `tests/.tmp/start-snapshot-${stepId}.json`) {
+    throw fail('stepId');
+  }
+
+  const hx = obj.statusZHex;
+  if (typeof hx !== 'string' || hx.length % 2 !== 0 || !/^[0-9a-f]*$/.test(hx)) throw fail('statusZHex');
+  const parsed = parseSnapshotStatus(Buffer.from(hx, 'hex'));
+  if (parsed.error) throw fail(parsed.error);
+  const { entries } = parsed;
+
+  const xy = statusXyMap(entries);
+  const xyKeys = Object.keys(xy);
+  const oxy = obj.xy;
+  if (!isPlainObject(oxy) || Object.keys(oxy).length !== xyKeys.length
+    || !xyKeys.every((k) => hasOwn(oxy, k) && oxy[k] === xy[k])) {
+    throw fail('xy');
+  }
+
+  const { files } = obj;
+  if (!isPlainObject(files)
+    || !Object.values(files).every((v) => v === null || (typeof v === 'string' && HEX64_RE.test(v)))) {
+    throw fail('files');
+  }
+  if (!Object.keys(files).every((p) => isRepoRelative(p))) throw fail('paths');
+  if (xyKeys.some((p) => !SKIP_PREFIXES.some((s) => p.startsWith(s)) && !hasOwn(files, p))) {
+    throw fail('files/status');
+  }
+
+  return {
+    stepId,
+    identity: {
+      schemaVersion: obj.schemaVersion,
+      projectRoot: obj.projectRoot,
+      head: obj.head,
+      base: obj.base,
+      harness: obj.harness,
+    },
+    entries,
+    xy: oxy,
+    files,
+  };
 }
