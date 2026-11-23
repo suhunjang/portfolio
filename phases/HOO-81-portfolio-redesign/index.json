@@ -79,7 +79,10 @@
     {
       "step": 7,
       "name": "scope-snapshot-identity",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:55:37+0900",
+      "completed_at": "2026-11-24T08:58:58+0900",
+      "summary": "step7 시작 snapshot(created→reused), scope-snapshot.mjs에 step7 API(computeIdentity: checkRoot→show-toplevel realpath=root realpath→lock checkPath(UnsafePathError, verify·open 전)→HEAD→verify BASE→lock 3값·lockSha256; checkIdentity: schemaVersion·projectRoot·head·base·harness.{sourceCommit,manifestHash,distributionVersion,lockSha256} 순서 identity-mismatch:{field}; diffAgainstStart(new|deleted|content-changed|status-changed, xyBefore/xyAfter null 허용, 경로 오름차순); classifyChanges(allow·EXEMPT 면제, GUARDED 비면제, tests-changed/outside-tests/status-changed); checkRuntimeVisible; checkSnapshotFirst(files·xy, 정렬·중복 제거); evaluateGate(snapshot-not-first→unsafe면 정렬 unsafe만→변경→runtime-visible)) 추가(step1~4 함수 불변, 쓰기·CLI 없음)와 scope-snapshot-identity.spec.js(desktop-dark 전용: checkIdentity 필드별·다중 순서, computeIdentity 가짜 fs·git 정상값·root/.harness 조상 symlink·lock FIFO/missing → UnsafePathError·verify 호출·open 없음·toplevel 불일치·BASE 없음·lock 3값 없음 throw, 실제 저장소 parity-<pid> identity 일치·tests/.tmp root throw·parity 삭제, CLAUDE.md·playwright.config·theme.js·wip·walk 전용·README status·docs/x.md·.harness runtime/phases 면제·GUARDED·runtime-visible·새 spec·rename 판정, unsafe 우선(allow 무관), 전체 순서·입력 불변) 작성. RED(export 없음) 확인 후 GREEN, AC1(spec 9 passed·전체 57 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 8,
