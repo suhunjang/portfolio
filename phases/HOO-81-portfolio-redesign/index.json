@@ -39,7 +39,10 @@
     {
       "step": 2,
       "name": "scope-snapshot-parse",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:40:54+0900",
+      "completed_at": "2026-11-24T08:42:46+0900",
+      "summary": "step2 시작 snapshot(created→reused), scope-snapshot.mjs에 step2 순수 API(isRepoRelative·parseStatusZ·statusXyMap·scanJsonTopLevel·isSchemaVersion1) 추가(step1 함수 불변, fs 접근 없음)와 scope-snapshot-parse.spec.js(desktop-dark 전용, S 설계 블록의 rel_ok 소스 exec parity·status 정상/형식오류/bad path·최상위 token·중복 key·schemaVersion token·입력 불변) 작성, RED(export 없음) 확인 후 GREEN, AC1(spec 13 passed·전체 18 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 3,
