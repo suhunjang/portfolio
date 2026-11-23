@@ -1,6 +1,6 @@
-# Step 11 — print-pdf
+# Step 11 — focus-trap
 
-- 예상 시간: 15분
+- 예상 시간: 18분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~10 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2
 3. index.json에서 step 0~10이 completed인지 확인한다. 아니면 중단한다.
-4. 현재 코드에서 `@media print`와 `ensureLightbox`를 확인한다.
+4. 현재 코드에서 모달·lightbox 함수, Tab 리스너, `:focus-visible`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,8 +21,9 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `css/style.css` (`@media print` 블록만)
-- `tests/specs/print.spec.js`
+- `js/main.js`
+- `css/style.css` (`:focus-visible` 규칙만)
+- `tests/specs/focus.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -30,34 +31,22 @@
 
 ## 수정 금지
 
-- `index.html`, `js/*`, `css/themes.css`
-- 기존 tests
+- `index.html`, `js/data.js`, `css/themes.css`
+- fixtures, helper, 기존 spec
 
 ## 작업 (TDD)
 
-### 1. `tests/specs/print.spec.js` (desktop-dark/light)
-
-시나리오 A — 새 페이지를 print로
-- 본문과 `#heroFeatured`가 visible이고 opacity 1이다.
-- 보이는 `.reveal`이 비어 있지 않다.
-- 인터랙션 요소와 `#projectModal`이 display none이다.
-- `.lightbox`는 count가 0이거나, 있으면 display none이다.
-- PDF가 10240바이트를 넘고 `/Type /Page`를 포함한다.
-
-시나리오 B — overlay를 연 뒤 print로
-- screen 상태에서 `.lightbox`가 1개이고 visible인지 먼저 확인한다.
-- print로 전환하면 `.lightbox`와 `#projectModal`이 display none이다.
-- 본문 가시성은 시나리오 A와 같다.
-- PDF가 10240바이트를 넘는다.
-
-### 2. `@media print`
-
-- reveal 요소를 표시한다.
-- `#heroFeatured`를 포함한다.
-- overlay와 인터랙션 요소를 숨긴다.
-- `body.modal-open` 잠금을 해제한다.
-- 기존 숨김 규칙은 유지한다.
+1. `focus.spec.js`를 먼저 작성한다.
+   - 모달 트랩
+   - lightbox 중첩: 트랩, Esc 후 `.shot-zoom`으로 복귀, 모달 트랩 재개, trigger로 복귀
+   - 닫기 경로마다 포커스 복귀
+   - 키보드 도달과 outline
+2. main.js
+   - `trapFocus`: 스택 기반, Tab 핸들러 1개, release는 여러 번 호출해도 안전
+   - 모달과 lightbox에 연결한다.
+   - 기존 Tab 고정 리스너를 제거한다.
 
 ## 완료 기준 (AC)
 
 - `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 모두 통과한다.
+- axe에서 새 key나 새 target이 0건이다.
