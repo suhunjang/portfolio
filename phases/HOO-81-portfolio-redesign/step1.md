@@ -1,7 +1,7 @@
-# Step 1 — scope-paths
+# Step 1 — tests-browser-smoke
 
-- 예상 시간: 18분
-- 실행 횟수: path self-test 1회, verify-scope 1회, 테스트 1회
+- 예상 시간: 14분
+- 실행 횟수: 시작 status 저장 1회, snapshot 저장 1회, 브라우저 설치 1회, smoke spec 2회, 전체 테스트 1회, snapshot 검사 1회
 - 선행 step: 0 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,66 +9,45 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §11.1, §11.5(Git diff 인자, 경로 정책), §12
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(테마), §11.4, §11.7
 3. index.json에서 step 0이 completed인지 확인한다. 아니면 중단한다.
-4. BASE `rev-parse`, Harness 파일 목록, `with-env.sh`를 확인한다.
+4. `THEME_KEY`, `playwright.config.js`, `scope-snapshot.mjs`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
-   - Git 상태를 바꾸는 명령(init 포함)과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
+   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
+   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object)은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/scripts/verify-scope.mjs` (신규)
-- `tests/package.json` (`verify-scope`, `verify-scope:selftest` script 추가만)
+- `tests/helpers/theme.js`
+- `tests/specs/smoke.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.pw-browsers/**`, `tests/.npm-cache/**`
+- `tests/.tmp/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- `tests/` 밖 전부
-- 위 목록 외의 tests 파일
+- `tests/` 밖의 모든 파일
+- step 0에서 만든 tests 파일
 
-## 작업
+## 작업 (순서 고정)
 
-1. 상수 두 개를 정의하고 export한다. 섞어 쓰지 않는다.
-   - `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']` (경로 수집 전용)
-   - `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']` (data.js patch 수집 전용)
-2. `export function collectInput({ git = runGit } = {})`을 만든다.
-   - `runGit(args): string`은 Git 읽기 명령만 실행한다.
-   - committed, index, worktree+untracked 세 층과 `uncommittedHarness`는 `GIT_DIFF_PATH_ARGS`로 수집한다.
-   - `dataJsDiffs = { baseHead, baseIndex, baseWorktree, indexWorktree }`는 `GIT_DIFF_PATCH_ARGS` + `-- js/data.js`로 수집한 실제 patch 문자열이다.
-   - 그 밖에 index.html blob 3종, gitignore blob 2종, 추적 중인 runtime 경로, 루트 package.json 존재 여부를 모은다.
-3. `export function evaluatePaths(input): string[]`로 §11.5 경로 정책을 구현한다.
-4. CLI
-   - 인자 없이 실행: 경로를 검사한다. 위반이 있으면 exit 1, 없으면 `verify-scope: OK (paths)`를 출력한다.
-   - `--self-test`
-     - 상수 검증: `GIT_DIFF_PATH_ARGS`와 `GIT_DIFF_PATCH_ARGS`가 위 배열과 정확히 같다.
-     - 호출 기록 검증: 가짜 `git`을 주입해 호출 인자를 기록한다. 경로 층 호출은 모두 `GIT_DIFF_PATH_ARGS`를 포함하고 `--unified=0`을 포함하지 않는다. data.js 4구간 호출은 모두 `GIT_DIFF_PATCH_ARGS`를 포함하고 `--name-only`를 포함하지 않는다.
-     - 정상 → 0
-     - 위반으로 잡아야 하는 경우
-       - worktree의 `docs/other.md`
-       - README를 stage한 뒤 worktree만 원복
-       - assets 추가
-       - 루트 package.json
-       - `CLAUDE.md` 미커밋
-       - `tests/node_modules/x` 추적
-       - `.harness/harness.lock.json` 미커밋
-     - 허용해야 하는 경우
-       - committed에만 있는 `scripts/harness.py`
-       - untracked `.harness/runtime/x.json`
-       - worktree의 phases index
-     - rename 우회(`--no-renames` 형태)는 모두 위반
-       - committed: README → tests/fixtures/x.md
-       - index: assets/favicon.svg → tests/fixtures/f.svg
-       - worktree: docs/superpowers/plans/... → tests/fixtures/p.md
-       - index: .claude/settings.json → tests/fixtures/s.json
-5. scripts를 추가한다.
+1. 시작 status 저장: `mkdir -p tests/.tmp && git status --porcelain=v1 -z --untracked-files=all > tests/.tmp/step1-status-before.z`
+2. snapshot 저장: `sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --save tests/.tmp/step1-scope-before.json --status-raw tests/.tmp/step1-status-before.z`
+3. 브라우저 설치: `sh tests/scripts/with-env.sh npm --prefix tests run browsers:install`
+4. `theme.js`
+   - fixture는 `THEME_KEY`가 null일 때만 테마를 주입한다.
+   - `collectConsoleErrors`를 §11.4 계약대로 구현한다.
+5. `smoke.spec.js` (6개 project)
+   - collect를 goto보다 먼저 호출한다.
+   - heroName과 테마를 확인한다.
+   - finish 결과의 두 배열이 빈 배열인지 확인한다.
+   - 비동기 throw를 일으키면 pageErrors가 1건 잡히는지 확인한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test` → 모두 exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- smoke.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/step1-scope-before.json --allow tests/helpers/theme.js,tests/specs/smoke.spec.js` → 모두 exit 0 (smoke는 6개 project 모두 통과)

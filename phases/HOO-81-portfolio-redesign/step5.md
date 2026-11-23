@@ -1,17 +1,17 @@
-# Step 5 — modal-regression
+# Step 5 — content-static-baseline
 
-- 예상 시간: 17분
-- 실행 횟수: modal-regression spec 2회, 전체 테스트 1회, verify-scope 1회
-- 선행 step: 0~4 completed
+- 예상 시간: 16분
+- 실행 횟수: content-static spec 2회, 전체 테스트 1회, verify-scope 1회
+- 선행 step: 0~4 completed (`baseline-index.html`과 `content.js`가 있어야 한다)
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(모달, lightbox), §5(대표 카드와 grid 카드의 같은 data-project), §7.4(modal.js 계약), §11.4
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §7.2, §7.3 (`StaticContent`, `extractStatic`)
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
-4. 다음을 확인한다: `#projectGrid` 카드 셀렉터, 모달 열기·닫기 위임, `modal-open`, 모달 제목 요소, `.shot-zoom`이 있는 프로젝트, `ensureLightbox`, Esc 처리 순서
+4. index.html 정적 본문 셀렉터를 확인한다: `.nav-link`, `.hero-eyebrow`, `.hero-cta .btn`, `.section-kicker`, `.section-title`, `.section-sub`, `.about-text p`, `.about-points li`, `.about-meta dt`, `.contact-text`, `.footer-note`, `.footer-top`
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,8 +21,9 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/helpers/modal.js` (신규)
-- `tests/specs/modal-regression.spec.js` (신규)
+- `tests/fixtures/content-exceptions.json` (신규)
+- `tests/helpers/content.js` (`extractStatic` 추가만)
+- `tests/specs/content-static.spec.js` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -31,24 +32,30 @@
 ## 수정 금지
 
 - `tests/` 밖 전부
-- 기존 tests 파일
-- 테마·메뉴·scrollspy·typing·reduced-motion 검사 (step 6에서 한다)
+- fixture 생성 스크립트, `baseline-data.json`, `baseline-index.html`, `content-data.spec.js`
+- `content.js`의 기존 함수
 
 ## 작업
 
-1. `modal.js` (§7.4 계약)
-   - `GRID_CARD`, `gridCard(page, N)` — 정확히 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`
-   - `openFirstProjectByClick`, `openFirstProjectByEnter` — `GRID_CARD` 범위만 사용
-   - `closeVia(page, how)`: button, backdrop({x:5, y:5}), esc
-   - `expectFocused`
-   - `modalTitle(page)`
-   - `findProjectWithShots(page)` — `#projectGrid .project-card[data-project]`만 탐색하고 `gridCard`로 연다.
-2. `modal-regression.spec.js` (6개 project, collector 고정 순서)
-   - 모달: click으로 열기, Enter로 열기, 제목이 데이터와 같음, body `modal-open`
-   - 닫기: button·backdrop·esc 각 경로로 닫히고 포커스가 트리거 카드로 돌아온다. 닫힌 뒤 `modal-open`이 없다.
-   - lightbox (desktop만): `findProjectWithShots`가 index를 반환하고, 그 index의 `gridCard` 모달에서 `.shot-zoom`으로 lightbox가 열린다. 탐색이 끝난 뒤 모달이 닫혀 있다.
-   - Esc 2단계: 1회째 lightbox만 닫히고 모달은 열려 있다. 2회째 모달이 닫힌다.
+1. `content-exceptions.json`에 §7.2 값을 넣는다.
+   - `kickers.base`, `kickers.final`
+   - `titles.base`, `titles.final`
+   - `featured.indexes` [1, 5, 7]
+   - `subsectionTitleFinal`
+2. `content.js`에 `extractStatic(page): Promise<StaticContent>`를 추가한다.
+   - 모든 필드에 norm을 적용한다.
+   - `navLabels`만 정렬하고, 나머지는 DOM 순서를 유지한다.
+3. `content-static.spec.js` (6개 project, collector 고정 순서)
+   - baseline-index.html을 `javaScriptEnabled: false` context에서 `setContent`로 열고 extractStatic을 실행한다. 그 결과를 현재 `/index.html`의 결과와 비교한다.
+   - `kickers`와 `sectionTitles`는 base 또는 final과 순서까지 정확히 같아야 한다.
+   - final이면 `h3.subsection-title` 기술 스택이 정확히 1개 있어야 한다.
+   - 나머지 필드는 BASE와 같아야 한다.
+   - 허용 예외 판정 함수에 대한 합성 검증
+     - base 배열 → 통과
+     - final 배열 → 통과
+     - 두 배열이 섞인 경우 → 거부
+     - 한 글자라도 다르면 → 거부
 
 ## 완료 기준 (AC)
 
-- BASE 사이트에서 다음이 모두 통과한다: `sh tests/scripts/with-env.sh npm --prefix tests test -- modal-regression.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-static.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과 (전체 회귀는 6개 project 모두에서 돌린다)

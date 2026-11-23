@@ -1,7 +1,7 @@
-# Step 2 — scope-content
+# Step 2 — scope-paths
 
 - 예상 시간: 18분
-- 실행 횟수: 전체 self-test 1회, verify-scope 1회, 테스트 1회
+- 실행 횟수: path self-test 1회, verify-scope 1회, 테스트 1회
 - 선행 step: 0~1 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,19 +9,20 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §11.1, §11.5(Git diff 인자, 내용 판정, final 규칙, 합성 테스트)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §11.1, §11.5(Git diff 인자, 경로 정책), §12
 3. index.json에서 step 0~1이 completed인지 확인한다. 아니면 중단한다.
-4. `verify-scope.mjs`의 `GIT_DIFF_PATH_ARGS`, `GIT_DIFF_PATCH_ARGS`, `collectInput`, `evaluatePaths`, self-test를 확인한다.
+4. BASE `rev-parse`, Harness 파일 목록, `with-env.sh`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
-   - Git 상태를 바꾸는 명령(init 포함)과 Harness 운영 명령은 하네스만 실행한다. 합성 테스트는 가짜 git 주입으로만 한다.
+   - Git 상태를 바꾸는 명령(init 포함)과 Harness 운영 명령은 하네스만 실행한다.
    - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/scripts/verify-scope.mjs`
+- `tests/scripts/verify-scope.mjs` (신규)
+- `tests/package.json` (`verify-scope`, `verify-scope:selftest` script 추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -30,41 +31,43 @@
 ## 수정 금지
 
 - `tests/` 밖 전부
-- 그 밖의 tests 파일
-- 두 Git diff 인자 상수의 값
+- 위 목록 외의 tests 파일
 
 ## 작업
 
-1. `checkGitignore(text)`
-   - null이면 위반
-   - 끝의 `\n` 1개만 제거한 뒤, 정확히 7줄과 일치해야 한다.
-2. `checkDataJsDiff(patchText, { requireExactly3 })`
-   - 입력은 `GIT_DIFF_PATCH_ARGS`로 얻은 실제 patch 문자열이다.
-   - `---`/`+++` 헤더를 제외한 삭제 줄, trim 후 `featured: true,`가 아닌 추가 줄, 3줄 초과는 위반
-   - `requireExactly3`이면 정확히 3줄이어야 한다.
-3. `evaluateContent(input, { final })`
-   - `input.dataJsDiffs`의 4구간 patch를 그대로 `checkDataJsDiff`에 넘긴다.
-   - BASE→HEAD, BASE→index, BASE→worktree: `requireExactly3: final`
-   - index→worktree: 항상 `requireExactly3: false`
-   - index.html 3종과 gitignore 2종도 함께 검사한다.
-4. `evaluateScope = [...evaluatePaths, ...evaluateContent]`
-   - CLI 기본 동작으로 쓴다. 통과하면 `verify-scope: OK`를 출력한다.
-   - `--final`을 지원한다.
-5. self-test에 사례를 추가한다. 기존 사례는 유지한다.
-   - patch 전달 합성 테스트 (가짜 git 주입, 실제 저장소 변경 없음)
-     - 가짜 git: 인자에 `GIT_DIFF_PATCH_ARGS`가 모두 있고 `js/data.js` 대상이면 `diff --git`·`@@`·`+    featured: true,` 3줄을 담은 patch를 반환한다. 인자에 `--name-only`가 있으면 `js/data.js`라는 이름만 반환한다.
-     - `evaluateContent(collectInput({ git: fake }), { final: true })` → data.js 위반 0
-     - 같은 patch에 `+    title: 'x',`를 추가 → 위반 1 이상 (patch 내용이 실제로 판정에 쓰인다는 증명)
-     - data.js 구간을 `--name-only`로 호출하도록 바꾼 가짜 수집기 결과(`js/data.js` 문자열) → final에서 3줄 미달 위반 (이름 목록으로는 통과하지 못함을 증명)
-   - data.js 위반: 삭제 줄, featured 외 줄, featured 4줄, stage 후 worktree만 원복
-   - final
-     - BASE→HEAD/index/worktree 각 3줄이고 index→worktree 0줄 → 위반 0
-     - BASE→HEAD 0줄 → 위반
-     - BASE→index 2줄 → 위반
-     - index→worktree에 featured 외 줄 → 위반
-   - Space Grotesk 제거를 stage한 뒤 worktree만 원복 → 위반
-   - gitignore 위반: 추가 줄, 중복, 빈 줄, 순서 변경, 주석, CRLF, index 버전만 잘못됨
-   - gitignore 통과: 끝 개행 없음
+1. 상수 두 개를 정의하고 export한다. 섞어 쓰지 않는다.
+   - `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']` (경로 수집 전용)
+   - `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']` (data.js patch 수집 전용)
+2. `export function collectInput({ git = runGit } = {})`을 만든다.
+   - `runGit(args): string`은 Git 읽기 명령만 실행한다.
+   - committed, index, worktree+untracked 세 층과 `uncommittedHarness`는 `GIT_DIFF_PATH_ARGS`로 수집한다.
+   - `dataJsDiffs = { baseHead, baseIndex, baseWorktree, indexWorktree }`는 `GIT_DIFF_PATCH_ARGS` + `-- js/data.js`로 수집한 실제 patch 문자열이다.
+   - 그 밖에 index.html blob 3종, gitignore blob 2종, 추적 중인 runtime 경로, 루트 package.json 존재 여부를 모은다.
+3. `export function evaluatePaths(input): string[]`로 §11.5 경로 정책을 구현한다.
+4. CLI
+   - 인자 없이 실행: 경로를 검사한다. 위반이 있으면 exit 1, 없으면 `verify-scope: OK (paths)`를 출력한다.
+   - `--self-test`
+     - 상수 검증: `GIT_DIFF_PATH_ARGS`와 `GIT_DIFF_PATCH_ARGS`가 위 배열과 정확히 같다.
+     - 호출 기록 검증: 가짜 `git`을 주입해 호출 인자를 기록한다. 경로 층 호출은 모두 `GIT_DIFF_PATH_ARGS`를 포함하고 `--unified=0`을 포함하지 않는다. data.js 4구간 호출은 모두 `GIT_DIFF_PATCH_ARGS`를 포함하고 `--name-only`를 포함하지 않는다.
+     - 정상 → 0
+     - 위반으로 잡아야 하는 경우
+       - worktree의 `docs/other.md`
+       - README를 stage한 뒤 worktree만 원복
+       - assets 추가
+       - 루트 package.json
+       - `CLAUDE.md` 미커밋
+       - `tests/node_modules/x` 추적
+       - `.harness/harness.lock.json` 미커밋
+     - 허용해야 하는 경우
+       - committed에만 있는 `scripts/harness.py`
+       - untracked `.harness/runtime/x.json`
+       - worktree의 phases index
+     - rename 우회(`--no-renames` 형태)는 모두 위반
+       - committed: README → tests/fixtures/x.md
+       - index: assets/favicon.svg → tests/fixtures/f.svg
+       - worktree: docs/superpowers/plans/... → tests/fixtures/p.md
+       - index: .claude/settings.json → tests/fixtures/s.json
+5. scripts를 추가한다.
 
 ## 완료 기준 (AC)
 

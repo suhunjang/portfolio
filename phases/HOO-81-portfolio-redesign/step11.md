@@ -1,7 +1,7 @@
-# Step 11 — axe-baseline-regression
+# Step 11 — axe-prepare-lightbox
 
 - 예상 시간: 18분
-- 실행 횟수: 테스트 2회, verify-scope 1회
+- 실행 횟수: lightbox·modal·page spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~10 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 11: 스키마, 회귀, 누락 정책, `FIX_FILES_BY_KIND`)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(lightbox), §7.4(`findProjectWithShots`), §8.4(lightbox 준비·결합 진입점, 오류 코드, 합성 fixture 규칙)
 3. index.json에서 step 0~10이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js의 `Violation`, `MergedEntry`, `makeEntryKey`를 확인한다.
+4. `modal.js`의 `findProjectWithShots`, `closeVia`와 `axe-prepare.js`의 `preparePage`, `prepareModal`, `assertContentLoaded`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,51 +21,43 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/helpers/axe.js` (추가만)
-- `tests/specs/axe-helper.spec.js` (추가만)
+- `tests/helpers/axe-prepare.js` (추가만: `assertContentLoaded`의 img·svg 검사, `prepareLightbox`, `prepareOverlay`, `prepareForAxe`)
+- `tests/specs/axe-prepare-lightbox.spec.js` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
-- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
 - `tests/` 밖 전부
-- 그 밖의 tests 파일, fixtures
-- step 7·10에서 만든 동작 (`makeEntryKey` 포함)
+- 기존 tests 파일 (`modal.js`, `axe.js`, `axe-prepare-page.spec.js`, `axe-prepare-modal.spec.js` 포함 — import만 한다)
+- step 9·10 함수의 기존 동작 (text 검사, grid 범위)
 
 ## 작업
 
-1. axe.js에 step 11 계약을 구현한다.
-   - 상수: `BASELINE_PATH`, `FIX_FILES_BY_KIND`
-   - 함수: `baselineExists`, `loadBaseline`, `resolveBaselineMode`, `validateBaseline`, `checkRegression`, `assertEmptyFile`
-   - `validateBaseline`: `key === makeEntryKey(항목)`, key 고유, targets 중복 없음·정렬을 추가로 확인한다.
-   - `checkRegression(violations, baseline, scenario, project)`: key는 `makeEntryKey({ scenario, project, ruleId })`로 만든다.
-   - CLI: `--assert-empty [path]`
-2. axe-helper.spec.js에 테스트를 추가한다 (desktop-dark).
-   - `validateBaseline`
-     - 통과: 혼합 color-contrast, js-render `[js/main.js]`, static-markup `[index.html]`, text-change `[]`
-     - 거부(key): key가 `makeEntryKey`와 다름, 중복 key, targets 중복, targets 미정렬
-     - 거부(파일 오대응): css-token에 `[css/style.css]`, css-rule에 `[css/themes.css]`, js-render에 `[index.html]`, static-markup에 `[js/main.js]`, text-change에 `[index.html]`
-     - 거부(빈 배열): css-token·css-rule·js-render·static-markup에 `[]`
-     - 거부(파일 여분): js-render에 `[js/main.js, index.html]`
-     - 거부(기타): 합집합 불일치, fix 누락, targets 밖의 target, 알 수 없는 kind
-   - `checkRegression`
-     - 새 key 또는 새 target은 오류다.
-     - 사라진 항목은 허용한다.
-     - 같은 canonical target이 baseline의 `page:desktop-dark:*`에만 있을 때 `page:desktop-light`에서 나타나면 `new-key` 또는 `new-target`으로 잡힌다(다른 entry로 취급).
-     - 입력을 변경하지 않는다.
-   - `resolveBaselineMode`
-     - 파일 있음 → check
-     - 파일 없음, env `{}` → throw
-     - 파일 없음, `AXE_ALLOW_MISSING_BASELINE` = `'1'` → skip
-     - 파일 없음, 값이 `'true'` → throw
-   - `loadBaseline`: 파일 없음, 잘못된 JSON, `{}`에서 throw
-   - subprocess `--assert-empty`
-     - `[]` → 0
-     - `[{}]`, `{}`, 잘못된 JSON, 파일 없음 → 1
+1. `axe-prepare.js`에 추가한다.
+   - `assertContentLoaded`: img `complete && naturalWidth > 0`(`content-not-loaded:img`), svg bounding box width·height > 0(`content-not-loaded:svg`) 검사를 추가한다.
+   - `prepareLightbox(page, { projectIndex?, timeoutMs = 10000 } = {})`: 기본 index는 `findProjectWithShots`(null → `no-shots-project`) → `prepareModal` → 첫 `.shot-zoom` click(없거나 열리지 않으면 `lightbox-not-open`) → 열림·포커스 확인 → `assertContentLoaded(.lightbox)` → `{ include: '.lightbox', projectIndex }`
+   - `prepareOverlay(page, { scenario, ... })`: modal/lightbox 분기, 그 밖 `unknown-scenario`
+   - `prepareForAxe(page, { scenario, projectIndex?, timeoutMs })`: scenario 검증 → `preparePage` → page면 `include: 'body'`, 그 밖에는 `prepareOverlay` 결과를 합쳐 반환
+2. `axe-prepare-lightbox.spec.js` (desktop-dark, desktop-light)
+   - 실제 사이트
+     - `prepareForAxe({ scenario: 'page' })` → `include === 'body'`, `projectIndex === null`
+     - `prepareForAxe({ scenario: 'modal' })` → `include === '#projectModal'`
+     - `prepareForAxe({ scenario: 'lightbox' })` → `include === '.lightbox'`, `.lightbox img` 로딩 완료, 포커스가 lightbox 안
+     - `.shot-zoom`이 없는 grid 카드 index를 `projectIndex`로 주고 lightbox → `prepareForAxe: lightbox-not-open`
+     - `page.route`로 이미지 요청을 abort한 뒤 lightbox → `prepareForAxe: content-not-loaded:img`
+   - `unknown-scenario`: `prepareForAxe({ scenario: 'x' })`, `prepareOverlay({ scenario: 'page' })` → `prepareForAxe: unknown-scenario`
+   - `findProjectWithShots` 탐색 (동작 모달 fixture, §8.4 규칙: 제목, 비어 있지 않은 본문, `[data-modal-close]`, grid 카드 click handler와 닫기 handler 모두 제공)
+     - no-shots: grid 카드 2개(0, 1) 모두 `.shot-zoom` 없음 + grid 밖 대표 버튼(`data-project="0"`)
+       - `findProjectWithShots(page)` → null, `__opens === 2`, `__closes === 2`, 끝난 뒤 `modal-open` 없음, 대표 버튼 click 0
+       - `prepareForAxe({ scenario: 'lightbox' })` → `prepareForAxe: no-shots-project` (모든 카드를 정상적으로 열고 닫은 뒤에만 이 코드가 난다는 것을 위 카운터로 함께 확인)
+     - shots 있음: grid 카드 0(shots 없음), 1(`.shot-zoom` 있음) + 대표 버튼(`data-project="1"`) → `findProjectWithShots(page)` → 1, `__opens === 2`, `__closes === 2`, 대표 버튼 click 0
+   - 이미지·SVG 오류 fixture (동작 모달 fixture)
+     - 모달 본문에 존재하지 않는 src의 img → `prepareModal` 결과가 `prepareForAxe: content-not-loaded:img`
+     - 모달 본문에 width·height 0인 svg → `prepareForAxe: content-not-loaded:svg`
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-lightbox.spec.js axe-prepare-modal.spec.js axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

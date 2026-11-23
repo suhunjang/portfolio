@@ -1,7 +1,7 @@
-# Step 26 — axe-remediation-gate
+# Step 26 — focus-trap-lightbox
 
-- 예상 시간: 17분
-- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, `--check-regression`·`--prune-plan`·`--check-coverage`·`--check-plan`·`--check-executable` 각 1회, 테스트 1회, verify-scope 1회
+- 예상 시간: 16분
+- 실행 횟수: focus-lightbox spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~25 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §7.2, §8.3 (entry key 계약, COLLECT_CHAIN, REGRESSION_GATE, step 14 실행 가능성, step 16 도구, step 26 gate, 재계획 그룹 step 생성 조건)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2 (step 26 범위)
 3. index.json에서 step 0~25가 completed인지 확인한다. 아니면 중단한다.
-4. `axe-baseline.json`과 `axe-remediation-plan.json`을 확인한다.
+4. step 25의 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 고정 리스너, `.shot-zoom`, `:focus-visible` 규칙을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,47 +21,32 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/axe-remediation-plan.json`: `--prune-plan` CLI 실행 결과로만 바뀐다. 손 편집과 추가는 금지다.
+- `js/main.js`: lightbox 열기·닫기의 trap 연결과 기존 lightbox Tab 리스너 제거만
+- `css/style.css`: `:focus-visible` 규칙만
+- `tests/specs/focus-lightbox.spec.js` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (실제 `COLLECT_DIR`, `axe-current.json`)
-- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- 사이트 파일 전부
-- `axe-baseline.json`, `axe-collected.json`, helper, spec
+- `index.html`, `js/data.js`, `css/themes.css`
+- `trapFocus` 시그니처와 모달 연결(step 25)
+- fixtures, helper, 기존 spec(`focus-modal.spec.js` 포함)
 
-## 작업 (gate 절차 — step 27이 그대로 다시 실행한다)
+## 작업 (TDD)
 
-아래 1~6을 하나의 `&&` 체인으로 순차 실행한다. 병렬 금지. 어느 단계든 실패하면 즉시 중단하고 보고한다.
-
-1. COLLECT_CHAIN
-   1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
-   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-   3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
-   4. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json`
-2. REGRESSION_GATE (plan 수정 전): `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json`
-   - 실패하면 plan은 건드리지 않는다.
-3. plan 정리: `sh tests/scripts/with-env.sh node tests/helpers/axe.js --prune-plan --collected tests/.tmp/axe-current.json`
-   - 사라진 target 제거, 빈 그룹 삭제, fixFiles 재계산(부분집합), id 유지. 추가 없음.
-4. coverage: `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-coverage --collected tests/.tmp/axe-current.json`
-   - plan 밖 잔여 target이 있으면 자동 편입하지 않는다. 재계획 사유로 실패시키고 중단한다.
-5. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan`
-6. 실행 가능성: `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable`
-   - blocked 그룹(text-change 포함)이나 `fixFiles = []` 그룹이 하나라도 있으면 실패한다. remediation step을 만들지 않고 step 27 이후로 진행하지 않는다. Harness 재계획 사유로 보고한다.
-7. 결과 로그
-   - groups가 `[]`이면 `remediation 불필요`를 남긴다.
-   - 그룹이 남아 있고 1~6이 모두 통과했으면 `Harness 재계획 필요`와 그룹별 상세를 남긴다.
-8. 재계획 계약 (하네스가 수행)
-   - 생성 조건: 6 통과, 그룹 `blocked === false`, `fixFiles.length >= 1`. 하나라도 어기면 생성 금지.
-   - 그룹마다 step을 step 26과 27 사이에 둔다.
-   - 소스 allowedPaths는 그룹 fixFiles만이다.
-   - runtime 쓰기: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-   - plan은 수정하지 않는다.
-   - AC: `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-group-done {id} --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
+1. `focus-lightbox.spec.js`를 먼저 작성해 실패를 확인한다 (desktop-dark/light).
+   - 중첩: `findProjectWithShots`로 찾은 grid 카드 모달 → `.shot-zoom`으로 lightbox 열기 → Tab/Shift+Tab이 lightbox 안에서만 순환한다(모달 trap 일시정지).
+   - 해제·재개: Esc 1회 → lightbox 닫힘, 포커스가 `.shot-zoom`으로 복귀, 이후 Tab이 다시 모달 경계 안에서 순환한다. Esc 2회째 → 모달 닫힘, 트리거로 복귀.
+   - 기존 리스너 제거: lightbox를 3회 열고 닫은 뒤에도 Tab 1회가 정확히 한 칸만 이동한다.
+   - outline: 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 computed `outline-style`이 `none`이 아니다.
+2. main.js
+   - lightbox 열 때 push(returnFocusTo = `.shot-zoom`), 닫을 때 release.
+   - 기존 lightbox Tab 고정 리스너를 제거한다.
+3. style.css: `:focus-visible` outline을 유지·보강한다(토큰만 사용).
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --prune-plan --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-coverage --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

@@ -1,7 +1,7 @@
-# Step 24 — focus-trap-lightbox
+# Step 24 — section-layout
 
-- 예상 시간: 16분
-- 실행 횟수: focus-lightbox spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 15분
+- 실행 횟수: layout spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~23 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2 (step 24 범위)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §9
 3. index.json에서 step 0~23이 completed인지 확인한다. 아니면 중단한다.
-4. step 23의 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 고정 리스너, `.shot-zoom`, `:focus-visible` 규칙을 확인한다.
+4. 섹션 CSS, timeline, 그리드 규칙을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,9 +21,8 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `js/main.js`: lightbox 열기·닫기의 trap 연결과 기존 lightbox Tab 리스너 제거만
-- `css/style.css`: `:focus-visible` 규칙만
-- `tests/specs/focus-lightbox.spec.js` (신규)
+- `css/style.css` (섹션 여백, Career, 그리드, `.subsection-title`만)
+- `tests/specs/layout.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -31,22 +30,26 @@
 
 ## 수정 금지
 
-- `index.html`, `js/data.js`, `css/themes.css`
-- `trapFocus` 시그니처와 모달 연결(step 23)
-- fixtures, helper, 기존 spec(`focus-modal.spec.js` 포함)
+- `index.html`, `js/*`, `css/themes.css`
+- fixtures, helper, 기존 spec
 
 ## 작업 (TDD)
 
-1. `focus-lightbox.spec.js`를 먼저 작성해 실패를 확인한다 (desktop-dark/light).
-   - 중첩: `findProjectWithShots`로 찾은 grid 카드 모달 → `.shot-zoom`으로 lightbox 열기 → Tab/Shift+Tab이 lightbox 안에서만 순환한다(모달 trap 일시정지).
-   - 해제·재개: Esc 1회 → lightbox 닫힘, 포커스가 `.shot-zoom`으로 복귀, 이후 Tab이 다시 모달 경계 안에서 순환한다. Esc 2회째 → 모달 닫힘, 트리거로 복귀.
-   - 기존 리스너 제거: lightbox를 3회 열고 닫은 뒤에도 Tab 1회가 정확히 한 칸만 이동한다.
-   - outline: 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 computed `outline-style`이 `none`이 아니다.
-2. main.js
-   - lightbox 열 때 push(returnFocusTo = `.shot-zoom`), 닫을 때 release.
-   - 기존 lightbox Tab 고정 리스너를 제거한다.
-3. style.css: `:focus-visible` outline을 유지·보강한다(토큰만 사용).
+1. `layout.spec.js`를 먼저 작성한다 (6개 project).
+   - 가로 스크롤이 없다.
+   - projectGrid와 strengthsGrid 열: 1280에서 3, 768에서 2, 375에서 1
+   - Career: 375에서 세로, 768·1280에서 가로
+   - 375에서 highlights가 보인다.
+   - section gap: career부터 contact까지 padding-top이 모두 같다.
+   - `.subsection-title`의 font-weight가 h2 이하다.
+2. style.css
+   - 섹션 여백
+   - Career 2열/1열
+   - 그리드 3/2/1열
+   - `.subsection-title`
+   - 토큰만 사용
+3. axe 새 target은 step 21과 같은 규칙을 따른다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- layout.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

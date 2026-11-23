@@ -1,7 +1,7 @@
-# Step 20 — hero-first-screen
+# Step 20 — axe-classify
 
-- 예상 시간: 18분
-- 실행 횟수: hero spec 2회, 전체 테스트 1회, verify-scope 1회
+- 예상 시간: 20분 이하. 산정 결과가 20분을 넘으면 즉시 재계획한다.
+- 실행 횟수: 조사 스크립트 수회, 일치·plan·실행 가능성·회귀 검사 각 1회, 테스트 1회, verify-scope 1회
 - 선행 step: 0~19 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5 (히어로 순서, tagline 계약, 첫 화면 AC), §9
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §7.2, §8.3 (entry key 계약, step 14 투영, step 16 실행 가능성, fixture, `FIX_FILES_BY_KIND`, plan, step 20)
 3. index.json에서 step 0~19가 completed인지 확인한다. 아니면 중단한다.
-4. hero 마크업, reveal, 여백, `#heroFeatured`, `setText` 시그니처를 확인한다.
+4. `tests/fixtures/axe-collected.json`이 있는지 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,10 +21,8 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `index.html` (section#hero 내부만. `#heroFeatured`의 마크업은 그대로 둔다)
-- `js/main.js`: 정확히 `setText('heroTagline', PROFILE.tagline);` 1줄만 추가
-- `css/style.css` (hero, `#heroStats`, `#heroFeatured` 배치 규칙만)
-- `tests/specs/hero.spec.js`
+- `tests/fixtures/axe-baseline.json` (신규)
+- `tests/fixtures/axe-remediation-plan.json` (신규)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -32,37 +30,30 @@
 
 ## 수정 금지
 
-- `js/data.js`, `css/themes.css`
-- 대표 카드 렌더링·모달 로직
-- `#heroFeatured`의 속성
-- 섹션, nav
-- 기존 tests, fixtures, helper
+- 사이트 파일 전부
+- helper, spec, `axe-collected.json`, 그 밖의 tests 파일
 
-## 작업 (TDD)
+## 작업
 
-1. `hero.spec.js`를 먼저 작성해 실패를 확인한다. 6개 project에서 실행하고 collector는 고정 순서로 쓴다.
-   - hero DOM 순서가 §5 1~8과 같다.
-   - tagline
-     - `p.hero-tagline`의 id가 `heroTagline`이다.
-     - `document.getElementById('heroTagline').textContent`가 `PROFILE.tagline`과 같다.
-   - CTA가 맞고, eyebrow·typed가 유지된다.
-   - `#heroFeatured`의 `role=region`과 `aria-label`이 유지된다.
-   - STATS: 375에서 2×2, 768·1280에서 4×1
-   - featured: 375 1열, 768 2열, 1280 3열
-   - 첫 화면 AC (desktop, 실제 폰트)
-     - `document.fonts.ready`를 기다린다.
-     - scrollY는 0이다.
-     - 대상 6개 모두: visible, 크기 > 0, 조상까지 visibility·opacity(`expect.poll`), 1280×800 경계 안
-2. index.html: hero 순서를 바꾸고 `p.hero-tagline#heroTagline`을 추가한다.
-3. main.js: 정확히 `setText('heroTagline', PROFILE.tagline);`를 추가한다.
-4. style.css
-   - eyebrow와 typing을 줄인다.
-   - 여백을 조정한다.
-   - STATS와 featured를 반응형으로 만든다.
-   - blurb는 2줄 clamp
-   - 토큰만 쓴다. 문구는 줄이지 않는다.
-5. axe 새 target은 step 19와 같은 규칙을 따른다.
+1. 시간 산정 (가장 먼저)
+   - 계산식: 각 묶음 (2분 + target 수 × 1분)의 합 + 5분
+   - 20분을 넘으면 즉시 중단하고 재계획을 요청한다. 파일은 쓰지 않는다.
+   - 위반이 0건이면 baseline은 `[]`, plan은 `{ groups: [] }`로 쓰고 5번으로 간다.
+2. 조사
+   - `tests/.tmp`의 임시 Playwright 스크립트를 래퍼로 실행한다. 대상 화면은 `prepareForAxe`로 준비한다.
+   - 다음을 근거로 fixKind를 판별한다: computed 색상, `var(--토큰)` 출처, JS 렌더 영역 여부, 정적 속성 여부
+3. `axe-baseline.json`
+   - axe-collected.json의 entry마다 항목 1개를 만든다. `projectEntry` 7개 필드를 그대로 옮기고 `fixes`, `fixFiles`만 덧붙인다.
+   - fixFiles는 `FIX_FILES_BY_KIND`와 정확히 같게 쓴다.
+   - 항목의 fixFiles는 합집합으로 쓴다.
+4. `axe-remediation-plan.json`
+   - id는 kebab-case로, 서로 겹치지 않게 짓는다.
+   - 그룹마다 difficulty, estMinutes(20 이하), fixFiles, blocked, reason을 채운다.
+   - 모든 canonical target이 어느 한 그룹에 포함되어야 한다(coverage).
+   - 자동 편입은 금지한다.
+   - text-change가 필요하거나 그 밖의 이유로 blocked 그룹이 생기면 plan에 사실대로 기록한다. 이 경우 아래 AC의 `--check-executable`이 실패하므로 step은 실패로 끝나고 Harness 재계획을 요청한다. 콘텐츠 예외를 스스로 만들지 않는다.
+5. 옵션 없이 기본 일반 모드로 확인한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
+- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-baseline-match --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --coverage && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과. 기본 testCommand가 옵션 없이 통과해야 한다.

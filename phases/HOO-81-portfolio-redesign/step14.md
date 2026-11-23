@@ -1,6 +1,6 @@
-# Step 14 — axe-plan-executable
+# Step 14 — axe-baseline-projection
 
-- 예상 시간: 14분
+- 예상 시간: 16분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~13 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §7.2(예외 밖 콘텐츠 변경), §8.3 (step 14 실행 가능성 검사, gate, 재계획 그룹 step 생성 조건)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 14 투영·양방향 일치, fixture)
 3. index.json에서 step 0~13이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js의 `Plan`, `loadPlan`, `validateRemediationPlan`, `FIX_FILES_BY_KIND`를 확인한다.
+4. axe.js의 `MergedEntry`, `BaselineEntry`, `makeEntryKey`, `loadBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -33,26 +33,32 @@
 
 - `tests/` 밖 전부
 - 그 밖의 tests 파일, fixtures
-- step 7~13의 동작
+- step 8·12·13에서 만든 동작
 
 ## 작업
 
 1. axe.js에 step 14 계약을 구현한다.
-   - `validateRemediationExecutable(plan, baseline) → string[]` (`blocked-group:{id}`, `text-change:{id}:{target}`, `empty-fixfiles:{id}`)
-   - CLI: `--check-executable [--plan <f>] [--baseline <f>]`. 오류가 있으면 첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`과 목록을 stderr에 출력하고 exit 1
+   - `PROJECTION_FIELDS`, `projectEntry`, `compareCollectedBaseline`
+   - CLI: `--check-baseline-match [--collected <f>] [--baseline <f>]` (`--collected` 기본 `tests/fixtures/axe-collected.json`)
 2. axe-helper.spec.js (desktop-dark, 독립 디렉터리)
-   - `{ groups: [] }` → `[]`
-   - css-token 그룹(blocked false, fixFiles `[css/themes.css]`) → `[]`
-   - blocked true인 css-rule 그룹 → `blocked-group:{id}`
-   - text-change target을 가진 그룹(blocked true, fixFiles `[]`) → `blocked-group`, `text-change`, `empty-fixfiles` 세 오류 모두
-   - 정상 그룹 + blocked 그룹 혼합 → blocked 그룹 오류만 있고 결과 배열 길이 ≥ 1 (하나라도 있으면 전체 실패)
-   - 입력이 변경되지 않는다.
-   - subprocess `--check-executable`
-     - 빈 groups → 0
-     - 실행 가능 그룹만 → 0
-     - blocked 그룹 1개 → 1, stderr 첫 줄이 `Harness 재계획 필요: 실행 불가 remediation 그룹`
-     - fixFiles `[]` 그룹 → 1
-     - plan 없음, baseline JSON 오류 → 1
+   - `projectEntry`
+     - baseline 항목에서 `fixes`, `fixFiles`를 버리고 7개 필드만 남긴다.
+     - 미정렬·중복 targets/selectors를 정렬·중복 제거한다.
+     - key 불일치, 필드 누락 → throw
+   - `compareCollectedBaseline`
+     - 같은 내용(baseline은 fixes 포함) → `ok`
+     - collected에만 있는 entry → `missingEntries`에 key 1건, `ok` false
+     - baseline에만 있는 entry → `extraEntries`에 key 1건, `ok` false
+     - 같은 key에서 collected에만 있는 target → `missingTargets` 1건
+     - 같은 key에서 baseline에만 있는 target → `extraTargets` 1건
+     - impact 다름 → `fieldMismatches`에 `{key, field: 'impact'}`
+     - selectors 다름 → `fieldMismatches`에 `{key, field: 'selectors'}`
+     - 한쪽에 중복 key → throw
+     - 두 입력이 변경되지 않는다.
+   - subprocess `--check-baseline-match`
+     - 일치 → 0
+     - missing entry, extra entry, missing target, extra target, impact 불일치 각각 → 1
+     - collected 파일 없음, baseline JSON 오류 → 1
 
 ## 완료 기준 (AC)
 
