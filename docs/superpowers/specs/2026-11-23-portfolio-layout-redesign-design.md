@@ -4,7 +4,7 @@
 - BASE: `d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d`
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
-- 리뷰 반영: 1차 Astra `1432c5274b33`(12건, 승인 1574220980048634010), 2차 `570513f95a2f`(7), 3차 `9e8c69018dc0`(4), 4차 `8014bc034fb4`(3), 5차 `9277e222d6c3`(4), 6차 `5331b1167a3c`(6), 7차 `e849940ab365`(6), 8차 `77397ef36423`(6), 9차 `1890a28bd4a9`(7), 10차 `754f651120b1`(4), 11차 `2e850c809ca8`(5), 12차 `a26257befcd4`(4), 13차 `b2608d1436cb`(3), 14차 `acc631d51b74`(3), 15차 `927fc70c685a`(2), 16차 `0c7077b8904f`(2), 17차 `6632b4fe978d`(3), 18차 `496edfe61841`(4: 분류 대기 baseline 계약, S 재사용 strict 검증, runtime probe·합성 tmp repo, `workers: 1`), 19차 `a37a0eca1d41`(3: 합성 repo rename을 파일시스템 rename + add로 생성, CLI gate의 현재 identity 대조, schemaVersion 정수 1 엄격 판정). 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
+- 리뷰 반영: 1차 Astra `1432c5274b33`(12건, 승인 1574220980048634010), 2차 `570513f95a2f`(7), 3차 `9e8c69018dc0`(4), 4차 `8014bc034fb4`(3), 5차 `9277e222d6c3`(4), 6차 `5331b1167a3c`(6), 7차 `e849940ab365`(6), 8차 `77397ef36423`(6), 9차 `1890a28bd4a9`(7), 10차 `754f651120b1`(4), 11차 `2e850c809ca8`(5), 12차 `a26257befcd4`(4), 13차 `b2608d1436cb`(3), 14차 `acc631d51b74`(3), 15차 `927fc70c685a`(2), 16차 `0c7077b8904f`(2), 17차 `6632b4fe978d`(3), 18차 `496edfe61841`(4), 19차 `a37a0eca1d41`(3), 20차 `review-resume-central-a97eb68a108c-v16`(2: JS loader의 최상위 token scanner와 모든 깊이 중복 key 거부를 Python S와 같은 판정으로 고정, 비runtime symlink·비일반 경로를 null로 축약하지 않고 실패시키는 보수적 경로 안전 계약. 테스트 분량 때문에 snapshot 도구를 step 1~4로 나누어 이후 step 번호가 2씩 밀림). 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`이 고정): sourceCommit `cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae`, manifestHash `287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a`, distributionVersion 2.0.0
 
 ## 1. 의도
@@ -19,7 +19,7 @@
 
 ## 3. 현재 코드 사실 (read-first 대상)
 
-- 저장소 지침: BASE에는 `README.md`만 있다. 현재 checkout의 하네스 파일은 `CLAUDE.md`, `.harness/harness.lock.json`, `.harness/policy.json`, `.harness/install-state.json`, `.claude/`, `.codex/`, `pytest.ini`, `.python-version`, `.gitattributes`. Harness 공통 `scripts/`·`templates/`·`harness-manifest.json`은 중앙 store에 있다.
+- 저장소 지침: BASE에는 `README.md`만 있다. 현재 checkout의 하네스 파일은 `CLAUDE.md`, `.harness/harness.lock.json`, `.harness/policy.json`, `.harness/install-state.json`, `.claude/`, `.codex/`, `pytest.ini`, `.python-version`, `.gitattributes`. `.venv/`는 하네스 venv(루트 `.gitignore` 대상). Harness 공통 `scripts/`·`templates/`·`harness-manifest.json`은 중앙 store에 있다.
 - `js/data.js`: 전역 const `PROFILE`, `STATS`(4), `CAREER`, `VIS_ACCENT`, `makeVisual`, `PROJECTS`(13, 모두 `detail`), `STRENGTHS`(6), `SKILLS`. `PROFILE.tagline`은 BASE에서 렌더링되지 않는다. email·phone·social.*은 빈 문자열. 대표 프로젝트 index: Motion AD=1, VigoRight(의료 AI/VR)=5, Lost Energy Intel=7.
 - `js/main.js`: `setText(id, value)`(첫 인자 id 문자열). 렌더 대상 `#heroStats`(STATS 항목마다 지표 item 1개, item 안에 수치와 label), `#strengthsGrid`, `#timeline`(`.timeline-item` > `.timeline-period` + `.timeline-card`), `#projectGrid`, `#skillsGrid`, `#contactActions`. 카드: `article.project-card.has-detail[data-project=idx][tabindex=0][role=button]`.
 - 모달: index.html `div.modal#projectModal[hidden]` > `.modal-backdrop[data-modal-close]` + `.modal-dialog` > (`button.modal-close[data-modal-close]` + `div.modal-body#modalBody`). `#modalBody` 렌더: `.modal-visual`/`.modal-thumb`, `h3#modalTitle.modal-title`, `.modal-meta`, `p.modal-blurb`, `.modal-section`(갤러리 `.shot-zoom` 포함). 제목·닫기 버튼 제외 본문 텍스트는 `#modalBody .modal-blurb`, `#modalBody .modal-section`. `openProjectModal(idx)`는 `lastFocused = document.activeElement` 후 닫기 버튼 포커스, body `modal-open`. 열기는 `#projectGrid` click/keydown 위임, 닫기는 `[data-modal-close]` 또는 Esc(lightbox가 열려 있으면 lightbox부터).
@@ -75,7 +75,7 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. B(시각 전�
 ## 7. 콘텐츠 보존과 예외
 
 ### 7.1 기준
-- `BaselineData`: BASE data.js 평가 결과(step 6). `StaticContent`: BASE index.html 정적 본문(step 7).
+- `BaselineData`: BASE data.js 평가 결과(step 8). `StaticContent`: BASE index.html 정적 본문(step 9).
 
 ### 7.2 허용 예외
 1. index 1, 5, 7의 `featured: true`
@@ -90,10 +90,10 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. B(시각 전�
 - `norm(s) = String(s).replace(/\s+/g, ' ').trim()`
 - `BaselineData = { PROFILE, STATS, CAREER, VIS_ACCENT, PROJECTS, STRENGTHS, SKILLS }` (JSON, 순서 유지, deep-equal)
 - `StaticContent` (모두 norm): `title`, `metaDescription`, `navLabels`(정렬), `heroEyebrow`, `ctaLabels`, `kickers`, `sectionTitles`, `sectionSubs`(DOM 순서), `aboutParagraphs`(`.about-text p:not([id])`), `aboutPoints`, `aboutMetaTerms`, `contactHeading`, `contactText`, `footerNote`, `footerTop`
-- step 6: `readLiveData(page)`, `normalizeFeatured(data)`(structuredClone, 지정 index만). step 7: `extractStatic(page)`
+- step 8: `readLiveData(page)`, `normalizeFeatured(data)`(structuredClone, 지정 index만). step 9: `extractStatic(page)`
 
-### 7.4 회귀 spec (step 8, 9)
-- step 8 `modal-regression.spec.js` + `tests/helpers/modal.js`: 모달·lightbox. step 9 `ui-regression.spec.js` + `first-visit.spec.js`: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion.
+### 7.4 회귀 spec (step 10, 11)
+- step 10 `modal-regression.spec.js` + `tests/helpers/modal.js`: 모달·lightbox. step 11 `ui-regression.spec.js` + `first-visit.spec.js`: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion.
 - `modal.js`: `GRID_CARD = '#projectGrid .project-card'`; `gridCard(page, N)` = 정확히 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`; `openFirstProjectByClick`, `openFirstProjectByEnter`(GRID_CARD 범위); `closeVia(page, 'button'|'backdrop'|'esc')`(button `#projectModal .modal-close[data-modal-close]`, backdrop `{x:5, y:5}`); `expectFocused`; `modalTitle(page)` = `page.locator('#projectModal #modalTitle')`; `findProjectWithShots(page): number|null` — grid 카드만 DOM 순서로 열고(`modal-open` 확인) `.shot-zoom` 유무 확인 후 `closeVia('button')`로 닫고 `modal-open` 해제 확인, 첫 N 또는 null. grid 밖 같은 data-project 요소는 클릭하지 않는다.
 
 ## 8. 접근성
@@ -101,58 +101,58 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. B(시각 전�
 ### 8.1 axe
 - wcag2a·wcag2aa serious/critical 0건. 시나리오 10개: page 3 viewport × 2 테마, modal × dark/light, lightbox × dark/light. 수집·일반 모드 모두 `prepareForAxe` 통과 후에만 실행.
 
-### 8.2 포커스 트랩 (step 27, 28)
+### 8.2 포커스 트랩 (step 29, 30)
 - `trapFocus(container, { returnFocusTo? }): () => void` — 스택, 최상위만 Tab 순환, document Tab 핸들러 1개. `release()`는 스택 제거·returnFocusTo 포커스·직전 trap 재개, 다중 호출 안전.
-- step 27: 구현 + 모달 열 때 push(trigger)/닫을 때 release, 경계 순환·경로별 복귀. lightbox 코드는 건드리지 않는다.
-- step 28: lightbox 열 때 push(`.shot-zoom`), 열린 동안 모달 trap 일시정지, 닫히면 재개, 기존 lightbox Tab 리스너 제거, `:focus-visible` outline 유지·검증.
+- step 29: 구현 + 모달 열 때 push(trigger)/닫을 때 release, 경계 순환·경로별 복귀. lightbox 코드는 건드리지 않는다.
+- step 30: lightbox 열 때 push(`.shot-zoom`), 열린 동안 모달 trap 일시정지, 닫히면 재개, 기존 lightbox Tab 리스너 제거, `:focus-visible` outline 유지·검증.
 - h1은 1개, heading level을 건너뛰지 않는다.
 
 ### 8.3 axe 기준선·식별·해소
 
-canonical target (step 10): `{ruleId}::{anchor}::{textSig}`. selectors는 정보용.
+canonical target (step 12): `{ruleId}::{anchor}::{textSig}`. selectors는 정보용.
 - anchor(자신부터 조상으로 처음): `[data-featured-card][data-project]`→`featured:{N}`, `[data-project]`→`project:{N}`, `[id]`→`#{id}`, landmark(header/nav/main/footer)→태그명, 없으면 `document`.
 - textSig: norm(textContent), 비면 aria-label→alt→title→src 파일명. 숫자는 `#`, 80자 자름. 고정 alias: `## — Stack & Contact`→`## — Contact`, `기술 스택 & 연락처`→`연락처`.
 - anchor와 대상의 조상 관계가 유지될 때만 같은 key를 보장한다(subtree 통째 이동은 유지, anchor 밖 이동은 다른 key).
 
-entry key (step 14, 이후 공통): `makeEntryKey({ scenario, project, ruleId })` = `${scenario}:${project}:${ruleId}`(빈 값·`:` 포함 시 throw). (scenario, project, ruleId)마다 entry 1개, targets·selectors 중복 제거·오름차순. 다른 scenario/project의 같은 target은 별도 entry. (key, target) 쌍이 위반 1건. mergeCollected, baseline, validateBaseline, projectEntry, compareCollectedBaseline, checkRegression, checkCollectedRegression, countCollectedTargets, checkGroupDone, checkCollectedCoverage, prunePlan과 step 21 이후 모든 step이 따른다.
+entry key (step 16, 이후 공통): `makeEntryKey({ scenario, project, ruleId })` = `${scenario}:${project}:${ruleId}`(빈 값·`:` 포함 시 throw). (scenario, project, ruleId)마다 entry 1개, targets·selectors 중복 제거·오름차순. 다른 scenario/project의 같은 target은 별도 entry. (key, target) 쌍이 위반 1건. mergeCollected, baseline, validateBaseline, projectEntry, compareCollectedBaseline, checkRegression, checkCollectedRegression, countCollectedTargets, checkGroupDone, checkCollectedCoverage, prunePlan과 step 23 이후 모든 step이 따른다.
 
 helper (`tests/helpers/axe.js`):
-- step 10: `ALIASES`, `canonicalTargetInPage(el) → { anchor, text }`, `canonicalFromDescriptor({ ruleId, anchor, text })`, `runAxe(page, { include }) → Violation[]` (`{ ruleId, impact, selectors, targets }`)
-- step 14: `makeEntryKey`; `COLLECT_DIR`(`tests/.tmp/axe-collected` 절대경로); `EXPECTED_FILES` 10개(`page-{mobile,tablet,desktop}-{dark,light}.json`, `modal-desktop-{dark,light}.json`, `lightbox-desktop-{dark,light}.json`); `resolveCollectDir(opts)`(opts.collectDir → `AXE_COLLECT_DIR` → COLLECT_DIR, `tests/.tmp/` 밖이면 `Error('collectDir must be under tests/.tmp')`); `resetCollected`; `writeCollected(scenario, project, violations, opts)`(목록 밖 파일명 throw); `mergeCollected({ collectDir, out })`(구성 불일치 `Error('collected files mismatch: missing=[...] extra=[...]')`, 파일명에서 scenario·project, key 정렬, out 기본 `tests/fixtures/axe-collected.json`, `MergedEntry = { key, scenario, project, ruleId, impact, targets, selectors }`). CLI `--reset [--dir]`, `--merge [--dir] [--out]`, throw면 stderr + exit 1.
-- step 15: `BASELINE_PATH` `tests/fixtures/axe-baseline.json`, `COLLECTED_PATH` `tests/fixtures/axe-collected.json`, `PLAN_PATH` `tests/fixtures/axe-remediation-plan.json`; `FIX_FILES_BY_KIND` = css-token `[css/themes.css]`, css-rule `[css/style.css]`, js-render `[js/main.js]`, static-markup `[index.html]`, text-change `[]`; `baselineExists`; `loadBaseline`(없음·JSON 오류·비배열 throw); `resolveBaselineMode({ path, collectedPath, planPath } = 기본 경로) → 'check' | 'pending'` — 분류 대기 baseline 계약: baseline 파일이 있으면 `check`; baseline이 없고 collected가 있고 plan이 없으면(step 21 종료~step 22 시작 사이 상태) `pending`; 그 밖(collected 없음, 또는 baseline 없이 plan만 있음)은 `Error('axe baseline missing: tests/fixtures/axe-baseline.json')`. 환경변수로 우회하지 않는다. `validateBaseline`(key = makeEntryKey, 고유, targets 중복 없음·정렬, fixes[i].fixFiles = FIX_FILES_BY_KIND[fixKind], 항목 fixFiles = 합집합); `checkRegression(violations, baseline, scenario, project)`(순수, `new-key:{key}`, `new-target:{key}:{target}`); `assertEmptyFile`; CLI `--assert-empty [path]`.
-- step 16: `PROJECTION_FIELDS = ['key','scenario','project','ruleId','impact','targets','selectors']`; `projectEntry`(7필드만, targets·selectors 정렬·중복 제거, 누락·key 불일치 throw); `compareCollectedBaseline(collected, baseline) → { ok, missingEntries, extraEntries, missingTargets, extraTargets, fieldMismatches }`(순수, 중복 key throw, 필드는 scenario·project·ruleId·impact·selectors); CLI `--check-baseline-match [--collected 기본 tests/fixtures/axe-collected.json] [--baseline]`.
-- step 17: `GROUP_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/`; `loadPlan`; `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`(requireEmpty면 `groups: expected empty, got {n}`); CLI `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`.
-- step 18: `validateRemediationExecutable(plan, baseline)`(순수, `blocked-group:{id}`, `text-change:{id}:{target}`, `empty-fixfiles:{id}`, groups `[]`면 `[]`); CLI `--check-executable`(실패 시 첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹` + 목록, exit 1). 실패하면 remediation step 생성·진행을 멈춘다. `fixFiles = []` 실행 step은 만들지 않는다.
-- step 19 (`--collected` 기본 `tests/.tmp/axe-current.json`): `checkGroupDone(collected, plan, id) → { done, remaining }`(비배열 `Error('invalid collected')`, 없는 id `Error('unknown group id: {id}')`); `checkCollectedCoverage → { ok, uncovered }`(자동 편입 없음); `countCollectedTargets`; CLI `--check-group-done <id>`, `--check-coverage`(실패 시 `재계획 필요: plan 밖 잔여 target`), `--assert-no-violations`.
-- step 20: `checkCollectedRegression(collected, baseline)`(`bad-key:`, `new-key:`, `new-target:`); `prunePlan(plan, collected, baseline)`(순수, 사라진 target 제거, 빈 그룹 삭제, fixFiles 재계산 부분집합, id·difficulty·estMinutes·blocked·reason 유지, 추가 없음); CLI `--check-regression`, `--prune-plan`(먼저 3파일 읽고 회귀 검사, 실패 시 쓰지 않고 exit 1·bytes 불변, 통과 시 `JSON.stringify(plan, null, 2) + '\n'`). plan 파일은 `--prune-plan`으로만 바꾼다.
+- step 12: `ALIASES`, `canonicalTargetInPage(el) → { anchor, text }`, `canonicalFromDescriptor({ ruleId, anchor, text })`, `runAxe(page, { include }) → Violation[]` (`{ ruleId, impact, selectors, targets }`)
+- step 16: `makeEntryKey`; `COLLECT_DIR`(`tests/.tmp/axe-collected` 절대경로); `EXPECTED_FILES` 10개(`page-{mobile,tablet,desktop}-{dark,light}.json`, `modal-desktop-{dark,light}.json`, `lightbox-desktop-{dark,light}.json`); `resolveCollectDir(opts)`(opts.collectDir → `AXE_COLLECT_DIR` → COLLECT_DIR, `tests/.tmp/` 밖이면 `Error('collectDir must be under tests/.tmp')`); `resetCollected`; `writeCollected(scenario, project, violations, opts)`(목록 밖 파일명 throw); `mergeCollected({ collectDir, out })`(구성 불일치 `Error('collected files mismatch: missing=[...] extra=[...]')`, 파일명에서 scenario·project, key 정렬, out 기본 `tests/fixtures/axe-collected.json`, `MergedEntry = { key, scenario, project, ruleId, impact, targets, selectors }`). CLI `--reset [--dir]`, `--merge [--dir] [--out]`, throw면 stderr + exit 1.
+- step 17: `BASELINE_PATH` `tests/fixtures/axe-baseline.json`, `COLLECTED_PATH` `tests/fixtures/axe-collected.json`, `PLAN_PATH` `tests/fixtures/axe-remediation-plan.json`; `FIX_FILES_BY_KIND` = css-token `[css/themes.css]`, css-rule `[css/style.css]`, js-render `[js/main.js]`, static-markup `[index.html]`, text-change `[]`; `baselineExists`; `loadBaseline`(없음·JSON 오류·비배열 throw); `resolveBaselineMode({ path, collectedPath, planPath } = 기본 경로) → 'check' | 'pending'` — 분류 대기 baseline 계약: baseline 파일이 있으면 `check`; baseline이 없고 collected가 있고 plan이 없으면(step 23 종료~step 24 시작 사이 상태) `pending`; 그 밖(collected 없음, 또는 baseline 없이 plan만 있음)은 `Error('axe baseline missing: tests/fixtures/axe-baseline.json')`. 환경변수로 우회하지 않는다. `validateBaseline`(key = makeEntryKey, 고유, targets 중복 없음·정렬, fixes[i].fixFiles = FIX_FILES_BY_KIND[fixKind], 항목 fixFiles = 합집합); `checkRegression(violations, baseline, scenario, project)`(순수, `new-key:{key}`, `new-target:{key}:{target}`); `assertEmptyFile`; CLI `--assert-empty [path]`.
+- step 18: `PROJECTION_FIELDS = ['key','scenario','project','ruleId','impact','targets','selectors']`; `projectEntry`(7필드만, targets·selectors 정렬·중복 제거, 누락·key 불일치 throw); `compareCollectedBaseline(collected, baseline) → { ok, missingEntries, extraEntries, missingTargets, extraTargets, fieldMismatches }`(순수, 중복 key throw, 필드는 scenario·project·ruleId·impact·selectors); CLI `--check-baseline-match [--collected 기본 tests/fixtures/axe-collected.json] [--baseline]`.
+- step 19: `GROUP_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/`; `loadPlan`; `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`(requireEmpty면 `groups: expected empty, got {n}`); CLI `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`.
+- step 20: `validateRemediationExecutable(plan, baseline)`(순수, `blocked-group:{id}`, `text-change:{id}:{target}`, `empty-fixfiles:{id}`, groups `[]`면 `[]`); CLI `--check-executable`(실패 시 첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹` + 목록, exit 1). 실패하면 remediation step 생성·진행을 멈춘다. `fixFiles = []` 실행 step은 만들지 않는다.
+- step 21 (`--collected` 기본 `tests/.tmp/axe-current.json`): `checkGroupDone(collected, plan, id) → { done, remaining }`(비배열 `Error('invalid collected')`, 없는 id `Error('unknown group id: {id}')`); `checkCollectedCoverage → { ok, uncovered }`(자동 편입 없음); `countCollectedTargets`; CLI `--check-group-done <id>`, `--check-coverage`(실패 시 `재계획 필요: plan 밖 잔여 target`), `--assert-no-violations`.
+- step 22: `checkCollectedRegression(collected, baseline)`(`bad-key:`, `new-key:`, `new-target:`); `prunePlan(plan, collected, baseline)`(순수, 사라진 target 제거, 빈 그룹 삭제, fixFiles 재계산 부분집합, id·difficulty·estMinutes·blocked·reason 유지, 추가 없음); CLI `--check-regression`, `--prune-plan`(먼저 3파일 읽고 회귀 검사, 실패 시 쓰지 않고 exit 1·bytes 불변, 통과 시 `JSON.stringify(plan, null, 2) + '\n'`). plan 파일은 `--prune-plan`으로만 바꾼다.
 
 fixture:
-- `axe-collected.json`(step 21): 병합 결과, tracked, 정보용.
-- `axe-baseline.json`(step 22): `key, scenario, project, ruleId, impact, targets, selectors, fixes[{ target, fixKind, fixFiles }], fixFiles`. projectEntry 투영이 collected와 양방향 일치.
-- `axe-remediation-plan.json`(step 22): `{ groups: [{ id, targets, fixFiles, difficulty: low|medium|high, estMinutes: 1~20, blocked, reason }] }`. id 고유·형식, target은 baseline 합집합의 부분집합·그룹 간 중복 없음, fixFiles 합집합, text-change면 blocked, `--coverage`면 모든 target이 정확히 한 그룹.
+- `axe-collected.json`(step 23): 병합 결과, tracked, 정보용.
+- `axe-baseline.json`(step 24): `key, scenario, project, ruleId, impact, targets, selectors, fixes[{ target, fixKind, fixFiles }], fixFiles`. projectEntry 투영이 collected와 양방향 일치.
+- `axe-remediation-plan.json`(step 24): `{ groups: [{ id, targets, fixFiles, difficulty: low|medium|high, estMinutes: 1~20, blocked, reason }] }`. id 고유·형식, target은 baseline 합집합의 부분집합·그룹 간 중복 없음, fixFiles 합집합, text-change면 blocked, `--coverage`면 모든 target이 정확히 한 그룹.
 
 실행 모드:
 - 공통: 시나리오마다 `prepareForAxe(page, { scenario })` 후 `runAxe(page, { include })`. 준비 실패는 테스트 실패.
 - 수집(`AXE_COLLECT=1`): baseline을 읽지 않고 `writeCollected`만.
-- 일반(기본 testCommand): `resolveBaselineMode()`. `check`면 checkRegression·validateBaseline(desktop-dark 1회)·plan이 있으면 validateRemediationPlan(coverage false). `pending`(분류 대기)이면 준비 절차까지만 실행하고 axe 판정은 `test.skip(true, 'axe classification pending (step 22)')`. 그 밖은 throw로 실패.
-- 이 계약 덕분에 모든 step 종료 시 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 별도 환경변수 없이 통과한다. step 22 이후에는 baseline이 존재하므로 항상 `check`이며, baseline 삭제는 각 step 범위 gate(§11.7)가 `tests-changed:`로 거부한다.
+- 일반(기본 testCommand): `resolveBaselineMode()`. `check`면 checkRegression·validateBaseline(desktop-dark 1회)·plan이 있으면 validateRemediationPlan(coverage false). `pending`(분류 대기)이면 준비 절차까지만 실행하고 axe 판정은 `test.skip(true, 'axe classification pending (step 24)')`. 그 밖은 throw로 실패.
+- 이 계약 덕분에 모든 step 종료 시 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 별도 환경변수 없이 통과한다. step 24 이후에는 baseline이 존재하므로 항상 `check`이며, baseline 삭제는 각 step 범위 gate(§11.7)가 `tests-changed:`로 거부한다.
 - COLLECT_CHAIN(순차 `&&`, 병렬 금지): `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge [--out <f>]`
 - REGRESSION_GATE(plan 수정 전, COLLECT_CHAIN 직후): `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json`
 
 단계:
-- step 21: 10개 시나리오 구현, axe-collected.json 생성. 종료 시 baseline·plan 없음 + collected 있음 = `pending` 상태이므로 기본 testCommand가 통과한다.
-- step 22: 예상 = 묶음별(2분 + target × 1분) 합 + 6분. 20분 초과면 즉시 재계획. AC에 `--check-baseline-match`, `--check-executable`. blocked 그룹이 있으면 실패로 끝나고 재계획. 종료 시 `check` 모드로 기본 testCommand 통과.
-- step 23~29: 새 key/target은 실패(사라짐 허용, 자동 편입 금지). 해당 step이 만든 신규 위반은 그 step에서 고친다. 식별이 깨지면 중단·재계획.
-- step 30 gate(순차): COLLECT_CHAIN(`--merge --out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan --collected tests/.tmp/axe-current.json` → `--check-coverage --collected tests/.tmp/axe-current.json` → `--check-plan` → `--check-executable`. 모두 통과하고 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 30과 31 사이에 재계획한다.
-- 재계획 그룹 step: 생성 조건 `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`. 소스 allowedPaths는 그룹 fixFiles만, runtime은 §15.6 기본. 20분 이하, plan 수정 금지. 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`. AC: COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) && REGRESSION_GATE && `--check-group-done {id} --collected tests/.tmp/axe-current.json` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`(identity 대조 포함).
-- step 31 recheck: gate를 같은 순서로 재실행 + `--check-plan --require-empty` + `--assert-no-violations --collected tests/.tmp/axe-current.json`.
-- step 32 finalize: COLLECT_CHAIN·REGRESSION_GATE 재실행 → `--check-plan --require-empty && --assert-no-violations` 통과 후에만 baseline을 `[]`로. AC `--assert-empty` + 일반 axe 통과.
+- step 23: 10개 시나리오 구현, axe-collected.json 생성. 종료 시 baseline·plan 없음 + collected 있음 = `pending` 상태이므로 기본 testCommand가 통과한다.
+- step 24: 예상 = 묶음별(2분 + target × 1분) 합 + 6분. 20분 초과면 즉시 재계획. AC에 `--check-baseline-match`, `--check-executable`. blocked 그룹이 있으면 실패로 끝나고 재계획. 종료 시 `check` 모드로 기본 testCommand 통과.
+- step 25~31: 새 key/target은 실패(사라짐 허용, 자동 편입 금지). 해당 step이 만든 신규 위반은 그 step에서 고친다. 식별이 깨지면 중단·재계획.
+- step 32 gate(순차): COLLECT_CHAIN(`--merge --out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan --collected tests/.tmp/axe-current.json` → `--check-coverage --collected tests/.tmp/axe-current.json` → `--check-plan` → `--check-executable`. 모두 통과하고 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 32와 33 사이에 재계획한다.
+- 재계획 그룹 step: 생성 조건 `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`. 소스 allowedPaths는 그룹 fixFiles만, runtime은 §15.6 기본. 20분 이하, plan 수정 금지. 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`. AC: COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) && REGRESSION_GATE && `--check-group-done {id} --collected tests/.tmp/axe-current.json` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`(schema·identity·경로 안전 포함).
+- step 33 recheck: gate를 같은 순서로 재실행 + `--check-plan --require-empty` + `--assert-no-violations --collected tests/.tmp/axe-current.json`.
+- step 34 finalize: COLLECT_CHAIN·REGRESSION_GATE 재실행 → `--check-plan --require-empty && --assert-no-violations` 통과 후에만 baseline을 `[]`로. AC `--assert-empty` + 일반 axe 통과.
 
 ### 8.4 axe 시나리오 준비 (`tests/helpers/axe-prepare.js`)
 
-- step 11 공통·page: `PREPARE_PREFIX = 'prepareForAxe: '`; `prepareError(code, cause?)`(message `prepareForAxe: {code}`, `.code`, `.cause`); `withPrepareCode(code, fn)`(실패를 prepareError로, 이미 prefix면 그대로); `preparePage(page, { timeoutMs = 10000 }) → { revealChecked, scrollSteps }` — fonts.ready 후 `status === 'loaded'`(`fonts-not-ready`), scrollY 0부터 `innerHeight × 0.8` 간격 끝까지 단계마다 2 frame, `scrollTo(0, 0)`, 모든 `.reveal`의 `.in`·visibility·opacity를 `expect.poll`(`reveal-hidden:{n}`). 테마·reduced-motion은 바꾸지 않는다.
-- step 12 콘텐츠·modal: `MODAL_ROOT = '#projectModal'`, `MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section'`. `assertContentLoaded(locator, timeoutMs, { textLocator = null } = {})` — locator 안 모든 img `complete && naturalWidth > 0`(`content-not-loaded:img`), 모든 svg bbox w·h > 0(`content-not-loaded:svg`), textLocator가 있으면 1개 이상이고 innerText 합의 norm 길이 > 0(`content-not-loaded:text`), null이면 텍스트 생략. 제목만 있고 본문이 비면 text로 실패. `prepareModal(page, { projectIndex = 0, timeoutMs })` — `gridCard(page, N)` 개수가 1이 아니면 `project-card-not-found:{N}`, click → body `modal-open`·visible·opacity 1(`modal-not-open`), `modalTitle` = `norm(PROJECTS[N].title)`(`modal-not-open`), `assertContentLoaded(page.locator(MODAL_ROOT), t, { textLocator: page.locator(MODAL_BODY_TEXT) })`, 반환 `{ include: '#projectModal', projectIndex }`.
-- step 13 lightbox·결합: `prepareLightbox(page, { projectIndex?, timeoutMs })` — 기본 index `findProjectWithShots`(null → `no-shots-project`), prepareModal → 첫 `.shot-zoom` click(없거나 안 열리면 `lightbox-not-open`), `.lightbox` 1개·visible·opacity 1·activeElement 내부(`lightbox-not-open`), `assertContentLoaded(page.locator('.lightbox'), t, { textLocator: null })`, 반환 `{ include: '.lightbox', projectIndex }`. `prepareOverlay`(modal/lightbox, 그 밖 `unknown-scenario`). `prepareForAxe(page, { scenario, projectIndex?, timeoutMs })` — scenario 검증(`unknown-scenario`) → preparePage → page면 `{ include: 'body', projectIndex: null }`, 그 밖은 overlay 결과 병합(`scenario`, `revealChecked`, `scrollSteps` 포함).
+- step 13 공통·page: `PREPARE_PREFIX = 'prepareForAxe: '`; `prepareError(code, cause?)`(message `prepareForAxe: {code}`, `.code`, `.cause`); `withPrepareCode(code, fn)`(실패를 prepareError로, 이미 prefix면 그대로); `preparePage(page, { timeoutMs = 10000 }) → { revealChecked, scrollSteps }` — fonts.ready 후 `status === 'loaded'`(`fonts-not-ready`), scrollY 0부터 `innerHeight × 0.8` 간격 끝까지 단계마다 2 frame, `scrollTo(0, 0)`, 모든 `.reveal`의 `.in`·visibility·opacity를 `expect.poll`(`reveal-hidden:{n}`). 테마·reduced-motion은 바꾸지 않는다.
+- step 14 콘텐츠·modal: `MODAL_ROOT = '#projectModal'`, `MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section'`. `assertContentLoaded(locator, timeoutMs, { textLocator = null } = {})` — locator 안 모든 img `complete && naturalWidth > 0`(`content-not-loaded:img`), 모든 svg bbox w·h > 0(`content-not-loaded:svg`), textLocator가 있으면 1개 이상이고 innerText 합의 norm 길이 > 0(`content-not-loaded:text`), null이면 텍스트 생략. 제목만 있고 본문이 비면 text로 실패. `prepareModal(page, { projectIndex = 0, timeoutMs })` — `gridCard(page, N)` 개수가 1이 아니면 `project-card-not-found:{N}`, click → body `modal-open`·visible·opacity 1(`modal-not-open`), `modalTitle` = `norm(PROJECTS[N].title)`(`modal-not-open`), `assertContentLoaded(page.locator(MODAL_ROOT), t, { textLocator: page.locator(MODAL_BODY_TEXT) })`, 반환 `{ include: '#projectModal', projectIndex }`.
+- step 15 lightbox·결합: `prepareLightbox(page, { projectIndex?, timeoutMs })` — 기본 index `findProjectWithShots`(null → `no-shots-project`), prepareModal → 첫 `.shot-zoom` click(없거나 안 열리면 `lightbox-not-open`), `.lightbox` 1개·visible·opacity 1·activeElement 내부(`lightbox-not-open`), `assertContentLoaded(page.locator('.lightbox'), t, { textLocator: null })`, 반환 `{ include: '.lightbox', projectIndex }`. `prepareOverlay`(modal/lightbox, 그 밖 `unknown-scenario`). `prepareForAxe(page, { scenario, projectIndex?, timeoutMs })` — scenario 검증(`unknown-scenario`) → preparePage → page면 `{ include: 'body', projectIndex: null }`, 그 밖은 overlay 결과 병합(`scenario`, `revealChecked`, `scrollSteps` 포함).
 - 합성 fixture: 동작 모달 fixture는 `window.PROJECTS`, `#projectGrid .project-card[data-project="N"]`, §3 모달 마크업을 최소 복제하고 grid click handler가 `#modalBody`에 `h3#modalTitle.modal-title`·`p.modal-blurb`·필요 시 `.modal-section`을 채우고 `modal-open`을 붙인다. 닫기 handler(`[data-modal-close]`, Esc)는 숨기고 떼어낸다. `window.__opens`, `__closes`, `__clicks` 기록. handler 없는 fixture는 `modal-not-open` 전용으로 따로 둔다.
 
 ## 9. 반응형
@@ -218,43 +218,53 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 - `collectConsoleErrors(page)`: 즉시 listener 등록, pageerror 전부, console.error는 location hostname이 정확히 Google Fonts 두 도메인일 때만 제외(파싱 실패 시 제외 안 함). `finish()`는 networkidle 후 `{ pageErrors, consoleErrors }` 사본(`ErrorRecord = { kind, message, url, line, column }`). 순서: collect → goto → 동작 → finish → 두 배열 `[]`.
 
 ### 11.5 `tests/scripts/verify-scope.mjs`
-- step 4 경로: `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`(committed·index·worktree·uncommittedHarness 경로 수집 전용), `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']`(data.js 4구간 BASE→HEAD, BASE→index, BASE→worktree, index→worktree 실제 patch 전용). 둘 다 export, 섞지 않음. `collectInput({ git = runGit })`(Git 읽기만), `input.dataJsDiffs`는 실제 patch 문자열. 경로 정책: 빌더 허용 = §11.1 tracked. 하네스 소유(`CLAUDE.md`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, `.claude/**`, `.codex/**`, `.harness/harness.lock.json`, `.harness/policy.json`, 이 설계 문서, 레거시 `scripts/**`·`templates/**`·`harness-manifest.json`)은 committed 면제·미커밋 위반. 하네스 런타임 면제: 위 두 `.harness` 파일 외 `.harness/**`, `.venv/**`, `phases/HOO-81-portfolio-redesign/**`. runtime 경로 추적·루트 package.json은 위반.
-- step 5 내용: `checkDataJsDiff(patch, { requireExactly3 })`(헤더 제외 삭제 줄 0, 추가 줄은 trim 후 `featured: true,`만, 3줄 이하, requireExactly3면 정확히 3). `--final`이면 BASE→HEAD/index/worktree 정확히 3, index→worktree는 공통 규칙만. index.html 3종 `Space+Grotesk` 포함. gitignore(index, worktree) §11.1. 합성: 가짜 git이 PATCH 인자에만 patch, PATH 인자엔 이름 목록을 돌려주고 그 patch가 판정에 쓰임을 확인.
+- step 6 경로: `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`(committed·index·worktree·uncommittedHarness 경로 수집 전용), `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']`(data.js 4구간 BASE→HEAD, BASE→index, BASE→worktree, index→worktree 실제 patch 전용). 둘 다 export, 섞지 않음. `collectInput({ git = runGit })`(Git 읽기만), `input.dataJsDiffs`는 실제 patch 문자열. 경로 정책: 빌더 허용 = §11.1 tracked. 하네스 소유(`CLAUDE.md`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, `.claude/**`, `.codex/**`, `.harness/harness.lock.json`, `.harness/policy.json`, 이 설계 문서, 레거시 `scripts/**`·`templates/**`·`harness-manifest.json`)은 committed 면제·미커밋 위반. 하네스 런타임 면제: 위 두 `.harness` 파일 외 `.harness/**`, `.venv/**`, `phases/HOO-81-portfolio-redesign/**`. runtime 경로 추적·루트 package.json은 위반.
+- step 7 내용: `checkDataJsDiff(patch, { requireExactly3 })`(헤더 제외 삭제 줄 0, 추가 줄은 trim 후 `featured: true,`만, 3줄 이하, requireExactly3면 정확히 3). `--final`이면 BASE→HEAD/index/worktree 정확히 3, index→worktree는 공통 규칙만. index.html 3종 `Space+Grotesk` 포함. gitignore(index, worktree) §11.1. 합성: 가짜 git이 PATCH 인자에만 patch, PATH 인자엔 이름 목록을 돌려주고 그 patch가 판정에 쓰임을 확인.
 
 ### 11.6 통합 AC
 - 모든 step: 첫 동작 §11.7 시작 snapshot, 종료 시 기본 testCommand 통과(환경변수 없음, §8.3 분류 대기 계약), AC 마지막 §11.7 범위 gate.
-- 종료 gate의 identity 경유(필수): step 0·1은 `python3 -I tests/scripts/start-snapshot.py step{N}`(`reused` = strict schema + 현재 identity 대조) 직후 inline C. step 2 이후는 모두 CLI `scope-snapshot.mjs --check`이며, CLI가 strict schema → 현재 identity 대조 → 변경 판정 순서로 실행한다. identity가 하나라도 다르면 어떤 파일도 쓰지 않고 exit 1.
-- step 4 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate.
-- step 32·33은 `--assert-empty`. step 33은 screenshots 단독 → 전체 → `verify-scope -- --final` → gate.
+- 종료 gate의 identity·경로 안전 경유(필수): step 0~3은 `python3 -I tests/scripts/start-snapshot.py step{N}`(`reused` = 경로 안전 + strict schema + 현재 identity 대조) 직후 inline C(경로 안전 + 변경 판정). step 4 이후는 모두 CLI `scope-snapshot.mjs --check`이며, CLI가 strict schema → 현재 identity 대조 → 현재 상태 수집(경로 안전) → 변경 판정 순서로 실행한다. identity가 하나라도 다르면 어떤 파일도 쓰지 않고 exit 1.
+- step 6 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate.
+- step 34·35는 `--assert-empty`. step 35는 screenshots 단독 → 전체 → `verify-scope -- --final` → gate.
 
 ### 11.7 시작 snapshot과 범위 gate
 
 규칙:
-- RUNTIME 접두어: §11.1 runtime 7개 디렉터리. EXEMPT: `.harness/`, `.venv/`, `phases/HOO-81-portfolio-redesign/` (GUARDED `.harness/harness.lock.json`, `.harness/policy.json`은 면제 아님).
-- 기록 대상 = status의 path·origPath ∪ `git ls-files -z` ∪ `tests/` 파일 walk(RUNTIME 디렉터리 미진입) − RUNTIME. tests 밖과 tests 안 비runtime 파일(추적·미추적·ignore 무관) 모두 포함. 경로별 sha256(일반 파일 아니면 null)과 status xy를 기록한다.
-- 판정(시작·현재 합집합 p, allow·EXEMPT 제외): hash 다르면 tests 안 `tests-changed:{p}`, 밖 `outside-tests:{p}`(같은 ` M`에서 내용만 바뀜, 삭제, 시작 시 수정 상태의 원복 모두 거부). hash 같고 xy 다르면 `status-changed:{p}`. 시작에 없던 RUNTIME 경로가 status에 보이면 `runtime-visible:{p}`. `--require-absent` 경로가 시작 기록에 있으면 `snapshot-not-first:{p}`. 순서: snapshot-not-first → 경로 오름차순 변경 → runtime-visible.
+- RUNTIME 접두어: §11.1 runtime 7개 디렉터리. SKIP 접두어 = RUNTIME + `.git/` + `.venv/`(하네스 venv, 인터프리터 symlink를 포함): 이 디렉터리 안으로는 걷지 않고 그 아래 경로는 hash·기록하지 않는다. EXEMPT: `.harness/`, `.venv/`, `phases/HOO-81-portfolio-redesign/` (GUARDED `.harness/harness.lock.json`, `.harness/policy.json`은 면제 아님).
+- 기록 대상 = status의 path·origPath ∪ `git ls-files -z` ∪ projectRoot walk에서 얻은 `tests/` 아래 파일 − SKIP. 추적·미추적·ignore 무관. 경로별 값: 일반 파일이면 `O_NOFOLLOW`로 열어 읽은 sha256, 경로가 없으면 null. null은 '경로 없음'만 뜻한다. 그 밖(symlink, 디렉터리, FIFO, socket, 장치)은 null로 축약하지 않고 아래 경로 안전 계약으로 실패한다.
+- 경로 안전 계약(보수적, symlink 금지): projectRoot부터 `lstat` 기준으로 트리 전체를 걷는다. 링크를 따라가지 않고 SKIP 디렉터리 내부는 들어가지 않는다. 추적·ignore 여부와 관계없이 발견한 모든 symlink 엔트리(파일·디렉터리·깨진 링크, SKIP 디렉터리 엔트리 자체 포함)는 `symlink:{p}`, 기록 대상 중 일반 파일이 아닌 경로는 `non-regular:{p}`. allow·EXEMPT·GUARDED 어느 것도 이를 면제하지 않는다. SKIP 내부(예: npm이 만드는 `tests/node_modules/.bin` 링크)는 걷지 않으므로 판정 대상이 아니며 그 내용도 hash·비교하지 않는다. symlink의 대상 경로나 내용은 읽지 않는다(readlink, 링크를 따르는 stat·open 금지). snapshot 파일 자체가 symlink여도 거부한다.
+- 적용 시점: S 생성·재사용(둘 다 BASE·lock 확인과 snapshot 읽기·쓰기 전에 검사해 `unsafe path: {목록}`으로 exit 1, 파일 생성·변경 없음), loader(snapshot 파일 symlink), 현재 상태 수집(`takeCurrent`의 `unsafe`, 하나라도 있으면 hash하지 않음), 종료 gate(C·CLI는 unsafe가 있으면 변경 판정 없이 실패).
+- 판정(시작·현재 합집합 p, allow·EXEMPT 제외): hash 다르면 tests 안 `tests-changed:{p}`, 밖 `outside-tests:{p}`(같은 ` M`에서 내용만 바뀜, 삭제, 시작 시 수정 상태의 원복 모두 거부). hash 같고 xy 다르면 `status-changed:{p}`. 시작에 없던 RUNTIME 경로가 status에 보이면 `runtime-visible:{p}`. `--require-absent` 경로가 시작 기록에 있으면 `snapshot-not-first:{p}`. 순서: snapshot-not-first → 정렬된 unsafe(있으면 이후 판정 생략) → 경로 오름차순 변경 → runtime-visible.
 - Git은 `status`, `ls-files`, `rev-parse` 읽기만. python3 표준 라이브러리만.
 
 schema (strict, schemaVersion 1) — 생성·재사용·loader가 모두 같은 규칙으로 검증한다:
+- JSON 파싱 공통: 모든 깊이의 중복 key, `NaN`·`Infinity`·`-Infinity`는 `invalid json`. Python은 `json.load(f, object_pairs_hook=no_dup, parse_constant=no_const)`, JS는 `JSON.parse` 성공 뒤 `scanJsonTopLevel`(중복 key throw)로 같은 판정을 낸다.
 - 키 집합 정확히 `schemaVersion, stepId, projectRoot, head, base, harness, statusZHex, xy, files`.
-- `schemaVersion`: 정수 1만 허용. Python은 `type(v) is int and v == 1`(true·1.0 거부). JavaScript는 `Number.isInteger(v) && v === 1`이고, `JSON.parse`가 `1.0`을 `1`로 바꾸므로 원문 JSON 텍스트에서 `"schemaVersion"` 값 토큰이 정확히 `1`인지(`/"schemaVersion"\s*:\s*1\s*[,}]/`, `1.0`·`1e0`·`true` 불일치) 함께 확인한다.
+- `schemaVersion`: 최상위 키로 정확히 한 번 있고 값의 lexical token이 정수 리터럴 `1`. Python은 `type(v) is int and v == 1`(중복 key를 거부한 상태에서 Python이 int 1을 만드는 JSON 토큰은 `1`뿐이므로 lexical 판정과 같다. true·1.0·1e0 거부). JS는 `Number.isInteger(v) && v === 1` 그리고 `scanJsonTopLevel` 결과에서 key가 `schemaVersion`인 항목이 정확히 1개이고 그 token이 정확히 `'1'`. 전역 정규식 검색은 쓰지 않으며 중첩 객체·문자열 안의 `schemaVersion`은 판정에 쓰지 않는다.
 - stepId는 `step{N}` | `axe-remediation-{id}` | 테스트 전용 `parity-{숫자}`, 파일은 `tests/.tmp/start-snapshot-{stepId}.json`. projectRoot = `git rev-parse --show-toplevel` realpath(cwd가 다르면 실패). head = `git rev-parse HEAD`. base = BASE(`rev-parse --verify BASE^{commit}` 성공 필요). harness = 중앙 identity 3값 + `.harness/harness.lock.json` sha256(`lockSha256`), lock 내용에 3값이 모두 있어야 한다.
 - `statusZHex`: 문자열, 짝수 길이, 소문자 hex만. 디코드한 bytes를 NUL 레코드로 엄격 파싱(각 레코드 길이 ≥ 4, 세 번째 바이트 공백, R/C면 비어 있지 않은 다음 필드가 origPath)한다.
 - `xy`: 파싱 결과(path와 origPath 모두 → xy)와 정확히 같아야 한다.
-- `files`: 객체, 값은 소문자 64자리 hex SHA-256 또는 null. 파싱된 status의 비runtime 경로는 모두 `files`의 key여야 한다.
-- 검증 실패 메시지: `bad start snapshot: {keys|schemaVersion|statusZHex|status parse|xy|files|files/status|invalid json}: <path>`, identity 차이 `start snapshot identity mismatch: {field}`.
+- `files`: 객체, 값은 소문자 64자리 hex SHA-256 또는 null(경로 없음). 파싱된 status의 비SKIP 경로는 모두 `files`의 key여야 한다.
+- 검증 실패 메시지: `bad start snapshot: {keys|schemaVersion|statusZHex|status parse|xy|files|files/status|invalid json}: <path>`, identity 차이 `start snapshot identity mismatch: {field}`, 경로 안전 `unsafe path: {symlink:p|non-regular:p, ...}`.
+
+`scanJsonTopLevel(rawText) → Array<{ key, token }>` (JS, step 1, `JSON.parse`가 성공한 텍스트에만 호출):
+- 위치 i를 앞에서부터 한 번 훑는다. 공백(space, tab, LF, CR)은 건너뛴다. 큰따옴표를 만나면 백슬래시 다음 1문자를 건너뛰며 닫는 큰따옴표까지를 문자열 slice로 읽는다(문자열 안의 괄호·쉼표·콜론은 구조로 보지 않는다).
+- 스택 원소는 `{ kind: 'object' | 'array', keys: Set, expectKey }`. `{`·`[`는 push, `}`·`]`는 pop. object에서 key 위치의 문자열 slice는 `JSON.parse(slice)`로 디코드하고(이스케이프된 `schema\u0056ersion`도 `schemaVersion`), 그 object의 keys에 이미 있으면 `Error('duplicate key: {key}')`.
+- 스택 깊이 1(최상위 객체)의 멤버는 `:` 뒤 값 시작 위치부터 깊이 1로 돌아와 만나는 `,` 또는 `}` 직전까지를 trim한 원문 slice를 token으로 기록한다(값이 객체·배열이면 그 전체 원문).
+- 최상위가 객체가 아니면 `[]`. 반환 순서는 원문 순서. 입력을 바꾸지 않는다.
 
 최초 실행·재시도 계약:
-- 최초: 파일이 없으면 수집 후 exclusive create(`open(..., 'x')`), `start-snapshot: created <path>`.
-- 재시도(중간 실패 뒤 포함): 파일이 있으면 새로 수집하지 않고 위 strict schema 전체와 identity 필드를 현재 값과 비교한다. 모두 같으면 최초 baseline을 그대로 재사용하고 `start-snapshot: reused <path>`, exit 0. 아니면 exit 1.
+- 최초: 파일이 없으면 경로 안전 검사 후 수집하고 exclusive create(`open(..., 'x')`), `start-snapshot: created <path>`.
+- 재시도(중간 실패 뒤 포함): 파일이 있으면 경로 안전 검사 후 새로 수집하지 않고 위 strict schema 전체와 identity 필드를 현재 값과 비교한다. 모두 같으면 최초 baseline을 그대로 재사용하고 `start-snapshot: reused <path>`, exit 0. 아니면 exit 1.
 - 어떤 경우에도 기존 snapshot을 덮어쓰기·삭제·재기준화하지 않는다. 실패해도 bytes 불변. 불일치는 하네스 조치·재계획 사유로 보고한다.
 - gate는 항상 최초 snapshot과 비교한다. step 0의 `tests/`·루트 package.json 부재와 `--require-absent`도 최초 snapshot 기준이다.
 
-스크립트 S — step 0은 어떤 파일보다 먼저 `python3 -I - step0 <<'PY'` + 아래 본문 + `PY`로 실행하고, 같은 본문을 바이트 그대로 `tests/scripts/start-snapshot.py`에 저장한다. step 1 이후 첫 동작은 `python3 -I tests/scripts/start-snapshot.py step{N}`(재시도도 동일).
+스크립트 S — step 0은 어떤 파일보다 먼저 `python3 -I - step0 <<'PY'` + 아래 본문 + `PY`로 실행하고, 같은 본문을 바이트 그대로 `tests/scripts/start-snapshot.py`에 저장한다. step 1 이후 첫 동작은 `python3 -I tests/scripts/start-snapshot.py step{N}`(재시도도 동일). 경로 안전 검사가 BASE 확인보다 먼저이므로 BASE가 없는 합성 저장소에서도 symlink 거부를 실행 검증할 수 있다.
 
 ```
-import hashlib, json, os, re, subprocess, sys
+import hashlib, json, os, re, stat, subprocess, sys
 RUNTIME = ('tests/node_modules/', 'tests/.npm-cache/', 'tests/.pw-browsers/', 'tests/.tmp/', 'tests/test-results/', 'tests/playwright-report/', 'tests/screenshots/')
+SKIP = RUNTIME + ('.git/', '.venv/')
 BASE = 'd0a8a6e462bc1366757b1401c3ba7aeb0fbf391d'
 HARNESS = {'sourceCommit': 'cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae', 'manifestHash': '287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a', 'distributionVersion': '2.0.0'}
 KEYS = {'schemaVersion', 'stepId', 'projectRoot', 'head', 'base', 'harness', 'statusZHex', 'xy', 'files'}
@@ -265,10 +275,34 @@ if not re.fullmatch('step[0-9]+|axe-remediation-[a-z0-9]+(-[a-z0-9]+)*|parity-[0
 OUT = 'tests/.tmp/start-snapshot-' + STEP + '.json'
 def git(*args):
     return subprocess.run(['git', *args], check=True, capture_output=True).stdout
+def unsafe(items):
+    sys.exit('unsafe path: ' + ','.join(items))
+def scan():
+    bad, found = [], []
+    for top, dirs, names in os.walk('.'):
+        rel = '' if top == '.' else top[2:] + '/'
+        keep = []
+        for d in dirs:
+            if os.path.islink(rel + d):
+                bad.append('symlink:' + rel + d)
+            elif not (rel + d + '/').startswith(SKIP):
+                keep.append(d)
+        dirs[:] = keep
+        for n in names:
+            if os.path.islink(rel + n):
+                bad.append('symlink:' + rel + n)
+            elif (rel + n).startswith('tests/'):
+                found.append(rel + n)
+    return sorted(bad), found
 def digest(p):
-    if os.path.isfile(p) and not os.path.islink(p):
-        return hashlib.sha256(open(p, 'rb').read()).hexdigest()
-    return None
+    try:
+        mode = os.lstat(p).st_mode
+    except FileNotFoundError:
+        return None
+    if not stat.S_ISREG(mode):
+        unsafe([('symlink:' if stat.S_ISLNK(mode) else 'non-regular:') + p])
+    with os.fdopen(os.open(p, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()
 def parse_status(raw):
     recs = raw.split(bytes(1))
     if recs and recs[-1] == b'':
@@ -292,9 +326,19 @@ def fail(what):
     sys.exit('bad start snapshot: ' + what + ': ' + OUT)
 def version_ok(v):
     return type(v) is int and v == 1
+def no_dup(pairs):
+    keys = [k for k, _ in pairs]
+    if len(keys) != len(set(keys)):
+        raise ValueError('duplicate key')
+    return dict(pairs)
+def no_const(name):
+    raise ValueError('json constant ' + name)
 root = os.path.realpath(git('rev-parse', '--show-toplevel').decode().strip())
 if os.path.realpath(os.getcwd()) != root:
     sys.exit('run from project root: ' + root)
+bad, found = scan()
+if bad:
+    unsafe(bad)
 git('rev-parse', '--verify', BASE + '^{commit}')
 lock = open('.harness/harness.lock.json', encoding='utf-8').read()
 if any(v not in lock for v in HARNESS.values()):
@@ -302,9 +346,12 @@ if any(v not in lock for v in HARNESS.values()):
 ident = {'schemaVersion': 1, 'stepId': STEP, 'projectRoot': root, 'head': git('rev-parse', 'HEAD').decode().strip(), 'base': BASE, 'harness': dict(HARNESS, lockSha256=digest('.harness/harness.lock.json'))}
 if not version_ok(ident['schemaVersion']):
     fail('schemaVersion')
+if os.path.islink(OUT):
+    unsafe(['symlink:' + OUT])
 if os.path.lexists(OUT):
     try:
-        old = json.load(open(OUT, encoding='utf-8'))
+        with open(OUT, encoding='utf-8') as f:
+            old = json.load(f, object_pairs_hook=no_dup, parse_constant=no_const)
     except (OSError, ValueError):
         fail('invalid json')
     if not isinstance(old, dict) or set(old) != KEYS:
@@ -322,7 +369,7 @@ if os.path.lexists(OUT):
         fail('xy')
     if not isinstance(ofiles, dict) or any(not (v is None or (isinstance(v, str) and HEX64.fullmatch(v))) for v in ofiles.values()):
         fail('files')
-    if any(p not in ofiles for p in parsed if not p.startswith(RUNTIME)):
+    if any(p not in ofiles for p in parsed if not p.startswith(SKIP)):
         fail('files/status')
     for k in sorted(ident):
         if old[k] != ident[k]:
@@ -332,22 +379,20 @@ if os.path.lexists(OUT):
 os.makedirs('tests/.tmp', exist_ok=True)
 status = git('status', '--porcelain=v1', '-z', '--untracked-files=all')
 xy = parse_status(status)
-paths = set(xy)
+paths = set(xy) | set(found)
 paths.update(p.decode() for p in git('ls-files', '-z').split(bytes(1)) if p)
-for top, dirs, names in os.walk('tests'):
-    dirs[:] = [d for d in dirs if not (top + '/' + d + '/').startswith(RUNTIME)]
-    paths.update(top + '/' + n for n in names)
-files = {p: digest(p) for p in sorted(paths) if not p.startswith(RUNTIME)}
+files = {p: digest(p) for p in sorted(paths) if not p.startswith(SKIP)}
 with open(OUT, 'x', encoding='utf-8') as f:
     json.dump(dict(ident, statusZHex=status.hex(), xy=xy, files=files), f, indent=1, sort_keys=True)
 print('start-snapshot: created ' + OUT)
 ```
 
-inline 범위 검사 C — step 0·1 종료 검사. 반드시 직전에 S `reused`(strict schema + 현재 identity 대조)를 통과한 뒤 실행한다. 실행: `python3 -I - <stepId> '<allow 쉼표 목록>' '<require-absent 쉼표 목록>' <<'PY'` + 아래 본문 + `PY`. 위반이면 stderr 목록 + exit 1, 아니면 `scope-snapshot: OK`. 현재 status 원문을 `<snapshot 이름>-after.z`에 쓴다(snapshot 자체는 쓰지 않음).
+inline 범위 검사 C — step 0~3 종료 검사. 반드시 직전에 S `reused`(경로 안전 + strict schema + 현재 identity 대조)를 통과한 뒤 실행한다. 실행: `python3 -I - <stepId> '<allow 쉼표 목록>' '<require-absent 쉼표 목록>' <<'PY'` + 아래 본문 + `PY`. 위반이면 stderr 목록 + exit 1, 아니면 `scope-snapshot: OK`. 현재 status 원문을 `<snapshot 이름>-after.z`에 쓴다(snapshot 자체는 쓰지 않음).
 
 ```
-import hashlib, json, os, subprocess, sys
+import hashlib, json, os, stat, subprocess, sys
 RUNTIME = ('tests/node_modules/', 'tests/.npm-cache/', 'tests/.pw-browsers/', 'tests/.tmp/', 'tests/test-results/', 'tests/playwright-report/', 'tests/screenshots/')
+SKIP = RUNTIME + ('.git/', '.venv/')
 EXEMPT = ('.harness/', '.venv/', 'phases/HOO-81-portfolio-redesign/')
 GUARDED = ('.harness/harness.lock.json', '.harness/policy.json')
 KEYS = {'schemaVersion', 'stepId', 'projectRoot', 'head', 'base', 'harness', 'statusZHex', 'xy', 'files'}
@@ -355,7 +400,14 @@ STEP = sys.argv[1]
 START = 'tests/.tmp/start-snapshot-' + STEP + '.json'
 allow = {p for p in sys.argv[2].split(',') if p}
 absent = {p for p in sys.argv[3].split(',') if p}
-start = json.load(open(START, encoding='utf-8'))
+def no_dup(pairs):
+    keys = [k for k, _ in pairs]
+    if len(keys) != len(set(keys)):
+        raise ValueError('duplicate key')
+    return dict(pairs)
+if os.path.islink(START):
+    sys.exit('unsafe path: symlink:' + START)
+start = json.load(open(START, encoding='utf-8'), object_pairs_hook=no_dup)
 if not isinstance(start, dict) or set(start) != KEYS or start['stepId'] != STEP:
     sys.exit('bad start snapshot: ' + START)
 def git(*args):
@@ -374,25 +426,48 @@ while i < len(recs):
     if code[0] in 'RC' or code[1] in 'RC':
         xy[recs[i].decode()] = code
         i += 1
-paths = set(xy) | set(start['files'])
-paths.update(p.decode() for p in git('ls-files', '-z').split(bytes(1)) if p)
-for top, dirs, names in os.walk('tests'):
-    dirs[:] = [d for d in dirs if not (top + '/' + d + '/').startswith(RUNTIME)]
-    paths.update(top + '/' + n for n in names)
+unsafe, found = [], []
+for top, dirs, names in os.walk('.'):
+    rel = '' if top == '.' else top[2:] + '/'
+    keep = []
+    for d in dirs:
+        if os.path.islink(rel + d):
+            unsafe.append('symlink:' + rel + d)
+        elif not (rel + d + '/').startswith(SKIP):
+            keep.append(d)
+    dirs[:] = keep
+    for n in names:
+        if os.path.islink(rel + n):
+            unsafe.append('symlink:' + rel + n)
+        elif (rel + n).startswith('tests/'):
+            found.append(rel + n)
 def digest(p):
-    if os.path.isfile(p) and not os.path.islink(p):
-        return hashlib.sha256(open(p, 'rb').read()).hexdigest()
-    return None
-files = {p: digest(p) for p in sorted(paths) if not p.startswith(RUNTIME)}
+    try:
+        mode = os.lstat(p).st_mode
+    except FileNotFoundError:
+        return None
+    if not stat.S_ISREG(mode):
+        unsafe.append(('symlink:' if stat.S_ISLNK(mode) else 'non-regular:') + p)
+        return None
+    with os.fdopen(os.open(p, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()
+files = {}
+if not unsafe:
+    paths = set(xy) | set(start['files']) | set(found)
+    paths.update(p.decode() for p in git('ls-files', '-z').split(bytes(1)) if p)
+    files = {p: digest(p) for p in sorted(paths) if not p.startswith(SKIP)}
 bad = ['snapshot-not-first:' + p for p in sorted(absent) if p in start['files'] or p in start['xy']]
-for p in sorted(files):
-    if p in allow or (p.startswith(EXEMPT) and p not in GUARDED):
-        continue
-    if start['files'].get(p) != files[p]:
-        bad.append(('tests-changed:' if p.startswith('tests/') else 'outside-tests:') + p)
-    elif start['xy'].get(p) != xy.get(p):
-        bad.append('status-changed:' + p)
-bad += ['runtime-visible:' + p for p in sorted(xy) if p.startswith(RUNTIME) and p not in start['xy']]
+if unsafe:
+    bad += sorted(set(unsafe))
+else:
+    for p in sorted(files):
+        if p in allow or (p.startswith(EXEMPT) and p not in GUARDED):
+            continue
+        if start['files'].get(p) != files[p]:
+            bad.append(('tests-changed:' if p.startswith('tests/') else 'outside-tests:') + p)
+        elif start['xy'].get(p) != xy.get(p):
+            bad.append('status-changed:' + p)
+    bad += ['runtime-visible:' + p for p in sorted(xy) if p.startswith(RUNTIME) and p not in start['xy']]
 with open(START[:-5] + '-after.z', 'wb') as f:
     f.write(status)
 if bad:
@@ -400,66 +475,72 @@ if bad:
 print('scope-snapshot: OK')
 ```
 
+설계 블록 추출 규칙(테스트용, 읽기 전용): 이 문서에서 `스크립트 S`로 시작하는 줄 다음 첫 fenced code block이 S 본문, `inline 범위 검사 C`로 시작하는 줄 다음 첫 fenced code block이 C 본문이다(여는·닫는 ``` 줄 제외, 끝 개행 1개 포함).
+
 비교 도구 `tests/scripts/scope-snapshot.mjs` (C와 같은 판정·문자열·순서):
-- step 1 (상태 수집, CLI 없음): 상수 `RUNTIME_PREFIXES`, `EXEMPT_PREFIXES`, `GUARDED_PATHS`, `SNAPSHOT_KEYS`, `STEP_ID_RE`, `HEX64_RE`, `BASE`, `HARNESS_IDENTITY`(3값), `STATUS_ARGS = ['status','--porcelain=v1','-z','--untracked-files=all']`, `LS_FILES_ARGS = ['ls-files','-z']`. `parseStatusZ(raw) → { xy, path, origPath }[]`(S의 `parse_status`와 같은 엄격 규칙, 오류 `Error('bad status record: ...')`). `statusXyMap(entries)`(path·origPath 모두). `isSchemaVersion1(value, rawText)` = `Number.isInteger(value) && value === 1` 그리고 원문 토큰 검사(§11.7 schema). `loadStartSnapshot(file)` — 위 strict schema 전체(S 재사용 분기와 같은 항목·순서·메시지 범주: keys, schemaVersion, stepId 형식·파일명 일치, statusZHex 소문자 짝수 hex, status parse, xy 일치, files 64hex|null, files/status), 반환 `{ stepId, identity: { schemaVersion, projectRoot, head, base, harness }, entries, xy, files }`, 오류 `Error('bad start snapshot: ...')`. `hashPath(path, { fs, root })`. `walkTests({ fs, root })`. `takeCurrent(start | null, { git, fs, root = process.cwd() }) → { entries, xy, files }`(root 기준 현재 status path·origPath ∪ start.files ∪ ls-files ∪ walk − RUNTIME; 시작 경로는 status에서 사라져도 다시 hash).
-- step 2 (identity 대조·판정·CLI):
+- step 1 (schema, CLI 없음): 상수 `RUNTIME_PREFIXES`, `SKIP_PREFIXES`, `EXEMPT_PREFIXES`, `GUARDED_PATHS`, `SNAPSHOT_KEYS`, `STEP_ID_RE`, `HEX64_RE`, `BASE`, `HARNESS_IDENTITY`(3값), `STATUS_ARGS = ['status','--porcelain=v1','-z','--untracked-files=all']`, `LS_FILES_ARGS = ['ls-files','-z']`. `parseStatusZ(raw) → { xy, path, origPath }[]`(S의 `parse_status`와 같은 엄격 규칙, 오류 `Error('bad status record: ...')`). `statusXyMap(entries)`(path·origPath 모두). `scanJsonTopLevel(rawText)`(위 정의). `isSchemaVersion1(value, token)` = `Number.isInteger(value) && value === 1 && token === '1'`. `loadStartSnapshot(file, { fs } = {})` 순서: `lstat`가 symlink면 `Error('unsafe path: symlink:{file}')` → 읽기·`JSON.parse` 실패 `invalid json` → `scanJsonTopLevel`의 duplicate key `invalid json` → 최상위 객체·키 집합 `keys` → 최상위 `schemaVersion` 항목 정확히 1개 && `isSchemaVersion1` 아니면 `schemaVersion` → stepId 형식·파일명 일치 → statusZHex → status parse → xy → files(64hex|null) → files/status(비SKIP). 오류는 `Error('bad start snapshot: {범주}: {file}')`(S와 같은 범주), 반환 `{ stepId, identity: { schemaVersion, projectRoot, head, base, harness }, entries, xy, files }`.
+- step 2 (상태 수집): `scanProject({ fs, root }) → { unsafe, testsFiles }`(root부터 `readdirSync(withFileTypes)`·`lstatSync`만 사용, SKIP 디렉터리 미진입이나 그 엔트리 자체가 symlink면 기록, 모든 symlink 엔트리 `symlink:{p}`, 정렬). `hashPath(path, { fs, root }) → string | null`(lstat ENOENT → null; 일반 파일이면 `openSync(abs, O_RDONLY | O_NOFOLLOW)`로 읽은 sha256; symlink면 `UnsafePathError('symlink:{p}')`; 그 밖 `UnsafePathError('non-regular:{p}')`; 대상을 읽거나 따라가지 않음). `takeCurrent(start | null, { git, fs, root = process.cwd() }) → { entries, xy, files, unsafe }`(scanProject unsafe가 있으면 hash하지 않고 `files: {}`; 없으면 현재 status path·origPath ∪ start.files ∪ ls-files ∪ testsFiles − SKIP을 hashPath, UnsafePathError는 unsafe에 모으고 하나라도 생기면 `files: {}`; 시작 경로는 status에서 사라져도 다시 hash).
+- step 3: 코드 추가 없음. 합성 저장소에서 symlink 거부를 S·C·`takeCurrent` 세 경로로 실행 검증한다.
+- step 4 (identity 대조·판정·CLI):
   - `computeIdentity({ git, fs, root = process.cwd() }) → { schemaVersion: 1, projectRoot, head, base, harness }` — S와 같은 규칙(`git rev-parse --show-toplevel` realpath가 root realpath와 다르면 throw, `git rev-parse HEAD`, `git rev-parse --verify BASE^{commit}` 실패 시 throw, lock 파일에 3값 포함 확인, `lockSha256`).
   - `checkIdentity(start, current) → string[]` — `schemaVersion`, `projectRoot`, `head`, `base`, `harness`(4개 하위 필드 전부 비교) 순서로 다른 필드마다 `identity-mismatch:{field}`. 순수.
-  - `diffAgainstStart(start, current) → Change[]`(`{ path, kind: new|deleted|content-changed|status-changed, xyBefore, xyAfter(null 허용) }`, 순수). `classifyChanges(changes, { allow })`. `checkRuntimeVisible(start, current)`. `checkSnapshotFirst(start, paths)`. `evaluateGate(start, current, { allow, requireAbsent })`.
-  - CLI `--check <start.json> --allow <list> [--require-absent <list>]` 실행 순서: (1) `loadStartSnapshot`(strict schema) → (2) `computeIdentity` + `checkIdentity` — 실패하면 stderr `start snapshot identity mismatch: {field}`(또는 schema 오류)로 exit 1, 이때 어떤 파일도 쓰지 않는다(after.z 미생성, snapshot·프로젝트 bytes 불변) → (3) `takeCurrent`, after.z 저장, `evaluateGate`; 위반 시 stderr + exit 1, 아니면 `scope-snapshot: OK`. snapshot을 만들거나 고치지 않는다.
+  - `diffAgainstStart(start, current) → Change[]`(`{ path, kind: new|deleted|content-changed|status-changed, xyBefore, xyAfter(null 허용) }`, 순수). `classifyChanges(changes, { allow })`. `checkRuntimeVisible(start, current)`. `checkSnapshotFirst(start, paths)`. `evaluateGate(start, current, { allow, requireAbsent })`(current.unsafe가 있으면 snapshot-not-first 다음 정렬된 unsafe만 반환하고 변경 판정 생략; allow는 unsafe를 면제하지 않음).
+  - CLI `--check <start.json> --allow <list> [--require-absent <list>]` 실행 순서: (1) `loadStartSnapshot`(경로 안전 + strict schema) → (2) `computeIdentity` + `checkIdentity` — 실패하면 stderr `start snapshot identity mismatch: {field}`(또는 schema 오류)로 exit 1, 이때 어떤 파일도 쓰지 않는다(after.z 미생성, snapshot·프로젝트 bytes 불변) → (3) `takeCurrent`, after.z 저장, `evaluateGate`; 위반 시 stderr + exit 1, 아니면 `scope-snapshot: OK`. snapshot을 만들거나 고치지 않는다.
 
 테스트 격리 규칙:
-- 실제 저장소에 쓰는 테스트 산출물은 runtime 경로만 쓴다: snapshot 테스트는 `tests/.tmp/start-snapshot-parity-{숫자}.json`, retry probe는 정확히 `tests/.tmp/snapshot-probes/__retry_probe.txt`. 실제 저장소에 새 비runtime 파일을 만들지 않는다.
-- 비runtime 파일 hash 수집과 rename 상태는 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`에서 검증한다(§12 예외).
+- 실제 저장소에 쓰는 테스트 산출물은 runtime 경로만 쓴다: snapshot 테스트는 `tests/.tmp/start-snapshot-parity-{숫자}.json`(symlink 거부 테스트용 링크 포함), retry probe는 정확히 `tests/.tmp/snapshot-probes/__retry_probe.txt`. 실제 저장소에 새 비runtime 파일이나 symlink를 만들지 않는다.
+- 비runtime 파일 hash 수집, rename 상태, 비runtime symlink 거부는 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`에서 검증한다(§12 예외). symlink 대상 파일은 `tests/.tmp/synthetic-repos/<pid>-outside/`에 두고, 내용에 고유 sentinel 문자열을 넣어 어떤 출력·snapshot·after.z에도 나타나지 않음을 확인한다.
 - 실제 저장소를 읽는 parity와 probe 테스트의 경합은 §11.4 `workers: 1`로 제거한다.
 
 ## 12. 변경 허용 경로와 운영 경계
 
 - index.json allowedPaths: `index.html`, `css/style.css`, `css/themes.css`, `js/main.js`, `js/data.js`, `tests/` (Harness managed·policy·lock·state 제외). 각 step의 tracked 허용 파일 = 범위 gate `--allow`. fixtures는 정확한 파일 단위로만 허용한다.
-- `index.html` 구조 변경은 step 23·24·25, 속성 변경은 remediation 그룹 step만. `css/themes.css`는 remediation 그룹 step만.
+- `index.html` 구조 변경은 step 25·26·27, 속성 변경은 remediation 그룹 step만. `css/themes.css`는 remediation 그룹 step만.
 - 빌더 허용 명령: Git 읽기(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object), §11.7 snapshot·검사. 하네스 전용: 프로젝트 저장소의 Git 상태 변경(init, checkout, switch, add, commit, mv, push, reset, stash, merge, rebase, tag 등), Harness 운영 명령(`harness --project-root . check|plan-session|review-plan|approval|runner`). main 직접 변경·merge·deploy 금지.
-- 합성 저장소 예외: 테스트 코드는 `tests/.tmp/synthetic-repos/<pid>/` 아래 일회용 저장소에서만 Git 변경 명령 `git -C <dir> init -q`, `git -C <dir> add -A` 또는 정확한 경로 지정 `add`, `git -C <dir> -c user.name=t -c user.email=t@example.invalid commit -q -m <msg>` 세 가지를 실행할 수 있다. `git mv`를 포함한 그 밖의 Git 변경 명령은 쓰지 않는다. 파일 이동·삭제는 Node `fs`(또는 Python 파일시스템 API)로 하고 `add`로 stage한다. 프로젝트 저장소의 index·refs·worktree는 건드리지 않고, 테스트 종료 시 디렉터리를 지운다.
+- 합성 저장소 예외: 테스트 코드는 `tests/.tmp/synthetic-repos/<pid>/` 아래 일회용 저장소에서만 Git 변경 명령 `git -C <dir> init -q`, `git -C <dir> add -A` 또는 정확한 경로 지정 `add`, `git -C <dir> -c user.name=t -c user.email=t@example.invalid commit -q -m <msg>` 세 가지를 실행할 수 있다. `git mv`를 포함한 그 밖의 Git 변경 명령은 쓰지 않는다. 파일 이동·삭제·symlink 생성은 Node `fs`(또는 Python 파일시스템 API)로 하고 `add`로 stage한다. 권한 변경(chmod 등)은 하지 않는다. 프로젝트 저장소의 index·refs·worktree는 건드리지 않고, 테스트 종료 시 `<pid>`와 `<pid>-outside` 디렉터리를 지운다.
 - 빌더 수정 금지: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, 시작 snapshot 파일.
 
 ## 13. Step 목록 (각 20분 이하, snapshot·gate·검증·디버깅 포함, 종료 시 기본 testCommand 통과)
 
 | # | name | 예상 | 선행 |
 |---|---|---|---|
-| 0 | tests-env-bootstrap | 20 | 없음 |
-| 1 | scope-snapshot-state | 19 | 0 |
-| 2 | scope-snapshot-gate | 20 | 0~1 |
-| 3 | tests-browser-smoke | 15 | 0~2 |
-| 4 | scope-paths | 19 | 0~3 |
-| 5 | scope-content | 19 | 0~4 |
-| 6 | content-data-baseline | 16 | 0~5 |
-| 7 | content-static-baseline | 17 | 0~6 |
-| 8 | modal-regression | 18 | 0~7 |
-| 9 | ui-regression | 17 | 0~8 |
-| 10 | axe-canonical | 19 | 0~9 |
-| 11 | axe-prepare-page | 15 | 0~10 |
-| 12 | axe-prepare-modal | 18 | 0~11 |
-| 13 | axe-prepare-lightbox | 19 | 0~12 |
-| 14 | axe-collect-tooling | 19 | 0~13 |
-| 15 | axe-baseline-regression | 19 | 0~14 |
-| 16 | axe-baseline-projection | 17 | 0~15 |
-| 17 | axe-remediation-plan-schema | 17 | 0~16 |
-| 18 | axe-plan-executable | 15 | 0~17 |
-| 19 | axe-current-checks | 17 | 0~18 |
-| 20 | axe-regression-prune | 19 | 0~19 |
-| 21 | axe-collect | 17 | 0~20 |
-| 22 | axe-classify | ≤20 (초과 시 재계획) | 0~21 |
-| 23 | featured-projects | 19 | 0~22 |
-| 24 | hero-first-screen | 20 | 0~23 |
-| 25 | section-structure | 19 | 0~24 |
-| 26 | section-layout | 16 | 0~25 |
-| 27 | focus-trap-modal | 17 | 0~26 |
-| 28 | focus-trap-lightbox | 17 | 0~27 |
-| 29 | print-pdf | 16 | 0~28 |
-| 30 | axe-remediation-gate | 18 | 0~29 |
-| (재계획) | axe-remediation-{id} | ≤20 | 30 |
-| 31 | axe-remediation-recheck | 18 | 0~30 + 재계획 그룹 |
-| 32 | axe-finalize | 16 | 0~31 |
-| 33 | final-verification | 16 | 0~32 |
+| 0 | tests-env-bootstrap | 18 | 없음 |
+| 1 | scope-snapshot-schema | 18 | 0 |
+| 2 | scope-snapshot-state | 19 | 0~1 |
+| 3 | scope-snapshot-symlink | 17 | 0~2 |
+| 4 | scope-snapshot-gate | 20 | 0~3 |
+| 5 | tests-browser-smoke | 15 | 0~4 |
+| 6 | scope-paths | 19 | 0~5 |
+| 7 | scope-content | 19 | 0~6 |
+| 8 | content-data-baseline | 16 | 0~7 |
+| 9 | content-static-baseline | 17 | 0~8 |
+| 10 | modal-regression | 18 | 0~9 |
+| 11 | ui-regression | 17 | 0~10 |
+| 12 | axe-canonical | 19 | 0~11 |
+| 13 | axe-prepare-page | 15 | 0~12 |
+| 14 | axe-prepare-modal | 18 | 0~13 |
+| 15 | axe-prepare-lightbox | 19 | 0~14 |
+| 16 | axe-collect-tooling | 19 | 0~15 |
+| 17 | axe-baseline-regression | 19 | 0~16 |
+| 18 | axe-baseline-projection | 17 | 0~17 |
+| 19 | axe-remediation-plan-schema | 17 | 0~18 |
+| 20 | axe-plan-executable | 15 | 0~19 |
+| 21 | axe-current-checks | 17 | 0~20 |
+| 22 | axe-regression-prune | 19 | 0~21 |
+| 23 | axe-collect | 17 | 0~22 |
+| 24 | axe-classify | ≤20 (초과 시 재계획) | 0~23 |
+| 25 | featured-projects | 19 | 0~24 |
+| 26 | hero-first-screen | 20 | 0~25 |
+| 27 | section-structure | 19 | 0~26 |
+| 28 | section-layout | 16 | 0~27 |
+| 29 | focus-trap-modal | 17 | 0~28 |
+| 30 | focus-trap-lightbox | 17 | 0~29 |
+| 31 | print-pdf | 16 | 0~30 |
+| 32 | axe-remediation-gate | 18 | 0~31 |
+| (재계획) | axe-remediation-{id} | ≤20 | 32 |
+| 33 | axe-remediation-recheck | 18 | 0~32 + 재계획 그룹 |
+| 34 | axe-finalize | 16 | 0~33 |
+| 35 | final-verification | 16 | 0~34 |
 
 ## 14. 빌더 재량
 
@@ -471,7 +552,7 @@ print('scope-snapshot: OK')
 2. read-only: §12 빌더 수정 금지 목록.
 3. 명령 권한: §12.
 4. 실행: npm·node는 `sh tests/scripts/with-env.sh <명령>`(step 0은 래퍼 작성 뒤부터). Playwright는 항상 config의 `workers: 1`로 실행한다.
-5. 첫 동작: 어떤 파일도 쓰기 전에 §11.7 시작 snapshot(`python3 -I tests/scripts/start-snapshot.py step{N}`, step 0은 heredoc S). 출력이 `created` 또는 `reused`가 아니면 중단·보고. 재시도도 같은 명령으로 최초 baseline을 재사용한다.
+5. 첫 동작: 어떤 파일도 쓰기 전에 §11.7 시작 snapshot(`python3 -I tests/scripts/start-snapshot.py step{N}`, step 0은 heredoc S). 출력이 `created` 또는 `reused`가 아니면(`unsafe path` 포함) 중단·보고. 재시도도 같은 명령으로 최초 baseline을 재사용한다.
 6. runtime 쓰기 기본 R0: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`. step이 추가 경로를 명시할 수 있다.
-7. 공통 수정 금지: tests 밖 파일(step이 사이트 파일을 명시한 경우 그 범위만), step 허용 목록 밖 tests 파일, 이전 step이 만든 함수의 동작, 시작 snapshot.
-8. 종료 조건: 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 환경변수 없이 통과하고, AC 마지막 §11.7 범위 gate가 identity 대조를 거쳐 통과한다(`--allow` = step의 tracked 허용 파일 목록).
+7. 공통 수정 금지: tests 밖 파일(step이 사이트 파일을 명시한 경우 그 범위만), step 허용 목록 밖 tests 파일, 이전 step이 만든 함수의 동작, 시작 snapshot, 비runtime 경로의 symlink 생성.
+8. 종료 조건: 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 환경변수 없이 통과하고, AC 마지막 §11.7 범위 gate가 identity 대조·경로 안전 검사를 거쳐 통과한다(`--allow` = step의 tracked 허용 파일 목록).

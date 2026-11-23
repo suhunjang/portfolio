@@ -1,18 +1,19 @@
-# Step 8 — modal-regression
+# Step 8 — content-data-baseline
 
-- 목적: modal.js helper와 모달·lightbox 회귀(BASE 사이트에서 통과).
-- 예상 18분 / 선행 0~7 / 공통 절차 설계 §15
-- read-first: 설계 §3(모달, lightbox), §5(같은 data-project), §7.4, §11.4
-- tracked 허용(exact): `tests/helpers/modal.js`(신규), `tests/specs/modal-regression.spec.js`(신규)
+- 목적: BASE data·index fixture 생성과 데이터 보존 검사.
+- 예상 16분 / 선행 0~7 / 공통 절차 설계 §15
+- read-first: 설계 §3, §7.1, §7.2-1, §7.3
+- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` script 추가만)
 - runtime: R0
-- 금지: §15.7, 테마·메뉴·scrollspy·typing·reduced-motion(step 9)
+- 금지: §15.7, `extractStatic`(step 9)
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step8`
-2. `modal.js`: 설계 §7.4 계약 그대로(`GRID_CARD`, `gridCard`, `openFirstProjectByClick/Enter`, `closeVia`, `expectFocused`, `modalTitle`, `findProjectWithShots`).
-3. `modal-regression.spec.js`(6 project): click·Enter로 열기, 제목 일치, `modal-open`; button·backdrop·esc 닫기 후 트리거 포커스 복귀·`modal-open` 해제; desktop lightbox: `findProjectWithShots` index 반환·탐색 후 닫힘·그 카드에서 `.shot-zoom`으로 열림; Esc 1회 lightbox만, 2회 모달.
+2. `make-fixtures.mjs`: `git show BASE:js/data.js`를 vm 평가 → `baseline-data.json`, `git show BASE:index.html` → `baseline-index.html`(step 9용). `fixtures` script 추가 후 실행.
+3. `content.js`: `norm`, `readLiveData`, `normalizeFeatured`(structuredClone, index 1·5·7만, 그 밖·true 아님은 throw), JSDoc typedef.
+4. `content-data.spec.js`(6 project, collector 고정 순서): normalizeFeatured 입력 불변·금지 index throw; `normalizeFeatured(await readLiveData(page))` = baseline deep-equal; featured 없음 또는 1·5·7만; email·phone·social 빈 값; 렌더 개수 stats 4, timeline = CAREER 길이, project-card 13, strengths 6, project-title 배열 = baseline.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- modal-regression.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step8.json --allow tests/helpers/modal.js,tests/specs/modal-regression.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step8.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0

@@ -1,19 +1,19 @@
-# Step 25 — section-structure
+# Step 25 — featured-projects
 
-- 목적: 섹션 순서·nav·kicker·heading 재구성(§6).
+- 목적: 대표 프로젝트 3개 카드와 모달 연결.
 - 예상 19분 / 선행 0~24 / 공통 절차 설계 §15
-- read-first: 설계 §5(컨테이너), §6, §7, §8.3(canonical 안정성, 회귀), §11.4; content-exceptions final, baseline canonical
-- tracked 허용(exact): `index.html`(hero 밖 섹션·nav·scroll-hint), `js/main.js`(스크롤스파이 배열과 skill-group h4만), `tests/specs/structure.spec.js`
+- read-first: 설계 §5(컨테이너·카드·함수·data.js), §7, §8.3(회귀); projectGrid 렌더, `openProjectModal`, `lastFocused`, 위임, data.js 1·5·7
+- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤에 정확한 `#heroFeatured` 마크업 추가만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, `#heroFeatured` 위임만), `css/style.css`(`.featured-card`, `.featured-title`, `.featured-blurb`만), `tests/specs/featured.spec.js`
 - runtime: R0
-- 금지: §15.7, `css/*`, `js/data.js`, hero 내부, 표에 없는 문구
+- 금지: §15.7, `css/themes.css`, hero의 그 밖 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
 
 ## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step25`
-2. `structure.spec.js`(6 project): 섹션·nav·kicker·h2가 §6과 일치, subsection h3 1개, skillsGrid는 about 안·h4, contact·scroll-hint, heading 계층, `#heroFeatured` 유지, desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#about"]'); await link.click(); await expect(link).toHaveClass(/active/);`.
-3. index.html: 섹션 subtree 통째 이동(anchor 보존), kicker, Stack &amp; Contact 분리, nav·scroll-hint·section-alt. main.js: 배열과 h4.
-4. axe canonical 점검: 식별 손실이면 중단·재계획, 새 요소 신규 위반은 허용 파일 안에서 수정, 자동 편입 금지.
+2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드별 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter 열고 esc 닫기 복귀; 대표 카드가 생긴 뒤에도 `findProjectWithShots`와 `prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용(닫은 뒤 복귀 대상이 grid 카드).
+3. data.js 3줄, index.html 마크업, main.js(`esc()` 이스케이프 span만, 그리드 직후 호출, `(idx, card)` 호출, 위임), style.css(토큰만).
+4. axe 새 target: 이 step 마크업 때문이면 허용 파일 안에서 고치고, 식별 손실이면 중단·재계획.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step25.json --allow index.html,js/main.js,tests/specs/structure.spec.js` → exit 0, content-static.spec에서 final 성립
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step25.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0

@@ -1,17 +1,17 @@
-# Step 19 — axe-current-checks
+# Step 19 — axe-remediation-plan-schema
 
-- 목적: 현재 수집 결과 판정(group done, coverage, 위반 0).
+- 목적: remediation plan 스키마 검증.
 - 예상 17분 / 선행 0~18 / 공통 절차 설계 §15
-- read-first: 설계 §8.3(entry key, step 19, gate·recheck·finalize·재계획 계약)
+- read-first: 설계 §8.3(step 19, plan 규칙)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 10·14~18 동작, 실제 fixtures
+- 금지: §15.7, step 12·16~18 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step19`
-2. 설계 §8.3 step 19 계약 구현.
-3. spec(desktop-dark): checkGroupDone 사라짐 done, lightbox에만 남음 remaining 1(`lightbox:desktop-*:*`), 다른 그룹 잔여 무영향, unknown·형식 오류 id throw, collected `{}` throw; checkCollectedCoverage 전부 포함 ok, plan 밖 1개 uncovered, 빈 groups + 잔여 uncovered, 입력 불변; countCollectedTargets `[]` 0, 2+1 → 3, 같은 target 두 entry → 2; CLI group-done done 0·remaining 1·unknown 1·없음 1, coverage 포함 0·잔여 1·없음 1, assert-no-violations `[]` 0·1개 1·없음 1; baseline과 수집에 같은 target이 남으면 checkRegression `[]`이어도 `--assert-no-violations` 1.
+2. 설계 §8.3 step 19 계약 구현(target 부분집합은 baseline 전체 canonical 합집합 기준).
+3. spec(desktop-dark): id 통과 `color-token-1`, `a`, `x2` / 거부 `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열; 중복 id 거부; 정상 통과; 다른 project의 같은 target을 한 그룹에 한 번 → coverage 통과; 거부 estMinutes 21·0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상, coverage 누락; requireEmpty 빈 통과·그룹 1개 오류; CLI 정상 0, plan 없음·JSON 오류·대문자 id·중복 id·coverage 누락·baseline 없음 1, `--require-empty` 빈 0·그룹 1개 1.
 
 ## AC
 

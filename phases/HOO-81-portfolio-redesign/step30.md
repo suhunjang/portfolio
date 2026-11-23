@@ -1,18 +1,18 @@
-# Step 30 — axe-remediation-gate
+# Step 30 — focus-trap-lightbox
 
-- 목적: 재수집·회귀 gate·plan 정리·coverage·실행 가능성 판정, remediation 재계획 입력 생성.
-- 예상 18분 / 선행 0~29 / 공통 절차 설계 §15
-- read-first: 설계 §7.2, §8.3(COLLECT_CHAIN, REGRESSION_GATE, step 18·20 도구, step 30 gate, 재계획 그룹 step 계약); baseline·plan 파일
-- tracked 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만, 손 편집 금지)
-- runtime: R0(COLLECT_DIR, `axe-current.json`)
-- 금지: §15.7, 사이트 파일, baseline·collected·helper·spec
+- 목적: lightbox trap 연결, 기존 Tab 리스너 제거, focus-visible.
+- 예상 17분 / 선행 0~29 / 공통 절차 설계 §15
+- read-first: 설계 §8.2(step 30); step 29 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 리스너, `.shot-zoom`, `:focus-visible`
+- tracked 허용(exact): `js/main.js`(lightbox 열기·닫기 trap 연결과 기존 Tab 리스너 제거만), `css/style.css`(`:focus-visible`만), `tests/specs/focus-lightbox.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, `index.html`, `js/data.js`, `css/themes.css`, trapFocus 시그니처와 모달 연결, focus-modal.spec
 
-## 작업 (step 31이 같은 절차를 재실행)
+## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step30`
-2. 아래 AC 체인을 순차 실행(병렬 금지). REGRESSION_GATE 실패 시 plan 불변으로 중단, coverage 실패는 자동 편입 없이 재계획 사유, `--check-executable` 실패는 remediation step 생성 없이 중단·재계획 사유.
-3. 결과 로그: groups `[]`이면 `remediation 불필요`, 그룹이 남고 모두 통과면 `Harness 재계획 필요`와 그룹별 상세. 그룹 step은 설계 §8.3 재계획 그룹 step 계약(첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`, gate `--check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`)대로 하네스가 30과 31 사이에 만든다.
+2. spec(desktop-dark/light) 먼저 실패 확인: grid 카드 모달 → `.shot-zoom` lightbox에서 Tab/Shift+Tab이 lightbox 안에서만 순환; Esc 1회 lightbox 닫힘·`.shot-zoom` 복귀·이후 모달 경계 순환; Esc 2회 모달 닫힘·트리거 복귀; lightbox 3회 열고 닫은 뒤에도 Tab 한 칸; 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 outline-style ≠ none.
+3. main.js: 열 때 push(`.shot-zoom`)·닫을 때 release, 기존 리스너 제거. style.css: outline 유지·보강(토큰만).
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --prune-plan --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-coverage --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step30.json --allow tests/fixtures/axe-remediation-plan.json` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step30.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → exit 0
