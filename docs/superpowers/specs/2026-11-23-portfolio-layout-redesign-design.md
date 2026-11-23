@@ -4,7 +4,7 @@
 - BASE: `d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d`
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
-- 리뷰 반영: 1차 Astra `1432c5274b33`(12건, 승인 1574220980048634010), 2차 `570513f95a2f`(7), 3차 `9e8c69018dc0`(4), 4차 `8014bc034fb4`(3), 5차 `9277e222d6c3`(4), 6차 `5331b1167a3c`(6), 7차 `e849940ab365`(6), 8차 `77397ef36423`(6), 9차 `1890a28bd4a9`(7), 10차 `754f651120b1`(4), 11차 `2e850c809ca8`(5), 12차 `a26257befcd4`(4), 13차 `b2608d1436cb`(3), 14차 `acc631d51b74`(3), 15차 `927fc70c685a`(2), 16차 `0c7077b8904f`(2), 17차 `6632b4fe978d`(3: snapshot 도구 분할, hero 지표 item 개별 검사, snapshot 재시도 계약), 18차 `496edfe61841`(4: 분류 대기 baseline 계약으로 모든 step 종료 시 기본 testCommand 통과, S 재사용 분기 strict 검증, retry probe를 runtime 경로로 이동·합성 tmp repo, Playwright `workers: 1` 직렬화). 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
+- 리뷰 반영: 1차 Astra `1432c5274b33`(12건, 승인 1574220980048634010), 2차 `570513f95a2f`(7), 3차 `9e8c69018dc0`(4), 4차 `8014bc034fb4`(3), 5차 `9277e222d6c3`(4), 6차 `5331b1167a3c`(6), 7차 `e849940ab365`(6), 8차 `77397ef36423`(6), 9차 `1890a28bd4a9`(7), 10차 `754f651120b1`(4), 11차 `2e850c809ca8`(5), 12차 `a26257befcd4`(4), 13차 `b2608d1436cb`(3), 14차 `acc631d51b74`(3), 15차 `927fc70c685a`(2), 16차 `0c7077b8904f`(2), 17차 `6632b4fe978d`(3), 18차 `496edfe61841`(4: 분류 대기 baseline 계약, S 재사용 strict 검증, runtime probe·합성 tmp repo, `workers: 1`), 19차 `a37a0eca1d41`(3: 합성 repo rename을 파일시스템 rename + add로 생성, CLI gate의 현재 identity 대조, schemaVersion 정수 1 엄격 판정). 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`이 고정): sourceCommit `cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae`, manifestHash `287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a`, distributionVersion 2.0.0
 
 ## 1. 의도
@@ -144,7 +144,7 @@ fixture:
 - step 22: 예상 = 묶음별(2분 + target × 1분) 합 + 6분. 20분 초과면 즉시 재계획. AC에 `--check-baseline-match`, `--check-executable`. blocked 그룹이 있으면 실패로 끝나고 재계획. 종료 시 `check` 모드로 기본 testCommand 통과.
 - step 23~29: 새 key/target은 실패(사라짐 허용, 자동 편입 금지). 해당 step이 만든 신규 위반은 그 step에서 고친다. 식별이 깨지면 중단·재계획.
 - step 30 gate(순차): COLLECT_CHAIN(`--merge --out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan --collected tests/.tmp/axe-current.json` → `--check-coverage --collected tests/.tmp/axe-current.json` → `--check-plan` → `--check-executable`. 모두 통과하고 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 30과 31 사이에 재계획한다.
-- 재계획 그룹 step: 생성 조건 `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`. 소스 allowedPaths는 그룹 fixFiles만, runtime은 §15.6 기본. 20분 이하, plan 수정 금지. 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`. AC: COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) && REGRESSION_GATE && `--check-group-done {id} --collected tests/.tmp/axe-current.json` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`.
+- 재계획 그룹 step: 생성 조건 `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`. 소스 allowedPaths는 그룹 fixFiles만, runtime은 §15.6 기본. 20분 이하, plan 수정 금지. 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`. AC: COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) && REGRESSION_GATE && `--check-group-done {id} --collected tests/.tmp/axe-current.json` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`(identity 대조 포함).
 - step 31 recheck: gate를 같은 순서로 재실행 + `--check-plan --require-empty` + `--assert-no-violations --collected tests/.tmp/axe-current.json`.
 - step 32 finalize: COLLECT_CHAIN·REGRESSION_GATE 재실행 → `--check-plan --require-empty && --assert-no-violations` 통과 후에만 baseline을 `[]`로. AC `--assert-empty` + 일반 axe 통과.
 
@@ -222,7 +222,8 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 - step 5 내용: `checkDataJsDiff(patch, { requireExactly3 })`(헤더 제외 삭제 줄 0, 추가 줄은 trim 후 `featured: true,`만, 3줄 이하, requireExactly3면 정확히 3). `--final`이면 BASE→HEAD/index/worktree 정확히 3, index→worktree는 공통 규칙만. index.html 3종 `Space+Grotesk` 포함. gitignore(index, worktree) §11.1. 합성: 가짜 git이 PATCH 인자에만 patch, PATH 인자엔 이름 목록을 돌려주고 그 patch가 판정에 쓰임을 확인.
 
 ### 11.6 통합 AC
-- 모든 step: 첫 동작 §11.7 시작 snapshot, 종료 시 기본 testCommand 통과(환경변수 없음, §8.3 분류 대기 계약), AC 마지막 §11.7 범위 gate(step 0·1은 inline C, step 2 이후 CLI).
+- 모든 step: 첫 동작 §11.7 시작 snapshot, 종료 시 기본 testCommand 통과(환경변수 없음, §8.3 분류 대기 계약), AC 마지막 §11.7 범위 gate.
+- 종료 gate의 identity 경유(필수): step 0·1은 `python3 -I tests/scripts/start-snapshot.py step{N}`(`reused` = strict schema + 현재 identity 대조) 직후 inline C. step 2 이후는 모두 CLI `scope-snapshot.mjs --check`이며, CLI가 strict schema → 현재 identity 대조 → 변경 판정 순서로 실행한다. identity가 하나라도 다르면 어떤 파일도 쓰지 않고 exit 1.
 - step 4 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate.
 - step 32·33은 `--assert-empty`. step 33은 screenshots 단독 → 전체 → `verify-scope -- --final` → gate.
 
@@ -235,7 +236,8 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 - Git은 `status`, `ls-files`, `rev-parse` 읽기만. python3 표준 라이브러리만.
 
 schema (strict, schemaVersion 1) — 생성·재사용·loader가 모두 같은 규칙으로 검증한다:
-- 키 집합 정확히 `schemaVersion, stepId, projectRoot, head, base, harness, statusZHex, xy, files`. `schemaVersion === 1`.
+- 키 집합 정확히 `schemaVersion, stepId, projectRoot, head, base, harness, statusZHex, xy, files`.
+- `schemaVersion`: 정수 1만 허용. Python은 `type(v) is int and v == 1`(true·1.0 거부). JavaScript는 `Number.isInteger(v) && v === 1`이고, `JSON.parse`가 `1.0`을 `1`로 바꾸므로 원문 JSON 텍스트에서 `"schemaVersion"` 값 토큰이 정확히 `1`인지(`/"schemaVersion"\s*:\s*1\s*[,}]/`, `1.0`·`1e0`·`true` 불일치) 함께 확인한다.
 - stepId는 `step{N}` | `axe-remediation-{id}` | 테스트 전용 `parity-{숫자}`, 파일은 `tests/.tmp/start-snapshot-{stepId}.json`. projectRoot = `git rev-parse --show-toplevel` realpath(cwd가 다르면 실패). head = `git rev-parse HEAD`. base = BASE(`rev-parse --verify BASE^{commit}` 성공 필요). harness = 중앙 identity 3값 + `.harness/harness.lock.json` sha256(`lockSha256`), lock 내용에 3값이 모두 있어야 한다.
 - `statusZHex`: 문자열, 짝수 길이, 소문자 hex만. 디코드한 bytes를 NUL 레코드로 엄격 파싱(각 레코드 길이 ≥ 4, 세 번째 바이트 공백, R/C면 비어 있지 않은 다음 필드가 origPath)한다.
 - `xy`: 파싱 결과(path와 origPath 모두 → xy)와 정확히 같아야 한다.
@@ -288,6 +290,8 @@ def parse_status(raw):
     return xy
 def fail(what):
     sys.exit('bad start snapshot: ' + what + ': ' + OUT)
+def version_ok(v):
+    return type(v) is int and v == 1
 root = os.path.realpath(git('rev-parse', '--show-toplevel').decode().strip())
 if os.path.realpath(os.getcwd()) != root:
     sys.exit('run from project root: ' + root)
@@ -296,6 +300,8 @@ lock = open('.harness/harness.lock.json', encoding='utf-8').read()
 if any(v not in lock for v in HARNESS.values()):
     sys.exit('harness identity mismatch: .harness/harness.lock.json')
 ident = {'schemaVersion': 1, 'stepId': STEP, 'projectRoot': root, 'head': git('rev-parse', 'HEAD').decode().strip(), 'base': BASE, 'harness': dict(HARNESS, lockSha256=digest('.harness/harness.lock.json'))}
+if not version_ok(ident['schemaVersion']):
+    fail('schemaVersion')
 if os.path.lexists(OUT):
     try:
         old = json.load(open(OUT, encoding='utf-8'))
@@ -303,7 +309,7 @@ if os.path.lexists(OUT):
         fail('invalid json')
     if not isinstance(old, dict) or set(old) != KEYS:
         fail('keys')
-    if old['schemaVersion'] != 1:
+    if not version_ok(old['schemaVersion']):
         fail('schemaVersion')
     hx, oxy, ofiles = old['statusZHex'], old['xy'], old['files']
     if not isinstance(hx, str) or len(hx) % 2 or not re.fullmatch('[0-9a-f]*', hx):
@@ -337,7 +343,7 @@ with open(OUT, 'x', encoding='utf-8') as f:
 print('start-snapshot: created ' + OUT)
 ```
 
-inline 범위 검사 C — step 0·1 종료 검사. 실행: `python3 -I - <stepId> '<allow 쉼표 목록>' '<require-absent 쉼표 목록>' <<'PY'` + 아래 본문 + `PY`. 위반이면 stderr 목록 + exit 1, 아니면 `scope-snapshot: OK`. 현재 status 원문을 `<snapshot 이름>-after.z`에 쓴다(snapshot 자체는 쓰지 않음). 시작 snapshot의 strict 검증은 직전에 실행하는 S(`reused`)가 담당한다.
+inline 범위 검사 C — step 0·1 종료 검사. 반드시 직전에 S `reused`(strict schema + 현재 identity 대조)를 통과한 뒤 실행한다. 실행: `python3 -I - <stepId> '<allow 쉼표 목록>' '<require-absent 쉼표 목록>' <<'PY'` + 아래 본문 + `PY`. 위반이면 stderr 목록 + exit 1, 아니면 `scope-snapshot: OK`. 현재 status 원문을 `<snapshot 이름>-after.z`에 쓴다(snapshot 자체는 쓰지 않음).
 
 ```
 import hashlib, json, os, subprocess, sys
@@ -395,20 +401,24 @@ print('scope-snapshot: OK')
 ```
 
 비교 도구 `tests/scripts/scope-snapshot.mjs` (C와 같은 판정·문자열·순서):
-- step 1 (상태 수집, CLI 없음): 상수 `RUNTIME_PREFIXES`, `EXEMPT_PREFIXES`, `GUARDED_PATHS`, `SNAPSHOT_KEYS`, `STEP_ID_RE`, `HEX64_RE`, `STATUS_ARGS = ['status','--porcelain=v1','-z','--untracked-files=all']`, `LS_FILES_ARGS = ['ls-files','-z']`. `parseStatusZ(raw) → { xy, path, origPath }[]`(S의 `parse_status`와 같은 엄격 규칙, 오류 `Error('bad status record: ...')`). `statusXyMap(entries)`(path·origPath 모두). `loadStartSnapshot(file)` — 위 strict schema 전체(S 재사용 분기와 같은 항목·순서·메시지 범주: keys, schemaVersion, stepId 형식·파일명 일치, statusZHex 소문자 짝수 hex, status parse, xy 일치, files 64hex|null, files/status), 반환 `{ stepId, identity, entries, xy, files }`, 오류 `Error('bad start snapshot: ...')`. `hashPath(path, { fs, root })`. `walkTests({ fs, root })`. `takeCurrent(start | null, { git, fs, root = process.cwd() }) → { entries, xy, files }`(root 기준 현재 status path·origPath ∪ start.files ∪ ls-files ∪ walk − RUNTIME; 시작 경로는 status에서 사라져도 다시 hash).
-- step 2 (판정·CLI): `diffAgainstStart(start, current) → Change[]`(`{ path, kind: new|deleted|content-changed|status-changed, xyBefore, xyAfter(null 허용) }`, 순수). `classifyChanges(changes, { allow })`. `checkRuntimeVisible(start, current)`. `checkSnapshotFirst(start, paths)`. `evaluateGate(start, current, { allow, requireAbsent })`. CLI `--check <start.json> --allow <list> [--require-absent <list>]`: loadStartSnapshot, after.z 저장, 위반 시 stderr + exit 1, 아니면 `scope-snapshot: OK`; 파일 없음·schema 오류 exit 1. snapshot을 만들거나 고치지 않는다.
+- step 1 (상태 수집, CLI 없음): 상수 `RUNTIME_PREFIXES`, `EXEMPT_PREFIXES`, `GUARDED_PATHS`, `SNAPSHOT_KEYS`, `STEP_ID_RE`, `HEX64_RE`, `BASE`, `HARNESS_IDENTITY`(3값), `STATUS_ARGS = ['status','--porcelain=v1','-z','--untracked-files=all']`, `LS_FILES_ARGS = ['ls-files','-z']`. `parseStatusZ(raw) → { xy, path, origPath }[]`(S의 `parse_status`와 같은 엄격 규칙, 오류 `Error('bad status record: ...')`). `statusXyMap(entries)`(path·origPath 모두). `isSchemaVersion1(value, rawText)` = `Number.isInteger(value) && value === 1` 그리고 원문 토큰 검사(§11.7 schema). `loadStartSnapshot(file)` — 위 strict schema 전체(S 재사용 분기와 같은 항목·순서·메시지 범주: keys, schemaVersion, stepId 형식·파일명 일치, statusZHex 소문자 짝수 hex, status parse, xy 일치, files 64hex|null, files/status), 반환 `{ stepId, identity: { schemaVersion, projectRoot, head, base, harness }, entries, xy, files }`, 오류 `Error('bad start snapshot: ...')`. `hashPath(path, { fs, root })`. `walkTests({ fs, root })`. `takeCurrent(start | null, { git, fs, root = process.cwd() }) → { entries, xy, files }`(root 기준 현재 status path·origPath ∪ start.files ∪ ls-files ∪ walk − RUNTIME; 시작 경로는 status에서 사라져도 다시 hash).
+- step 2 (identity 대조·판정·CLI):
+  - `computeIdentity({ git, fs, root = process.cwd() }) → { schemaVersion: 1, projectRoot, head, base, harness }` — S와 같은 규칙(`git rev-parse --show-toplevel` realpath가 root realpath와 다르면 throw, `git rev-parse HEAD`, `git rev-parse --verify BASE^{commit}` 실패 시 throw, lock 파일에 3값 포함 확인, `lockSha256`).
+  - `checkIdentity(start, current) → string[]` — `schemaVersion`, `projectRoot`, `head`, `base`, `harness`(4개 하위 필드 전부 비교) 순서로 다른 필드마다 `identity-mismatch:{field}`. 순수.
+  - `diffAgainstStart(start, current) → Change[]`(`{ path, kind: new|deleted|content-changed|status-changed, xyBefore, xyAfter(null 허용) }`, 순수). `classifyChanges(changes, { allow })`. `checkRuntimeVisible(start, current)`. `checkSnapshotFirst(start, paths)`. `evaluateGate(start, current, { allow, requireAbsent })`.
+  - CLI `--check <start.json> --allow <list> [--require-absent <list>]` 실행 순서: (1) `loadStartSnapshot`(strict schema) → (2) `computeIdentity` + `checkIdentity` — 실패하면 stderr `start snapshot identity mismatch: {field}`(또는 schema 오류)로 exit 1, 이때 어떤 파일도 쓰지 않는다(after.z 미생성, snapshot·프로젝트 bytes 불변) → (3) `takeCurrent`, after.z 저장, `evaluateGate`; 위반 시 stderr + exit 1, 아니면 `scope-snapshot: OK`. snapshot을 만들거나 고치지 않는다.
 
 테스트 격리 규칙:
 - 실제 저장소에 쓰는 테스트 산출물은 runtime 경로만 쓴다: snapshot 테스트는 `tests/.tmp/start-snapshot-parity-{숫자}.json`, retry probe는 정확히 `tests/.tmp/snapshot-probes/__retry_probe.txt`. 실제 저장소에 새 비runtime 파일을 만들지 않는다.
-- 비runtime 파일 hash 수집은 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`에서 검증한다(§12 예외).
+- 비runtime 파일 hash 수집과 rename 상태는 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`에서 검증한다(§12 예외).
 - 실제 저장소를 읽는 parity와 probe 테스트의 경합은 §11.4 `workers: 1`로 제거한다.
 
 ## 12. 변경 허용 경로와 운영 경계
 
 - index.json allowedPaths: `index.html`, `css/style.css`, `css/themes.css`, `js/main.js`, `js/data.js`, `tests/` (Harness managed·policy·lock·state 제외). 각 step의 tracked 허용 파일 = 범위 gate `--allow`. fixtures는 정확한 파일 단위로만 허용한다.
 - `index.html` 구조 변경은 step 23·24·25, 속성 변경은 remediation 그룹 step만. `css/themes.css`는 remediation 그룹 step만.
-- 빌더 허용 명령: Git 읽기(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object), §11.7 snapshot·검사. 하네스 전용: 프로젝트 저장소의 Git 상태 변경(init, checkout, switch, add, commit, push, reset, stash, merge, rebase, tag 등), Harness 운영 명령(`harness --project-root . check|plan-session|review-plan|approval|runner`). main 직접 변경·merge·deploy 금지.
-- 합성 저장소 예외: 테스트 코드는 `tests/.tmp/synthetic-repos/<pid>/` 아래 일회용 저장소에서만 `git -C <dir> init -q`, `add`, `-c user.name=t -c user.email=t@example.invalid commit`을 실행할 수 있다. 프로젝트 저장소의 index·refs·worktree는 건드리지 않고, 테스트 종료 시 디렉터리를 지운다.
+- 빌더 허용 명령: Git 읽기(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object), §11.7 snapshot·검사. 하네스 전용: 프로젝트 저장소의 Git 상태 변경(init, checkout, switch, add, commit, mv, push, reset, stash, merge, rebase, tag 등), Harness 운영 명령(`harness --project-root . check|plan-session|review-plan|approval|runner`). main 직접 변경·merge·deploy 금지.
+- 합성 저장소 예외: 테스트 코드는 `tests/.tmp/synthetic-repos/<pid>/` 아래 일회용 저장소에서만 Git 변경 명령 `git -C <dir> init -q`, `git -C <dir> add -A` 또는 정확한 경로 지정 `add`, `git -C <dir> -c user.name=t -c user.email=t@example.invalid commit -q -m <msg>` 세 가지를 실행할 수 있다. `git mv`를 포함한 그 밖의 Git 변경 명령은 쓰지 않는다. 파일 이동·삭제는 Node `fs`(또는 Python 파일시스템 API)로 하고 `add`로 stage한다. 프로젝트 저장소의 index·refs·worktree는 건드리지 않고, 테스트 종료 시 디렉터리를 지운다.
 - 빌더 수정 금지: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, 시작 snapshot 파일.
 
 ## 13. Step 목록 (각 20분 이하, snapshot·gate·검증·디버깅 포함, 종료 시 기본 testCommand 통과)
@@ -417,7 +427,7 @@ print('scope-snapshot: OK')
 |---|---|---|---|
 | 0 | tests-env-bootstrap | 20 | 없음 |
 | 1 | scope-snapshot-state | 19 | 0 |
-| 2 | scope-snapshot-gate | 19 | 0~1 |
+| 2 | scope-snapshot-gate | 20 | 0~1 |
 | 3 | tests-browser-smoke | 15 | 0~2 |
 | 4 | scope-paths | 19 | 0~3 |
 | 5 | scope-content | 19 | 0~4 |
@@ -464,4 +474,4 @@ print('scope-snapshot: OK')
 5. 첫 동작: 어떤 파일도 쓰기 전에 §11.7 시작 snapshot(`python3 -I tests/scripts/start-snapshot.py step{N}`, step 0은 heredoc S). 출력이 `created` 또는 `reused`가 아니면 중단·보고. 재시도도 같은 명령으로 최초 baseline을 재사용한다.
 6. runtime 쓰기 기본 R0: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`. step이 추가 경로를 명시할 수 있다.
 7. 공통 수정 금지: tests 밖 파일(step이 사이트 파일을 명시한 경우 그 범위만), step 허용 목록 밖 tests 파일, 이전 step이 만든 함수의 동작, 시작 snapshot.
-8. 종료 조건: 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 환경변수 없이 통과하고, AC 마지막 §11.7 범위 gate가 통과한다(`--allow` = step의 tracked 허용 파일 목록).
+8. 종료 조건: 기본 testCommand `sh tests/scripts/with-env.sh npm --prefix tests test`가 환경변수 없이 통과하고, AC 마지막 §11.7 범위 gate가 identity 대조를 거쳐 통과한다(`--allow` = step의 tracked 허용 파일 목록).

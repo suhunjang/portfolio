@@ -20,13 +20,13 @@
 8. `bootstrap.spec.js` (node 전용, desktop-dark만, 나머지 `test.skip`; 실제 저장소에는 `tests/.tmp/start-snapshot-parity-{숫자}.json`과 `tests/.tmp/snapshot-probes/__retry_probe.txt`만 쓰고 끝나면 삭제, `step{N}` snapshot은 건드리지 않음)
    - config: import한 config의 `workers === 1`, `fullyParallel === false`, 6 project 이름·viewport·colorScheme
    - `.gitignore` 7줄 정확 일치, `with-env.sh` 첫 두 줄 `#!/bin/sh`·`set -eu`와 `PLAYWRIGHT_BROWSERS_PATH` export
-   - 최초: `python3 -I tests/scripts/start-snapshot.py parity-<A>` → exit 0, `created`, 키 집합이 schema와 같고 `stepId` 일치, 기존 비runtime 파일 `tests/playwright.config.js`의 `files` 값이 그 파일 sha256과 같음, RUNTIME 경로 없음
+   - 최초: `python3 -I tests/scripts/start-snapshot.py parity-<A>` → exit 0, `created`, 키 집합이 schema와 같고 `stepId` 일치, `schemaVersion` 원문 토큰이 정수 `1`, 기존 비runtime 파일 `tests/playwright.config.js`의 `files` 값이 그 파일 sha256과 같음, RUNTIME 경로 없음
    - 중간 실패 뒤 재사용: 생성 후 probe `tests/.tmp/snapshot-probes/__retry_probe.txt`를 쓰고 재실행 → exit 0, `reused`, snapshot sha256·mtime 불변. probe는 finally에서 삭제
    - identity 거부: 최초 snapshot을 복사해 한 필드씩 바꾼 별도 `parity-<n>` 파일(`stepId` 파일명과 다름, `head` 40자 0, `base`, `projectRoot` `/tmp/other`, `harness.manifestHash`, `harness.lockSha256`) → 각각 exit ≠ 0, stderr `identity mismatch: {field}` 또는 `bad start snapshot`, sha256 불변
-   - strict schema 거부(각각 exit ≠ 0, stderr `bad start snapshot: {범주}`, sha256 불변): 여분 키·키 누락(`keys`), `schemaVersion` 2(`schemaVersion`), 깨진 JSON(`invalid json`), `statusZHex` = `zz`·홀수 길이 `0`·대문자 hex(`statusZHex`), 잘린 레코드 hex `3f3f`(`status parse`), `xy`에 status에 없는 경로 추가·xy 값 변경(`xy`), `files` 값 `abc`·대문자 64hex·숫자(`files`), status의 비runtime 경로를 `files`에서 제거(`files/status`)
+   - strict schema 거부(각각 exit ≠ 0, stderr `bad start snapshot: {범주}`, sha256 불변): 여분 키·키 누락(`keys`), `schemaVersion` = `2`·`true`·`1.0`(`schemaVersion`, 원문 JSON에 각각 `2`, `true`, `1.0` 토큰으로 씀), 깨진 JSON(`invalid json`), `statusZHex` = `zz`·홀수 길이 `0`·대문자 hex(`statusZHex`), 잘린 레코드 hex `3f3f`(`status parse`), `xy`에 status에 없는 경로 추가·xy 값 변경(`xy`), `files` 값 `abc`·대문자 64hex·숫자(`files`), status의 비runtime 경로를 `files`에서 제거(`files/status`)
    - 잘못된 id(`step`, `../x`, `Step1`) → exit ≠ 0, 파일 생성 없음
 
 ## AC (한 셸에서 순서대로, 모두 exit 0)
 
-1. `sh tests/scripts/with-env.sh npm --prefix tests test -- bootstrap.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step0` (전체는 config의 `workers: 1`로 직렬 실행, 마지막은 `reused`)
+1. `sh tests/scripts/with-env.sh npm --prefix tests test -- bootstrap.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step0` (전체는 config의 `workers: 1`로 직렬 실행, 마지막은 `reused` = strict schema + 현재 identity 대조 통과)
 2. 범위 gate: `python3 -I - step0 'tests/scripts/with-env.sh,tests/scripts/start-snapshot.py,tests/package.json,tests/package-lock.json,tests/.gitignore,tests/playwright.config.js,tests/specs/bootstrap.spec.js' 'tests/scripts/with-env.sh,tests/scripts/start-snapshot.py,tests/package.json,tests/package-lock.json,tests/.gitignore,tests/playwright.config.js,tests/specs/bootstrap.spec.js' <<'PY'` + 설계 §11.7 C 코드 블록 본문(그대로) + `PY`
