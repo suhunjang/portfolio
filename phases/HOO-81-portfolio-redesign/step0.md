@@ -5,7 +5,7 @@
 - read-first: 설계 §3, §11.1~§11.4, §11.6, §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, 실행 순서, schema, 재시도 계약, S, C, 설계 블록 추출 규칙, 테스트 격리)
 - tracked 허용(exact): `tests/scripts/with-env.sh`, `tests/scripts/start-snapshot.py`, `tests/package.json`, `tests/package-lock.json`, `tests/.gitignore`, `tests/playwright.config.js`, `tests/specs/bootstrap.spec.js`
 - runtime: R0 + `tests/node_modules/**`
-- 금지: §15.7, `tests/scripts/scope-snapshot.mjs`(step 1~9), S·C 본문 변경, 실제 저장소의 비runtime 경로에 symlink·FIFO 생성
+- 금지: §15.7, `tests/scripts/scope-snapshot.mjs`(step 1~8), S·C 본문 변경, 실제 저장소의 비runtime 경로에 symlink·FIFO 생성
 
 ## 작업 (순서 고정)
 

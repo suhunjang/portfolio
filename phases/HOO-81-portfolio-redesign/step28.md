@@ -1,19 +1,18 @@
-# Step 28 — axe-collect
+# Step 28 — axe-current-checks
 
-- 목적: axe.spec.js 10개 시나리오와 최초 수집. 종료 시 분류 대기(`pending`) 상태로 기본 testCommand가 통과한다.
-- 예상 17분 / 선행 0~27 / 공통 절차 설계 §15
-- read-first: 설계 §8.1, §8.3(분류 대기 baseline 계약, 실행 모드, COLLECT_CHAIN, step 28), §8.4
-- tracked 허용(exact): `tests/specs/axe.spec.js`(신규), `tests/fixtures/axe-collected.json`
-- runtime: R0(실제 COLLECT_DIR 포함)
-- 금지: §15.7, helper, `axe-baseline.json`·plan 생성(step 29)
+- 목적: 현재 수집 결과 판정(group done, coverage, 위반 0).
+- 예상 17분 / 선행 0~27 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.3(entry key, step 28, gate·recheck·finalize·재계획 계약)
+- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- runtime: R0(독립 디렉터리)
+- 금지: §15.7, step 19·23~27 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step28`
-2. `axe.spec.js`: 10개 시나리오, collector 고정 순서, `prepareForAxe` → `runAxe({ include: prep.include })`. 수집 모드 `writeCollected(scenario, testInfo.project.name, violations)`만. 일반 모드 `resolveBaselineMode()`; `check`면 checkRegression, validateBaseline(desktop-dark 1회), plan 있으면 validateRemediationPlan(coverage false); `pending`이면 준비 절차까지만 실행하고 `test.skip(true, 'axe classification pending (step 29)')`; throw면 실패.
-3. COLLECT_CHAIN(기본 out `tests/fixtures/axe-collected.json`) 실행 후 entry 수·(key, target) 수·ruleId 분포를 로그로 남기고 모든 key = makeEntryKey 확인.
-4. 기본 testCommand(환경변수 없음)를 실행해 axe.spec.js가 `pending` 경로로 준비 통과·판정 skip되는지 확인.
+2. 설계 §8.3 step 28 계약 구현.
+3. spec(desktop-dark): checkGroupDone 사라짐 done, lightbox에만 남음 remaining 1(`lightbox:desktop-*:*`), 다른 그룹 잔여 무영향, unknown·형식 오류 id throw, collected `{}` throw; checkCollectedCoverage 전부 포함 ok, plan 밖 1개 uncovered, 빈 groups + 잔여 uncovered, 입력 불변; countCollectedTargets `[]` 0, 2+1 → 3, 같은 target 두 entry → 2; CLI group-done done 0·remaining 1·unknown 1·없음 1, coverage 포함 0·잔여 1·없음 1, assert-no-violations `[]` 0·1개 1·없음 1; baseline과 수집에 같은 target이 남으면 checkRegression `[]`이어도 `--assert-no-violations` 1.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step28.json --allow tests/specs/axe.spec.js,tests/fixtures/axe-collected.json` → exit 0 (기본 testCommand가 환경변수 없이 통과)
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step28.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0

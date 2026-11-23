@@ -1,19 +1,18 @@
-# Step 13 — content-data-baseline
+# Step 13 — scope-paths
 
-- 목적: BASE data·index fixture 생성과 데이터 보존 검사.
-- 예상 16분 / 선행 0~12 / 공통 절차 설계 §15
-- read-first: 설계 §3, §7.1, §7.2-1, §7.3
-- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` script 추가만)
+- 목적: verify-scope 경로 정책과 diff 인자 분리.
+- 예상 19분 / 선행 0~12 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §11.1, §11.5(diff 인자, 경로 정책), §12
+- tracked 허용(exact): `tests/scripts/verify-scope.mjs`(신규), `tests/package.json`(`verify-scope`, `verify-scope:selftest` script 추가만)
 - runtime: R0
-- 금지: §15.7, `extractStatic`(step 14)
+- 금지: §15.7
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step13`
-2. `make-fixtures.mjs`: `git show BASE:js/data.js`를 vm 평가 → `baseline-data.json`, `git show BASE:index.html` → `baseline-index.html`(step 14용). `fixtures` script 추가 후 실행.
-3. `content.js`: `norm`, `readLiveData`, `normalizeFeatured`(structuredClone, index 1·5·7만, 그 밖·true 아님은 throw), JSDoc typedef.
-4. `content-data.spec.js`(6 project, collector 고정 순서): normalizeFeatured 입력 불변·금지 index throw; `normalizeFeatured(await readLiveData(page))` = baseline deep-equal; featured 없음 또는 1·5·7만; email·phone·social 빈 값; 렌더 개수 stats 4, timeline = CAREER 길이, project-card 13, strengths 6, project-title 배열 = baseline.
+2. `GIT_DIFF_PATH_ARGS`, `GIT_DIFF_PATCH_ARGS` export(섞지 않음), `collectInput({ git = runGit })`(경로 층은 PATH 인자, data.js 4구간은 PATCH 인자 + `-- js/data.js`; index.html blob 3종, gitignore blob 2종, 추적 runtime 경로, 루트 package.json), `evaluatePaths(input)`.
+3. CLI: 인자 없음 → 경로 검사(`verify-scope: OK (paths)`). `--self-test`: 상수 값; 가짜 git 호출 기록(경로 층은 PATH 인자만, data.js는 PATCH 인자만); 정상 0; 위반 — worktree `docs/other.md`, README stage 후 worktree 원복, assets 추가, 루트 package.json, `CLAUDE.md` 미커밋, `tests/node_modules/x` 추적, `.harness/harness.lock.json` 미커밋; 허용 — committed `scripts/harness.py`, untracked `.harness/runtime/x.json`, worktree phases index; rename 우회 위반 — committed README→tests/fixtures/x.md, index assets/favicon.svg→tests/fixtures/f.svg, worktree docs/superpowers/plans/...→tests/fixtures/p.md, index .claude/settings.json→tests/fixtures/s.json.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step13.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step13.json --allow tests/scripts/verify-scope.mjs,tests/package.json` → exit 0

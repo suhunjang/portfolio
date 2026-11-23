@@ -1,6 +1,6 @@
 # Step 8 — scope-snapshot-cli
 
-- 목적: after.z 안전 쓰기, `runCheck` 실행 순서(unsafe면 after.z 쓰기 전 즉시 실패), CLI 연결을 만든다. CLI는 이 step에서 완성되므로 종료 gate는 아직 S reused + inline C이고, AC에서 새 CLI를 같은 snapshot에 대해 실행해 동작만 확인한다.
+- 목적: after.z 안전 쓰기, `runCheck` 실행 순서(unsafe면 after.z 쓰기 전 즉시 실패), CLI 연결을 만든다. CLI는 이 step에서 완성되지만 종료 gate는 step 11까지 S reused + inline C이고(CLI 종료 gate 전환은 step 12), AC에서 새 CLI를 같은 snapshot에 대해 실행해 동작만 확인한다.
 - 예상 17분 / 선행 0~7 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
 - read-first: 설계 §11.6, §11.7(저장소 상대 경로 계약, 경로 유형 계약, 실행 순서, 비교 도구 step 8)
 - tracked 허용(exact): `tests/scripts/scope-snapshot.mjs`(추가만), `tests/specs/scope-snapshot-cli.spec.js`(신규)

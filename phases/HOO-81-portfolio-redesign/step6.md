@@ -22,7 +22,7 @@
    - C 합성(cwd `dir`, `designBlock('inline 범위 검사 C')`): (g) (f)와 같은 `tests/.tmp` 외부 링크 → exit 1, stderr `unsafe path: symlink:tests/.tmp`, `<outside>/tmpdir`에 `-after.z` 미생성, 외부 bytes·mtime 불변; (h) 정상 start 파일 + `…-after.z`가 FIFO → exit 1, `non-regular:…-after.z`, FIFO 유지, 멈추지 않음; (i) after.z가 외부 파일 symlink → `symlink:…-after.z`, 외부 파일 bytes 불변; (j) snapshot 자체가 FIFO → `non-regular:`, 멈추지 않음
    - JS loader 합성: (f) 상태에서 `loadStartSnapshot('tests/.tmp/start-snapshot-parity-1.json', { root: dir, fs: 기록용 fs })` → `unsafe path: symlink:tests/.tmp` throw, 기록은 root·`tests`·`tests/.tmp`에 대한 `lstatSync`뿐(외부 대상에 대한 open·read·stat·readlink·realpath 없음); snapshot FIFO·디렉터리 → `non-regular:` throw, open 없음
    - JS `takeCurrent` 합성: (c)·(d)·(e) 각각 `unsafe`에 같은 항목, `files` `{}`, 해당 경로 open 없음
-   - 기록 대상 unsafe 시 after.z 보존은 step 9가 C·CLI 양쪽에서 검증한다
+   - 기록 대상 unsafe 시 after.z 보존은 step 11이 C·`runCheck` 양쪽에서 검증한다
 
 ## AC (모두 exit 0)
 
