@@ -10,7 +10,7 @@
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step4`
-2. `scope-snapshot-special.spec.js` (node 전용, desktop-dark만, 모든 S·C subprocess timeout 10초 — timeout은 실패로 판정, 각 사례 전후로 대상 디렉터리의 파일 목록·각 regular 파일 sha256·FIFO/디렉터리 유형을 기록해 비교). FIFO는 `os.mkfifo`(python3 -I -c) 또는 `mkfifo`로 만든다.
+2. `scope-snapshot-special.spec.js` (node 전용, desktop-dark만, 모든 S·C subprocess timeout 10초 — timeout은 실패로 판정, 각 사례 전후로 대상 디렉터리의 파일 목록·각 regular 파일 sha256·mtime·FIFO/디렉터리 유형을 기록해 비교). FIFO는 `os.mkfifo`(python3 -I -c) 또는 `mkfifo`로 만든다.
    - S 합성(cwd `dir`, BASE 없음 → 유형 검사 실패가 BASE 오류보다 먼저 나와야 함)
      - (a) snapshot FIFO: `tests/.tmp/start-snapshot-parity-1.json`이 FIFO → exit ≠ 0, stderr `unsafe path:`에 `non-regular:tests/.tmp/start-snapshot-parity-1.json`, 멈추지 않음, FIFO 유지, 새 파일 없음
      - (b) snapshot 디렉터리: 같은 경로가 디렉터리(안에 파일 1개) → `non-regular:…`, 디렉터리 내용 불변
@@ -20,8 +20,9 @@
      - (f) `tests/.tmp` 외부 디렉터리 symlink: `tests/.tmp → <outside>/tmpdir`(안에 sentinel 파일과 정상 형식 snapshot 사본) → `symlink:tests/.tmp`, 외부 디렉터리 목록·bytes·mtime 불변
    - S 실제 저장소(재사용 분기, 실제 BASE): `tests/.tmp/start-snapshot-parity-<m>.json`이 FIFO, 디렉터리인 경우 각각 exit ≠ 0·`non-regular:`·멈추지 않음, 다른 parity 파일 sha256 불변. 끝나면 삭제
    - C 합성(cwd `dir`, `designBlock('inline 범위 검사 C')`): (g) (f)와 같은 `tests/.tmp` 외부 링크 → exit 1, stderr `unsafe path: symlink:tests/.tmp`, `<outside>/tmpdir`에 `-after.z` 미생성, 외부 bytes·mtime 불변; (h) 정상 start 파일 + `…-after.z`가 FIFO → exit 1, `non-regular:…-after.z`, FIFO 유지, 멈추지 않음; (i) after.z가 외부 파일 symlink → `symlink:…-after.z`, 외부 파일 bytes 불변; (j) snapshot 자체가 FIFO → `non-regular:`, 멈추지 않음
-   - JS loader 합성: (f) 상태에서 `loadStartSnapshot('tests/.tmp/start-snapshot-parity-1.json', { root: dir, fs: 기록용 fs })` → `unsafe path: symlink:tests/.tmp` throw, 기록은 `tests`·`tests/.tmp`에 대한 `lstatSync`뿐(외부 대상에 대한 open·read·stat·readlink·realpath 없음); snapshot FIFO·디렉터리 → `non-regular:` throw, open 없음
+   - JS loader 합성: (f) 상태에서 `loadStartSnapshot('tests/.tmp/start-snapshot-parity-1.json', { root: dir, fs: 기록용 fs })` → `unsafe path: symlink:tests/.tmp` throw, 기록은 root·`tests`·`tests/.tmp`에 대한 `lstatSync`뿐(외부 대상에 대한 open·read·stat·readlink·realpath 없음); snapshot FIFO·디렉터리 → `non-regular:` throw, open 없음
    - JS `takeCurrent` 합성: (c)·(d)·(e) 각각 `unsafe`에 같은 항목, `files` `{}`, 해당 경로 open 없음
+   - 기록 대상 unsafe 시 after.z 보존은 step 5가 C·CLI 양쪽에서 검증한다
 
 ## AC (모두 exit 0)
 
