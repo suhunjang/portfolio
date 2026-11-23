@@ -29,39 +29,34 @@
 
 ## 수정 금지
 
-- `tests/` 밖의 모든 파일
+- `tests/` 밖 전부
 - 그 밖의 tests 파일
 
 ## 작업
 
-1. `checkGitignore(text): string[]`
-   - null이면 위반이다.
-   - 끝의 `\n` 1개만 제거한다.
-   - 나머지가 정확히 7줄과 일치해야 한다.
-2. `checkDataJsDiff(diffText, { requireExactly3 }): string[]`
-   - 다음은 위반이다.
-     - 삭제 줄
-     - `featured: true,`가 아닌 추가 줄
-     - 3줄을 넘는 추가
+1. `checkGitignore(text)`
+   - null이면 위반
+   - 끝의 `\n` 1개만 제거한 뒤, 정확히 7줄과 일치해야 한다.
+2. `checkDataJsDiff(diffText, { requireExactly3 })`
+   - 삭제 줄, `featured: true,`가 아닌 추가 줄, 3줄 초과는 위반
    - `requireExactly3`이면 정확히 3줄이어야 한다.
 3. `evaluateContent(input, { final })`
    - BASE→HEAD, BASE→index, BASE→worktree: `requireExactly3: final`
    - index→worktree: 항상 `requireExactly3: false`
-   - index.html 3종과 gitignore 2종을 검사한다.
+   - index.html 3종과 gitignore 2종도 함께 검사한다.
 4. `evaluateScope = [...evaluatePaths, ...evaluateContent]`
    - CLI 기본 동작으로 쓴다. 통과하면 `verify-scope: OK`를 출력한다.
    - `--final`을 지원한다.
-5. self-test 추가 (기존 사례는 유지)
-   - data.js 위반: 삭제 줄, featured 외 줄, featured 4줄, stage한 뒤 worktree만 원복
+5. self-test에 사례를 추가한다. 기존 사례는 유지한다.
+   - data.js 위반: 삭제 줄, featured 외 줄, featured 4줄, stage 후 worktree만 원복
    - final
-     - BASE→HEAD/index/worktree 각 3줄이고 index→worktree 0줄이면 위반 0
+     - BASE→HEAD/index/worktree 각 3줄이고 index→worktree 0줄 → 위반 0
      - BASE→HEAD 0줄 → 위반
      - BASE→index 2줄 → 위반
      - index→worktree에 featured 외 줄 → 위반
    - Space Grotesk 제거를 stage한 뒤 worktree만 원복 → 위반
-   - gitignore
-     - 위반: 추가 줄, 중복 줄, 빈 줄, 순서 변경, 주석, CRLF, index 버전만 잘못됨
-     - 통과: 끝 개행 없음
+   - gitignore 위반: 추가 줄, 중복, 빈 줄, 순서 변경, 주석, CRLF, index 버전만 잘못됨
+   - gitignore 통과: 끝 개행 없음
 
 ## 완료 기준 (AC)
 

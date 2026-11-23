@@ -1,7 +1,7 @@
-# Step 14 — section-structure
+# Step 14 — hero-first-screen
 
 - 예상 시간: 18분
-- 실행 횟수: structure spec 2회, 전체 테스트 1회, verify-scope 1회
+- 실행 횟수: hero spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~13 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,13 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §7, §8.3(canonical 안정성 범위, 회귀), §11.4
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5 (히어로 순서, tagline 계약, 첫 화면 AC), §9
 3. index.json에서 step 0~13이 completed인지 확인한다. 아니면 중단한다.
-4. 다음을 확인한다.
-   - 섹션, nav, scroll-hint
-   - 스크롤스파이 배열, skillsGrid 렌더링
-   - content-exceptions의 final
-   - baseline canonical
+4. hero 마크업, reveal, 여백, `#heroFeatured`, `setText` 시그니처를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -25,9 +21,10 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `index.html` (hero 밖 섹션, nav, scroll-hint)
-- `js/main.js` (스크롤스파이 배열, skill-group h4만)
-- `tests/specs/structure.spec.js`
+- `index.html` (section#hero 내부만. `#heroFeatured`의 마크업은 그대로 둔다)
+- `js/main.js`: 정확히 `setText('heroTagline', PROFILE.tagline);` 1줄만 추가
+- `css/style.css` (hero, `#heroStats`, `#heroFeatured` 배치 규칙만)
+- `tests/specs/hero.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -35,31 +32,37 @@
 
 ## 수정 금지
 
-- `css/*`, `js/data.js`
-- fixtures, helper, 기존 spec
-- 섹션 표 밖의 문구
+- `js/data.js`, `css/themes.css`
+- 대표 카드 렌더링·모달 로직
+- `#heroFeatured`의 속성
+- 섹션, nav
+- 기존 tests, fixtures, helper
 
 ## 작업 (TDD)
 
-1. `structure.spec.js`를 먼저 작성한다. 6개 project에서 실행한다.
-   - 섹션 순서, nav, kicker, h2가 §6과 일치한다.
-   - subsection h3가 1개다.
-   - skillsGrid가 about 안에 있고 h4를 쓴다.
-   - contact와 scroll-hint가 맞다.
-   - heading: h1은 1개이고 레벨을 건너뛰지 않는다.
-   - 스크롤스파이 (desktop): `const link = page.locator(.nav-link[href="#about"])` 클릭 후 `await expect(link).toHaveClass(/active/)`
-2. index.html
-   - 섹션 subtree를 통째로 옮긴다. anchor를 보존하기 위해서다.
-   - kicker를 바꾼다.
-   - Stack &amp; Contact를 분리한다.
-   - nav, scroll-hint, section-alt를 반영한다.
-3. main.js: 스크롤스파이 배열을 바꾸고 skill-group 제목을 h4로 바꾼다.
-4. axe canonical 점검 (필수)
-   - 식별이 상실된 경우: 즉시 중단하고 key와 selector를 보고한 뒤 재계획을 요청한다.
-   - 이 step에서 새로 만든 요소의 신규 위반: 허용 파일 안에서 고친다.
-   - baseline에 자동 편입하지 않는다.
+1. `hero.spec.js`를 먼저 작성해 실패를 확인한다. 6개 project에서 실행하고 collector는 고정 순서로 쓴다.
+   - hero DOM 순서가 §5 1~8과 같다.
+   - tagline
+     - `p.hero-tagline`의 id가 `heroTagline`이다.
+     - `document.getElementById('heroTagline').textContent`가 `PROFILE.tagline`과 같다.
+   - CTA가 맞고, eyebrow·typed가 유지된다.
+   - `#heroFeatured`의 `role=region`과 `aria-label`이 유지된다.
+   - STATS: 375에서 2×2, 768·1280에서 4×1
+   - featured: 375 1열, 768 2열, 1280 3열
+   - 첫 화면 AC (desktop, 실제 폰트)
+     - `document.fonts.ready`를 기다린다.
+     - scrollY는 0이다.
+     - 대상 6개 모두: visible, 크기 > 0, 조상까지 visibility·opacity(`expect.poll`), 1280×800 경계 안
+2. index.html: hero 순서를 바꾸고 `p.hero-tagline#heroTagline`을 추가한다.
+3. main.js: 정확히 `setText('heroTagline', PROFILE.tagline);`를 추가한다.
+4. style.css
+   - eyebrow와 typing을 줄인다.
+   - 여백을 조정한다.
+   - STATS와 featured를 반응형으로 만든다.
+   - blurb는 2줄 clamp
+   - 토큰만 쓴다. 문구는 줄이지 않는다.
+5. axe 새 target은 step 13과 같은 규칙을 따른다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과
-- content.spec에서 final이 성립한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 모두 통과

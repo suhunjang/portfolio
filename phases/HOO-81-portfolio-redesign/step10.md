@@ -1,7 +1,7 @@
-# Step 10 — axe-collect
+# Step 10 — axe-current-checks
 
-- 예상 시간: 15분
-- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, 일반 테스트 1회, verify-scope 1회
+- 예상 시간: 16분
+- 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~9 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (실행 모드, 수집 명령 순서, step 10)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 10 현재 수집 결과 판정, gate, recheck, finalize, 재계획 그룹 step 계약)
 3. index.json에서 step 0~9가 completed인지 확인한다. 아니면 중단한다.
-4. axe helper API를 확인한다.
+4. axe.js에서 `MergedEntry`, `Plan`, `GROUP_ID_RE`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,48 +21,53 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/specs/axe.spec.js` (신규)
-- `tests/fixtures/axe-collected.json` (병합 결과)
+- `tests/helpers/axe.js` (추가만)
+- `tests/specs/axe-helper.spec.js` (추가만)
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (실제 `COLLECT_DIR` 포함)
+- `tests/.tmp/axe-helper-test-*/**`, `tests/.tmp/**`
 - `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
 - `tests/` 밖 전부
-- helper와 그 밖의 tests 파일
-- `axe-baseline.json`, plan
+- 그 밖의 tests 파일, fixtures
+- step 6~9에서 만든 동작
 
 ## 작업
 
-### 1. `axe.spec.js`
-
-- 시나리오 10개를 만든다. collector는 고정 순서로 쓴다.
-- 수집 모드: `writeCollected`만 한다.
-- 일반 모드
-  - 맨 앞에서 `resolveBaselineMode()`를 호출한다. baseline이 없으면 기본적으로 throw하므로 실패한다.
-  - check: `checkRegression`, `validateBaseline`(desktop-dark에서 1회), plan이 있으면 `validateRemediationPlan`(coverage false)
-  - skip(`AXE_ALLOW_MISSING_BASELINE=1`일 때): `test.skip`, 사유 `baseline 미생성(step 10 최초 수집 전용)`
-
-### 2. 수집 (순차, 병렬 금지)
-
-1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
-   - helper 합성 검증과 실제 디렉터리 보존 증명
-2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
-4. 1과 3이 모두 성공한 뒤에 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge`를 실행해 `tests/fixtures/axe-collected.json`을 만든다.
-5. 로그에 key 수, 고유 target 수, ruleId별 분포를 남긴다.
-
-### 3. 최초 일반 실행
-
-- `AXE_ALLOW_MISSING_BASELINE=1` 옵션은 이 명령 하나에서만 쓴다: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
-- 이 시점에 옵션 없이 기본 실행하면 실패한다. 기본 누락 실패 계약에 따른 의도된 결과다.
-- 하네스는 이 step을 아래 AC로 검증한다.
-- step 11에서 baseline이 생기면 기본 testCommand가 다시 통과한다.
+1. axe.js에 step 10 계약을 구현한다.
+   - `checkGroupDone(collected, plan, groupId) → { done, remaining }`
+   - `checkCollectedCoverage(collected, plan) → { ok, uncovered }`: plan에 없는 target을 자동으로 편입하지 않는다.
+   - `countCollectedTargets(collected) → number`
+   - CLI (`--collected` 기본값은 `tests/.tmp/axe-current.json`)
+     - `--check-group-done <id>`
+     - `--check-coverage`: uncovered가 있으면 `재계획 필요: plan 밖 잔여 target`을 출력하고 exit 1
+     - `--assert-no-violations`: 0이 아니면 exit 1
+2. axe-helper.spec.js (desktop-dark, 파일은 독립 디렉터리에 둔다)
+   - `checkGroupDone`
+     - 그룹 target이 사라짐 → done
+     - lightbox 시나리오에만 남음 → remaining 1건
+     - 다른 그룹의 잔여 target은 결과에 영향을 주지 않는다.
+     - unknown id, 형식 오류 id → throw
+     - collected가 `{}` → throw
+   - `checkCollectedCoverage`
+     - 모든 target이 groups에 포함됨 → ok
+     - plan에 없는 target 1개 → uncovered 1건
+     - groups가 비어 있는데 target이 1개 남음 → uncovered
+     - 입력이 변경되지 않음
+   - `countCollectedTargets`
+     - `[]` → 0
+     - target 2개인 entry 1개와 1개인 entry 1개 → 3
+   - subprocess
+     - `--check-group-done`: done → 0, remaining → 1, unknown → 1, 파일 없음 → 1
+     - `--check-coverage`: 완전 포함 → 0, 잔여 → 1, 파일 없음 → 1
+     - `--assert-no-violations`: `[]` → 0, target 1개 → 1, 파일 없음 → 1
+     - 회귀 허점 사례
+       - baseline에 target이 남아 있고 수집 결과에도 같은 target이 남아 있는 경우
+       - `checkRegression`은 `[]`를 반환해도 `--assert-no-violations`는 1이어야 한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge` → exit 0
-- `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과

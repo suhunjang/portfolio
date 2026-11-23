@@ -1,4 +1,4 @@
-# Step 5 — axe-canonical
+# Step 5 — interaction-regression
 
 - 예상 시간: 18분
 - 실행 횟수: 테스트 2회, verify-scope 1회
@@ -6,12 +6,15 @@
 
 ## 공통: 시작 전 필수 확인 (read-first)
 
-1. 저장소 지침 `CLAUDE.md`(중앙 Harness 계약)와 `README.md`를 읽는다. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
+1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (canonical 식별, 안정성 보장 범위, step 5 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §11.4
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
-4. JS 렌더 영역, `data-project`, landmark를 확인한다.
+4. 다음을 확인한다.
+   - 모달·lightbox·위임·Esc 처리
+   - THEME_KEY, 메뉴, 스크롤스파이, reveal
+   - Motion-O shots
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,8 +24,9 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/helpers/axe.js` (신규)
-- `tests/specs/axe-helper.spec.js` (신규)
+- `tests/specs/interaction.spec.js`
+- `tests/specs/first-visit.spec.js`
+- `tests/helpers/modal.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
@@ -35,15 +39,19 @@
 
 ## 작업
 
-1. `axe.js`에 step 5 계약을 구현한다: `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe`
-2. `axe-helper.spec.js` (desktop-dark, `page.setContent`로 실제 axe 실행)
-   - a) `section#career` subtree 전체를 이동하고, h3를 span으로 바꾸고, 01을 04로 바꿔도 같은 key
-   - a2) h3만 section 밖(body 직속)으로 옮기면 다른 key
-   - b) `[data-project=5]` 안에서 div를 p로 바꿔도 같은 key
-   - c) 텍스트가 다르면 다른 key
-   - d) `project:5`와 `featured:5`는 서로 다른 key
-   - e) alias가 적용되면 같은 key
+1. `modal.js`
+   - `openFirstProjectByClick`, `openFirstProjectByEnter`
+   - `closeVia(page, how)`: button, backdrop({x:5, y:5}), esc
+   - `expectFocused`
+2. `interaction.spec.js` (6개 project, collector 고정 순서)
+   - 테마
+   - 모달: 닫기 경로별 동작과 포커스 복귀, Enter로 열기, 제목, `modal-open`
+   - lightbox: Esc 2단계
+   - 메뉴 (mobile)
+   - 스크롤스파이 (desktop): `const link = page.locator(.nav-link[href="#projects"])`를 클릭한 뒤 `await expect(link).toHaveClass(/active/)`
+   - typing, reduced motion
+3. `first-visit.spec.js`: fixture 없이 desktop-dark에서 실행한다. light와 dark를 각각 확인한다.
 
 ## 완료 기준 (AC)
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` → 통과
+- BASE 사이트에서 다음이 모두 통과한다: `sh tests/scripts/with-env.sh npm --prefix tests test -- interaction.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`

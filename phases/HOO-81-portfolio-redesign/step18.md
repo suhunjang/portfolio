@@ -1,7 +1,7 @@
-# Step 18 — axe-remediation-gate
+# Step 18 — print-pdf
 
-- 예상 시간: 14분
-- 실행 횟수: helper 검증 1회, 수집 1회, 병합 1회, `--check-plan` 1회, 테스트 1회, verify-scope 1회
+- 예상 시간: 15분
+- 실행 횟수: print spec 2회, 전체 테스트 1회, verify-scope 1회
 - 선행 step: 0~17 completed
 
 ## 공통: 시작 전 필수 확인 (read-first)
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (수집 명령 순서, step 18 gate, 재계획 그룹 step 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10
 3. index.json에서 step 0~17이 completed인지 확인한다. 아니면 중단한다.
-4. `axe-baseline.json`과 `axe-remediation-plan.json`을 확인한다.
+4. `@media print`와 `ensureLightbox`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -21,43 +21,42 @@
 
 ## tracked source 허용 파일 (exact)
 
-- `tests/fixtures/axe-remediation-plan.json`: 사라진 target과 빈 그룹을 제거하는 것만 허용한다. 추가는 금지다.
+- `css/style.css` (`@media print` 블록만)
+- `tests/specs/print.spec.js`
 
 ## runtime 쓰기 허용 경로 (추적 금지)
 
-- `tests/.tmp/**` (실제 `COLLECT_DIR`, `axe-current.json`)
-- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
+- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 
 ## 수정 금지
 
-- 사이트 파일 전부
-- `axe-baseline.json`, `axe-collected.json`, helper, spec
+- `index.html`, `js/*`, `css/themes.css`
+- 기존 tests
+- PDF 파서 의존성 추가
 
-## 작업 (gate 절차 — step 19가 그대로 다시 실행한다)
+## 작업 (TDD)
 
-1. 순차 재수집 (병렬 금지)
-   1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
-   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-   3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
-   4. 1과 3이 모두 성공한 뒤 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json`
-2. 회귀 검사: `checkRegression`을 적용한다. 오류가 있으면 즉시 중단하고 보고한다.
-3. plan 재생성
-   - 사라진 target을 제거한다.
-   - 빈 그룹을 삭제한다.
-   - fixFiles를 다시 계산한다(기존 값의 부분집합).
-   - id는 유지한다.
-4. 결과 로그
-   - groups가 `[]`이면 `remediation 불필요`
-   - 그룹이 남아 있으면 `Harness 재계획 필요`와 그룹별 상세를 남긴다.
-5. 재계획 계약 (하네스가 수행, 설계 §8.3)
-   - 그룹마다 `axe-remediation-{id}` step을 step 18과 19 사이에 둔다.
-   - 소스 allowedPaths는 그룹 fixFiles만이다.
-   - runtime 쓰기 경로: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-   - plan은 수정하지 않는다.
-   - 각 그룹 step의 AC (순차)
-     - `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-group-done {id} --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
+1. `print.spec.js` (desktop-dark/light)
+   - helper: `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length`
+     - 자체 검증: `/Pages`만 있으면 0, `/Page`가 있으면 1, 공백 없는 `/Type/Page`도 1
+   - 시나리오 A (새 페이지)
+     - 본문과 featured가 보이고 opacity 1이다.
+     - reveal이 비어 있지 않다.
+     - 인터랙션 요소와 modal이 숨겨져 있다.
+     - lightbox는 없거나, 있으면 display none이다.
+     - PDF 크기 > 10240바이트, `pdfPageCount` >= 1
+   - 시나리오 B (overlay 열림)
+     - screen에서 lightbox 1개가 visible인지 먼저 확인한다.
+     - print로 바꾸면 lightbox와 modal이 display none이 된다.
+     - 본문 가시성은 A와 같다.
+     - PDF 크기 > 10240바이트, `pdfPageCount` >= 1
+2. `@media print`
+   - reveal을 보이게 한다.
+   - featured를 포함한다.
+   - overlay와 인터랙션 요소를 숨긴다.
+   - modal-open 잠금을 해제한다.
+   - 기존 숨김 규칙은 유지한다.
 
 ## 완료 기준 (AC)
 
-- 작업 1의 순차 체인이 exit 0이다.
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`가 통과한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- print.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope` 모두 통과

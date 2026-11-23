@@ -1,6 +1,6 @@
-# Step 9 — axe-group-done
+# Step 9 — axe-remediation-plan-schema
 
-- 예상 시간: 12분
+- 예상 시간: 16분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~8 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 9 그룹 완료 판정, 재계획 그룹 step 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 9 계약, plan 규칙)
 3. index.json에서 step 0~8이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js의 `MergedEntry`, `Plan`, `GROUP_ID_RE`를 확인한다.
+4. axe.js의 `BaselineEntry`와 `validateBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -33,31 +33,30 @@
 
 - `tests/` 밖 전부
 - 그 밖의 tests 파일, fixtures
-- step 5~8에서 만든 동작
+- step 6~8의 동작
 
 ## 작업
 
-1. axe.js
-   - `checkGroupDone(collected, plan, groupId) → { done, remaining }`
-     - 순수 함수다.
-     - collected가 배열이 아니면 `Error('invalid collected')`
-     - groupId 형식이 틀리거나 plan에 없으면 `Error('unknown group id: {id}')`
-   - CLI: `--check-group-done <id> [--collected <f>] [--plan <f>]`
-     - collected 기본값: `tests/.tmp/axe-current.json`
-     - done이면 0
-     - remaining이 있거나 오류면 1. remaining은 stderr에 출력한다.
+1. axe.js에 step 9 계약을 구현한다.
+   - `PLAN_PATH`, `GROUP_ID_RE`, `loadPlan`
+   - `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`
+   - CLI: `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`
 2. axe-helper.spec.js (desktop-dark)
-   - 그룹 target이 어느 시나리오에도 없으면 `done: true`
-   - 한 target이 lightbox 시나리오에만 남아 있으면 `done: false`이고, remaining에 해당 key와 target이 들어간다.
-   - 다른 그룹의 target이 남아 있는 것은 결과에 영향을 주지 않는다.
-   - unknown id와 형식 오류 id는 throw한다.
-   - collected가 `{}`이면 throw한다.
-   - 입력이 바뀌지 않는다.
+   - id 형식
+     - 통과: `color-token-1`, `a`, `x2`
+     - 거부: `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열
+   - 중복 id는 거부한다.
+   - 기타 규칙
+     - 정상 plan은 통과한다.
+     - 거부: estMinutes 21, estMinutes 0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상값, coverage 누락
+   - `requireEmpty`
+     - 빈 groups → 통과
+     - 그룹 1개 → 오류
    - subprocess (독립 디렉터리 파일 사용)
-     - done → 0
-     - remaining 있음 → 1
-     - unknown id → 1
-     - collected 파일 없음 → 1
+     - 정상 → 0
+     - 다음은 모두 1: plan 없음, JSON 오류, 대문자 id, 중복 id, coverage 누락, baseline 없음
+     - `--require-empty`: 빈 groups → 0, 그룹 1개 → 1
+     - schema는 정상이지만 그룹이 남은 경우 `--require-empty` → 1
 
 ## 완료 기준 (AC)
 
