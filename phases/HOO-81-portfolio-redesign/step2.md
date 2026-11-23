@@ -1,54 +1,26 @@
-# Step 2 — tests-browser-smoke
+# Step 2 — scope-snapshot-gate
 
-- 예상 시간: 15분
-- 실행 횟수: 시작 snapshot 1회, 브라우저 설치 1회, smoke spec 2회, 전체 테스트 1회, 범위 gate 1회
-- 선행 step: 0~1 completed
+- 목적: 변경 판정, exact allowedPaths/runtime 정책 분류, CLI gate와 나머지 합성 사례를 완성한다. 이 step부터 종료 검사는 완성 CLI.
+- 예상 19분 / 선행 0~1 / 공통 절차 설계 §15
+- read-first: 설계 §11.1, §11.5(런타임 면제), §11.7(규칙, C, 비교 도구 step 2)
+- tracked 허용(exact): `tests/scripts/scope-snapshot.mjs`(추가만), `tests/specs/scope-snapshot-gate.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, step 1 함수 동작, `scope-snapshot-state.spec.js`
 
-## 공통: 시작 전 필수 확인 (read-first)
+## 작업
 
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3(테마), §11.4, §11.7
-3. index.json에서 step 0~1이 completed인지 확인한다. 아니면 중단한다.
-4. `THEME_KEY`, `playwright.config.js`, `start-snapshot.py`, `scope-snapshot.mjs`를 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step2.json`이다. 어떤 파일도 쓰기 전에 실행한다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step2`
+2. `scope-snapshot.mjs`에 step 2 API(`diffAgainstStart`, `classifyChanges`, `checkRuntimeVisible`, `checkSnapshotFirst`, `evaluateGate`, CLI `--check`) 추가. 문자열·순서는 C와 같다.
+3. `scope-snapshot-gate.spec.js` (node 전용, desktop-dark만, 가짜 git·fs, h0·h1·h2 서로 다름)
+   - `CLAUDE.md` 시작 ` M`/h1: 그대로 → 0; 원복(status 없음, h0) → `{content-changed, xyBefore ' M', xyAfter null}`·`outside-tests:CLAUDE.md`; 삭제(` D`, null) → `deleted`·`outside-tests:`; 같은 ` M`에서 h2 → `{content-changed, ' M', ' M'}`·`outside-tests:`
+   - 기존 `tests/playwright.config.js` 시작 ` M`/h1(allow 밖): 그대로 → 0; 시작·종료 ` M`이고 h2 → `tests-changed:tests/playwright.config.js`; 삭제 → `tests-changed:`(deleted); 원복 → `tests-changed:`(xyAfter null); allow에 있으면 → 0
+   - 깨끗한 추적 `tests/helpers/theme.js` → ` M`/h' → `tests-changed:`; 미추적 `?? tests/specs/wip.spec.js` 사라짐 → `tests-changed:`; walk 전용 `tests/fixtures/local.json` h1→h2 → `tests-changed:`
+   - `README.md` hash 같고 xy 없음→`M ` → `status-changed:README.md`; 깨끗한 README → ` M`/h' → `outside-tests:`; 새 `?? docs/x.md` → `outside-tests:`
+   - `?? .harness/runtime/a.json`, `phases/HOO-81-portfolio-redesign/step3.md` 변경 → 0; `.harness/policy.json`·`.harness/harness.lock.json` 변경 → 각각 `outside-tests:`
+   - `?? tests/node_modules/x/index.js` → `runtime-visible:`; 새 allow spec → 0; 새 `tests/specs/other.spec.js` → `tests-changed:`; `R  tests/x.js`←`README.md`(README null) → `outside-tests:README.md`와 `tests-changed:tests/x.js`
+   - `checkSnapshotFirst`, `evaluateGate` 순서, 입력 불변
+   - CLI subprocess(`parity-{숫자}` snapshot 사용 후 삭제): 없는 파일·깨진 JSON·stepId≠파일명 → exit 1; 방금 만든 parity snapshot + `--allow ''` → exit 0·`scope-snapshot: OK`; 모든 실행 전후 snapshot sha256 불변
 
-## tracked source 허용 파일 (exact)
+## AC
 
-- `tests/helpers/theme.js`
-- `tests/specs/smoke.spec.js`
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.pw-browsers/**`, `tests/.npm-cache/**`
-- `tests/.tmp/**` (시작 snapshot 포함), `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `tests/` 밖의 모든 파일
-- step 0·1에서 만든 tests 파일
-- `tests/.tmp/start-snapshot-step2.json` (생성 후 다시 쓰지 않는다)
-
-## 작업 (순서 고정)
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step2.json`
-2. 브라우저 설치: `sh tests/scripts/with-env.sh npm --prefix tests run browsers:install`
-3. `theme.js`
-   - fixture는 `THEME_KEY`가 null일 때만 테마를 주입한다.
-   - `collectConsoleErrors`를 §11.4 계약대로 구현한다.
-4. `smoke.spec.js` (6개 project)
-   - collect를 goto보다 먼저 호출한다.
-   - heroName과 테마를 확인한다.
-   - finish 결과의 두 배열이 빈 배열인지 확인한다.
-   - 비동기 throw를 일으키면 pageErrors가 1건 잡히는지 확인한다.
-
-## 완료 기준 (AC)
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- smoke.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step2.json --allow tests/helpers/theme.js,tests/specs/smoke.spec.js --require-absent tests/helpers/theme.js,tests/specs/smoke.spec.js` → 모두 exit 0 (smoke는 6개 project 모두 통과)
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- scope-snapshot-gate.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step2 && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step2.json --allow tests/scripts/scope-snapshot.mjs,tests/specs/scope-snapshot-gate.spec.js --require-absent tests/specs/scope-snapshot-gate.spec.js` → exit 0

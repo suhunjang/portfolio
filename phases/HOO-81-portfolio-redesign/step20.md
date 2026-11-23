@@ -1,62 +1,18 @@
-# Step 20 — axe-collect
+# Step 20 — axe-regression-prune
 
-- 예상 시간: 17분
-- 실행 횟수: 시작 snapshot 1회, helper 검증 1회, 수집 1회, 병합 1회, 일반 테스트 1회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~19 completed
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (entry key 계약, 실행 모드, 수집 명령 순서, step 20), §8.4, §11.7
-3. index.json에서 step 0~19가 completed인지 확인한다. 아니면 중단한다.
-4. `axe.js`와 `axe-prepare.js`(`prepareForAxe`) API를 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step20.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `tests/specs/axe.spec.js` (신규)
-- `tests/fixtures/axe-collected.json`
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**` (실제 `COLLECT_DIR` 포함)
-- `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `tests/` 밖 전부
-- helper와 그 밖의 tests 파일
-- `axe-baseline.json`, plan
+- 목적: plan 수정 전 회귀 gate와 plan 정리 도구.
+- 예상 19분 / 선행 0~19 / 공통 절차 설계 §15
+- read-first: 설계 §8.3(entry key, step 20, REGRESSION_GATE, gate/recheck)
+- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- runtime: R0(독립 디렉터리 사본만, 실제 plan 파일에 쓰지 않음)
+- 금지: §15.7, step 10·14~19 동작, fixtures
 
 ## 작업
 
-1. `axe.spec.js`
-   - 10개 시나리오를 작성한다. collector는 고정 순서로 사용한다.
-   - 두 모드 공통: 각 시나리오에서 `const prep = await prepareForAxe(page, { scenario })`를 호출한 뒤 `runAxe(page, { include: prep.include })`를 실행한다. 준비가 reject하면 테스트는 실패한다.
-   - 수집 모드에서는 `writeCollected(scenario, testInfo.project.name, violations)`만 실행한다.
-   - 일반 모드에서는 `resolveBaselineMode()`를 먼저 호출한다. baseline이 없으면 기본적으로 throw로 실패한다.
-     - check일 때: `checkRegression(violations, baseline, scenario, project)`, `validateBaseline`(desktop-dark 1회), plan이 있으면 `validateRemediationPlan`(coverage false)
-     - skip일 때: 준비 절차까지만 실행하고 axe 판정은 `test.skip`
-2. 수집 (순차, 병렬 금지)
-   1. `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`
-   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
-   3. `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
-   4. 1과 3이 성공한 뒤 `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge`
-   5. entry 수, (key, target) 수, ruleId별 분포를 로그로 남긴다. 모든 entry가 `key === makeEntryKey(entry)`인지 확인한다.
-3. 최초 일반 실행
-   - 옵션은 이 명령에서만 사용한다: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
-   - 옵션 없는 기본 실행이 이 시점에 실패하는 것은 의도된 결과다.
-   - 하네스는 아래 AC로 검증한다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step20`
+2. 설계 §8.3 step 20 계약 구현.
+3. spec(desktop-dark): checkCollectedRegression 같음 `[]`, 새 key `new-key:`, 새 target `new-target:`, key 불일치 `bad-key:`, 사라짐 `[]`; prunePlan 사라진 target 제거·빈 그룹 삭제·fixFiles 부분집합·id 유지·plan 밖 target 추가 없음·blocked 불변·입력 불변; CLI check-regression 0/1(new-target, baseline 없음, collected 없음); prune-plan 전 sha256·mtime 기록 → new-target이면 exit 1·불변, collected 없음·baseline JSON 오류 exit 1·불변, `sh -c 'node axe.js --check-regression ... && node axe.js --prune-plan ...'` 회귀 실패 시 exit 1·불변, 회귀 없음+사라진 target 1개 exit 0·target 제거·`validateRemediationPlan`(coverage false) 통과.
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge` → exit 0
-- `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step20.json --allow tests/specs/axe.spec.js,tests/fixtures/axe-collected.json` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step20.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0

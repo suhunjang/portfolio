@@ -1,63 +1,18 @@
-# Step 28 — print-pdf
+# Step 28 — focus-trap-lightbox
 
-- 예상 시간: 16분
-- 실행 횟수: 시작 snapshot 1회, print spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~27 completed
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §10, §11.7
-3. index.json에서 step 0~27이 completed인지 확인한다. 아니면 중단한다.
-4. `@media print`와 `ensureLightbox`를 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step28.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `css/style.css` (`@media print` 블록만)
-- `tests/specs/print.spec.js`
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `index.html`, `js/*`, `css/themes.css`
-- 기존 tests
-- PDF 파서 의존성 추가
+- 목적: lightbox trap 연결, 기존 Tab 리스너 제거, focus-visible.
+- 예상 17분 / 선행 0~27 / 공통 절차 설계 §15
+- read-first: 설계 §8.2(step 28); step 27 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 리스너, `.shot-zoom`, `:focus-visible`
+- tracked 허용(exact): `js/main.js`(lightbox 열기·닫기 trap 연결과 기존 Tab 리스너 제거만), `css/style.css`(`:focus-visible`만), `tests/specs/focus-lightbox.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, `index.html`, `js/data.js`, `css/themes.css`, trapFocus 시그니처와 모달 연결, focus-modal.spec
 
 ## 작업 (TDD)
 
-1. `print.spec.js` (desktop-dark/light)
-   - helper: `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length`
-     - 자체 검증: `/Pages`만 있으면 0, `/Page`가 있으면 1, 공백 없는 `/Type/Page`도 1
-   - 시나리오 A (새 페이지)
-     - 본문과 featured가 보이고 opacity 1이다.
-     - reveal이 비어 있지 않다.
-     - 인터랙션 요소와 modal이 숨겨져 있다.
-     - lightbox는 없거나, 있으면 display none이다.
-     - PDF 크기 > 10240바이트, `pdfPageCount` >= 1
-   - 시나리오 B (overlay 열림)
-     - screen에서 lightbox 1개가 visible인지 먼저 확인한다.
-     - print로 바꾸면 lightbox와 modal이 display none이 된다.
-     - 본문 가시성은 A와 같다.
-     - PDF 크기 > 10240바이트, `pdfPageCount` >= 1
-2. `@media print`
-   - reveal을 보이게 한다.
-   - featured를 포함한다.
-   - overlay와 인터랙션 요소를 숨긴다.
-   - modal-open 잠금을 해제한다.
-   - 기존 숨김 규칙은 유지한다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step28`
+2. spec(desktop-dark/light) 먼저 실패 확인: grid 카드 모달 → `.shot-zoom` lightbox에서 Tab/Shift+Tab이 lightbox 안에서만 순환; Esc 1회 lightbox 닫힘·`.shot-zoom` 복귀·이후 모달 경계 순환; Esc 2회 모달 닫힘·트리거 복귀; lightbox 3회 열고 닫은 뒤에도 Tab 한 칸; 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 outline-style ≠ none.
+3. main.js: 열 때 push(`.shot-zoom`)·닫을 때 release, 기존 리스너 제거. style.css: outline 유지·보강(토큰만).
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- print.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step28.json --allow css/style.css,tests/specs/print.spec.js` 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step28.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → exit 0

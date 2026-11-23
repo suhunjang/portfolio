@@ -1,62 +1,19 @@
-# Step 6 — content-static-baseline
+# Step 6 — content-data-baseline
 
-- 예상 시간: 17분
-- 실행 횟수: 시작 snapshot 1회, content-static spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~5 completed (`baseline-index.html`과 `content.js`가 있어야 한다)
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §6, §7.2, §7.3 (`StaticContent`, `extractStatic`), §11.7
-3. index.json에서 step 0~5가 completed인지 확인한다. 아니면 중단한다.
-4. index.html 정적 본문 셀렉터를 확인한다: `.nav-link`, `.hero-eyebrow`, `.hero-cta .btn`, `.section-kicker`, `.section-title`, `.section-sub`, `.about-text p`, `.about-points li`, `.about-meta dt`, `.contact-text`, `.footer-note`, `.footer-top`
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step6.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `tests/fixtures/content-exceptions.json` (신규)
-- `tests/helpers/content.js` (`extractStatic` 추가만)
-- `tests/specs/content-static.spec.js` (신규)
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `tests/` 밖 전부
-- fixture 생성 스크립트, `baseline-data.json`, `baseline-index.html`, `content-data.spec.js`
-- `content.js`의 기존 함수
+- 목적: BASE data·index fixture 생성과 데이터 보존 검사.
+- 예상 16분 / 선행 0~5 / 공통 절차 설계 §15
+- read-first: 설계 §3, §7.1, §7.2-1, §7.3
+- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` script 추가만)
+- runtime: R0
+- 금지: §15.7, `extractStatic`(step 7)
 
 ## 작업
 
-1. `content-exceptions.json`에 §7.2 값을 넣는다.
-   - `kickers.base`, `kickers.final`
-   - `titles.base`, `titles.final`
-   - `featured.indexes` [1, 5, 7]
-   - `subsectionTitleFinal`
-2. `content.js`에 `extractStatic(page): Promise<StaticContent>`를 추가한다.
-   - 모든 필드에 norm을 적용한다.
-   - `navLabels`만 정렬하고, 나머지는 DOM 순서를 유지한다.
-3. `content-static.spec.js` (6개 project, collector 고정 순서)
-   - baseline-index.html을 `javaScriptEnabled: false` context에서 `setContent`로 열고 extractStatic을 실행한다. 그 결과를 현재 `/index.html`의 결과와 비교한다.
-   - `kickers`와 `sectionTitles`는 base 또는 final과 순서까지 정확히 같아야 한다.
-   - final이면 `h3.subsection-title` 기술 스택이 정확히 1개 있어야 한다.
-   - 나머지 필드는 BASE와 같아야 한다.
-   - 허용 예외 판정 함수에 대한 합성 검증
-     - base 배열 → 통과
-     - final 배열 → 통과
-     - 두 배열이 섞인 경우 → 거부
-     - 한 글자라도 다르면 → 거부
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step6`
+2. `make-fixtures.mjs`: `git show BASE:js/data.js`를 vm 평가 → `baseline-data.json`, `git show BASE:index.html` → `baseline-index.html`(step 7용). `fixtures` script 추가 후 실행.
+3. `content.js`: `norm`, `readLiveData`, `normalizeFeatured`(structuredClone, index 1·5·7만, 그 밖·true 아님은 throw), JSDoc typedef.
+4. `content-data.spec.js`(6 project, collector 고정 순서): normalizeFeatured 입력 불변·금지 index throw; `normalizeFeatured(await readLiveData(page))` = baseline deep-equal; featured 없음 또는 1·5·7만; email·phone·social 빈 값; 렌더 개수 stats 4, timeline = CAREER 길이, project-card 13, strengths 6, project-title 배열 = baseline.
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-static.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step6.json --allow tests/fixtures/content-exceptions.json,tests/helpers/content.js,tests/specs/content-static.spec.js` → 모두 통과 (전체 회귀는 6개 project 모두에서 돌린다)
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step6.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0

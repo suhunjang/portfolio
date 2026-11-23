@@ -1,53 +1,18 @@
-# Step 27 — focus-trap-lightbox
+# Step 27 — focus-trap-modal
 
-- 예상 시간: 17분
-- 실행 횟수: 시작 snapshot 1회, focus-lightbox spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~26 completed
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.2 (step 27 범위), §11.7
-3. index.json에서 step 0~26이 completed인지 확인한다. 아니면 중단한다.
-4. step 26의 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 고정 리스너, `.shot-zoom`, `:focus-visible` 규칙을 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step27.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `js/main.js`: lightbox 열기·닫기의 trap 연결과 기존 lightbox Tab 리스너 제거만
-- `css/style.css`: `:focus-visible` 규칙만
-- `tests/specs/focus-lightbox.spec.js` (신규)
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `index.html`, `js/data.js`, `css/themes.css`
-- `trapFocus` 시그니처와 모달 연결(step 26)
-- fixtures, helper, 기존 spec(`focus-modal.spec.js` 포함)
+- 목적: `trapFocus` 구현과 모달 연결.
+- 예상 17분 / 선행 0~26 / 공통 절차 설계 §15
+- read-first: 설계 §8.2(step 27); `openProjectModal`, `closeProjectModal`, `lastFocused`, 모달 포커스 요소, lightbox 코드 위치(수정 금지)
+- tracked 허용(exact): `js/main.js`(`trapFocus` 추가와 모달 열기·닫기 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 관련 코드
 
 ## 작업 (TDD)
 
-1. `focus-lightbox.spec.js`를 먼저 작성해 실패를 확인한다 (desktop-dark/light).
-   - 중첩: `findProjectWithShots`로 찾은 grid 카드 모달 → `.shot-zoom`으로 lightbox 열기 → Tab/Shift+Tab이 lightbox 안에서만 순환한다(모달 trap 일시정지).
-   - 해제·재개: Esc 1회 → lightbox 닫힘, 포커스가 `.shot-zoom`으로 복귀, 이후 Tab이 다시 모달 경계 안에서 순환한다. Esc 2회째 → 모달 닫힘, 트리거로 복귀.
-   - 기존 리스너 제거: lightbox를 3회 열고 닫은 뒤에도 Tab 1회가 정확히 한 칸만 이동한다.
-   - outline: 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 computed `outline-style`이 `none`이 아니다.
-2. main.js
-   - lightbox 열 때 push(returnFocusTo = `.shot-zoom`), 닫을 때 release.
-   - 기존 lightbox Tab 고정 리스너를 제거한다.
-3. style.css: `:focus-visible` outline을 유지·보강한다(토큰만 사용).
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step27`
+2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 마지막→Tab→첫, 첫→Shift+Tab→마지막, 모달 밖으로 나가지 않음; button·backdrop·esc 닫기 후 트리거 복귀; `#heroFeatured`·`#projectGrid` 트리거 양쪽; 연속 2회 열고 닫아도 Tab 한 칸만 이동.
+3. main.js: §8.2 계약 그대로, 열 때 push(trigger)·닫을 때 release.
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0

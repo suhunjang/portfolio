@@ -1,69 +1,19 @@
-# Step 23 — hero-first-screen
+# Step 23 — featured-projects
 
-- 예상 시간: 19분
-- 실행 횟수: 시작 snapshot 1회, hero spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~22 completed
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5 (히어로 순서, tagline 계약, 첫 화면 AC), §9, §11.7
-3. index.json에서 step 0~22가 completed인지 확인한다. 아니면 중단한다.
-4. hero 마크업, reveal, 여백, `#heroFeatured`, `setText` 시그니처를 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step23.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `index.html` (section#hero 내부만. `#heroFeatured`의 마크업은 그대로 둔다)
-- `js/main.js`: 정확히 `setText('heroTagline', PROFILE.tagline);` 1줄만 추가
-- `css/style.css` (hero, `#heroStats`, `#heroFeatured` 배치 규칙만)
-- `tests/specs/hero.spec.js`
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `js/data.js`, `css/themes.css`
-- 대표 카드 렌더링·모달 로직
-- `#heroFeatured`의 속성
-- 섹션, nav
-- 기존 tests, fixtures, helper
+- 목적: 대표 프로젝트 3개 카드와 모달 연결.
+- 예상 19분 / 선행 0~22 / 공통 절차 설계 §15
+- read-first: 설계 §5(컨테이너·카드·함수·data.js), §7, §8.3(회귀); projectGrid 렌더, `openProjectModal`, `lastFocused`, 위임, data.js 1·5·7
+- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤에 정확한 `#heroFeatured` 마크업 추가만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, `#heroFeatured` 위임만), `css/style.css`(`.featured-card`, `.featured-title`, `.featured-blurb`만), `tests/specs/featured.spec.js`
+- runtime: R0
+- 금지: §15.7, `css/themes.css`, hero의 그 밖 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
 
 ## 작업 (TDD)
 
-1. `hero.spec.js`를 먼저 작성해 실패를 확인한다. 6개 project에서 실행하고 collector는 고정 순서로 쓴다.
-   - hero DOM 순서가 §5 1~8과 같다.
-   - tagline
-     - `p.hero-tagline`의 id가 `heroTagline`이다.
-     - `document.getElementById('heroTagline').textContent`가 `PROFILE.tagline`과 같다.
-   - CTA가 맞고, eyebrow·typed가 유지된다.
-   - `#heroFeatured`의 `role=region`과 `aria-label`이 유지된다.
-   - STATS: 375에서 2×2, 768·1280에서 4×1
-   - featured: 375 1열, 768 2열, 1280 3열
-   - 첫 화면 AC (desktop, 실제 폰트)
-     - `document.fonts.ready`를 기다린다.
-     - scrollY는 0이다.
-     - 대상 6개 모두: visible, 크기 > 0, 조상까지 visibility·opacity(`expect.poll`), 1280×800 경계 안
-2. index.html: hero 순서를 바꾸고 `p.hero-tagline#heroTagline`을 추가한다.
-3. main.js: 정확히 `setText('heroTagline', PROFILE.tagline);`를 추가한다.
-4. style.css
-   - eyebrow와 typing을 줄인다.
-   - 여백을 조정한다.
-   - STATS와 featured를 반응형으로 만든다.
-   - blurb는 2줄 clamp
-   - 토큰만 쓴다. 문구는 줄이지 않는다.
-5. axe 새 target은 step 22와 같은 규칙을 따른다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step23`
+2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드별 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter 열고 esc 닫기 복귀; 대표 카드가 생긴 뒤에도 `findProjectWithShots`와 `prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용(닫은 뒤 복귀 대상이 grid 카드).
+3. data.js 3줄, index.html 마크업, main.js(`esc()` 이스케이프 span만, 그리드 직후 호출, `(idx, card)` 호출, 위임), style.css(토큰만).
+4. axe 새 target: 이 step 마크업 때문이면 허용 파일 안에서 고치고, 식별 손실이면 중단·재계획.
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step23.json --allow index.html,js/main.js,css/style.css,tests/specs/hero.spec.js` → 모두 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step23.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0

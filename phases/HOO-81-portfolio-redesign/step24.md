@@ -1,67 +1,26 @@
-# Step 24 — section-structure
+# Step 24 — hero-first-screen
 
-- 예상 시간: 19분
-- 실행 횟수: 시작 snapshot 1회, structure spec 2회, 전체 테스트 1회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~23 completed
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §5(컨테이너 마크업), §6(스크롤스파이 locator 예시 포함), §7, §8.3(canonical 안정성 범위, entry key, 회귀), §11.4, §11.7
-3. index.json에서 step 0~23이 completed인지 확인한다. 아니면 중단한다.
-4. 섹션, nav, scroll-hint, 스크롤스파이, skillsGrid, content-exceptions final, baseline canonical을 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step24.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `index.html` (hero 밖의 섹션, nav, scroll-hint)
-- `js/main.js` (스크롤스파이 배열과 skill-group h4만)
-- `tests/specs/structure.spec.js`
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `css/*`, `js/data.js`
-- hero 내부(`#heroFeatured` 포함)
-- fixtures, helper, 기존 spec
-- 섹션 표에 없는 문구
+- 목적: 히어로 순서·tagline·반응형과 첫 화면 AC(지표 item 4개 개별 검사 포함).
+- 예상 20분 / 선행 0~23 / 공통 절차 설계 §15
+- read-first: 설계 §3(렌더링), §5(히어로 순서, tagline, 첫 화면 AC), §9; main.js `#heroStats` 렌더 코드에서 지표 item·수치·label 셀렉터와 대응 STATS 필드명
+- tracked 허용(exact): `index.html`(section#hero 내부만, `#heroFeatured` 마크업 유지), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄 추가만), `css/style.css`(hero, `#heroStats`, `#heroFeatured` 배치만), `tests/specs/hero.spec.js`
+- runtime: R0
+- 금지: §15.7, `js/data.js`, `css/themes.css`, 대표 카드·모달·`#heroStats` 렌더 로직, `#heroFeatured` 속성, 섹션·nav
 
 ## 작업 (TDD)
 
-1. `structure.spec.js`를 먼저 작성한다 (6개 project).
-   - 섹션, nav, kicker, h2가 §6과 일치한다.
-   - subsection h3가 1개다.
-   - skillsGrid는 about 안에 있고 h4를 쓴다.
-   - contact와 scroll-hint가 맞다.
-   - heading 계층이 올바르다.
-   - 섹션을 이동한 뒤에도 `#heroFeatured`가 `div[role=region][aria-label=대표 프로젝트]`로 유지된다.
-   - 스크롤스파이 (desktop), 정확히 다음 문법을 쓴다:
-     - `const link = page.locator('.nav-link[href="#about"]');`
-     - `await link.click();`
-     - `await expect(link).toHaveClass(/active/);`
-2. index.html
-   - 섹션 subtree를 통째로 이동해 anchor를 보존한다.
-   - kicker를 바꾼다.
-   - Stack &amp; Contact를 분리한다.
-   - nav, scroll-hint, section-alt를 맞춘다.
-3. main.js: 스크롤스파이 배열, skill-group h4
-4. axe canonical 점검 (필수)
-   - 식별을 잃은 경우: 즉시 중단하고 보고한 뒤 재계획을 요청한다.
-   - 새로 만든 요소의 신규 위반: 허용 파일 안에서 고친다.
-   - 자동 편입은 금지다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step24`
+2. `hero.spec.js`(6 project) 먼저 실패 확인
+   - 상단 상수 `STAT_ITEM`, `STAT_VALUE`, `STAT_LABEL`
+   - hero DOM 순서 §5 1~8; `p.hero-tagline` id `heroTagline`, 텍스트 = `PROFILE.tagline`; CTA·eyebrow·typed 유지; `#heroFeatured` role·aria-label 유지
+   - 배치: STATS item 375 2×2, 768·1280 4×1; featured 1/2/3열
+   - 첫 화면(desktop-dark/light, fonts.ready, scrollY 0): helper `expectInFirstScreen(locator)` = `toBeVisible()`, bbox w·h > 0, 자신과 `document.documentElement`까지 모든 조상 visibility `visible`·opacity `1`(`expect.poll`), left x ≥ 0, top y ≥ 0, right x+w ≤ 1280, bottom y+h ≤ 800
+   - 적용: `#heroName`, `#heroTagline`, `#heroStats`, `.featured-title` 3개 각각
+   - 지표: `#heroStats` 안 `STAT_ITEM` 개수 정확히 4. i = 0..3마다 item, item 안 `STAT_VALUE`(정확히 1개), `STAT_LABEL`(정확히 1개) 각각 `expectInFirstScreen`; VALUE 텍스트(norm) = `STATS[i]` 수치 필드, LABEL 텍스트(norm) = `STATS[i]` label 필드
+3. index.html 순서 변경과 tagline 추가, main.js 1줄, style.css(eyebrow·typing 축소, 여백, STATS·featured 반응형, blurb 2줄 clamp, 토큰만, 문구 축소 금지).
+4. axe 새 target은 step 23과 같은 규칙.
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step24.json --allow index.html,js/main.js,tests/specs/structure.spec.js` → 모두 통과
-- content-static.spec에서 final 상태가 성립한다.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step24.json --allow index.html,js/main.js,css/style.css,tests/specs/hero.spec.js` → exit 0
+- hero.spec.js 단독 실행에 지표 item 4개 × (item, 수치, label)의 텍스트·가시성·크기·조상 visibility/opacity·viewport 네 경계 assertion이 포함되어 통과한다.

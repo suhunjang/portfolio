@@ -1,50 +1,18 @@
-# Step 9 — axe-canonical
+# Step 9 — ui-regression
 
-- 예상 시간: 19분
-- 실행 횟수: 시작 snapshot 1회, 테스트 2회, verify-scope 1회, 범위 gate 1회
-- 선행 step: 0~8 completed
-
-## 공통: 시작 전 필수 확인 (read-first)
-
-1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
-2. 설계 문서를 읽는다.
-   - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.1, §8.3 (canonical 식별, 안정성 범위, step 9 계약), §11.7
-3. index.json에서 step 0~8이 completed인지 확인한다. 아니면 중단한다.
-4. JS 렌더 영역, `data-project`, landmark를 확인한다.
-5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
-6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
-   - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)과 §11.7 시작 snapshot 명령은 허용한다.
-   - main 직접 변경, merge, deploy는 금지다.
-7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
-8. 범위 gate(§11.7): 이 step의 첫 동작은 `python3 -I tests/scripts/start-snapshot.py tests/.tmp/start-snapshot-step9.json`이다. 어떤 파일도 쓰기 전에 실행한다.
-
-## tracked source 허용 파일 (exact)
-
-- `tests/helpers/axe.js` (신규)
-- `tests/specs/axe-helper.spec.js` (신규)
-
-## runtime 쓰기 허용 경로 (추적 금지)
-
-- `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
-
-## 수정 금지
-
-- `tests/` 밖 전부
-- 기존 tests 파일
+- 목적: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion 회귀(BASE 사이트에서 통과).
+- 예상 17분 / 선행 0~8 / 공통 절차 설계 §15
+- read-first: 설계 §3(기타), §6(locator 문법), §7.4, §11.4
+- tracked 허용(exact): `tests/specs/ui-regression.spec.js`, `tests/specs/first-visit.spec.js`
+- runtime: R0
+- 금지: §15.7, 모달·lightbox 검사
 
 ## 작업
 
-1. `axe.js`에 step 9 계약을 구현한다: `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe`
-2. `axe-helper.spec.js` (desktop-dark에서 `page.setContent`로 실제 axe 실행)
-   - a) `section#career` subtree 전체를 이동하고, h3를 span으로 바꾸고, 텍스트를 01→04로 바꿔도 key가 같다.
-   - a2) h3만 section 밖으로 이동하면 key가 달라진다.
-   - b) `[data-project=5]` 안에서 div를 p로 바꿔도 key가 같다.
-   - c) 텍스트가 다르면 key가 다르다.
-   - d) `project:5`와 `featured:5`는 서로 다른 key다.
-   - e) alias가 적용되면 key가 같다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step9`
+2. `ui-regression.spec.js`(6 project): 테마 토글 시 `data-theme`·`THEME_KEY` 변경 후 새로고침 유지; mobile 메뉴 `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#projects"]'); await link.click(); await expect(link).toHaveClass(/active/);`; typing 텍스트 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`.
+3. `first-visit.spec.js`: fixture 없이 desktop-dark, colorScheme light·dark 각각 저장값 없으면 시스템 따름.
 
-## 완료 기준 (AC)
+## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step9.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → 통과
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- ui-regression.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step9.json --allow tests/specs/ui-regression.spec.js,tests/specs/first-visit.spec.js` → exit 0
