@@ -47,7 +47,10 @@
     {
       "step": 3,
       "name": "scope-snapshot-loader",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:42:47+0900",
+      "completed_at": "2026-11-24T08:46:32+0900",
+      "summary": "step3 시작 snapshot(created→reused), scope-snapshot.mjs에 loadStartSnapshot 추가(checkPath→readRegular→strict UTF-8/JSON·중복 key→keys→schemaVersion token→stepId·파일명→statusZHex→status parse/paths(S의 레코드별 decode 순서 반영)→xy→files→paths→files/status, 반환 {stepId, identity, entries, xy, files}, 쓰기 없음, step1·2 함수 불변)와 scope-snapshot-loader.spec.js(desktop-dark 전용, 가짜 fs root symlink/file 거부·missing/조상 거부, stepId 형식·파일명 불일치, 실제 저장소 S 생성 parity-<A>→27개 변형에서 S 재사용 분기와 loader 오류 메시지 완전 일치·sha 불변, 경로 계약 6사례(../outside.txt·절대 경로 sentinel·a//b·./x·x/..·statusZHex 외부 레코드) 모두 paths·기록 fs 호출이 root/tests/tests/.tmp/snapshot뿐·sentinel bytes·mtime 불변, 정상 사본 반환 구조·S reused, parity·sentinel 정리) 작성. RED(export 없음) 확인 후 GREEN, AC1(3개 spec 19 passed·전체 24 passed·S reused)·AC2(inline C scope-snapshot: OK) 통과"
     },
     {
       "step": 4,
