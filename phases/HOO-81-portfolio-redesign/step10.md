@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 10 현재 수집 결과 판정, gate, recheck, finalize, 재계획 그룹 step 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 10 현재 수집 결과 판정, gate, recheck, finalize, 재계획 그룹 step 계약)
 3. index.json에서 step 0~9가 completed인지 확인한다. 아니면 중단한다.
-4. axe.js에서 `MergedEntry`, `Plan`, `GROUP_ID_RE`를 확인한다.
+4. axe.js에서 `MergedEntry`, `makeEntryKey`, `Plan`, `GROUP_ID_RE`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -40,7 +40,7 @@
 1. axe.js에 step 10 계약을 구현한다.
    - `checkGroupDone(collected, plan, groupId) → { done, remaining }`
    - `checkCollectedCoverage(collected, plan) → { ok, uncovered }`: plan에 없는 target을 자동으로 편입하지 않는다.
-   - `countCollectedTargets(collected) → number`
+   - `countCollectedTargets(collected) → number`: (key, target) 쌍 개수
    - CLI (`--collected` 기본값은 `tests/.tmp/axe-current.json`)
      - `--check-group-done <id>`
      - `--check-coverage`: uncovered가 있으면 `재계획 필요: plan 밖 잔여 target`을 출력하고 exit 1
@@ -48,7 +48,7 @@
 2. axe-helper.spec.js (desktop-dark, 파일은 독립 디렉터리에 둔다)
    - `checkGroupDone`
      - 그룹 target이 사라짐 → done
-     - lightbox 시나리오에만 남음 → remaining 1건
+     - lightbox 시나리오에만 남음 → remaining 1건 (key는 `lightbox:desktop-*:*`)
      - 다른 그룹의 잔여 target은 결과에 영향을 주지 않는다.
      - unknown id, 형식 오류 id → throw
      - collected가 `{}` → throw
@@ -60,6 +60,7 @@
    - `countCollectedTargets`
      - `[]` → 0
      - target 2개인 entry 1개와 1개인 entry 1개 → 3
+     - 같은 canonical target이 `page:desktop-dark:r`과 `page:desktop-light:r` 두 entry에 있음 → 2
    - subprocess
      - `--check-group-done`: done → 0, remaining → 1, unknown → 1, 파일 없음 → 1
      - `--check-coverage`: 완전 포함 → 0, 잔여 → 1, 파일 없음 → 1

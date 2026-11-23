@@ -9,7 +9,7 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §11.4
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §3, §6(스크롤스파이 locator 예시), §11.4
 3. index.json에서 step 0~4가 completed인지 확인한다. 아니면 중단한다.
 4. 다음을 확인한다.
    - 모달·lightbox·위임·Esc 처리
@@ -48,7 +48,10 @@
    - 모달: 닫기 경로별 동작과 포커스 복귀, Enter로 열기, 제목, `modal-open`
    - lightbox: Esc 2단계
    - 메뉴 (mobile)
-   - 스크롤스파이 (desktop): `const link = page.locator(.nav-link[href="#projects"])`를 클릭한 뒤 `await expect(link).toHaveClass(/active/)`
+   - 스크롤스파이 (desktop), 정확히 다음 문법을 쓴다:
+     - `const link = page.locator('.nav-link[href="#projects"]');`
+     - `await link.click();`
+     - `await expect(link).toHaveClass(/active/);`
    - typing, reduced motion
 3. `first-visit.spec.js`: fixture 없이 desktop-dark에서 실행한다. light와 dark를 각각 확인한다.
 

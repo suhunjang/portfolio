@@ -9,12 +9,12 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §11.1, §11.5(경로 정책), §12
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §11.1, §11.5(Git diff 인자, 경로 정책), §12
 3. index.json에서 step 0이 completed인지 확인한다. 아니면 중단한다.
 4. BASE `rev-parse`, Harness 파일 목록, `with-env.sh`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
-   - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
+   - Git 상태를 바꾸는 명령(init 포함)과 Harness 운영 명령은 하네스만 실행한다.
    - 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 허용한다.
    - main 직접 변경, merge, deploy는 금지다.
 7. 공통 실행 계약: npm·node 명령은 `sh tests/scripts/with-env.sh <명령>`으로 실행한다.
@@ -35,16 +35,20 @@
 
 ## 작업
 
-1. `export const GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`를 정의한다.
-2. `export function collectInput()`을 만든다.
-   - committed, index, worktree+untracked 세 층을 `GIT_DIFF_PATH_ARGS`로 수집한다.
-   - `uncommittedHarness`도 `--no-renames`로 수집한다.
-   - data.js diff 4종은 `--no-renames --unified=0`으로 수집한다.
+1. 상수 두 개를 정의하고 export한다. 섞어 쓰지 않는다.
+   - `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']` (경로 수집 전용)
+   - `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']` (data.js patch 수집 전용)
+2. `export function collectInput({ git = runGit } = {})`을 만든다.
+   - `runGit(args): string`은 Git 읽기 명령만 실행한다.
+   - committed, index, worktree+untracked 세 층과 `uncommittedHarness`는 `GIT_DIFF_PATH_ARGS`로 수집한다.
+   - `dataJsDiffs = { baseHead, baseIndex, baseWorktree, indexWorktree }`는 `GIT_DIFF_PATCH_ARGS` + `-- js/data.js`로 수집한 실제 patch 문자열이다.
    - 그 밖에 index.html blob 3종, gitignore blob 2종, 추적 중인 runtime 경로, 루트 package.json 존재 여부를 모은다.
 3. `export function evaluatePaths(input): string[]`로 §11.5 경로 정책을 구현한다.
 4. CLI
    - 인자 없이 실행: 경로를 검사한다. 위반이 있으면 exit 1, 없으면 `verify-scope: OK (paths)`를 출력한다.
    - `--self-test`
+     - 상수 검증: `GIT_DIFF_PATH_ARGS`와 `GIT_DIFF_PATCH_ARGS`가 위 배열과 정확히 같다.
+     - 호출 기록 검증: 가짜 `git`을 주입해 호출 인자를 기록한다. 경로 층 호출은 모두 `GIT_DIFF_PATH_ARGS`를 포함하고 `--unified=0`을 포함하지 않는다. data.js 4구간 호출은 모두 `GIT_DIFF_PATCH_ARGS`를 포함하고 `--name-only`를 포함하지 않는다.
      - 정상 → 0
      - 위반으로 잡아야 하는 경우
        - worktree의 `docs/other.md`
@@ -63,7 +67,6 @@
        - index: assets/favicon.svg → tests/fixtures/f.svg
        - worktree: docs/superpowers/plans/... → tests/fixtures/p.md
        - index: .claude/settings.json → tests/fixtures/s.json
-     - `GIT_DIFF_PATH_ARGS`에 `--no-renames`가 포함되어 있는지 확인한다.
 5. scripts를 추가한다.
 
 ## 완료 기준 (AC)

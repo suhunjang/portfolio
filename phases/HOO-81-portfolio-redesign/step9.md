@@ -9,7 +9,7 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (step 9 계약, plan 규칙)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 9 계약, plan 규칙)
 3. index.json에서 step 0~8이 completed인지 확인한다. 아니면 중단한다.
 4. axe.js의 `BaselineEntry`와 `validateBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
@@ -39,7 +39,7 @@
 
 1. axe.js에 step 9 계약을 구현한다.
    - `PLAN_PATH`, `GROUP_ID_RE`, `loadPlan`
-   - `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`
+   - `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`. target 부분집합 판정은 baseline 모든 entry의 canonical target 합집합 기준이다.
    - CLI: `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`
 2. axe-helper.spec.js (desktop-dark)
    - id 형식
@@ -48,6 +48,7 @@
    - 중복 id는 거부한다.
    - 기타 규칙
      - 정상 plan은 통과한다.
+     - 같은 canonical target이 baseline 두 entry(다른 project)에 있어도 plan에는 한 그룹에 한 번만 두면 coverage 통과
      - 거부: estMinutes 21, estMinutes 0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상값, coverage 누락
    - `requireEmpty`
      - 빈 groups → 통과

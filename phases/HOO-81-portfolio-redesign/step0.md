@@ -14,7 +14,7 @@
 4. 다음을 확인한다: `THEME_KEY`, 루트 package.json 없음, `tests/` 없음
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
-   - 하네스 전용: Git 상태를 바꾸는 명령(checkout, switch, add, commit, push, reset, stash, merge, rebase, tag 등), Harness 운영 명령(`harness --project-root . ...`)
+   - 하네스 전용: Git 상태를 바꾸는 명령(init, checkout, switch, add, commit, push, reset, stash, merge, rebase, tag 등), Harness 운영 명령(`harness --project-root . ...`)
    - 허용: 검증용 Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)
    - 금지: main 직접 변경, merge, deploy
 7. BASE = `d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d`

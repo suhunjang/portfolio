@@ -19,6 +19,7 @@
   - 8차 `77397ef36423`: 6건
   - 9차 `1890a28bd4a9`: 7건
   - 10차 `754f651120b1`: 4건
+  - 11차 `2e850c809ca8`: 5건 (diff 인자 분리, entry key 계약, plan 수정 전 회귀 gate, focus trap 분할, locator 문법)
   - 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`이 고정)
   - sourceCommit: `cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae`
@@ -173,6 +174,9 @@
 - nav 순서: Career, Projects, Strengths, About, Contact
 - 스크롤스파이 배열: career, projects, strengths, about, contact
 - `.scroll-hint` href: `#career`
+- 스크롤스파이 테스트 예시(정확한 JS 문법)
+  - `const link = page.locator('.nav-link[href="#projects"]'); await link.click(); await expect(link).toHaveClass(/active/);`
+  - `const link = page.locator('.nav-link[href="#about"]'); await link.click(); await expect(link).toHaveClass(/active/);`
 
 ## 7. 콘텐츠 보존과 예외
 
@@ -220,19 +224,19 @@
   - 모달 열림 × dark/light = 2
   - lightbox 열림 × dark/light = 2
 
-### 8.2 포커스 트랩 (step 17)
+### 8.2 포커스 트랩 (step 18, 19)
 
 `trapFocus(container, options?: { returnFocusTo?: HTMLElement }): () => void`
-- 스택 구조이며 최상위 trap만 Tab 순환을 처리한다.
+- 스택 구조이며 최상위 trap만 Tab 순환을 처리한다. document Tab 핸들러는 1개다.
 - `release()`
   - 스택에서 제거하고, returnFocusTo로 포커스를 옮기고, 직전 trap을 재개한다.
   - 여러 번 호출해도 안전하다.
-- 모달: 열 때 push(returnFocusTo = trigger), 닫을 때 release
-- lightbox: 열 때 push(returnFocusTo = `.shot-zoom`)
+- step 18 (modal): trapFocus 구현, 모달 열 때 push(returnFocusTo = trigger), 닫을 때 release. 모달 경계 Tab/Shift+Tab 순환과 닫기 경로별 복귀를 검증한다. lightbox 코드와 기존 lightbox Tab 리스너는 건드리지 않는다.
+- step 19 (lightbox): lightbox 열 때 push(returnFocusTo = `.shot-zoom`)
   - 열려 있는 동안 모달 trap은 일시정지된다.
   - 닫히면 모달 trap이 재개된다.
-- 기존 Tab 고정 리스너는 제거한다.
-- `:focus-visible` outline을 유지한다.
+  - 기존 lightbox Tab 고정 리스너는 제거한다.
+  - `:focus-visible` outline을 유지·검증한다.
 - h1은 1개만 두고, heading level을 건너뛰지 않는다.
 
 ### 8.3 axe 기준선, 식별, 해소
@@ -263,7 +267,18 @@ textSig
 안정성 보장 범위
 - anchor와 대상의 조상 관계가 유지되는 동안에만 같은 key를 보장한다. anchor subtree를 통째로 이동하는 경우가 이에 해당한다.
 - 대상이 anchor 경계 밖으로 나가면 다른 key가 된다.
-- 같은 key는 하나로 합친다.
+
+#### entry key와 병합 단위 (step 7, 이후 모든 step 공통)
+
+- `makeEntryKey({ scenario, project, ruleId }): string` → 정확히 `${scenario}:${project}:${ruleId}`
+  - scenario는 `page|modal|lightbox`, project는 Playwright project 이름(예: `desktop-dark`)
+  - 세 값 중 하나라도 빈 문자열이거나 `:`를 포함하면 throw
+- entry는 (scenario, project, ruleId) 조합마다 정확히 1개다.
+- `targets`: canonical target을 중복 제거하고 문자열 오름차순 정렬해 저장한다.
+- `selectors`: 중복 제거·정렬해 정보로만 저장한다.
+- 같은 canonical target이 다른 scenario 또는 project에 나타나면 별도 entry로 각각 보존한다. 합치지 않는다.
+- 이 계약을 따르는 곳: `mergeCollected`, baseline entry(`key`), `validateBaseline`, `checkRegression`, `checkCollectedRegression`, `countCollectedTargets`, `checkGroupDone`, `checkCollectedCoverage`, `prunePlan`, 그리고 step 12 이후 모든 step
+- (key, target) 쌍이 위반 1건의 단위다.
 
 #### helper 계약 (`tests/helpers/axe.js`)
 
@@ -274,7 +289,8 @@ step 6 — 식별
 - `runAxe(page, { include }) → Violation[]`
   - `Violation = { ruleId, impact, selectors: string[], targets: string[] }`
 
-step 7 — 수집 파일 관리
+step 7 — entry key, 수집 파일 관리
+- `makeEntryKey` (위 계약)
 - `COLLECT_DIR`: 기본 실제 수집 디렉터리(`tests/.tmp/axe-collected` 절대경로)
 - `EXPECTED_FILES: readonly string[]` (10개)
   - `page-{mobile,tablet,desktop}-{dark,light}.json`
@@ -288,8 +304,10 @@ step 7 — 수집 파일 관리
   - 파일명이 `EXPECTED_FILES`에 없으면 throw한다.
 - `mergeCollected(opts?: { collectDir?: string, out?: string }): { entries: MergedEntry[], outPath: string }`
   - 파일 구성이 다르면 `Error('collected files mismatch: missing=[...] extra=[...]')`를 던진다.
+  - 파일마다 scenario·project를 파일명에서 얻고, 같은 ruleId의 violation들을 하나의 entry로 합친다(targets·selectors 중복 제거·정렬).
+  - entries는 key 오름차순으로 정렬한다.
   - out 기본값: `tests/fixtures/axe-collected.json`
-  - `MergedEntry = { key, scenario, project, ruleId, impact, targets, selectors }`
+  - `MergedEntry = { key, scenario, project, ruleId, impact, targets, selectors }`, `key === makeEntryKey(entry)`
 - CLI
   - `--reset [--dir <d>]`
   - `--merge [--dir <d>] [--out <f>]`
@@ -311,10 +329,13 @@ step 8 — baseline 스키마·회귀 판정·누락 정책
   - 파일이 없고 `env.AXE_ALLOW_MISSING_BASELINE === '1'`이면 `skip`
   - 그 밖에는 `Error('axe baseline missing: tests/fixtures/axe-baseline.json')`. 기본 실행은 누락 시 실패한다.
 - `validateBaseline(entries: unknown): string[]`
+  - 각 항목의 `key === makeEntryKey(항목)`이어야 한다. key는 고유해야 한다.
+  - `targets`는 중복 없이 정렬되어 있어야 한다.
   - 각 `fixes[i].fixFiles`가 `FIX_FILES_BY_KIND[fixKind]`와 정확히 같아야 한다.
   - 항목 `fixFiles`는 fixes의 합집합이어야 한다.
 - `checkRegression(violations, baseline, scenario, project): string[]`
   - 순수 함수이며 입력을 바꾸지 않는다.
+  - 각 violation의 key는 `makeEntryKey({ scenario, project, ruleId })`로 만든다.
   - 반환 형식: `new-key:{key}`, `new-target:{key}:{target}`
 - `assertEmptyFile(path = BASELINE_PATH): { ok: boolean, reason?: string }`
 - CLI: `--assert-empty [path]` (정확히 `[]`이면 0, 아니면 1)
@@ -336,11 +357,11 @@ step 10 — 현재 수집 결과 판정
   - `groupId`가 형식 오류이거나 plan에 없으면 `Error('unknown group id: {id}')`
 - `checkCollectedCoverage(collected: MergedEntry[], plan: Plan): { ok: boolean, uncovered: { key: string, target: string }[] }`
   - 순수 함수다.
-  - `collected`의 모든 target이 남은 plan groups 중 어느 한 그룹의 targets에 정확히 포함되어야 `ok`다.
-  - 빠진 target은 `uncovered`로 반환한다.
+  - `collected`의 모든 (key, target)에 대해 target이 남은 plan groups 중 어느 한 그룹의 targets에 정확히 포함되어야 `ok`다.
+  - 빠진 쌍은 `uncovered`로 반환한다.
   - 자동 편입하지 않는다.
 - `countCollectedTargets(collected: MergedEntry[]): number`
-  - 모든 entry의 targets를 (key, target) 쌍으로 센다.
+  - 모든 entry의 (key, target) 쌍을 센다. 같은 target이 다른 entry에 있으면 각각 센다.
   - `collected`가 배열이 아니면 throw한다.
 - CLI (`--collected` 기본값은 모두 `tests/.tmp/axe-current.json`)
   - `--check-group-done <id> [--collected <f>] [--plan <f>]`: done이면 0, 그 밖에는 1
@@ -352,20 +373,38 @@ step 10 — 현재 수집 결과 판정
     - 그 밖에는 개수와 목록을 출력하고 exit 1
   - 파일 없음이나 파싱 오류는 exit 1
 
+step 11 — plan 수정 전 회귀 gate와 plan 정리 도구
+- `checkCollectedRegression(collected: MergedEntry[], baseline: BaselineEntry[]): string[]`
+  - 순수 함수다. 각 entry에 대해 `entry.key === makeEntryKey(entry)`를 확인하고(불일치면 `bad-key:{key}`), `checkRegression`과 같은 규칙으로 `new-key:{key}`, `new-target:{key}:{target}`을 반환한다.
+- `prunePlan(plan: Plan, collected: MergedEntry[], baseline: BaselineEntry[]): Plan`
+  - 순수 함수이며 입력을 바꾸지 않는다.
+  - 현재 collected 어느 entry에도 없는 target을 그룹에서 제거한다.
+  - targets가 빈 그룹을 삭제한다.
+  - 그룹 fixFiles를 남은 target의 baseline fixes로 다시 계산한다. 결과는 기존 fixFiles의 부분집합이다.
+  - id, difficulty, estMinutes, blocked, reason은 유지한다. target이나 그룹을 추가하지 않는다.
+- CLI
+  - `--check-regression [--collected <f>] [--baseline <f>]`: 오류 0이면 exit 0, 아니면 stderr 목록 + exit 1
+  - `--prune-plan [--collected <f>] [--baseline <f>] [--plan <f>]`
+    - 먼저 파일 3개를 읽고 `checkCollectedRegression`을 실행한다.
+    - 읽기 실패나 회귀 오류가 있으면 plan 파일에 쓰지 않고 exit 1. 이때 plan 파일 bytes는 변하지 않는다.
+    - 통과하면 `prunePlan` 결과를 `JSON.stringify(plan, null, 2) + '\n'`으로 쓰고 exit 0
+- plan 파일 수정은 `--prune-plan`으로만 한다. 손으로 편집하는 것은 금지다.
+
 #### fixture
 
-`tests/fixtures/axe-collected.json` (step 11)
-- 병합한 수집 결과. tracked이며 정보용이다.
+`tests/fixtures/axe-collected.json` (step 12)
+- 병합한 수집 결과. tracked이며 정보용이다. entry 계약을 따른다.
 
-`tests/fixtures/axe-baseline.json` (step 12)
-- 항목 필드: `key`, `scenario`, `project`, `ruleId`, `impact`, `targets`(canonical), `selectors`, `fixes[{ target, fixKind, fixFiles }]`(target마다 1개), `fixFiles`(합집합)
+`tests/fixtures/axe-baseline.json` (step 13)
+- 항목 필드: `key`(= `makeEntryKey`), `scenario`, `project`, `ruleId`, `impact`, `targets`(canonical, 중복 제거·정렬), `selectors`, `fixes[{ target, fixKind, fixFiles }]`(target마다 1개), `fixFiles`(합집합)
+- axe-collected.json entry와 key·targets가 1:1로 대응한다.
 - fixKind와 fixFiles의 대응은 `FIX_FILES_BY_KIND`와 정확히 같아야 한다.
 
-`tests/fixtures/axe-remediation-plan.json` (step 12)
+`tests/fixtures/axe-remediation-plan.json` (step 13)
 - 형식: `{ groups: [{ id, targets: canonical[], fixFiles: string[], difficulty: 'low'|'medium'|'high', estMinutes: number, blocked: boolean, reason: string }] }`
 - 규칙
   - `id`는 `GROUP_ID_RE`를 만족하고 고유해야 한다.
-  - target은 baseline의 부분집합이고, 그룹 사이에 중복이 없어야 한다.
+  - target은 baseline canonical target 합집합의 부분집합이고, 그룹 사이에 중복이 없어야 한다.
   - `fixFiles`는 해당 target fixFiles의 합집합이다.
   - `estMinutes`는 1~20 정수다.
   - `difficulty`는 열거값 중 하나다.
@@ -375,43 +414,46 @@ step 10 — 현재 수집 결과 판정
 #### 실행 모드
 - 수집 모드(`AXE_COLLECT=1`): axe.spec.js는 baseline을 로드하지 않는다. `writeCollected`만 하며 위치는 `resolveCollectDir()`가 정한다.
 - 일반 모드(기본): axe.spec.js가 `resolveBaselineMode()`를 호출한다.
-  - check이면 회귀 판정, `validateBaseline`, plan 검증을 실행한다.
+  - check이면 회귀 판정(`checkRegression`), `validateBaseline`, plan 검증을 실행한다.
   - baseline이 없으면 기본적으로 실패한다.
-  - `AXE_ALLOW_MISSING_BASELINE=1`은 step 11의 일반 실행 명령에서만 쓴다.
-- 수집 명령 순서: 최초 수집, gate, recheck, finalize, remediation 그룹 step에 공통으로 적용한다.
+  - `AXE_ALLOW_MISSING_BASELINE=1`은 step 12의 일반 실행 명령에서만 쓴다.
+- 수집 명령 순서(COLLECT_CHAIN): 최초 수집, gate, recheck, finalize, remediation 그룹 step에 공통으로 적용한다.
   1. helper 합성 검증: `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`. 독립 디렉터리만 쓰며, 실제 `COLLECT_DIR`가 보존되는지 증명한다.
   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
   3. 실제 수집: `AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js`
   4. 1과 3이 모두 성공한 뒤에만 merge: `sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge [--out <f>]`
   - 모두 `&&`로 순차 연결한다. 병렬 실행은 금지다.
+- 회귀 사전 gate(REGRESSION_GATE): plan 수정 전에 COLLECT_CHAIN 바로 뒤에 `&&`로 연결한다.
+  - `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json`
 
 #### 단계
 
-step 11 — 최초 수집
+step 12 — 최초 수집
 - 10개 시나리오를 구현하고 `axe-collected.json`을 만든다.
 - 이 step의 일반 실행에만 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
   - 명령: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
   - 하네스는 이 step의 본문 AC로 검증한다.
   - 옵션 없는 기본 실행이 이 시점에 실패하는 것은 의도된 결과다.
-  - step 12 이후에는 기본 testCommand가 통과해야 한다.
+  - step 13 이후에는 기본 testCommand가 통과해야 한다.
 
-step 12 — 분류
+step 13 — 분류
 - 예상 시간 = 묶음별 (2분 + target × 1분)의 합 + 5분
 - 20분을 넘으면 즉시 중단하고 재계획을 요청한다.
 - 20분 이하면 실제 출처를 조사해 baseline과 plan을 확정한다.
 
-step 13~18 — 회귀 판정
+step 14~20 — 회귀 판정
 - 새 key나 target이 나오면 실패, 사라진 것은 허용한다.
 - 자동 편입은 금지다.
 - 해당 step이 만든 실제 신규 위반은 그 step 안에서 고친다.
 - 기존 위반의 식별이 깨진 경우면 중단하고 재계획을 요청한다.
 
-step 19 — gate
-1. 수집 순서대로 `tests/.tmp/axe-current.json`을 만든다.
-2. 회귀를 검사한다.
-3. plan을 재생성한다. 사라진 target과 빈 그룹만 제거하고 추가하지 않는다.
-4. `--check-coverage`로 현재 수집 target 전체가 남은 groups에 포함되는지 확인한다. 빠진 target이 있으면 자동 편입하지 않고 재계획 사유로 실패한다.
-5. 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 step 19와 20 사이에 재계획한다.
+step 21 — gate (순차, `&&`)
+1. COLLECT_CHAIN (`--merge --out tests/.tmp/axe-current.json`)
+2. REGRESSION_GATE (`--check-regression`). 실패하면 plan은 건드리지 않고 중단한다.
+3. `--prune-plan --collected tests/.tmp/axe-current.json`. 내부에서도 회귀를 다시 확인하며 실패 시 plan bytes는 그대로다.
+4. `--check-coverage --collected tests/.tmp/axe-current.json`. 빠진 target이 있으면 자동 편입하지 않고 재계획 사유로 실패한다.
+5. `--check-plan`
+6. 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 step 21과 22 사이에 재계획한다.
 
 재계획 그룹 step 계약
 - allowedPaths
@@ -419,19 +461,18 @@ step 19 — gate
   - runtime: `tests/.tmp/**`(실제 `COLLECT_DIR`, `axe-current.json` 포함), `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`
 - 시간: 20분 이하
 - plan 파일은 수정하지 않는다.
-- AC (순차): helper 검증 → reset → 실제 수집 → `--merge --out tests/.tmp/axe-current.json` → `--check-group-done {id}` → `npm --prefix tests test` → verify-scope
+- AC (순차): COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--check-group-done {id}` → `npm --prefix tests test` → verify-scope
 - blocked 그룹은 담당 구현 step을 재개한다.
 
-step 20 — recheck
-- gate 절차를 같은 allowedPaths로 다시 실행한다.
-- AC에 다음을 모두 포함한다.
-  - `--check-coverage`
+step 22 — recheck
+- gate 1~5를 같은 순서·같은 allowedPaths로 다시 실행한다. REGRESSION_GATE를 plan 수정 전에 똑같이 적용한다.
+- 추가 AC
   - `--check-plan --require-empty`
   - `--assert-no-violations --collected tests/.tmp/axe-current.json`
 - baseline에 target이 남아 있어도 회귀 판정은 통과할 수 있다. 그 허점은 `--assert-no-violations`로 막는다.
 
-step 21 — finalize
-1. 시작 전에 수집 순서대로 다시 수집한다.
+step 23 — finalize
+1. 시작 전에 COLLECT_CHAIN과 REGRESSION_GATE를 다시 실행한다.
 2. `--check-plan --require-empty && --assert-no-violations`가 통과해야 한다. 아니면 중단한다.
 3. 이 step에서만 baseline을 `[]`로 바꾼다.
 4. AC: `--assert-empty` + 일반 axe 전체 통과
@@ -524,7 +565,7 @@ exec "$@"
 - projects 6개: {mobile 375×812, tablet 768×1024, desktop 1280×800} × {dark, light}
 - 테마 fixture: `THEME_KEY`가 null일 때만 주입한다.
 - 최초 방문 검사: fixture 없이 별도 context에서 한다.
-- 스크롤스파이: `toHaveClass(/active/)` 재시도 assertion
+- 스크롤스파이: §6의 정확한 locator 예시와 `toHaveClass(/active/)` 재시도 assertion
 
 `collectConsoleErrors(page): ErrorCollector`
 
@@ -541,8 +582,14 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 
 ### 11.5 범위 검사 (`tests/scripts/verify-scope.mjs`)
 
+#### Git diff 인자 (분리, step 1)
+- `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`: 경로 수집 전용. committed·index·worktree·uncommittedHarness에 쓴다.
+- `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']`: `js/data.js` 4구간(BASE→HEAD, BASE→index, BASE→worktree, index→worktree) 실제 patch 수집 전용.
+- 두 상수는 export하며 서로 섞어 쓰지 않는다. 이동은 삭제 + 추가로 판정한다.
+- `collectInput({ git = runGit } = {})`: git 실행 함수를 주입할 수 있다. `runGit(args): string`은 Git 읽기 명령만 실행한다.
+- `input.dataJsDiffs = { baseHead, baseIndex, baseWorktree, indexWorktree }`는 실제 patch 문자열이며, 그대로 `checkDataJsDiff`에 전달된다.
+
 #### 경로 정책 (step 1)
-- `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`를 committed·index·worktree·uncommittedHarness·data.js diff 모두에 적용한다. 이동은 삭제 + 추가로 판정한다.
 - 빌더 허용 경로: §11.1 tracked source
 - 하네스 소유 경로
   - 대상: `CLAUDE.md`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, `.claude/**`, `.codex/**`, `.harness/harness.lock.json`, `.harness/policy.json`, 이 설계 문서, 레거시 `scripts/**`, `templates/**`, `harness-manifest.json`
@@ -552,19 +599,20 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 - runtime 경로가 추적되거나 루트 package.json이 있으면 위반이다.
 
 #### 내용 판정 (step 2)
-- `js/data.js` 4구간 공통
-  - 삭제 0줄
-  - 추가 줄은 `featured: true,`만
+- `js/data.js` 4구간 공통 (`checkDataJsDiff(patchText, { requireExactly3 })`)
+  - `---`/`+++` 헤더를 제외한 삭제 줄 0줄
+  - 추가 줄은 trim 후 `featured: true,`만
   - 3줄 이하
 - `--final`이면 BASE→HEAD, BASE→index, BASE→worktree 각각 정확히 3줄이다. index→worktree에는 공통 규칙만 적용한다.
 - `index.html` 3종은 `Space+Grotesk`를 포함해야 한다.
 - `tests/.gitignore`(index, worktree)는 §11.1 규칙을 따른다.
+- 합성 테스트: 주입한 가짜 git이 `GIT_DIFF_PATCH_ARGS` 호출에만 patch를, `GIT_DIFF_PATH_ARGS` 호출에는 이름 목록을 돌려준다. data.js 4구간이 patch 인자로 호출되었고 그 patch 문자열이 `checkDataJsDiff`까지 전달되어 판정에 쓰이는지 확인한다.
 
 ### 11.6 통합 AC
 - step 1 이후 기본: `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
-- step 11: 일반 실행에 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
-- step 21·22: `--assert-empty`를 추가한다.
-- step 22: `verify-scope -- --final`을 추가한다.
+- step 12: 일반 실행에 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
+- step 23·24: `--assert-empty`를 추가한다.
+- step 24: `verify-scope -- --final`을 추가한다.
 - 각 step은 자기 spec을 먼저 단독으로 실행한 뒤 전체 회귀를 돌린다.
 
 ## 12. 변경 허용 경로와 운영 경계
@@ -576,14 +624,14 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 
 ### 사이트 파일 변경 시점
 - `index.html`
-  - 구조 변경: step 13, 14, 15
+  - 구조 변경: step 14, 15, 16
   - 속성 변경: 재계획된 remediation 그룹 step만
 - `css/themes.css`: remediation 그룹 step만
 
 ### 명령 권한
 - Git 읽기 명령(rev-parse, diff, show, ls-files, ls-tree, status, log)은 빌더와 검증 스크립트에 허용한다.
 - 하네스만 실행
-  - Git 상태 변경 명령: checkout, switch, add, commit, push, reset, stash, merge, rebase, tag 등
+  - Git 상태 변경 명령: init, checkout, switch, add, commit, push, reset, stash, merge, rebase, tag 등
   - Harness 운영 명령: `harness --project-root . check`, `plan-session`, `review-plan`, `approval`, `runner`
 
 ### 빌더 수정 금지
@@ -600,23 +648,25 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 | 4 | content-static-baseline | 16분 | 0~3 |
 | 5 | interaction-regression | 18분 | 0~4 |
 | 6 | axe-canonical | 18분 | 0~5 |
-| 7 | axe-collect-tooling | 16분 | 0~6 |
+| 7 | axe-collect-tooling | 18분 | 0~6 |
 | 8 | axe-baseline-regression | 18분 | 0~7 |
 | 9 | axe-remediation-plan-schema | 16분 | 0~8 |
 | 10 | axe-current-checks | 16분 | 0~9 |
-| 11 | axe-collect | 15분 | 0~10 |
-| 12 | axe-classify | 20분 (초과 예상 시 재계획) | 0~11 |
-| 13 | featured-projects | 18분 | 0~12 |
-| 14 | hero-first-screen | 18분 | 0~13 |
-| 15 | section-structure | 18분 | 0~14 |
-| 16 | section-layout | 15분 | 0~15 |
-| 17 | focus-trap | 18분 | 0~16 |
-| 18 | print-pdf | 15분 | 0~17 |
-| 19 | axe-remediation-gate | 15분 | 0~18 |
-| (재계획) | axe-remediation-{id} | 그룹당 20분 이하 | 19 |
-| 20 | axe-remediation-recheck | 15분 | 0~19 + 재계획 그룹 |
-| 21 | axe-finalize | 14분 | 0~20 |
-| 22 | final-verification | 12분 | 0~21 |
+| 11 | axe-regression-prune | 18분 | 0~10 |
+| 12 | axe-collect | 15분 | 0~11 |
+| 13 | axe-classify | 20분 (초과 예상 시 재계획) | 0~12 |
+| 14 | featured-projects | 18분 | 0~13 |
+| 15 | hero-first-screen | 18분 | 0~14 |
+| 16 | section-structure | 18분 | 0~15 |
+| 17 | section-layout | 15분 | 0~16 |
+| 18 | focus-trap-modal | 16분 | 0~17 |
+| 19 | focus-trap-lightbox | 16분 | 0~18 |
+| 20 | print-pdf | 15분 | 0~19 |
+| 21 | axe-remediation-gate | 16분 | 0~20 |
+| (재계획) | axe-remediation-{id} | 그룹당 20분 이하 | 21 |
+| 22 | axe-remediation-recheck | 16분 | 0~21 + 재계획 그룹 |
+| 23 | axe-finalize | 15분 | 0~22 |
+| 24 | final-verification | 12분 | 0~23 |
 
 ## 14. 빌더 재량
 
