@@ -1,4 +1,4 @@
-# Step 12 — axe-remediation-plan-schema
+# Step 12 — axe-baseline-projection
 
 - 예상 시간: 16분
 - 실행 횟수: 테스트 2회, verify-scope 1회
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 12 계약, plan 규칙)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 12 투영·양방향 일치, fixture)
 3. index.json에서 step 0~11이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js의 `BaselineEntry`와 `validateBaseline`을 확인한다.
+4. axe.js의 `MergedEntry`, `BaselineEntry`, `makeEntryKey`, `loadBaseline`을 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -33,31 +33,32 @@
 
 - `tests/` 밖 전부
 - 그 밖의 tests 파일, fixtures
-- step 7~11의 동작
+- step 7~11에서 만든 동작
 
 ## 작업
 
 1. axe.js에 step 12 계약을 구현한다.
-   - `PLAN_PATH`, `GROUP_ID_RE`, `loadPlan`
-   - `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`. target 부분집합 판정은 baseline 모든 entry의 canonical target 합집합 기준이다.
-   - CLI: `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`
-2. axe-helper.spec.js (desktop-dark)
-   - id 형식
-     - 통과: `color-token-1`, `a`, `x2`
-     - 거부: `Group-1`, `a--b`, `-a`, `a-`, `a_b`, 빈 문자열
-   - 중복 id는 거부한다.
-   - 기타 규칙
-     - 정상 plan은 통과한다.
-     - 같은 canonical target이 baseline 두 entry(다른 project)에 있어도 plan에는 한 그룹에 한 번만 두면 coverage 통과
-     - 거부: estMinutes 21, estMinutes 0, fixFiles 불일치, 그룹 간 중복, text-change인데 blocked 아님, difficulty 이상값, coverage 누락
-   - `requireEmpty`
-     - 빈 groups → 통과
-     - 그룹 1개 → 오류
-   - subprocess (독립 디렉터리 파일 사용)
-     - 정상 → 0
-     - 다음은 모두 1: plan 없음, JSON 오류, 대문자 id, 중복 id, coverage 누락, baseline 없음
-     - `--require-empty`: 빈 groups → 0, 그룹 1개 → 1
-     - schema는 정상이지만 그룹이 남은 경우 `--require-empty` → 1
+   - `PROJECTION_FIELDS`, `projectEntry`, `compareCollectedBaseline`
+   - CLI: `--check-baseline-match [--collected <f>] [--baseline <f>]` (`--collected` 기본 `tests/fixtures/axe-collected.json`)
+2. axe-helper.spec.js (desktop-dark, 독립 디렉터리)
+   - `projectEntry`
+     - baseline 항목에서 `fixes`, `fixFiles`를 버리고 7개 필드만 남긴다.
+     - 미정렬·중복 targets/selectors를 정렬·중복 제거한다.
+     - key 불일치, 필드 누락 → throw
+   - `compareCollectedBaseline`
+     - 같은 내용(baseline은 fixes 포함) → `ok`
+     - collected에만 있는 entry → `missingEntries`에 key 1건, `ok` false
+     - baseline에만 있는 entry → `extraEntries`에 key 1건, `ok` false
+     - 같은 key에서 collected에만 있는 target → `missingTargets` 1건
+     - 같은 key에서 baseline에만 있는 target → `extraTargets` 1건
+     - impact 다름 → `fieldMismatches`에 `{key, field: 'impact'}`
+     - selectors 다름 → `fieldMismatches`에 `{key, field: 'selectors'}`
+     - 한쪽에 중복 key → throw
+     - 두 입력이 변경되지 않는다.
+   - subprocess `--check-baseline-match`
+     - 일치 → 0
+     - missing entry, extra entry, missing target, extra target, impact 불일치 각각 → 1
+     - collected 파일 없음, baseline JSON 오류 → 1
 
 ## 완료 기준 (AC)
 

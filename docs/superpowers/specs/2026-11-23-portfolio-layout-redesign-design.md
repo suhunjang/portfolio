@@ -21,6 +21,7 @@
   - 10차 `754f651120b1`: 4건
   - 11차 `2e850c809ca8`: 5건 (diff 인자 분리, entry key 계약, plan 수정 전 회귀 gate, focus trap 분할, locator 문법)
   - 12차 `a26257befcd4`: 4건 (axe 준비 절차, 회귀 spec 분할, blocked 그룹 중단, collected↔baseline 양방향 일치)
+  - 13차 `b2608d1436cb`: 3건 (grid 카드 클릭 범위 고정, 준비 helper page/overlay 분할, screenshots 단독 AC)
   - 사용자 결정·콘텐츠·비목표는 바뀌지 않았다.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`이 고정)
   - sourceCommit: `cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae`
@@ -132,6 +133,7 @@
 - 카드 안에는 `span`과 텍스트만 둔다.
 - h1~h6, p, div, ul, ol, li, section, article은 넣지 않는다.
 - 두 span은 `display: block`으로 표시한다.
+- 대표 카드와 grid 카드는 같은 `data-project` 값을 가진다. 테스트 helper가 grid 카드를 지정할 때는 반드시 `#projectGrid .project-card[data-project="N"]` 범위로 한정한다(§7.4, §8.4).
 
 ### 함수 계약
 - `renderFeaturedProjects(): void`
@@ -221,12 +223,17 @@
 - step 5 `modal-regression.spec.js`: `tests/helpers/modal.js`와 함께 모달·lightbox 회귀만 다룬다.
 - step 6 `ui-regression.spec.js` + `first-visit.spec.js`: 테마, 최초 방문, 메뉴, scrollspy, typing, reduced-motion 회귀만 다룬다.
 - `tests/helpers/modal.js` 계약 (step 5)
-  - `openFirstProjectByClick(page): Promise<Locator>` — 첫 `.project-card`를 click으로 열고 그 카드를 반환
+  - `GRID_CARD = '#projectGrid .project-card'`
+  - `gridCard(page, N): Locator` → 정확히 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`
+  - `openFirstProjectByClick(page): Promise<Locator>` — 첫 `GRID_CARD`를 click으로 열고 그 카드를 반환
   - `openFirstProjectByEnter(page): Promise<Locator>`
   - `closeVia(page, how: 'button'|'backdrop'|'esc'): Promise<void>` (backdrop은 `{x:5, y:5}` 클릭)
   - `expectFocused(page, locator): Promise<void>`
   - `modalTitle(page): Locator` — 열린 모달의 제목 요소
-  - `findProjectWithShots(page): Promise<number | null>` — 모달 안에 `.shot-zoom`이 렌더링되는 첫 프로젝트 index. 없으면 null
+  - `findProjectWithShots(page): Promise<number | null>`
+    - `#projectGrid .project-card[data-project]` 카드만 DOM 순서로 탐색한다. `#heroFeatured` 등 grid 밖의 같은 `data-project` 요소는 열거·클릭하지 않는다.
+    - 각 grid 카드를 `gridCard(page, N)`로 열어 모달 안에 `.shot-zoom`이 있으면 모달을 닫고 N을 반환한다. 없으면 닫고 다음 카드로 간다.
+    - 끝까지 없으면 null
 
 ## 8. 접근성
 
@@ -238,15 +245,15 @@
   - lightbox 열림 × dark/light = 2
 - 모든 시나리오는 수집 모드와 일반 모드 모두 §8.4의 `prepareForAxe`를 먼저 통과한 뒤에만 axe를 실행한다.
 
-### 8.2 포커스 트랩 (step 22, 23)
+### 8.2 포커스 트랩 (step 23, 24)
 
 `trapFocus(container, options?: { returnFocusTo?: HTMLElement }): () => void`
 - 스택 구조이며 최상위 trap만 Tab 순환을 처리한다. document Tab 핸들러는 1개다.
 - `release()`
   - 스택에서 제거하고, returnFocusTo로 포커스를 옮기고, 직전 trap을 재개한다.
   - 여러 번 호출해도 안전하다.
-- step 22 (modal): trapFocus 구현, 모달 열 때 push(returnFocusTo = trigger), 닫을 때 release. 모달 경계 Tab/Shift+Tab 순환과 닫기 경로별 복귀를 검증한다. lightbox 코드와 기존 lightbox Tab 리스너는 건드리지 않는다.
-- step 23 (lightbox): lightbox 열 때 push(returnFocusTo = `.shot-zoom`)
+- step 23 (modal): trapFocus 구현, 모달 열 때 push(returnFocusTo = trigger), 닫을 때 release. 모달 경계 Tab/Shift+Tab 순환과 닫기 경로별 복귀를 검증한다. lightbox 코드와 기존 lightbox Tab 리스너는 건드리지 않는다.
+- step 24 (lightbox): lightbox 열 때 push(returnFocusTo = `.shot-zoom`)
   - 열려 있는 동안 모달 trap은 일시정지된다.
   - 닫히면 모달 trap이 재개된다.
   - 기존 lightbox Tab 고정 리스너는 제거한다.
@@ -282,7 +289,7 @@ textSig
 - anchor와 대상의 조상 관계가 유지되는 동안에만 같은 key를 보장한다. anchor subtree를 통째로 이동하는 경우가 이에 해당한다.
 - 대상이 anchor 경계 밖으로 나가면 다른 key가 된다.
 
-#### entry key와 병합 단위 (step 9, 이후 모든 step 공통)
+#### entry key와 병합 단위 (step 10, 이후 모든 step 공통)
 
 - `makeEntryKey({ scenario, project, ruleId }): string` → 정확히 `${scenario}:${project}:${ruleId}`
   - scenario는 `page|modal|lightbox`, project는 Playwright project 이름(예: `desktop-dark`)
@@ -291,7 +298,7 @@ textSig
 - `targets`: canonical target을 중복 제거하고 문자열 오름차순 정렬해 저장한다.
 - `selectors`: 중복 제거·정렬해 정보로만 저장한다.
 - 같은 canonical target이 다른 scenario 또는 project에 나타나면 별도 entry로 각각 보존한다. 합치지 않는다.
-- 이 계약을 따르는 곳: `mergeCollected`, baseline entry(`key`), `validateBaseline`, `projectEntry`, `compareCollectedBaseline`, `checkRegression`, `checkCollectedRegression`, `countCollectedTargets`, `checkGroupDone`, `checkCollectedCoverage`, `prunePlan`, 그리고 step 16 이후 모든 step
+- 이 계약을 따르는 곳: `mergeCollected`, baseline entry(`key`), `validateBaseline`, `projectEntry`, `compareCollectedBaseline`, `checkRegression`, `checkCollectedRegression`, `countCollectedTargets`, `checkGroupDone`, `checkCollectedCoverage`, `prunePlan`, 그리고 step 17 이후 모든 step
 - (key, target) 쌍이 위반 1건의 단위다.
 
 #### helper 계약 (`tests/helpers/axe.js`)
@@ -303,9 +310,9 @@ step 7 — 식별
 - `runAxe(page, { include }) → Violation[]`
   - `Violation = { ruleId, impact, selectors: string[], targets: string[] }`
 
-step 8 — 시나리오 준비 (`tests/helpers/axe-prepare.js`, §8.4)
+step 8, 9 — 시나리오 준비 (`tests/helpers/axe-prepare.js`, §8.4)
 
-step 9 — entry key, 수집 파일 관리
+step 10 — entry key, 수집 파일 관리
 - `makeEntryKey` (위 계약)
 - `COLLECT_DIR`: 기본 실제 수집 디렉터리(`tests/.tmp/axe-collected` 절대경로)
 - `EXPECTED_FILES: readonly string[]` (10개)
@@ -329,7 +336,7 @@ step 9 — entry key, 수집 파일 관리
   - `--merge [--dir <d>] [--out <f>]`
   - throw가 나면 stderr에 출력하고 exit 1
 
-step 10 — baseline 스키마·회귀 판정·누락 정책
+step 11 — baseline 스키마·회귀 판정·누락 정책
 - `BASELINE_PATH`: `tests/fixtures/axe-baseline.json`
 - `FIX_FILES_BY_KIND`
   - css-token: `[css/themes.css]`
@@ -356,7 +363,7 @@ step 10 — baseline 스키마·회귀 판정·누락 정책
 - `assertEmptyFile(path = BASELINE_PATH): { ok: boolean, reason?: string }`
 - CLI: `--assert-empty [path]` (정확히 `[]`이면 0, 아니면 1)
 
-step 11 — collected↔baseline 투영·양방향 일치
+step 12 — collected↔baseline 투영·양방향 일치
 - `PROJECTION_FIELDS = ['key','scenario','project','ruleId','impact','targets','selectors']`
 - `projectEntry(entry): ProjectedEntry`
   - 위 7개 필드만 남긴다. `targets`·`selectors`는 중복 제거·오름차순 정렬한다. `fixes`, `fixFiles` 같은 baseline 전용 필드는 버린다.
@@ -373,7 +380,7 @@ step 11 — collected↔baseline 투영·양방향 일치
   - `--collected` 기본값: `tests/fixtures/axe-collected.json`
   - ok면 exit 0. 아니면 다섯 목록을 stderr에 출력하고 exit 1. 파일 없음·파싱 오류도 exit 1
 
-step 12 — remediation plan 스키마
+step 13 — remediation plan 스키마
 - `PLAN_PATH`: `tests/fixtures/axe-remediation-plan.json`
 - `GROUP_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/`
 - `loadPlan(path = PLAN_PATH): Plan`
@@ -383,7 +390,7 @@ step 12 — remediation plan 스키마
 - CLI: `--check-plan [--coverage] [--require-empty] [--plan <f>] [--baseline <f>]`
   - 오류가 있거나 파일이 없으면 exit 1
 
-step 13 — 실행 가능성 검사 (blocked·text-change·빈 fixFiles 중단)
+step 14 — 실행 가능성 검사 (blocked·text-change·빈 fixFiles 중단)
 - `validateRemediationExecutable(plan: Plan, baseline: BaselineEntry[]): string[]`
   - 순수 함수다. 남은 그룹마다 다음을 오류로 반환한다.
     - `blocked-group:{id}`: `blocked === true`
@@ -397,7 +404,7 @@ step 13 — 실행 가능성 검사 (blocked·text-change·빈 fixFiles 중단)
 - 이 검사가 실패하면 자동 remediation step 생성과 다음 단계 진행을 모두 멈춘다. 기존 콘텐츠 변경이 필요한 경우 새 계획에서 §7.2 설계 예외와 담당 step allowedPaths를 확정한 뒤에만 진행한다.
 - `fixFiles = []`인 실행 step은 생성하지 않는다.
 
-step 14 — 현재 수집 결과 판정
+step 15 — 현재 수집 결과 판정
 - `checkGroupDone(collected: MergedEntry[], plan: Plan, groupId: string): { done: boolean, remaining: { key: string, target: string }[] }`
   - 순수 함수다.
   - `collected`가 배열이 아니면 `Error('invalid collected')`
@@ -420,7 +427,7 @@ step 14 — 현재 수집 결과 판정
     - 그 밖에는 개수와 목록을 출력하고 exit 1
   - 파일 없음이나 파싱 오류는 exit 1
 
-step 15 — plan 수정 전 회귀 gate와 plan 정리 도구
+step 16 — plan 수정 전 회귀 gate와 plan 정리 도구
 - `checkCollectedRegression(collected: MergedEntry[], baseline: BaselineEntry[]): string[]`
   - 순수 함수다. 각 entry에 대해 `entry.key === makeEntryKey(entry)`를 확인하고(불일치면 `bad-key:{key}`), `checkRegression`과 같은 규칙으로 `new-key:{key}`, `new-target:{key}:{target}`을 반환한다.
 - `prunePlan(plan: Plan, collected: MergedEntry[], baseline: BaselineEntry[]): Plan`
@@ -439,15 +446,15 @@ step 15 — plan 수정 전 회귀 gate와 plan 정리 도구
 
 #### fixture
 
-`tests/fixtures/axe-collected.json` (step 16)
+`tests/fixtures/axe-collected.json` (step 17)
 - 병합한 수집 결과. tracked이며 정보용이다. entry 계약을 따른다.
 
-`tests/fixtures/axe-baseline.json` (step 17)
+`tests/fixtures/axe-baseline.json` (step 18)
 - 항목 필드: `key`(= `makeEntryKey`), `scenario`, `project`, `ruleId`, `impact`, `targets`(canonical, 중복 제거·정렬), `selectors`, `fixes[{ target, fixKind, fixFiles }]`(target마다 1개), `fixFiles`(합집합)
 - `projectEntry`로 투영했을 때 axe-collected.json과 양방향으로 정확히 같아야 한다(`--check-baseline-match`).
 - fixKind와 fixFiles의 대응은 `FIX_FILES_BY_KIND`와 정확히 같아야 한다.
 
-`tests/fixtures/axe-remediation-plan.json` (step 17)
+`tests/fixtures/axe-remediation-plan.json` (step 18)
 - 형식: `{ groups: [{ id, targets: canonical[], fixFiles: string[], difficulty: 'low'|'medium'|'high', estMinutes: number, blocked: boolean, reason: string }] }`
 - 규칙
   - `id`는 `GROUP_ID_RE`를 만족하고 고유해야 한다.
@@ -465,7 +472,7 @@ step 15 — plan 수정 전 회귀 gate와 plan 정리 도구
 - 일반 모드(기본): axe.spec.js가 `resolveBaselineMode()`를 호출한다.
   - check이면 회귀 판정(`checkRegression`), `validateBaseline`, plan 검증을 실행한다.
   - baseline이 없으면 기본적으로 실패한다.
-  - `AXE_ALLOW_MISSING_BASELINE=1`은 step 16의 일반 실행 명령에서만 쓴다.
+  - `AXE_ALLOW_MISSING_BASELINE=1`은 step 17의 일반 실행 명령에서만 쓴다.
 - 수집 명령 순서(COLLECT_CHAIN): 최초 수집, gate, recheck, finalize, remediation 그룹 step에 공통으로 적용한다.
   1. helper 합성 검증: `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js`. 독립 디렉터리만 쓰며, 실제 `COLLECT_DIR`가 보존되는지 증명한다.
   2. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset`
@@ -477,34 +484,34 @@ step 15 — plan 수정 전 회귀 gate와 plan 정리 도구
 
 #### 단계
 
-step 16 — 최초 수집
+step 17 — 최초 수집
 - 10개 시나리오를 구현하고 `axe-collected.json`을 만든다.
 - 이 step의 일반 실행에만 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
   - 명령: `AXE_ALLOW_MISSING_BASELINE=1 sh tests/scripts/with-env.sh npm --prefix tests test`
   - 하네스는 이 step의 본문 AC로 검증한다.
   - 옵션 없는 기본 실행이 이 시점에 실패하는 것은 의도된 결과다.
-  - step 17 이후에는 기본 testCommand가 통과해야 한다.
+  - step 18 이후에는 기본 testCommand가 통과해야 한다.
 
-step 17 — 분류
+step 18 — 분류
 - 예상 시간 = 묶음별 (2분 + target × 1분)의 합 + 5분
 - 20분을 넘으면 즉시 중단하고 재계획을 요청한다.
 - 20분 이하면 실제 출처를 조사해 baseline과 plan을 확정한다.
 - AC에 `--check-baseline-match`와 `--check-executable`을 포함한다. blocked 그룹(text-change 포함)이 하나라도 있으면 step은 실패로 끝나고 Harness 재계획을 요청한다.
 
-step 18~24 — 회귀 판정
+step 19~25 — 회귀 판정
 - 새 key나 target이 나오면 실패, 사라진 것은 허용한다.
 - 자동 편입은 금지다.
 - 해당 step이 만든 실제 신규 위반은 그 step 안에서 고친다.
 - 기존 위반의 식별이 깨진 경우면 중단하고 재계획을 요청한다.
 
-step 25 — gate (순차, `&&`)
+step 26 — gate (순차, `&&`)
 1. COLLECT_CHAIN (`--merge --out tests/.tmp/axe-current.json`)
 2. REGRESSION_GATE (`--check-regression`). 실패하면 plan은 건드리지 않고 중단한다.
 3. `--prune-plan --collected tests/.tmp/axe-current.json`. 내부에서도 회귀를 다시 확인하며 실패 시 plan bytes는 그대로다.
 4. `--check-coverage --collected tests/.tmp/axe-current.json`. 빠진 target이 있으면 자동 편입하지 않고 재계획 사유로 실패한다.
 5. `--check-plan`
 6. `--check-executable`. 실패하면 remediation step을 만들지 않고 다음 단계로 가지 않는다(Harness 재계획 사유).
-7. 1~6이 모두 통과하고 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 step 25와 26 사이에 재계획한다.
+7. 1~6이 모두 통과하고 그룹이 남으면 Harness가 그룹마다 `axe-remediation-{id}` step을 step 26과 27 사이에 재계획한다.
 
 재계획 그룹 step 계약
 - 생성 조건: `--check-executable` 통과, 그룹 `blocked === false`, `fixFiles.length >= 1`. 하나라도 어기면 생성 금지.
@@ -515,53 +522,73 @@ step 25 — gate (순차, `&&`)
 - plan 파일은 수정하지 않는다.
 - AC (순차): COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--check-group-done {id}` → `npm --prefix tests test` → verify-scope
 
-step 26 — recheck
+step 27 — recheck
 - gate 1~6을 같은 순서·같은 allowedPaths로 다시 실행한다. REGRESSION_GATE를 plan 수정 전에 똑같이 적용한다.
 - 추가 AC
   - `--check-plan --require-empty`
   - `--assert-no-violations --collected tests/.tmp/axe-current.json`
 - baseline에 target이 남아 있어도 회귀 판정은 통과할 수 있다. 그 허점은 `--assert-no-violations`로 막는다.
 
-step 27 — finalize
+step 28 — finalize
 1. 시작 전에 COLLECT_CHAIN과 REGRESSION_GATE를 다시 실행한다.
 2. `--check-plan --require-empty && --assert-no-violations`가 통과해야 한다. 아니면 중단한다.
 3. 이 step에서만 baseline을 `[]`로 바꾼다.
 4. AC: `--assert-empty` + 일반 axe 전체 통과
 
-### 8.4 axe 시나리오 준비 (`tests/helpers/axe-prepare.js`, step 8)
+### 8.4 axe 시나리오 준비 (`tests/helpers/axe-prepare.js`, step 8·9)
+
+#### 공통 오류 계약 (step 8)
+- `PREPARE_PREFIX = 'prepareForAxe: '`
+- `prepareError(code: string, cause?: unknown): Error` — message는 `prepareForAxe: {code}`, `err.code === code`, `err.cause === cause`
+- `withPrepareCode<T>(code: string, fn: () => Promise<T>): Promise<T>` — `fn`이 throw/reject하면(`expect.poll` 타임아웃 포함) `prepareError(code, 원래 오류)`로 바꿔 reject한다. 이미 `prepareForAxe: `로 시작하는 오류는 그대로 전달한다.
+
+#### page 준비 (step 8)
+
+```
+preparePage(page, { timeoutMs = 10000 } = {}): Promise<{ revealChecked: number, scrollSteps: number }>
+```
+
+1. `await page.evaluate(() => document.fonts.ready)` 후 `document.fonts.status === 'loaded'`를 assertion으로 확인한다. 실패 코드 `fonts-not-ready`.
+2. 전체 순회 스크롤: `scrollY = 0`에서 시작해 `innerHeight × 0.8` 간격으로 `scrollHeight` 끝까지 내려가며 단계마다 2 animation frame을 기다린다. 끝에서 `scrollTo(0, 0)`로 돌아간다. 단계 수는 `scrollSteps`.
+3. 모든 `.reveal`에 대해 `.in` 클래스, computed `visibility === 'visible'`, `opacity === '1'`을 `expect.poll`(timeout = `timeoutMs`)로 확인한다. 실패 코드 `reveal-hidden:{숨은 개수}`. 확인한 개수는 `revealChecked`.
+- 테마·reduced-motion 설정은 바꾸지 않는다.
+
+#### overlay 준비 (step 9)
+
+```
+prepareOverlay(page, { scenario: 'modal' | 'lightbox', projectIndex?: number, timeoutMs = 10000 }):
+  Promise<{ include: '#projectModal' | '.lightbox', projectIndex: number }>
+```
+
+- 클릭 대상은 정확히 `gridCard(page, N)`, 즉 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`이다. 개수가 정확히 1이 아니면 `project-card-not-found:{N}`. 같은 `data-project`를 가진 `#heroFeatured` 버튼 등 grid 밖 요소는 클릭하지 않는다.
+- `modal`
+  - `projectIndex` 기본값 0. grid 카드를 click으로 연다.
+  - 열림: body `modal-open`, `#projectModal` visible, computed opacity `1`. 실패 코드 `modal-not-open`.
+  - 표시: `modalTitle(page)` 텍스트가 `norm(PROJECTS[N].title)`과 같다. 실패 코드 `modal-not-open`.
+  - 콘텐츠 로딩: 모달 안 모든 `img`가 `complete && naturalWidth > 0`(`content-not-loaded:img`), 모든 `svg`의 bounding box width·height > 0(`content-not-loaded:svg`), 본문 텍스트 길이 > 0(`content-not-loaded:text`)
+  - `include = '#projectModal'`
+- `lightbox`
+  - `projectIndex` 기본값: `findProjectWithShots(page)`(grid 카드 범위 탐색). null이면 `no-shots-project`.
+  - 모달을 위와 같이 연 뒤 첫 `.shot-zoom`을 click한다. `.shot-zoom`이 없거나 lightbox가 열리지 않으면 `lightbox-not-open`.
+  - 열림: `.lightbox` 1개, visible, computed opacity `1`, `document.activeElement`가 `.lightbox` 안. 실패 코드 `lightbox-not-open`.
+  - 콘텐츠 로딩: `.lightbox img`가 `complete && naturalWidth > 0`. 실패 코드 `content-not-loaded:img`.
+  - `include = '.lightbox'`
+- `scenario`가 `modal`/`lightbox`가 아니면 `unknown-scenario`.
+
+#### 결합 진입점 (step 9)
 
 ```
 prepareForAxe(page, { scenario, projectIndex?, timeoutMs = 10000 }):
   Promise<{ scenario, include: string, projectIndex: number | null, revealChecked: number, scrollSteps: number }>
 ```
 
-- `scenario`: `'page' | 'modal' | 'lightbox'`. 그 밖이면 reject.
-- 공통 절차 (모든 scenario)
-  1. `await page.evaluate(() => document.fonts.ready)` 후 `document.fonts.status === 'loaded'`를 assertion으로 확인한다.
-  2. 페이지 전체 순회 스크롤: `scrollY = 0`에서 시작해 `innerHeight × 0.8` 간격으로 `scrollHeight` 끝까지 내려가며 단계마다 2 animation frame을 기다린다. 끝에서 `scrollTo(0, 0)`로 돌아간다. 단계 수는 `scrollSteps`로 반환한다.
-  3. 모든 `.reveal` 요소에 대해 `.in` 클래스, computed `visibility === 'visible'`, `opacity === '1'`을 `expect.poll`로 확인한다. 개수는 `revealChecked`로 반환한다.
-- `page`: `include = 'body'`, `projectIndex = null`
-- `modal`
-  - `projectIndex` 기본값 0. 해당 `[data-project="{N}"]` 카드를 click으로 연다.
-  - 열림: body에 `modal-open` 클래스, `#projectModal`이 visible, computed opacity `1`
-  - 표시: `modalTitle(page)` 텍스트가 `norm(PROJECTS[N].title)`과 같다.
-  - 콘텐츠 로딩: 모달 안 모든 `img`가 `complete && naturalWidth > 0`, 모든 `svg`의 bounding box width·height > 0, 본문 텍스트 길이 > 0
-  - `include = '#projectModal'`
-- `lightbox`
-  - `projectIndex` 기본값: `findProjectWithShots(page)`. null이면 `no-shots-project`로 reject.
-  - 모달을 위와 같이 연 뒤 첫 `.shot-zoom`을 click한다. `.shot-zoom`이 없거나 lightbox가 열리지 않으면 `lightbox-not-open`으로 reject.
-  - 열림: `.lightbox`가 1개이며 visible, computed opacity `1`, `document.activeElement`가 `.lightbox` 안에 있다.
-  - 콘텐츠 로딩: `.lightbox img`가 `complete && naturalWidth > 0`
-  - `include = '.lightbox'`
-- 오류 계약: 모든 실패는 message가 `prepareForAxe: `로 시작하는 `Error`로 reject한다. `expect.poll` 타임아웃도 아래 코드로 변환한다.
-  - `unknown-scenario`
-  - `fonts-not-ready`
-  - `reveal-hidden:{개수}`
-  - `modal-not-open`
-  - `lightbox-not-open`
-  - `content-not-loaded:{img|svg|text}`
-  - `no-shots-project`
-- 준비 helper는 reduced-motion이나 테마를 바꾸지 않는다. 입력 page 상태만 사용한다.
+1. `scenario`가 `page|modal|lightbox`가 아니면 즉시 `unknown-scenario`로 reject한다.
+2. `preparePage`를 실행한다.
+3. `page`면 `include = 'body'`, `projectIndex = null`. 그 밖에는 `prepareOverlay` 결과를 합친다.
+
+#### 오류 코드 전체
+- 공통(step 8): `fonts-not-ready`, `reveal-hidden:{n}`
+- overlay(step 9): `unknown-scenario`, `project-card-not-found:{N}`, `modal-not-open`, `lightbox-not-open`, `content-not-loaded:{img|svg|text}`, `no-shots-project`
 
 ## 9. 반응형
 
@@ -696,9 +723,9 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 
 ### 11.6 통합 AC
 - step 1 이후 기본: `sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope`
-- step 16: 일반 실행에 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
-- step 27·28: `--assert-empty`를 추가한다.
-- step 28: `verify-scope -- --final`을 추가한다.
+- step 17: 일반 실행에 `AXE_ALLOW_MISSING_BASELINE=1`을 붙인다.
+- step 28·29: `--assert-empty`를 추가한다.
+- step 29: `screenshots.spec.js` 단독 실행을 먼저 하고 성공 후 전체 테스트, `verify-scope -- --final`을 `&&`로 잇는다.
 - 각 step은 자기 spec을 먼저 단독으로 실행한 뒤 전체 회귀를 돌린다.
 
 ## 12. 변경 허용 경로와 운영 경계
@@ -710,7 +737,7 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 
 ### 사이트 파일 변경 시점
 - `index.html`
-  - 구조 변경: step 18, 19, 20
+  - 구조 변경: step 19, 20, 21
   - 속성 변경: 재계획된 remediation 그룹 step만
 - `css/themes.css`: remediation 그룹 step만
 
@@ -732,31 +759,32 @@ type ErrorCollector = { finish(): Promise<{ pageErrors: ErrorRecord[], consoleEr
 | 2 | scope-content | 18분 | 0~1 |
 | 3 | content-data-baseline | 15분 | 0~2 |
 | 4 | content-static-baseline | 16분 | 0~3 |
-| 5 | modal-regression | 16분 | 0~4 |
+| 5 | modal-regression | 17분 | 0~4 |
 | 6 | ui-regression | 16분 | 0~5 |
 | 7 | axe-canonical | 18분 | 0~6 |
-| 8 | axe-prepare | 18분 | 0~7 |
-| 9 | axe-collect-tooling | 18분 | 0~8 |
-| 10 | axe-baseline-regression | 18분 | 0~9 |
-| 11 | axe-baseline-projection | 16분 | 0~10 |
-| 12 | axe-remediation-plan-schema | 16분 | 0~11 |
-| 13 | axe-plan-executable | 14분 | 0~12 |
-| 14 | axe-current-checks | 16분 | 0~13 |
-| 15 | axe-regression-prune | 18분 | 0~14 |
-| 16 | axe-collect | 16분 | 0~15 |
-| 17 | axe-classify | 20분 (초과 예상 시 재계획) | 0~16 |
-| 18 | featured-projects | 18분 | 0~17 |
-| 19 | hero-first-screen | 18분 | 0~18 |
-| 20 | section-structure | 18분 | 0~19 |
-| 21 | section-layout | 15분 | 0~20 |
-| 22 | focus-trap-modal | 16분 | 0~21 |
-| 23 | focus-trap-lightbox | 16분 | 0~22 |
-| 24 | print-pdf | 15분 | 0~23 |
-| 25 | axe-remediation-gate | 17분 | 0~24 |
-| (재계획) | axe-remediation-{id} | 그룹당 20분 이하, 생성 조건 충족 시만 | 25 |
-| 26 | axe-remediation-recheck | 17분 | 0~25 + 재계획 그룹 |
-| 27 | axe-finalize | 15분 | 0~26 |
-| 28 | final-verification | 12분 | 0~27 |
+| 8 | axe-prepare-page | 14분 | 0~7 |
+| 9 | axe-prepare-overlay | 18분 | 0~8 |
+| 10 | axe-collect-tooling | 18분 | 0~9 |
+| 11 | axe-baseline-regression | 18분 | 0~10 |
+| 12 | axe-baseline-projection | 16분 | 0~11 |
+| 13 | axe-remediation-plan-schema | 16분 | 0~12 |
+| 14 | axe-plan-executable | 14분 | 0~13 |
+| 15 | axe-current-checks | 16분 | 0~14 |
+| 16 | axe-regression-prune | 18분 | 0~15 |
+| 17 | axe-collect | 16분 | 0~16 |
+| 18 | axe-classify | 20분 (초과 예상 시 재계획) | 0~17 |
+| 19 | featured-projects | 18분 | 0~18 |
+| 20 | hero-first-screen | 18분 | 0~19 |
+| 21 | section-structure | 18분 | 0~20 |
+| 22 | section-layout | 15분 | 0~21 |
+| 23 | focus-trap-modal | 16분 | 0~22 |
+| 24 | focus-trap-lightbox | 16분 | 0~23 |
+| 25 | print-pdf | 15분 | 0~24 |
+| 26 | axe-remediation-gate | 17분 | 0~25 |
+| (재계획) | axe-remediation-{id} | 그룹당 20분 이하, 생성 조건 충족 시만 | 26 |
+| 27 | axe-remediation-recheck | 17분 | 0~26 + 재계획 그룹 |
+| 28 | axe-finalize | 15분 | 0~27 |
+| 29 | final-verification | 15분 | 0~28 |
 
 ## 14. 빌더 재량
 

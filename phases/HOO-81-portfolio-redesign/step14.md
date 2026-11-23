@@ -1,6 +1,6 @@
-# Step 14 — axe-current-checks
+# Step 14 — axe-plan-executable
 
-- 예상 시간: 16분
+- 예상 시간: 14분
 - 실행 횟수: 테스트 2회, verify-scope 1회
 - 선행 step: 0~13 completed
 
@@ -9,9 +9,9 @@
 1. 저장소 지침을 읽는다: `CLAUDE.md`(중앙 Harness 계약), `README.md`. 하위 디렉터리에 `CLAUDE.md`나 `AGENTS.md`가 있으면 함께 읽는다.
 2. 설계 문서를 읽는다.
    - `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md`
-   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §8.3 (entry key 계약, step 14 현재 수집 결과 판정, gate, recheck, finalize, 재계획 그룹 step 계약)
+   - `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md` §7.2(예외 밖 콘텐츠 변경), §8.3 (step 14 실행 가능성 검사, gate, 재계획 그룹 step 생성 조건)
 3. index.json에서 step 0~13이 completed인지 확인한다. 아니면 중단한다.
-4. axe.js에서 `MergedEntry`, `makeEntryKey`, `Plan`, `GROUP_ID_RE`를 확인한다.
+4. axe.js의 `Plan`, `loadPlan`, `validateRemediationPlan`, `FIX_FILES_BY_KIND`를 확인한다.
 5. 빌더 read-only 경로: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`
 6. 명령 권한
    - Git 상태를 바꾸는 명령과 Harness 운영 명령은 하네스만 실행한다.
@@ -33,41 +33,26 @@
 
 - `tests/` 밖 전부
 - 그 밖의 tests 파일, fixtures
-- step 7~13에서 만든 동작
+- step 7~13의 동작
 
 ## 작업
 
 1. axe.js에 step 14 계약을 구현한다.
-   - `checkGroupDone(collected, plan, groupId) → { done, remaining }`
-   - `checkCollectedCoverage(collected, plan) → { ok, uncovered }`: plan에 없는 target을 자동으로 편입하지 않는다.
-   - `countCollectedTargets(collected) → number`: (key, target) 쌍 개수
-   - CLI (`--collected` 기본값은 `tests/.tmp/axe-current.json`)
-     - `--check-group-done <id>`
-     - `--check-coverage`: uncovered가 있으면 `재계획 필요: plan 밖 잔여 target`을 출력하고 exit 1
-     - `--assert-no-violations`: 0이 아니면 exit 1
-2. axe-helper.spec.js (desktop-dark, 파일은 독립 디렉터리에 둔다)
-   - `checkGroupDone`
-     - 그룹 target이 사라짐 → done
-     - lightbox 시나리오에만 남음 → remaining 1건 (key는 `lightbox:desktop-*:*`)
-     - 다른 그룹의 잔여 target은 결과에 영향을 주지 않는다.
-     - unknown id, 형식 오류 id → throw
-     - collected가 `{}` → throw
-   - `checkCollectedCoverage`
-     - 모든 target이 groups에 포함됨 → ok
-     - plan에 없는 target 1개 → uncovered 1건
-     - groups가 비어 있는데 target이 1개 남음 → uncovered
-     - 입력이 변경되지 않음
-   - `countCollectedTargets`
-     - `[]` → 0
-     - target 2개인 entry 1개와 1개인 entry 1개 → 3
-     - 같은 canonical target이 `page:desktop-dark:r`과 `page:desktop-light:r` 두 entry에 있음 → 2
-   - subprocess
-     - `--check-group-done`: done → 0, remaining → 1, unknown → 1, 파일 없음 → 1
-     - `--check-coverage`: 완전 포함 → 0, 잔여 → 1, 파일 없음 → 1
-     - `--assert-no-violations`: `[]` → 0, target 1개 → 1, 파일 없음 → 1
-     - 회귀 허점 사례
-       - baseline에 target이 남아 있고 수집 결과에도 같은 target이 남아 있는 경우
-       - `checkRegression`은 `[]`를 반환해도 `--assert-no-violations`는 1이어야 한다.
+   - `validateRemediationExecutable(plan, baseline) → string[]` (`blocked-group:{id}`, `text-change:{id}:{target}`, `empty-fixfiles:{id}`)
+   - CLI: `--check-executable [--plan <f>] [--baseline <f>]`. 오류가 있으면 첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`과 목록을 stderr에 출력하고 exit 1
+2. axe-helper.spec.js (desktop-dark, 독립 디렉터리)
+   - `{ groups: [] }` → `[]`
+   - css-token 그룹(blocked false, fixFiles `[css/themes.css]`) → `[]`
+   - blocked true인 css-rule 그룹 → `blocked-group:{id}`
+   - text-change target을 가진 그룹(blocked true, fixFiles `[]`) → `blocked-group`, `text-change`, `empty-fixfiles` 세 오류 모두
+   - 정상 그룹 + blocked 그룹 혼합 → blocked 그룹 오류만 있고 결과 배열 길이 ≥ 1 (하나라도 있으면 전체 실패)
+   - 입력이 변경되지 않는다.
+   - subprocess `--check-executable`
+     - 빈 groups → 0
+     - 실행 가능 그룹만 → 0
+     - blocked 그룹 1개 → 1, stderr 첫 줄이 `Harness 재계획 필요: 실행 불가 remediation 그룹`
+     - fixFiles `[]` 그룹 → 1
+     - plan 없음, baseline JSON 오류 → 1
 
 ## 완료 기준 (AC)
 
