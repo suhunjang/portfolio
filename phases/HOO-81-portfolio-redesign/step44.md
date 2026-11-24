@@ -5,7 +5,7 @@
 - read-first: 설계 §3(무한 장식 애니메이션), §16.2(component state 측정 helper·대상·step 44 절차), §16.4(DESIGN_HASH_CHECK 후 `Components.dc.html`·`MobileMenu.dc.html` 읽기 전용); fixture tokens
 - tracked 허용(exact): `css/style.css`(§16.2 대상의 min-width·min-height·padding·line-height·display 등 비색 hit target 규칙만), `tests/helpers/component-state.js`(신규), `tests/specs/component-hit.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, 색 선언(기존 규칙에 추가 포함), hover·active·clamp 규칙(step 45·46), 무한 장식 애니메이션 제거·변경, 문서 전체 `document.getAnimations()` 대기, 기존 spec 수정
+- 금지: §15.7, `index.html`, `js/*`, 색 선언(기존 규칙에 추가 포함), hover·active·clamp 규칙(step 47·48), 무한 장식 애니메이션 제거·변경, 문서 전체 `document.getAnimations()` 대기, 기존 spec 수정
 
 ## 작업 (TDD)
 

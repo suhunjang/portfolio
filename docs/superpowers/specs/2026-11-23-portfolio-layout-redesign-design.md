@@ -5,9 +5,9 @@
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
 - 범위 변경: 대표 결정 `scope-change-claude-design-v27`·`scope-change-claude-design-v28-compact` — Claude Design 패턴(레이아웃·컴포넌트·간격·타이포 위계만)을 구현 기준으로 추가. 이전 Harness 2.0.1 계획·리뷰·승인은 재사용하지 않는다.
-- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`: 규칙 구조 CSS guard, baseline(§8.5)·plan(§8.6) schema, component state 측정, `css/themes.css` 제외, §17 preflight 28개 경로. 33차 `review-resume-d032b938c536-v30`: 색 custom property 의존 그래프, CSS guard step 분할, step 6·8·32 완전 기술, baseline 오류 예 교정, component state 3분할. 34차 `review-resume-16ea71f32fac-v31`: 고정 S·C `parse_status`의 UTF-8 decode 실패 → `ValueError('bad status record')` 변환(설계 소유자 확정), step 6 합성 저장소 lock·조상 준비, 색 guard 3분할(step 14~16), step 0~53 재번호. 35차 `review-resume-6a5d82a7db93-v32`(record `6a5d82a7db9327845ac1b1a429b2113f20fff779984eecc4fc27f7eba059c7b7`, major 2건): step 15 `checkColorRules`의 규칙에서 custom property 정의 제외(정의 검사는 step 16 `checkColorTokens` 전담) 및 회귀 사례 추가, step 33·34 plan 검증 fixture를 §8.6 정상 예와 정확히 대응하는 `aria-allowed-attr` baseline(FIXTURE_OK)과 themes blocked 전용 `color-contrast` baseline(FIXTURE_THEMES)으로 분리(§8.6). 36차 `review-resume-9c1f912760e7-v33`(record `9c1f912760e7aba49329496be4ce22a53612f3498c7796f636a018bd1ec817b0`, major 2·minor 1): step 14 `COLOR_PROPS`에 방향·논리 border 색 longhand 등 동등한 색 적용 속성 포함, step 15 짝지어진 기존 규칙에 새로 추가된 색 선언 거부, step 17 BASE `font-family`·`font` 선언의 양방향 보존(`font-decl-missing`), step 41 5:7 열 폭 허용 오차와 1023/1024px 전환 검증(§16.2). 37차 `review-resume-4a273c5a72dc-v34`(record `4a273c5a72dc829f3819e328102c0d73235e74a36730dd2472acfbe16f5d0192`, major 3): step 15 규칙 4의 prop 집합 제외 조건 제거(같은 prop의 다른 값 후행 추가·값 교체도 `color-decl-new`), `checkColorRules` 다중 진단 순서·중복 제거 고정과 기대 배열 정합화, step 17 보존·신규 판정이 공용 대응 helper `matchesBaseRule`(featured 대응 확장만 허용)을 함께 사용(§16.4). 38차 `review-resume-07753db669ba-v35`(record `07753db669ba0d853347ef8f1315c077b1e18998cfe10e670989ffdeb6b6e593`, major 3): step 0에서 S와 `scope-snapshot.mjs` `HARNESS_IDENTITY` 3값을 최초 전체 테스트 전에 2.0.1로 동기화(변경은 3값 줄로 제한), 전역 `document.getAnimations()` 대기를 대상·subtree의 유한 animation/transition만 기다리는 `waitForFiniteAnimations`로 대체(무한 장식 애니메이션 제외·timeout), step 45 색 검사를 상태별 BASE 색 보존(`tests/fixtures/component-state-colors.json`)으로 변경(§16.2). 39차 `review-resume-194334d2d96f-v36`(record `194334d2d96fbd34834e49b486a28bbd62e1d3a80584c8df95a2d3cea6b28275`, major 1): step 45 generator와 spec이 공용 `measureStateSequence`로 측정 대상마다 새 page를 열고 default→hover→active를 측정, `mouse.up()`·`page.close()`를 finally로 보장해 click에 따른 navigation·modal·hash·scroll을 대상 간 격리, 격리 회귀 검증 추가(§16.2).
+- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`: 규칙 구조 CSS guard, baseline(§8.5)·plan(§8.6) schema, component state 측정, `css/themes.css` 제외, §17 preflight 28개 경로. 33차 `review-resume-d032b938c536-v30`: 색 custom property 의존 그래프, CSS guard step 분할, step 6·8·32 완전 기술, baseline 오류 예 교정, component state 3분할. 34차 `review-resume-16ea71f32fac-v31`: 고정 S·C `parse_status`의 UTF-8 decode 실패 → `ValueError('bad status record')` 변환(설계 소유자 확정), step 6 합성 저장소 lock·조상 준비, 색 guard 3분할(step 14~16), step 재번호. 35차 `review-resume-6a5d82a7db93-v32`(record `6a5d82a7db9327845ac1b1a429b2113f20fff779984eecc4fc27f7eba059c7b7`): step 15 custom property 정의 제외, step 33·34 plan fixture를 FIXTURE_OK·FIXTURE_THEMES로 분리(§8.6). 36차 `review-resume-9c1f912760e7-v33`(record `9c1f912760e7aba49329496be4ce22a53612f3498c7796f636a018bd1ec817b0`): `COLOR_PROPS` 확장, 짝지어진 규칙의 새 색 선언 거부, BASE `font-family`·`font` 양방향 보존, hero 5:7 열 폭·1023/1024px 전환. 37차 `review-resume-4a273c5a72dc-v34`(record `4a273c5a72dc829f3819e328102c0d73235e74a36730dd2472acfbe16f5d0192`): 규칙 4 prop 제한 제거, 다중 진단 순서·중복 제거 고정, `matchesBaseRule` 공용 대응. 38차 `review-resume-07753db669ba-v35`(record `07753db669ba0d853347ef8f1315c077b1e18998cfe10e670989ffdeb6b6e593`): step 0 `HARNESS_IDENTITY` 동기화, `waitForFiniteAnimations`, 상태별 BASE 색 fixture. 39차 `review-resume-194334d2d96f-v36`(record `194334d2d96fbd34834e49b486a28bbd62e1d3a80584c8df95a2d3cea6b28275`): 공용 `measureStateSequence`로 대상마다 새 page·finally `mouse.up()`·`page.close()`·격리 회귀. 40차 `review-resume-e72caf27c285-v37`(record `e72caf27c28507c265ab6f5579f6ddfa3e1b8fabf14c7321e3144d934772abcd`, major 3): step 15 색 선언 순서 비교(`color-decl-reordered`)와 진단 순서 갱신, step 13 Rule `prelude` 추가와 step 17 `@import` 대응(file·chain·atRule·prelude, 변경·신규는 정확히 `asset:@import`), 기존 step 45를 state-sequence(45)·state-colors-fixture(46)·component-hover-active(47)로 분할하고 이후 step을 48~55로 재번호(§13, §16).
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`을 직접 읽어 확인): sourceCommit `e7a03919a460f975149f7c55343ca4b34d3d2352`, manifestHash `b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372`, distributionVersion 2.0.1
-- 진행 순서: materialize → 새 plan commit → Astra `gpt-6-astra` 계획 리뷰 CLEAN → 대표 exact 승인(§17 경로 목록 포함) → §17 preflight → fresh runner(step 0~53) → 전체 테스트 → exact-commit Astra 리뷰 CLEAN → feature push → OPEN PR. merge·deploy·main 직접 변경 없음.
+- 진행 순서: materialize → 새 plan commit → Astra `gpt-6-astra` 계획 리뷰 CLEAN → 대표 exact 승인(§17 경로 목록 포함) → §17 preflight → fresh runner(step 0~55) → 전체 테스트 → exact-commit Astra 리뷰 CLEAN → feature push → OPEN PR. merge·deploy·main 직접 변경 없음.
 
 ## 1. 의도
 
@@ -103,9 +103,9 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. 레이아웃�
 ### 8.1 axe
 - wcag2a·wcag2aa serious/critical 0건. 시나리오 10개: page 3 viewport × 2 테마, modal × dark/light, lightbox × dark/light. `prepareForAxe` 통과 후에만 실행.
 
-### 8.2 포커스 트랩 (step 47, 48)
+### 8.2 포커스 트랩 (step 49, 50)
 - `trapFocus(container, { returnFocusTo? }): () => void` — 스택, 최상위만 Tab 순환, document Tab 핸들러 1개, `release()` 다중 호출 안전.
-- step 47: 구현 + 모달 push/release. step 48: lightbox push(`.shot-zoom`), 모달 trap 일시정지·재개, 기존 lightbox Tab 리스너 제거, `:focus-visible` outline 검증.
+- step 49: 구현 + 모달 push/release. step 50: lightbox push(`.shot-zoom`), 모달 trap 일시정지·재개, 기존 lightbox Tab 리스너 제거, `:focus-visible` outline 검증.
 
 ### 8.3 axe 식별·도구
 
@@ -127,7 +127,7 @@ helper (`tests/helpers/axe.js`):
 - COLLECT_CHAIN: `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge [--out <f>]`
 - REGRESSION_GATE: `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json`
 
-단계: step 37 수집(`pending`으로 종료) → step 38 분류(§8.5·§8.6 계약으로만 생성, 예상 = 묶음별(2분 + target × 1분) + 6분, 20분 초과면 재계획) → step 39~49 새 key/target은 실패(색 변경 없이 그 step에서 해결) → step 50 gate(COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan` → `--check-coverage` → `--check-plan` → `--check-executable`, 그룹이 남으면 하네스가 50과 51 사이에 `axe-remediation-{id}` 재계획) → step 51 recheck(+ `--require-empty`, `--assert-no-violations`) → step 52 finalize(baseline `[]`).
+단계: step 37 수집(`pending`으로 종료) → step 38 분류(§8.5·§8.6 계약으로만 생성, 예상 = 묶음별(2분 + target × 1분) + 6분, 20분 초과면 재계획) → step 39~51 새 key/target은 실패(색 변경 없이 그 step에서 해결) → step 52 gate(COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan` → `--check-coverage` → `--check-plan` → `--check-executable`, 그룹이 남으면 하네스가 52와 53 사이에 `axe-remediation-{id}` 재계획) → step 53 recheck(+ `--require-empty`, `--assert-no-violations`) → step 54 finalize(baseline `[]`).
 - 재계획 그룹 step: `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`일 때만. allowedPaths = 그룹 fixFiles(index.json allowedPaths의 부분집합, `css/themes.css`가 있으면 생성하지 않음), 20분 이하, 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`, AC: COLLECT_CHAIN && REGRESSION_GATE && `--check-group-done {id}` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`.
 
 ### 8.4 axe 시나리오 준비 (`tests/helpers/axe-prepare.js`)
@@ -166,7 +166,7 @@ helper (`tests/helpers/axe.js`):
 - 오류 예 A: 위 entry에 `"note": "x"` 추가 → 정확히 `["baseline[0]: fields missing=[] extra=[note]"]`.
 - 오류 예 B: fix의 `fixKind`만 `css-rule`로 바꾸고 fix `fixFiles`와 entry `fixFiles`는 유지 → 정확히 `["baseline[0].fixes[0]: fixFiles-mismatch"]`.
 - 오류 예 C: fix는 정상 그대로 두고 entry `fixFiles`만 `["css/style.css"]`로 바꿈 → 정확히 `["baseline[0]: fixFiles union-mismatch"]`.
-- step 38은 이 계약으로만 baseline을 생성하고, step 31·32·36·52가 같은 계약을 쓴다.
+- step 38은 이 계약으로만 baseline을 생성하고, step 31·32·36·54가 같은 계약을 쓴다.
 
 ### 8.6 remediation plan schema (고정)
 
@@ -260,7 +260,7 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 ### 11.6 통합 AC와 재검증 모드
 - 모든 step: 첫 동작 §11.7 시작 snapshot, 종료 시 기본 testCommand 통과, AC 마지막 범위 gate.
 - 종료 gate: step 0~11은 S `reused` 직후 inline C. step 12부터(재계획 `axe-remediation-{id}` 포함) CLI `scope-snapshot.mjs --check`.
-- step 20 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate. 시각 step(39~46)과 53은 `python3 -I tests/scripts/design-intake-check.py`와 GUARD_SPECS(`css-parse.spec.js color-vocab.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js`)를 AC에 포함한다.
+- step 20 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate. 사이트 CSS·마크업을 바꾸는 시각 step(39~44, 47, 48)과 55는 `python3 -I tests/scripts/design-intake-check.py`와 GUARD_SPECS(`css-parse.spec.js color-vocab.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js`)를 AC에 포함한다.
 - 재검증 모드(step 0~11): HEAD에 그 step의 tracked 허용 파일이 이미 commit되어 있으면 재검증 모드. 시작 snapshot → AC 실행 → 통과면 파일을 바꾸지 않고 범위 gate 실행, 로그 `reverify step{N}: no-op` → 불일치면 그 step의 허용 파일 안에서만 고쳐 통과시키고 로그 `reverify step{N}: fixed <파일 목록>`. 재검증 모드의 inline C 세 번째 인자(require-absent)는 `''`. step 0의 `step0 start clean` 조건은 최초 구축에만 적용. 기능 추가 없음.
 
 ### 11.7 시작 snapshot과 범위 gate
@@ -628,7 +628,7 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 
 비교 도구 `tests/scripts/scope-snapshot.mjs` (S·C와 같은 판정, step별 추가만): step 1 상수(`HARNESS_IDENTITY` = S의 `HARNESS`와 같은 sourceCommit·manifestHash·distributionVersion 3값 포함)·`UnsafePathError`·`checkRoot`·`pathKind`·`checkPath`·`readRegular`; step 2 `isRepoRelative`·`parseStatusZ`(엄격 UTF-8)·`statusXyMap`·`scanJsonTopLevel`·`isSchemaVersion1`; step 3 `loadStartSnapshot`; step 4 `scanProject`·`hashPath`·`takeCurrent`; step 5·6 코드 없음; step 7 `computeIdentity`·`checkIdentity`·`diffAgainstStart`·`classifyChanges`·`checkRuntimeVisible`·`checkSnapshotFirst`·`evaluateGate`; step 8 `writeAfterZ`·`runCheck(opts, deps)`(deps `{ git, fs, root, impl? }`; `impl`은 테스트 전용으로 `checkRoot`, `loadStartSnapshot`, `computeIdentity`, `checkIdentity`, `takeCurrent`, `writeAfterZ`, `evaluateGate`를 바꿔 끼우는 객체, 없으면 실제 함수)·CLI `--check <start.json> --allow <list> [--require-absent <list>]`(인자 오류 exit 2); step 9~11 코드 없음. `HARNESS_IDENTITY` 3값은 step 0이 S와 함께 2.0.1로 동기화한다.
 
-테스트 격리 규칙: 실제 저장소에는 runtime 경로(`tests/.tmp/start-snapshot-parity-{숫자}.json`과 after.z, `tests/.tmp/snapshot-probes/__retry_probe.txt`, `tests/.tmp/status-harness-<pid>/`, `tests/.tmp/design-intake-<pid>/`)만 쓴다. 비runtime 검증은 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`(+`<pid>-outside`, `<pid>-link`, `<pid>-file`)에서 한다. subprocess timeout 10초.
+테스트 격리 규칙: 실제 저장소에는 runtime 경로(`tests/.tmp/start-snapshot-parity-{숫자}.json`과 after.z, `tests/.tmp/snapshot-probes/__retry_probe.txt`, `tests/.tmp/status-harness-<pid>/`, `tests/.tmp/design-intake-<pid>/`, `tests/.tmp/state-colors-<pid>/`)만 쓴다. 비runtime 검증은 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`(+`<pid>-outside`, `<pid>-link`, `<pid>-file`)에서 한다. subprocess timeout 10초(브라우저를 띄우는 `make-state-colors.mjs`는 60초).
 
 ## 12. 변경 허용 경로와 운영 경계
 
@@ -655,9 +655,9 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 | 10 | scope-snapshot-parity-paths (재검증) | 17 | S reused + C |
 | 11 | scope-snapshot-parity-artifacts (재검증) | 19 | S reused + C |
 | 12 | claude-design-intake | 15 | CLI (첫 CLI gate) |
-| 13 | css-parser | 17 | CLI |
+| 13 | css-parser | 18 | CLI |
 | 14 | color-vocab-graph | 17 | CLI |
-| 15 | design-guard-color-rules | 19 | CLI |
+| 15 | design-guard-color-rules | 20 | CLI |
 | 16 | design-guard-color-tokens | 17 | CLI |
 | 17 | design-guard-type-asset | 19 | CLI |
 | 18 | design-guard-integration | 15 | CLI |
@@ -687,18 +687,20 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 | 42 | section-structure | 19 | CLI |
 | 43 | section-layout | 17 | CLI |
 | 44 | component-hit-open | 19 | CLI |
-| 45 | component-hover-active | 20 | CLI |
-| 46 | component-clamp-stripe | 15 | CLI |
-| 47 | focus-trap-modal | 17 | CLI |
-| 48 | focus-trap-lightbox | 17 | CLI |
-| 49 | print-pdf | 17 | CLI |
-| 50 | axe-remediation-gate | 18 | CLI |
+| 45 | state-sequence | 17 | CLI |
+| 46 | state-colors-fixture | 18 | CLI |
+| 47 | component-hover-active | 16 | CLI |
+| 48 | component-clamp-stripe | 15 | CLI |
+| 49 | focus-trap-modal | 17 | CLI |
+| 50 | focus-trap-lightbox | 17 | CLI |
+| 51 | print-pdf | 17 | CLI |
+| 52 | axe-remediation-gate | 18 | CLI |
 | (재계획) | axe-remediation-{id} | ≤20 | CLI |
-| 51 | axe-remediation-recheck | 18 | CLI |
-| 52 | axe-finalize | 16 | CLI |
-| 53 | final-verification | 17 | CLI |
+| 53 | axe-remediation-recheck | 18 | CLI |
+| 54 | axe-finalize | 16 | CLI |
+| 55 | final-verification | 17 | CLI |
 
-각 step의 선행은 그보다 작은 번호 전부(51은 재계획 그룹 포함).
+각 step의 선행은 그보다 작은 번호 전부(53은 재계획 그룹 포함).
 
 ## 14. 빌더 재량
 
@@ -765,30 +767,31 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 - hero(step 40·41): `.hero-inner` 직계 자식 8개. viewport ≥ 1024px(`@media (min-width: 1024px)`)에서 `display: grid`, `grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)`, column-gap 48px, `grid-template-areas: "eyebrow summary" "name summary" "tagline summary" "role cta" "stats stats" "featured featured"`(DOM 순서 불변), 좌측 정렬. 1024px 미만 1열.
 - hero 열 폭 계약(step 41): `.hero-inner`의 computed `grid-template-columns`가 px 값 두 개 a(왼쪽)·b(오른쪽)이고, content 폭 W = `clientWidth` − 좌우 padding일 때 |a − (W − 48) × 5/12| ≤ 1, |b − (W − 48) × 7/12| ≤ 1, |a + 48 + b − W| ≤ 1(px). viewport 1023px에서는 computed `grid-template-columns`가 px 값 한 개 이하(또는 `display`가 grid 아님)이고 직계 자식 8개 left = content-box left ±1px·top이 DOM 순서대로 증가, 1024px에서는 위 2열 계약 전체가 성립한다.
 - 섹션 padding·card gap: §9 표.
-- component state 측정 helper(step 44 신설, `tests/helpers/component-state.js`, step 45·46 재사용). 문서 전체 `document.getAnimations()` 대기는 쓰지 않는다.
+- component state 측정 helper(step 44 신설, `tests/helpers/component-state.js`, step 45~48 재사용). 문서 전체 `document.getAnimations()` 대기는 쓰지 않는다.
   - `waitForFiniteAnimations(page, selectors, { timeoutMs = 5000 }) → Promise<void>`: selector마다 일치하는 모든 요소에서 `el.getAnimations({ subtree: true })`를 모으고, `effect.getComputedTiming().iterations !== Infinity`이며 `playState`가 `running` 또는 `pending`인 animation·transition만 남겨 `Promise.all(animation.finished)`을 기다린다(취소로 reject되면 끝난 것으로 본다). 무한 반복 장식 CSS 애니메이션(`.caret` blink, `.scroll-hint span` scrollDot 등)은 필터에서 제외되어 계속 실행되어도 측정이 진행된다(제거 요구 없음). `timeoutMs` 안에 끝나지 않으면 `Error('animation-timeout:{selector}')`.
   - `measureState(page, selector, { nth = 0 }) → { color, backgroundColor, borderColor, outlineColor, transform, opacity, box }`: 내부에서 먼저 `waitForFiniteAnimations(page, [selector])`를 호출한 뒤 `getComputedStyle`·`boundingBox`를 읽는다. 상태 진입 후 측정은 이 helper만 쓴다.
-- component state(step 44~46): 대상 `.nav-link`, `#menuToggle`, `#themeToggle`, `.hero-cta .btn`, `.featured-card`, `#projectGrid .project-card`, `#projectModal .modal-close`, `#contactActions a`, `.scroll-hint`(보일 때). 색 3속성 = color·background-color·border-color.
+- component state(step 44~48): 대상 `.nav-link`, `#menuToggle`, `#themeToggle`, `.hero-cta .btn`, `.featured-card`, `#projectGrid .project-card`, `#projectModal .modal-close`, `#contactActions a`, `.scroll-hint`(보일 때). 색 3속성 = color·background-color·border-color.
   - step 44 hit target(6 project): 그 project에서 기본 상태로 보이는 대상의 bbox width·height ≥ 44px.
   - step 44 menu open(`mobile-dark` 전용, 다른 project는 `test.skip`): 열기 전 `#menuToggle` 색 3속성 측정 → `#menuToggle` click → `aria-expanded="true"`·`#navLinks.open` → 보이는 `.nav-link` 각각 bbox ≥ 44px → `#menuToggle` 색 3속성이 열기 전과 같음 → 다시 click → `aria-expanded="false"`.
   - step 44 modal open(6 project): 열기 전 `#projectGrid .project-card[data-project="0"]` 색 3속성 측정 → 그 카드 click → body `modal-open`·`#projectModal` visible → `#projectModal .modal-close` bbox ≥ 44px → button으로 닫기 → `modal-open` 해제 후 같은 카드 색 3속성이 열기 전과 같음.
   - step 44 애니메이션 회귀: `.caret`·`.scroll-hint span`의 iterations Infinity 애니메이션이 실행 중인 상태에서 `#hero`·`.scroll-hint` 대상 측정이 timeout 없이 끝난다.
-  - step 45 상태 순서 측정 helper(step 45 신설, `tests/helpers/state-sequence.js`): `measureStateSequence(context, { url, selector, nth = 0, beforeMeasure = null }) → { default, hover, active }`. BASE fixture generator(`tests/scripts/make-state-colors.mjs`)와 현재 상태 spec(`component-hover.spec.js`)은 이 함수 하나만 쓴다. 절차(고정): 대상마다 `context.newPage()` → `goto(url)` → `document.fonts.ready` → `beforeMeasure(page)`(주어졌을 때) → 대상 locator `scrollIntoViewIfNeeded()` → `waitForFiniteAnimations(page, [selector])` → `page.mouse.move(0, 0)` 후 default `measureState` → `locator.hover()` 후 hover `measureState` → `page.mouse.down()` 직후 active `measureState` → finally에서 `mouse.down()`이 실행됐으면 `page.mouse.up()`, 그다음 항상 `page.close()`. 각 상태 값은 `measureState` 결과 중 `{ color, backgroundColor, borderColor, outlineColor, transform, opacity }`. context는 테마 단위(또는 runner 단위)로 재사용할 수 있으나 page는 측정 대상마다 새로 만든다. `mouse.up()`으로 생길 수 있는 click(CTA 기본 이동·hash·scroll, 카드 modal·`modal-open`)은 그 page와 함께 폐기되어 다음 대상에 영향을 주지 않는다.
-  - step 45 hover·active(`desktop-dark`·`desktop-light`): BASE 상태 색 fixture `tests/fixtures/component-state-colors.json`(step 45 `tests/scripts/make-state-colors.mjs`가 생성)과 같은 키·같은 상태끼리 비교한다. 키: `hero-cta-btn-{i}`(`.hero-cta .btn` i번째), `grid-card-0`·`grid-card-1`(`#projectGrid .project-card[data-project="0"|"1"]`). 상태: `default`·`hover`·`active`(위 `measureStateSequence` 절차). 현재 각 대상의 상태별 색 3속성 = fixture의 같은 키·같은 상태 값. 첫 `.featured-card`(data-project 1)의 상태별 색 3속성 = `grid-card-1`의 같은 상태 BASE 값. hover와 active 각각에서 transform 또는 opacity가 그 요소의 default와 다르다. outline-color는 그 요소 default와 같다.
-  - step 45 격리 회귀: `grid-card-0` 순서 측정(active 후 up으로 modal이 열릴 수 있음)이 끝난 뒤 같은 context의 새 page에서 `grid-card-1` 측정이 완료되고, 그 page의 `beforeMeasure` 시점에 `#projectModal`이 hidden이고 body에 `modal-open`이 없다. `hero-cta-btn-0` 측정 뒤 다음 대상 page의 `beforeMeasure` 시점에 `location.hash === ''`이고 `scrollY === 0`이다. 각 호출 뒤 `context.pages().length`는 호출 전과 같다(실패 경로 포함).
-  - step 46 line clamp: `.featured-blurb`와 `#projectGrid` 카드 blurb에 screen `-webkit-line-clamp: 3`(DOM 텍스트 전문 유지, 모달·print는 전문). strength 장식 stripe: BASE `.strength-card::before` 규칙은 제거 가능(선택).
-- focus-visible은 기존 outline(step 48).
+  - step 45 상태 순서 측정 helper(`tests/helpers/state-sequence.js`): `measureStateSequence(context, { url, selector, nth = 0, beforeMeasure = null }) → { default, hover, active }`. step 46 BASE fixture generator와 step 47 현재 상태 spec은 이 함수 하나만 쓴다. 절차(고정): 대상마다 `context.newPage()` → `goto(url)` → `document.fonts.ready` → `beforeMeasure(page)`(주어졌을 때) → 대상 locator `scrollIntoViewIfNeeded()` → `waitForFiniteAnimations(page, [selector])` → `page.mouse.move(0, 0)` 후 default `measureState` → `locator.hover()` 후 hover `measureState` → `page.mouse.down()` 직후 active `measureState` → finally에서 `mouse.down()`이 실행됐으면 `page.mouse.up()`, 그다음 항상 `page.close()`. 각 상태 값은 `measureState` 결과 중 `{ color, backgroundColor, borderColor, outlineColor, transform, opacity }`. context는 테마 단위(또는 runner 단위)로 재사용할 수 있으나 page는 측정 대상마다 새로 만든다. `mouse.up()`으로 생길 수 있는 click(CTA 기본 이동·hash·scroll, 카드 modal·`modal-open`)은 그 page와 함께 폐기되어 다음 대상에 영향을 주지 않는다.
+  - step 45 격리 회귀: `grid-card-0` 대상 순서 측정(active 후 up으로 modal이 열릴 수 있음)이 끝난 뒤 같은 context의 새 page에서 `grid-card-1` 측정이 완료되고, 그 호출의 `beforeMeasure` 시점에 `#projectModal`이 hidden이고 body에 `modal-open`이 없다. `.hero-cta .btn` 0번 측정 뒤 다음 대상 호출의 `beforeMeasure` 시점에 `location.hash === ''`이고 `scrollY === 0`이다. 각 호출은 page를 정확히 1개 열고, 호출 뒤 `context.pages().length`는 호출 전과 같다(실패 경로 포함).
+  - step 46 BASE 상태 색 fixture `tests/fixtures/component-state-colors.json`(`tests/scripts/make-state-colors.mjs`가 BASE 파일을 route로 제공한 페이지에서 `measureStateSequence`로 생성): 키 `hero-cta-btn-{i}`(`.hero-cta .btn` i번째), `grid-card-0`·`grid-card-1`(`#projectGrid .project-card[data-project="0"|"1"]`), 상태 `default`·`hover`·`active`, 값 `{ color, backgroundColor, borderColor }`.
+  - step 47 hover·active(`desktop-dark`·`desktop-light`): 현재 각 대상의 상태별 색 3속성 = fixture의 같은 키·같은 상태 값. 첫 `.featured-card`(data-project 1)의 상태별 색 3속성 = `grid-card-1`의 같은 상태 BASE 값. hover와 active 각각에서 transform 또는 opacity가 그 요소의 default와 다르다. outline-color는 그 요소 default와 같다.
+  - step 48 line clamp: `.featured-blurb`와 `#projectGrid` 카드 blurb에 screen `-webkit-line-clamp: 3`(DOM 텍스트 전문 유지, 모달·print는 전문). strength 장식 stripe: BASE `.strength-card::before` 규칙은 제거 가능(선택).
+- focus-visible은 기존 outline(step 50).
 - typography hierarchy: font-size·line-height·letter-spacing·margin 위계만. font-weight는 BASE `css/style.css`에 쓰인 값(400·500·600·700)만. BASE의 `font-family`·`font` 선언은 위치(file·chain·selectors, featured 대응 확장만 허용)와 값을 그대로 유지한다.
 
 ### 16.3 제외(절대 반영 금지)
 
-새 색상 값, 기존 색상의 역할·적용 위치 변경(특히 button/logo dark text `#0d0f12`, muted grey 재배정), 기존 규칙에 새 색 적용 선언 추가(같은 prop의 다른 값 추가 포함), 색 custom property의 추가·재정의·삭제·별칭 변경, named color·`currentColor`를 통한 색 역할 변경, 서체 family/weight asset 변경과 BASE `font-family`·`font` 선언의 삭제·이동·값 변경·featured 대응 외 선택자 확장, 새 문구·수치·통계·섹션·이미지·아이콘, 프로젝트 순서·정보구조 변경, mockup placeholder 실콘텐츠화, `css/themes.css` 변경. bundle의 hero `min-height`·card thumb 비율 등 허용 목록 밖 제안도 반영하지 않는다.
+새 색상 값, 기존 색상의 역할·적용 위치 변경(특히 button/logo dark text `#0d0f12`, muted grey 재배정), 기존 규칙에 새 색 적용 선언 추가(같은 prop의 다른 값 추가 포함)와 기존 색 선언 순서 변경, 색 custom property의 추가·재정의·삭제·별칭 변경, named color·`currentColor`를 통한 색 역할 변경, 서체 family/weight asset 변경과 BASE `font-family`·`font` 선언의 삭제·이동·값 변경·featured 대응 외 선택자 확장, `@import` 추가·URL·조건 변경, 새 문구·수치·통계·섹션·이미지·아이콘, 프로젝트 순서·정보구조 변경, mockup placeholder 실콘텐츠화, `css/themes.css` 변경. bundle의 hero `min-height`·card thumb 비율 등 허용 목록 밖 제안도 반영하지 않는다.
 
 ### 16.4 design guard (step 13~18)
 
 step 13 parser(`tests/helpers/css-parse.js`, 순수):
 - `parseCssRules(text, file) → Rule[]`. 주석(`/* */`) 제거, 따옴표 문자열(`'…'`, `"…"`, 백슬래시 이스케이프) 안의 `{`·`}`·`;`·`,`는 구조로 보지 않음, `url(…)` 안의 `;` 무시, 중첩 at-rule(`@media`, `@supports`, `@layer`, `@container`) 재귀, 블록 없는 at-rule(`@import`, `@charset`)과 `@font-face`는 Rule로 기록.
-- Rule = `{ file, chain: string[], selectors: string[], decls: Array<[prop, value]>, atRule: string|null, index }`. chain은 바깥 at-rule prelude(공백 정규화) 목록, selectors는 최상위 쉼표로만 분리(`:is(a, b)`·`[data-x="a,b"]` 안 쉼표는 분리하지 않음)하고 공백 정규화, prop은 소문자(custom property는 원문), value는 trim·공백 정규화, `!important` 유지.
+- Rule = `{ file, chain: string[], selectors: string[], decls: Array<[prop, value]>, atRule: string|null, prelude: string|null, index }`. chain은 바깥 at-rule prelude(공백 정규화) 목록, selectors는 최상위 쉼표로만 분리(`:is(a, b)`·`[data-x="a,b"]` 안 쉼표는 분리하지 않음)하고 공백 정규화, prop은 소문자(custom property는 원문), value는 trim·공백 정규화, `!important` 유지. `prelude`: 일반 선언 규칙과 `@font-face`는 null, 블록 없는 at-rule(`@import`, `@charset`)은 at-keyword 뒤부터 `;` 앞까지를 trim·공백 정규화한 문자열(따옴표·`url()` 내용·미디어 조건 원문 유지).
 - `splitSelectors(text)`, `normalizeValue(value)` export.
 
 step 14 색 어휘·의존 그래프(`tests/helpers/color-vocab.js`, 순수, step 13 import):
@@ -801,16 +804,17 @@ step 14 색 어휘·의존 그래프(`tests/helpers/color-vocab.js`, 순수, ste
 - `colorTokenSet(rules) → Set<string>`: 정의를 노드, `varRefs` 참조를 간선으로 둔다. 시작 집합 = `isColorLiteralValue(value)`인 정의 이름 ∪ 색 선언이 `var()`로 참조하는 이름. 별칭 간선을 양방향(참조하는 쪽·참조되는 쪽)으로 따라가는 고정점이 color token 집합이다.
 - `isColorValue(value, colorTokens)`: `isColorLiteralValue(value)` 또는 `varRefs(value)` 중 colorTokens에 있는 이름이 있음.
 
-step 15 색 규칙 대응(`tests/helpers/design-guard-color-rules.js`, 순수, step 13·14 import). 이 step의 모든 규칙은 custom property(`--x`) 선언을 검사하지 않는다(정의의 추가·변경·삭제는 step 16 `checkColorTokens` 전담):
+step 15 색 규칙 대응(`tests/helpers/design-guard-color-rules.js`, 순수, step 13·14 import). 이 step의 모든 규칙은 custom property(`--x`) 선언을 검사하지 않는다(정의의 추가·변경·삭제는 step 16 `checkColorTokens` 전담). "BASE 색 선언 배열"은 BASE Rule의 custom property가 아닌 색 선언(`isColorDecl` 참, prop·정규화 value)을 등장 순서대로 나열한 배열이다.
 - `featuredCounterpart(selector)`: `.project-card`를 포함한 선택자의 모든 `.project-card`를 `.featured-card`로 바꾼 문자열(없으면 null).
 - `pairColorRules(baseRules, currentRules) → Array<{ base, current|null }>`: BASE 색 Rule(custom property가 아닌 색 선언이 있는 Rule)마다 같은 file·chain에서 selectors ⊇ base.selectors인 현재 Rule을 찾는다. 같은 file·chain·selectors의 BASE Rule이 여러 개면 현재 후보를 등장 순서로 1:1 짝짓는다. 짝지어진 현재 Rule은 "짝 현재 Rule", 나머지는 "짝 없는 현재 Rule"이다.
-- `checkColorRules({ baseRules, currentRules, colorTokens }) → string[]`. 진단 순서(고정, 정렬하지 않음): ① BASE 색 Rule을 BASE 등장 순서(index)로 돌며 각 Rule마다 규칙 1 → 2 → 3 → 4, ② 그다음 짝 없는 현재 Rule을 현재 등장 순서로 돌며 각 Rule마다 규칙 5 → 6. 한 Rule 안에서는 선언 순서. 같은 문자열은 처음 나온 것 하나만 남긴다.
+- `checkColorRules({ baseRules, currentRules, colorTokens }) → string[]`. 진단 순서(고정, 정렬하지 않음): ① BASE 색 Rule을 BASE 등장 순서(index)로 돌며 각 Rule마다 규칙 1 → 2 → 3 → 4 → 5, ② 그다음 짝 없는 현재 Rule을 현재 등장 순서로 돌며 각 Rule마다 규칙 6 → 7. 한 Rule 안에서는 선언 순서. 같은 문자열은 처음 나온 것 하나만 남긴다.
   1. 짝이 없는 BASE 색 Rule: selectors가 모두 `.strength-card::before`이면 허용, 아니면 `color-rule-missing:{chain}|{selectors}`(chain은 ` > `로, selectors는 `, `로 연결; 대상 교체·미디어 조건 변경·삭제 포함).
   2. 짝 현재 Rule의 추가 선택자가 base selectors의 featured 대응 선택자가 아니면 `selector-extended:{현재 selectors}`.
-  3. BASE Rule의 색 선언(custom property 제외, prop·정규화 value) 중 하나라도 짝 현재 Rule에 그대로 없으면(값 변경·삭제) `color-decl-changed:{base selectors}`.
-  4. 짝 현재 Rule의 선언 중 custom property가 아니고 (prop, 정규화 value) 쌍이 BASE Rule의 선언에 없는 모든 선언(prop 제한 없음: 같은 prop의 다른 값 후행 추가·값 교체 포함)에 대해 `isColorDecl`이 참이거나 `isColorValue(value, colorTokens)`가 참이면 `color-decl-new:{base selectors}`. 비색 선언 추가는 허용. 값 교체는 규칙 3과 4가 함께 성립해 `color-decl-changed` 다음 `color-decl-new`가 나온다.
-  5. 짝 없는 현재 Rule의 custom property가 아닌 선언 중 색 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 `isColorLiteralValue`가 거짓이고 `varRefs`가 모두 colorTokens에 있음.
-  6. 짝 없는 현재 Rule의 custom property가 아닌 비색 선언 값에 `currentColor`·named color가 있고 같은 file·chain·selectors·선언이 BASE에 없으면 `color-decl-new:{selectors}`(규칙 5와 같은 문자열이면 중복 제거로 하나).
+  3. BASE 색 선언 배열의 원소 중 하나라도 짝 현재 Rule의 선언에 (prop, 정규화 value)로 없으면(값 변경·삭제) `color-decl-changed:{base selectors}`.
+  4. 규칙 3이 성립하지 않은 짝에서, 짝 현재 Rule의 custom property가 아닌 선언 중 (prop, 정규화 value)가 BASE 색 선언 배열에 있는 것만 등장 순서대로 뽑은 부분열이 BASE 색 선언 배열과 다르면(같은 prop의 두 색 선언 순서 뒤바꿈 포함) `color-decl-reordered:{base selectors}`. 비색 선언의 추가·이동·삭제는 이 비교에 들어가지 않는다.
+  5. 짝 현재 Rule의 선언 중 custom property가 아니고 (prop, 정규화 value) 쌍이 BASE Rule의 선언에 없는 모든 선언(prop 제한 없음: 같은 prop의 다른 값 후행 추가·값 교체 포함)에 대해 `isColorDecl`이 참이거나 `isColorValue(value, colorTokens)`가 참이면 `color-decl-new:{base selectors}`. 비색 선언 추가는 허용. 값 교체는 규칙 3과 5가 함께 성립해 `color-decl-changed` 다음 `color-decl-new`가 나온다(규칙 4는 판정하지 않음).
+  6. 짝 없는 현재 Rule의 custom property가 아닌 선언 중 색 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 `isColorLiteralValue`가 거짓이고 `varRefs`가 모두 colorTokens에 있음.
+  7. 짝 없는 현재 Rule의 custom property가 아닌 비색 선언 값에 `currentColor`·named color가 있고 같은 file·chain·selectors·선언이 BASE에 없으면 `color-decl-new:{selectors}`(규칙 6과 같은 문자열이면 중복 제거로 하나).
 
 step 16 token 보존·통합(`tests/helpers/design-guard-color.js`, 순수, step 13~15 import):
 - `checkColorTokens({ baseRules, currentRules, colorTokens }) → string[]`(custom property 정의만 검사):
@@ -823,7 +827,7 @@ step 17 서체·asset·token(`tests/helpers/design-guard-css.js`, 순수, step 1
 - `matchesBaseRule(baseRule, currentRule) → boolean`(export): 같은 file, chain 배열 동일, base.selectors의 모든 선택자가 current.selectors에 있고, current에만 있는 선택자는 모두 base 선택자 중 하나의 `featuredCounterpart`(step 15). 서체 보존·신규 판정은 이 helper 하나만 쓴다.
 - `checkTypeAndAssets({ baseRules, currentRules }) → string[]`. 결과 순서: (1) 보존 위반 전부(BASE 등장 순) → (2) 신규 위반(현재 등장 순, Rule 안에서는 선언 순), 같은 문자열은 처음 것만.
   1. 보존(BASE → 현재): BASE Rule의 `font-family`·`font` 선언(prop·정규화 value)마다 `matchesBaseRule(baseRule, currentRule)`이 참이고 같은 prop·정규화 value 선언을 가진 현재 Rule이 없으면 `font-decl-missing:{chain}|{selectors}|{prop}`(BASE 기준, chain은 ` > `, selectors는 `, `로 연결). 삭제·선택자 이동·featured 대응 외 선택자 확장·미디어 조건 이동·값 변경 모두 해당.
-  2. 신규(현재 → BASE): 현재 Rule의 `font-family`·`font` 선언마다 `matchesBaseRule(baseRule, currentRule)`이 참이고 같은 prop·정규화 value 선언을 가진 BASE Rule이 없으면 `font-asset:{현재 selectors}`(featured 대응 확장은 신규 아님); BASE에 같은 file·chain·atRule·prelude·선언으로 없는 `@font-face`·`@import` → `font-asset:{atRule}`; `font-weight` 값이 BASE style.css 값 집합 밖 → `font-weight:{value}`; 새 `url(` → `asset:{selectors|atRule}`; 새 `content` 값이 `none`·`''`·`""`·`normal` 밖 → `content:{selectors}`; `var(--x)`의 x가 BASE 두 파일과 현재의 비색 custom property 정의 어디에도 없으면 → `unknown-token:--x`.
+  2. 신규(현재 → BASE): 현재 Rule의 `font-family`·`font` 선언마다 `matchesBaseRule(baseRule, currentRule)`이 참이고 같은 prop·정규화 value 선언을 가진 BASE Rule이 없으면 `font-asset:{현재 selectors}`(featured 대응 확장은 신규 아님); 현재 `@import` Rule마다 BASE에 같은 file·chain·atRule·prelude인 Rule이 없으면(신규·URL 변경·조건 변경) 정확히 `asset:@import` 하나(`font-asset`은 내지 않음); BASE에 같은 file·chain·atRule·선언으로 없는 `@font-face` → `font-asset:@font-face`, 그 선언의 새 `url(` → `asset:@font-face`; `font-weight` 값이 BASE style.css 값 집합 밖 → `font-weight:{value}`; 선언 규칙의 새 `url(` → `asset:{selectors}`; 새 `content` 값이 `none`·`''`·`""`·`normal` 밖 → `content:{selectors}`; `var(--x)`의 x가 BASE 두 파일과 현재의 비색 custom property 정의 어디에도 없으면 → `unknown-token:--x`.
 - `checkCss({ baseCss, currentCss, baseThemes, currentThemes }) → string[]` = 네 텍스트를 parse해 `[...checkColors(...), ...checkTypeAndAssets(...)]`, 그리고 `currentThemes !== baseThemes`면 `themes-changed`.
 
 step 18 markup·통합(`tests/helpers/design-guard.js`):
