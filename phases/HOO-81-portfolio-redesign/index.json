@@ -262,7 +262,10 @@
     {
       "step": 30,
       "name": "axe-prepare-modal",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:39:51+0900",
+      "completed_at": "2026-11-24T20:45:02+0900",
+      "summary": "step30: tests/helpers/axe-prepare.js append-only (import gridCard from modal.js; MODAL_ROOT '#projectModal', MODAL_BODY_TEXT '#modalBody .modal-blurb, #modalBody .modal-section', assertContentLoaded(locator, timeoutMs, {textLocator=null}) polls img complete&&naturalWidth>0 -> svg rect>0 -> optional non-empty text else content-not-loaded:img|svg|text, prepareModal(page,{projectIndex=0,timeoutMs=10000}) clicks only #projectGrid card data-project=N (else project-card-not-found:N), waits !hidden + body.modal-open (withPrepareCode modal-not-open), assertContentLoaded(MODAL_ROOT, textLocator MODAL_BODY_TEXT), returns {include:'#projectModal'}); tests/specs/axe-prepare-modal.spec.js (8 tests desktop-dark/light: constants, real page PROJECTS[0].title + body, fixture grid click 1/featured 0/__opens 1, outside-grid -> project-card-not-found:3, no handler 500ms -> modal-not-open, empty blurb/no section -> content-not-loaded:text, empty div null pass/textLocator fail, broken img/zero svg); RED confirmed (export missing), SNAP 30 created, T modal+page 28 passed, FULL 352 passed, VS OK, GATE 30 scope-snapshot: OK"
     },
     {
       "step": 31,
