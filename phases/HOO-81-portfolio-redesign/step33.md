@@ -9,8 +9,8 @@
 ## 작업
 1. `SNAP 33`
 2. `validateBaseline` = §6.4(Fix 필드 정확히 `target, fixKind, fixFiles, requiresColorChange`; kind별 값; 오류 `baseline[{i}].fixes[{j}]: bad-requiresColorChange`).
-3. spec(desktop-dark; §6.5 fixture 상수 4개 정의):
-   - 통과 `[]`: §6.4 정상 예(FIXTURE_THEMES, true); FIXTURE_OK(false); FIXTURE_RULE_PLAIN(css-rule false); FIXTURE_RULE_COLOR(css-rule true); `[]`; text-change만 entry(`fixFiles: []`, false)
+3. spec(desktop-dark; §6.5 fixture 상수 6개 정의):
+   - 통과 `[]`: §6.4 정상 예(FIXTURE_THEMES, true); FIXTURE_OK(false); FIXTURE_RULE_PLAIN(css-rule false); FIXTURE_RULE_COLOR(css-rule true); FIXTURE_MIXED; FIXTURE_COLOR_PLAIN; `[]`; text-change만 entry(`fixFiles: []`, false)
    - §6.4 오류 예 A·B·C·D·E 정확한 배열
    - `requiresColorChange` 추가 사례(각 정확히 한 항목 `baseline[0].fixes[0]: bad-requiresColorChange`): 값 `"yes"`; `null`; FIXTURE_OK에서 true(static-markup); js-render true; text-change true; css-token false(=D)
    - fix에 `extraField` 추가 → `baseline[0].fixes[0]: fields missing=[] extra=[extraField]`
