@@ -126,7 +126,10 @@
     {
       "step": 13,
       "name": "css-parser",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:39:01+0900",
+      "completed_at": "2026-11-24T19:41:21+0900",
+      "summary": "step13: added tests/helpers/css-parse.js (pure parseCssRules/splitSelectors/normalizeValue per §11.4: comments stripped, strings/url() opaque, @media/@supports/@layer/@container/@keyframes chain recursion, @import/@charset/@font-face Rules, nested index) and tests/specs/css-parse.spec.js (21 passed desktop-dark); SNAP 13 created, FULL 105 passed, GATE 13 scope-snapshot: OK"
     },
     {
       "step": 14,
