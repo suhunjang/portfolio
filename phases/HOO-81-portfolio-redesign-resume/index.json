@@ -30,7 +30,10 @@
     {
       "step": 1,
       "name": "resume-preflight",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T22:42:19+0900",
+      "completed_at": "2026-11-24T22:46:38+0900",
+      "summary": "resume-preflight 검증 전용: RSNAP 1(step101 snapshot) · PREFLIGHT(§R4 블록) resume-preflight: OK · FULL 429 passed · VS OK · RGATE 1 (빈 허용) OK, 파일 변경 없음"
     },
     {
       "step": 2,
