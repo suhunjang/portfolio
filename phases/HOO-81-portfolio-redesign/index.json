@@ -318,7 +318,10 @@
     {
       "step": 37,
       "name": "axe-current-checks",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:25:17+0900",
+      "completed_at": "2026-11-24T21:30:42+0900",
+      "summary": "step37: tests/helpers/axe.js append (step-28/32~36 behavior unchanged; CLI parser only extended): CURRENT_COLLECTED_PATH 'tests/.tmp/axe-current.json', checkGroupDone(collected, plan, id) -> {done, remaining} (group PlanTargets still in collected, {key,target} sorted unique; non-array/malformed collected Error('invalid collected'), missing/format-bad id Error('unknown group id: {id}')), checkCollectedCoverage(collected, plan) -> {ok, uncovered} (collected (key,target) not in any group, sorted), countCollectedTargets (unique (key,target) count); CLI --check-group-done <id> [--collected] [--plan] (stdout 'check-group-done: OK (id)', stderr remaining:{key}|{target}), --check-coverage [--collected] [--plan] ('check-coverage: OK' / uncovered:{key}|{target}), --assert-no-violations [--collected] ('assert-no-violations: OK' / 'violations: n'), missing/invalid files exit 1; tests/specs/axe-helper.spec.js append-only step-37 describe (3 tests desktop-dark: group done, lightbox:desktop-dark-only remaining 1, other group no effect, unknown/format-bad id and {} throw, coverage ok/1 uncovered/empty groups+residual, immutability, countCollectedTargets 0/3/2, CLI 0/1/missing 1, checkRegression [] but residual -> --assert-no-violations 1; tmp dirs cleaned, real fixtures untouched); RED confirmed (CURRENT_COLLECTED_PATH export missing), SNAP 37 created, T axe-helper 40 passed, FULL 403 passed, VS OK, GATE 37 scope-snapshot: OK"
     },
     {
       "step": 38,
