@@ -94,7 +94,10 @@
     {
       "step": 9,
       "name": "scope-snapshot-parity-core",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:34:21+0900",
+      "completed_at": "2026-11-24T19:35:16+0900",
+      "summary": "reverify step9: no-op — SNAP 9 created→reused, scope-snapshot-parity-core.spec.js 5 passed (desktop-dark), FULL 81 passed, GATE 9 OK, CGATE 9 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 10,
