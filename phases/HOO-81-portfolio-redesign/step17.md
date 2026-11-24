@@ -2,10 +2,10 @@
 
 - 목적: 공용 대응 helper `matchesBaseRule`로 BASE `font-family`·`font` 선언을 양방향(보존·신규) 판정하고, `@import`를 file·chain·atRule·prelude로 대응하며, 서체·asset·content·unknown-token 검사와 `checkCss`를 결합한다(설계 §16.4 step 17).
 - 예상 19분 / 선행 0~16 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §16.2(font-weight·font-family 보존), §16.3, §16.4(step 13 `prelude`, step 15 `featuredCounterpart`, step 17); step 13~16 helper(import만)
+- read-first: 설계 §16.2(font-weight·font-family 보존), §16.3, §16.4(step 13 `prelude` 정규화 계약, step 15 `featuredCounterpart`, step 17); step 13~16 helper(import만)
 - tracked 허용(exact): `tests/helpers/design-guard-css.js`(신규), `tests/specs/design-guard-css.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 사이트 파일, step 13~16 helper·spec 수정, Git·파일 시스템 접근, 보존·신규 판정에 서로 다른 대응 조건 사용
+- 금지: §15.7, 사이트 파일, step 13~16 helper·spec 수정(step 13 정규화 계약 포함), Git·파일 시스템 접근, 보존·신규 판정에 서로 다른 대응 조건 사용
 
 ## 작업
 
@@ -13,7 +13,7 @@
 2. `design-guard-css.js` 추가 API: `matchesBaseRule(baseRule, currentRule)`, `checkTypeAndAssets({ baseRules, currentRules })`(보존 → 신규 순서, 서체 두 방향 모두 `matchesBaseRule`만 사용, `@import`는 file·chain·atRule·prelude 대응), `checkCss({ baseCss, currentCss, baseThemes, currentThemes })` — 설계 §16.4 step 17 그대로.
 3. `design-guard-css.spec.js`(node 전용, desktop-dark만, 합성 BASE style `@import url("a.css") screen and (min-width: 10px); body{font-family:"Pretendard",sans-serif;font-weight:400} h2{font-weight:700} .project-card{font:500 1rem/1.5 "Pretendard",sans-serif} :root{--pad:16px}`, themes `:root{--brand:#3355ff}`):
    - `matchesBaseRule` 단위: 같은 Rule → true; `.project-card` → `.project-card, .featured-card` → true; `.project-card` → `.project-card, .hero-name` → false; `.project-card` → `.card` → false; chain만 다름(`@media (min-width: 1024px)`) → false; file만 다름 → false
-   - `checkTypeAndAssets` 허용 → `[]`: 변경 없음(기존 `@import` 그대로); `@import`의 공백만 다른 `@import url("a.css")   screen and (min-width:10px);`(정규화 후 같은 prelude); `@import` 삭제; `.x{font-weight:700;font-size:1.25rem;letter-spacing:.01em}`; `.y{content:none}`; `.z{padding:var(--pad)}`; 새 `--gap:24px`와 `var(--gap)`; `.project-card, .featured-card{font:500 1rem/1.5 "Pretendard",sans-serif}`(featured 대응 확장은 보존 충족·신규 아님)
+   - `checkTypeAndAssets` 허용 → `[]`: 변경 없음(기존 `@import` 그대로); 공백만 다른 `@import url("a.css")   screen and (min-width:   10px);`(step 13 trim·연속 공백 1칸 정규화 후 BASE와 같은 prelude `url("a.css") screen and (min-width: 10px)`); `@import` 삭제; `.x{font-weight:700;font-size:1.25rem;letter-spacing:.01em}`; `.y{content:none}`; `.z{padding:var(--pad)}`; 새 `--gap:24px`와 `var(--gap)`; `.project-card, .featured-card{font:500 1rem/1.5 "Pretendard",sans-serif}`(featured 대응 확장은 보존 충족·신규 아님)
    - `@import` 거부(정확한 결과 배열): URL만 변경 `@import url("b.css") screen and (min-width: 10px);` → `["asset:@import"]`; 조건만 변경 `@import url("a.css") screen and (min-width: 20px);` → `["asset:@import"]`; 새 import 추가 `@import url(f.css);` → `["asset:@import"]`
    - 보존·신규 서체 거부(정확한 결과 배열):
      - 삭제: `body{font-weight:400}`만 남김 → `["font-decl-missing:|body|font-family"]`
