@@ -110,7 +110,10 @@
     {
       "step": 11,
       "name": "scope-snapshot-parity-artifacts",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:36:11+0900",
+      "completed_at": "2026-11-24T19:37:05+0900",
+      "summary": "reverify step11: no-op — SNAP 11 created→reused, scope-snapshot-parity-artifacts.spec.js 7 passed (desktop-dark), FULL 81 passed, GATE 11 OK, CGATE 11 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 12,
