@@ -2,7 +2,7 @@ import hashlib, json, os, re, stat, subprocess, sys
 RUNTIME = ('tests/node_modules/', 'tests/.npm-cache/', 'tests/.pw-browsers/', 'tests/.tmp/', 'tests/test-results/', 'tests/playwright-report/', 'tests/screenshots/')
 SKIP = RUNTIME + ('.git/', '.venv/')
 BASE = 'd0a8a6e462bc1366757b1401c3ba7aeb0fbf391d'
-HARNESS = {'sourceCommit': 'cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae', 'manifestHash': '287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a', 'distributionVersion': '2.0.0'}
+HARNESS = {'sourceCommit': 'e7a03919a460f975149f7c55343ca4b34d3d2352', 'manifestHash': 'b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372', 'distributionVersion': '2.0.1'}
 LOCK = '.harness/harness.lock.json'
 KEYS = {'schemaVersion', 'stepId', 'projectRoot', 'head', 'base', 'harness', 'statusZHex', 'xy', 'files'}
 HEX64 = re.compile('[0-9a-f]{64}')
@@ -84,15 +84,21 @@ def parse_status(raw):
         i += 1
         if len(rec) < 4 or rec[2:3] != b' ':
             raise ValueError('bad status record')
-        code = rec[:2].decode()
-        p = rec[3:].decode()
+        try:
+            code = rec[:2].decode()
+            p = rec[3:].decode()
+        except UnicodeDecodeError:
+            raise ValueError('bad status record')
         if not rel_ok(p):
             raise ValueError('bad path')
         xy[p] = code
         if code[0] in 'RC' or code[1] in 'RC':
             if i >= len(recs) or not recs[i]:
                 raise ValueError('bad status record')
-            o = recs[i].decode()
+            try:
+                o = recs[i].decode()
+            except UnicodeDecodeError:
+                raise ValueError('bad status record')
             if not rel_ok(o):
                 raise ValueError('bad path')
             xy[o] = code

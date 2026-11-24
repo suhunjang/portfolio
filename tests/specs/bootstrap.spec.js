@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import config from '../playwright.config.js';
+import { HARNESS_IDENTITY } from '../scripts/scope-snapshot.mjs';
 
 const TESTS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REPO_ROOT = path.resolve(TESTS_DIR, '..');
@@ -90,6 +91,13 @@ test.describe('step 0 bootstrap', () => {
   test('start-snapshot.py bytes = 설계 S 블록', () => {
     const actual = fs.readFileSync(path.join(REPO_ROOT, S_SCRIPT));
     expect(actual.equals(Buffer.from(designBlock('스크립트 S'), 'utf8'))).toBe(true);
+  });
+
+  test('scope-snapshot HARNESS_IDENTITY = 설계 S HARNESS', () => {
+    const m = designBlock('스크립트 S').match(/^HARNESS = (\{.*\})$/m);
+    expect(m, 'S HARNESS line').not.toBeNull();
+    const sHarness = JSON.parse(m[1].replace(/'/g, '"'));
+    expect({ ...HARNESS_IDENTITY }).toEqual(sHarness);
   });
 
   test('S 최초 생성·재사용·identity/schemaVersion 거부', () => {

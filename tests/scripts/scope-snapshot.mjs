@@ -25,9 +25,9 @@ export const STEP_ID_RE = /^(?:step[0-9]+|axe-remediation-[a-z0-9]+(?:-[a-z0-9]+
 export const HEX64_RE = /^[0-9a-f]{64}$/;
 export const BASE = 'd0a8a6e462bc1366757b1401c3ba7aeb0fbf391d';
 export const HARNESS_IDENTITY = Object.freeze({
-  sourceCommit: 'cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae',
-  manifestHash: '287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a',
-  distributionVersion: '2.0.0',
+  sourceCommit: 'e7a03919a460f975149f7c55343ca4b34d3d2352',
+  manifestHash: 'b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372',
+  distributionVersion: '2.0.1',
 });
 export const STATUS_ARGS = Object.freeze(['status', '--porcelain=v1', '-z', '--untracked-files=all']);
 export const LS_FILES_ARGS = Object.freeze(['ls-files', '-z']);
