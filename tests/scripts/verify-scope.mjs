@@ -31,6 +31,8 @@ export const HARNESS_OWNED_FILES = Object.freeze([
   'CLAUDE.md', 'pytest.ini', '.python-version', '.gitattributes', '.gitignore',
   '.harness/harness.lock.json', '.harness/policy.json',
   'docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md',
+  // resume §R3: commit된 resume 설계(정확한 경로 1개)
+  'docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md',
   'harness-manifest.json',
   'docs/PRD.md', 'docs/UI_GUIDE.md', 'phases/index.json',
 ]);
@@ -41,6 +43,8 @@ export const HARNESS_OWNED_PREFIXES = Object.freeze([
 // 런타임 면제(어느 구간이든): lock·policy 외 .harness/**, .venv/**, phase 디렉터리
 export const RUNTIME_EXEMPT_PREFIXES = Object.freeze([
   '.harness/', '.venv/', 'phases/HOO-81-portfolio-redesign/',
+  // resume §R3: resume phase 디렉터리(접두 정확 일치)
+  'phases/HOO-81-portfolio-redesign-resume/',
 ]);
 
 // 경로 구간: committed = BASE→HEAD, staged = HEAD→index, worktree = index→worktree, untracked
@@ -383,8 +387,44 @@ export function selfTest() {
     assert.deepEqual(evalScenario({ renames: [{ from, to, layer: 'committed' }] }),
       [`outside-scope:committed:${from}`]);
   }
+  selfTestResume();
   selfTestContent();
   return 'verify-scope: self-test OK';
+}
+
+// ---------------------------------------------------------------- self-test (resume §R3)
+
+function selfTestResume() {
+  const design = 'docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md';
+  const original = 'docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md';
+  const phase = 'phases/HOO-81-portfolio-redesign-resume';
+  // 허용
+  assert.deepEqual(evalScenario({ committed: [design] }), []);
+  for (const file of ['index.json', 'step0.md']) {
+    for (const layer of ['committed', 'worktree', 'untracked']) {
+      assert.deepEqual(evalScenario({ [layer]: [`${phase}/${file}`] }), [], `${layer} ${file}`);
+    }
+  }
+  // 위반
+  const cases = [
+    [{ worktree: [design] }, [`harness-uncommitted:worktree:${design}`]],
+    [{ staged: [design] }, [`harness-uncommitted:staged:${design}`]],
+    [{ committed: ['docs/superpowers/specs/other.md'] }, ['outside-scope:committed:docs/superpowers/specs/other.md']],
+    [{ committed: [`${design}.bak`] }, [`outside-scope:committed:${design}.bak`]],
+    [{ committed: ['phases/OTHER/x.json'] }, ['outside-scope:committed:phases/OTHER/x.json']],
+    [{ worktree: ['phases/OTHER/x.json'] }, ['outside-scope:worktree:phases/OTHER/x.json']],
+    [{ committed: [`${phase}-x/a.json`] }, [`outside-scope:committed:${phase}-x/a.json`]],
+    [{ staged: ['.harness/policy.json'] }, ['harness-uncommitted:staged:.harness/policy.json']],
+    [{ worktree: ['.harness/policy.json'] }, ['harness-uncommitted:worktree:.harness/policy.json']],
+    [{ untracked: ['.harness/policy.json'] }, ['harness-uncommitted:untracked:.harness/policy.json']],
+    [{ worktree: [original] }, [`harness-uncommitted:worktree:${original}`]],
+    [{ staged: ['CLAUDE.md'] }, ['harness-uncommitted:staged:CLAUDE.md']],
+    [{ worktree: ['CLAUDE.md'] }, ['harness-uncommitted:worktree:CLAUDE.md']],
+    [{ untracked: ['CLAUDE.md'] }, ['harness-uncommitted:untracked:CLAUDE.md']],
+  ];
+  for (const [scenario, expected] of cases) {
+    assert.deepEqual(evalScenario(scenario), expected, JSON.stringify(scenario));
+  }
 }
 
 // ---------------------------------------------------------------- self-test (step 23 내용)
