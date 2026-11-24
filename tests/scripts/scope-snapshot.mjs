@@ -4,6 +4,7 @@
 // step 3: strict schema loader (loadStartSnapshot).
 // step 4: 현재 상태 수집 (scanProject, hashPath, takeCurrent). Git 읽기만, 쓰기 없음.
 // step 7: identity(computeIdentity, checkIdentity), 순수 판정(diffAgainstStart … evaluateGate). 쓰기 없음.
+// step 8: after.z 안전 쓰기(writeAfterZ), runCheck 실행 순서, CLI --check.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import nodeFs from 'node:fs';
@@ -523,4 +524,111 @@ export function evaluateGate(start, current, { allow = [], requireAbsent = [] } 
     ...classifyChanges(diffAgainstStart(start, current), { allow }),
     ...checkRuntimeVisible(start, current),
   ];
+}
+
+// ---- step 8: after.z 안전 쓰기, runCheck 실행 순서, CLI --check ----------------------------------
+
+// after.z = snapshot 이름의 .json → -after.z. 경로 유형 검사 실패면 open 없이 UnsafePathError.
+export function writeAfterZ(startFile, statusBytes, { fs = nodeFs, root = process.cwd() } = {}) {
+  const after = startFile.replace(/\.json$/, '-after.z');
+  const item = checkPath(after, ['missing', 'file'], { fs, root });
+  if (item) throw new UnsafePathError(item);
+  const { O_WRONLY, O_CREAT, O_TRUNC, O_NOFOLLOW, O_NONBLOCK } = nodeFs.constants;
+  const fd = fs.openSync(path.join(root, after), O_WRONLY | O_CREAT | O_TRUNC | O_NOFOLLOW | O_NONBLOCK, 0o644);
+  try {
+    if (!fs.fstatSync(fd).isFile()) throw new UnsafePathError(`non-regular:${after}`);
+    fs.writeFileSync(fd, Buffer.from(statusBytes));
+  } finally {
+    fs.closeSync(fd);
+  }
+  return after;
+}
+
+const errText = (e) => String(e?.message ?? e);
+const isStatusArgs = (args) => args.length === STATUS_ARGS.length && args.every((a, i) => a === STATUS_ARGS[i]);
+
+// 설계 §11.7 비교 도구 step 8 순서: checkRoot → loader → identity → takeCurrent(unsafe면 즉시 실패) →
+// writeAfterZ → evaluateGate. (0)~(3) 실패는 어떤 파일도 쓰지 않는다. snapshot은 만들거나 고치지 않는다.
+// deps는 테스트용 단계 대체(기본은 이 모듈의 함수).
+export function runCheck({ startFile, allow = [], requireAbsent = [] } = {},
+  { git, fs = nodeFs, root = process.cwd(), deps = {} } = {}) {
+  const d = {
+    checkRoot, loadStartSnapshot, computeIdentity, checkIdentity, takeCurrent, writeAfterZ, evaluateGate, ...deps,
+  };
+  const fail = (lines) => ({ code: 1, stdout: '', stderr: lines.join('\n') });
+  const readGit = git ?? ((args) => runGit(args, root));
+  let statusRaw = null;
+  const recGit = (args) => {
+    const out = readGit(args);
+    if (isStatusArgs(args)) statusRaw = out;
+    return out;
+  };
+
+  let start;
+  let current;
+  try {
+    d.checkRoot({ fs, root });
+    start = d.loadStartSnapshot(startFile, { fs, root });
+    const ident = d.computeIdentity({ git: recGit, fs, root });
+    const mismatch = d.checkIdentity(start.identity, ident);
+    if (mismatch.length) {
+      return fail(mismatch.map((m) => `start snapshot identity mismatch: ${m.replace(/^identity-mismatch:/, '')}`));
+    }
+    current = d.takeCurrent(start, { git: recGit, fs, root });
+  } catch (e) {
+    return fail([errText(e)]);
+  }
+  if (current.unsafe.length) {
+    return fail([...checkSnapshotFirst(start, requireAbsent), ...sortedUnique(current.unsafe)]);
+  }
+  try {
+    d.writeAfterZ(startFile, statusRaw ?? Buffer.alloc(0), { fs, root });
+  } catch (e) {
+    return fail([errText(e)]);
+  }
+  const bad = d.evaluateGate(start, current, { allow, requireAbsent });
+  if (bad.length) return fail(bad);
+  return { code: 0, stdout: 'scope-snapshot: OK', stderr: '' };
+}
+
+const USAGE = 'usage: scope-snapshot.mjs --check <start.json> --allow <list> [--require-absent <list>]';
+const splitList = (s) => s.split(',').filter((p) => p !== '');
+
+// CLI 인자 → runCheck 옵션. 알 수 없는·중복·값 없는 인자, --check·--allow 누락이면 null.
+function parseCliArgs(argv) {
+  const known = new Set(['--check', '--allow', '--require-absent']);
+  const got = {};
+  for (let i = 0; i < argv.length; i += 2) {
+    const k = argv[i];
+    if (!known.has(k) || hasOwn(got, k) || i + 1 >= argv.length) return null;
+    got[k] = argv[i + 1];
+  }
+  if (!hasOwn(got, '--check') || got['--check'] === '' || !hasOwn(got, '--allow')) return null;
+  return {
+    startFile: got['--check'],
+    allow: splitList(got['--allow']),
+    requireAbsent: splitList(got['--require-absent'] ?? ''),
+  };
+}
+
+function isMain() {
+  if (!process.argv[1]) return false;
+  try {
+    return nodeFs.realpathSync(process.argv[1]) === nodeFs.realpathSync(new URL(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (isMain()) {
+  const parsed = parseCliArgs(process.argv.slice(2));
+  if (!parsed) {
+    process.stderr.write(`${USAGE}\n`);
+    process.exitCode = 2;
+  } else {
+    const r = runCheck(parsed, { root: process.cwd() });
+    if (r.stdout) process.stdout.write(`${r.stdout}\n`);
+    if (r.stderr) process.stderr.write(`${r.stderr}\n`);
+    process.exitCode = r.code;
+  }
 }
