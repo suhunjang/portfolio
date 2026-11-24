@@ -38,7 +38,10 @@
     {
       "step": 2,
       "name": "axe-classify-occ-batch-1",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T22:46:38+0900",
+      "completed_at": "2026-11-24T22:57:44+0900",
+      "summary": "OCC_RUN 1(§R5.1 골격 그대로, import·config 자가 검사 통과, 소유 서버 spawn→정리): batch 1 occurrence 10개(page:desktop-dark color-contrast) 전부 axe 재현 — --text-faint 라벨 3.67~3.97:1, --accent 위 #fff 2.47:1, opacity/render 원인 없음 → 모두 css-rule·requiresColorChange true, pair 불일치 없음; occ-batch-1.json·server-1.json 기록. OCC_CHECK 1 'occ-check 1: OK 10' · FULL 429 passed(1차 실행 1건 page.goto timeout flake, 재실행 통과) · VS OK · RGATE 2 '' OK"
     },
     {
       "step": 3,
