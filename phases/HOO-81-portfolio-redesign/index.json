@@ -302,7 +302,10 @@
     {
       "step": 35,
       "name": "axe-remediation-plan-schema",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:13:29+0900",
+      "completed_at": "2026-11-24T21:19:56+0900",
+      "summary": "step35: tests/helpers/axe.js append (step-28/32/33/34 behavior unchanged; CLI parser only extended): GROUP_ID_RE /^[a-z0-9]+(?:-[a-z0-9]+)*$/, loadPlan (missing/invalid json throw), requiredBlockReason(groupTargets, baseline) pure (text-change -> 'text change excluded', requiresColorChange true -> 'color change excluded (HOO-81 §16.3)', joined '; ' in that order, unknown targets ignored), validateRemediationPlan(plan, baseline, {coverage, requireEmpty}) per §6.5 (plan not-object/fields/groups not-array; groups[i] not-object/fields/bad-id/targets empty/targets[j] not-object|fields|unknown-target/targets duplicate|unsorted/fixFiles-mismatch (only without target errors)/bad-difficulty/bad-estMinutes/bad-blocked/blocked-required|reason-required|reason-mismatch|reason-must-be-empty using requiredBlockReason only; plan duplicate-id, groups unsorted, target-in-multiple-groups, uncovered, 'groups: expected empty, got n'); CLI --check-plan [--coverage] [--require-empty] [--plan] [--baseline] (stdout 'check-plan: OK', errors to stderr exit 1, missing/invalid json exit 1); tests/specs/axe-helper.spec.js append-only step-35 describe (5 tests desktop-dark: fixtures validateBaseline [], requiredBlockReason cases + immutability, FIXTURE_OK normal/error examples/ids/dup/sort/PlanTarget/field errors/coverage/requireEmpty, THEMES/RULE_PLAIN/RULE_COLOR/MIXED/COLOR_PLAIN blocked·reason, loadPlan + CLI 0/1 cases; tmp dirs under tests/.tmp cleaned, real fixtures untouched); RED confirmed (GROUP_ID_RE export missing), SNAP 35 created, T axe-helper 35 passed, FULL 398 passed, VS OK, GATE 35 scope-snapshot: OK"
     },
     {
       "step": 36,
