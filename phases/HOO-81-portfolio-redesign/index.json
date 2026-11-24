@@ -102,7 +102,10 @@
     {
       "step": 10,
       "name": "scope-snapshot-parity-paths",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:35:16+0900",
+      "completed_at": "2026-11-24T19:36:11+0900",
+      "summary": "reverify step10: no-op — SNAP 10 created→reused, scope-snapshot-parity-paths.spec.js 2 passed (desktop-dark), FULL 81 passed, GATE 10 OK, CGATE 10 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 11,
