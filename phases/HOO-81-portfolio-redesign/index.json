@@ -334,7 +334,10 @@
     {
       "step": 39,
       "name": "axe-collect",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:37:39+0900",
+      "completed_at": "2026-11-24T21:43:54+0900",
+      "summary": "step39: added tests/specs/axe.spec.js (§THEME test, scenarios page x6 projects + modal/lightbox desktop-dark/light, others skipped 'desktop only'; page.goto -> prepareForAxe -> runAxe({include}); AXE_COLLECT=1 -> writeCollected only; normal -> resolveBaselineMode before prepare: pending -> prepare then test.skip 'axe classification pending (step 40)', check -> checkRegression [] + desktop-dark page validateBaseline [] + plan validateRemediationPlan(coverage false) []); RED confirmed (resolveBaselineMode throw without collected), COLLECT_CHAIN OK -> tests/fixtures/axe-collected.json 12 entries / 139 targets (color-contrast 6 entries 61 targets, nested-interactive 6 entries 78 targets; page only, modal/lightbox 0), all keys = makeEntryKey; SNAP 39 created, FULL 407 passed (10 axe pending skips), VS OK, GATE 39 scope-snapshot: OK"
     },
     {
       "step": 40,
