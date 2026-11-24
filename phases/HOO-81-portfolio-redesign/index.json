@@ -70,7 +70,10 @@
     {
       "step": 6,
       "name": "scope-snapshot-special-files",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:31:51+0900",
+      "completed_at": "2026-11-24T19:32:48+0900",
+      "summary": "reverify step6: no-op — SNAP 6 created→reused, scope-snapshot-special.spec.js 12 passed (desktop-dark), FULL 81 passed, CGATE 6 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 7,
