@@ -150,7 +150,10 @@
     {
       "step": 16,
       "name": "color-decl-rules",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:45:30+0900",
+      "completed_at": "2026-11-24T19:47:39+0900",
+      "summary": "step16: added tests/helpers/design-guard-color-rules.js (checkColorRules = checkColorRulePairs result + per paired BASE color Rule in BASE order rule 4 color-decl-changed -> 5 color-decl-reordered (subsequence of BASE color decls, non-color ignored) -> 6 color-decl-new (decls absent from BASE Rule with isColorDecl/isColorValue), then unpaired current Rules in current order rule 7 (color decl or isColorValue, :focus-visible outline/outline-offset token-only exception) -> 8 (non-color currentColor/named color absent at same file/chain/selectors in BASE); custom properties excluded, global dedup, no sorting, inputs unmutated; pairs import only) and tests/specs/design-guard-color-rules.spec.js (5 passed desktop-dark, all step16 BASE cases); SNAP 16 created, T rules+pairs+color-vocab+css-parse 42 passed, FULL 126 passed, GATE 16 scope-snapshot: OK"
     },
     {
       "step": 17,
