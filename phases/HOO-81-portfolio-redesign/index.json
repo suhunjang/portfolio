@@ -326,7 +326,10 @@
     {
       "step": 38,
       "name": "axe-regression-prune",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:30:42+0900",
+      "completed_at": "2026-11-24T21:37:39+0900",
+      "summary": "step38: tests/helpers/axe.js append (step-28/32~37 behavior unchanged; CLI parser only extended): checkCollectedRegression(collected, baseline) (invalid collected throw; key != makeEntryKey(scenario,project,ruleId) -> bad-key:{key}, baseline missing key -> new-key:{key}, new target -> new-target:{key}:{target}; vanished allowed; unique sorted; pure), prunePlan(plan, collected, baseline) per §6.5 (1)~(6) (drop absent PlanTargets keeping order, drop empty groups keeping order, fixFiles = sorted union of baseline fix fixFiles, R' via requiredBlockReason reuse -> blocked true/R', else manual block kept only if prior blocked true·non-empty reason != requiredBlockReason(prior targets), else false/''; id·difficulty·estMinutes kept, no extra fields, new objects, pure/deterministic); CLI --check-regression [--collected] [--baseline] ('check-regression: OK' / regression lines stderr exit 1) and --prune-plan [--collected] [--plan] [--baseline] (regression -> stderr exit 1 no write; input/pruned plan validated with validateRemediationPlan; writes JSON.stringify(plan,null,2)+'\\n', stdout 'prune-plan: OK (plan)'); collected default tests/.tmp/axe-current.json; tests/specs/axe-helper.spec.js append-only step-38 describe (4 tests desktop-dark: regression same/new-key/new-target/bad-key/vanished, basic prune with removal/order/fixFiles/empty groups/fields, MIXED (a)(b), COLOR_PLAIN derived-blocker removal, COLOR_PLAIN manual rejected by validator, RULE_PLAIN manual hold kept, false kept, every prune result validateRemediationPlan [] + immutability + determinism; CLI sha256·mtime unchanged on new-target/missing collected/broken baseline and sh -c chain failure, success writes exact pruned JSON; tmp dirs cleaned, real fixtures untouched); RED confirmed (checkCollectedRegression export missing), SNAP 38 created, T axe-helper 44 passed, FULL 407 passed, VS OK, GATE 38 scope-snapshot: OK"
     },
     {
       "step": 39,
