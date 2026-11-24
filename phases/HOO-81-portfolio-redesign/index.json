@@ -142,7 +142,10 @@
     {
       "step": 15,
       "name": "color-rule-pairs",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:43:43+0900",
+      "completed_at": "2026-11-24T19:45:30+0900",
+      "summary": "step15: added tests/helpers/design-guard-color-pairs.js (featuredCounterpart class-boundary .project-card→.featured-card else null; pairColorRules over BASE color Rules in (file,index) order, same file·chain, selectors ⊇, same-selectors groups 1:1 by appearance; checkColorRulePairs rule 1 color-rule-missing with .strength-card::before exemption → rule 2 selector-extended (non-featured extras) → per-file rule 3 color-rule-reordered, dedup, no sorting, inputs unmutated) and tests/specs/design-guard-color-pairs.spec.js (5 passed desktop-dark, all step15 BASE cases); SNAP 15 created, T pairs+color-vocab+css-parse 37 passed, FULL 121 passed, GATE 15 scope-snapshot: OK"
     },
     {
       "step": 16,
