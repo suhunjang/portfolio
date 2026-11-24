@@ -134,7 +134,10 @@
     {
       "step": 14,
       "name": "color-vocab-graph",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:41:21+0900",
+      "completed_at": "2026-11-24T19:43:43+0900",
+      "summary": "step14: added tests/helpers/color-vocab.js (NAMED_COLORS 149, COLOR_LITERAL_RE per §11.4 /i, COLOR_PROPS design set with 0/none shorthand exclusion, valueIdentifiers/varRefs/isColorLiteralValue with string·url() stripping, isColorDecl, customPropertyDefs, bidirectional colorTokenSet fixpoint, isColorValue) and tests/specs/color-vocab.spec.js (11 passed desktop-dark); SNAP 14 created, T color-vocab+css-parse 32 passed, FULL 116 passed, GATE 14 scope-snapshot: OK"
     },
     {
       "step": 15,
