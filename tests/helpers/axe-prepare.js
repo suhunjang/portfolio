@@ -1,4 +1,5 @@
 // step 29 — axe 실행 전 페이지 준비 (설계 §6.3): PREPARE_PREFIX · prepareError · withPrepareCode · preparePage
+import { gridCard } from './modal.js';
 
 export const PREPARE_PREFIX = 'prepareForAxe: ';
 
@@ -64,4 +65,60 @@ export async function preparePage(page, { timeoutMs = 10000 } = {}) {
 
   const revealChecked = await page.evaluate(() => document.querySelectorAll('.reveal').length);
   return { revealChecked, scrollSteps };
+}
+
+// step 30 — 모달 준비 (설계 §6.3): MODAL_ROOT · MODAL_BODY_TEXT · assertContentLoaded · prepareModal
+export const MODAL_ROOT = '#projectModal';
+export const MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section';
+
+// locator 안의 img는 decode 완료(naturalWidth > 0), svg는 렌더 크기 > 0, textLocator가 있으면
+// 그중 하나 이상이 비어 있지 않은 텍스트를 가질 때까지 timeoutMs 동안 기다린다.
+export async function assertContentLoaded(locator, timeoutMs, { textLocator = null } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  const poll = async (code, check) => {
+    for (;;) {
+      if (await check()) return;
+      if (Date.now() >= deadline) throw prepareError(`content-not-loaded:${code}`);
+      await new Promise((r) => setTimeout(r, 50));
+    }
+  };
+  await poll('img', () =>
+    locator.evaluateAll((roots) =>
+      roots.every((root) => [...root.querySelectorAll('img')].every((img) => img.complete && img.naturalWidth > 0)),
+    ),
+  );
+  await poll('svg', () =>
+    locator.evaluateAll((roots) =>
+      roots.every((root) =>
+        [...root.querySelectorAll('svg')].every((svg) => {
+          const r = svg.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        }),
+      ),
+    ),
+  );
+  if (textLocator !== null) {
+    await poll('text', () =>
+      textLocator.evaluateAll((els) => els.some((el) => (el.textContent || '').replace(/\s+/g, ' ').trim() !== '')),
+    );
+  }
+}
+
+// #projectGrid의 data-project=N 카드만 클릭한다(대표 영역 버튼은 건드리지 않는다).
+export async function prepareModal(page, { projectIndex = 0, timeoutMs = 10000 } = {}) {
+  const card = gridCard(page, projectIndex);
+  if ((await card.count()) === 0) throw prepareError(`project-card-not-found:${projectIndex}`);
+  await withPrepareCode('modal-not-open', async () => {
+    await card.first().click({ timeout: timeoutMs });
+    await page.waitForFunction(
+      (sel) => {
+        const m = document.querySelector(sel);
+        return !!m && !m.hidden && document.body.classList.contains('modal-open');
+      },
+      MODAL_ROOT,
+      { timeout: timeoutMs },
+    );
+  });
+  await assertContentLoaded(page.locator(MODAL_ROOT), timeoutMs, { textLocator: page.locator(MODAL_BODY_TEXT) });
+  return { include: MODAL_ROOT };
 }
