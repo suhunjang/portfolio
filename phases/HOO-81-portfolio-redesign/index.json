@@ -246,7 +246,10 @@
     {
       "step": 28,
       "name": "axe-canonical",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:25:26+0900",
+      "completed_at": "2026-11-24T20:29:06+0900",
+      "summary": "step28: added tests/helpers/axe.js (ALIASES {'## — Stack & Contact'->'## — Contact','기술 스택 & 연락처'->'연락처'}; canonicalFromDescriptor -> '{ruleId}::{anchor}::{textSig}' with anchor featured:N|project:N|#id|landmark tag|document (unknown kind throws), textSig = first non-empty norm(textContent)/aria-label/alt/title else src filename, digits -> '#', ALIASES, 80 chars; canonicalTargetInPage(page, ruleId, selector) resolves anchor by priority [data-featured-card][data-project] > [data-project] > [id] > landmark > document via closest(), throws 'target not found'; runAxe(page,{include}) = AxeBuilder wcag2a/wcag2aa, serious/critical only -> [{ruleId,impact,targets,selectors}] sorted unique, ruleId order) and tests/specs/axe-helper.spec.js (9 passed desktop-dark: ALIASES, descriptor cases, section#career subtree move/h3->span/01->04 same, h3-only move differs, [data-project=5] div->p same/text differs, project:5 != featured:5, alias same, missing selector throws, runAxe image-alt include); RED confirmed (module missing), SNAP 28 created, T axe-helper 9 passed, FULL 324 passed, VS OK, GATE 28 scope-snapshot: OK"
     },
     {
       "step": 29,
