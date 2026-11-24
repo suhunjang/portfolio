@@ -1,19 +1,20 @@
-# Step 34 — featured-projects
+# Step 34 — axe-classify
 
-- 목적: 대표 프로젝트 3개 카드와 모달 연결(새 색 없이 기존 카드 규칙 재사용).
-- 예상 19분 / 선행 0~33 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §5, §7, §8.3(회귀), §16(DESIGN_HASH_CHECK 후 `DesktopTop.dc.html`·`Components.dc.html` 읽기 전용 참고); projectGrid 렌더, `openProjectModal`, data.js 1·5·7
-- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤 정확한 `#heroFeatured` 마크업 추가만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, `#heroFeatured` 위임만), `css/style.css`(`.featured-*` 배치 규칙과 기존 카드 규칙 선택자 목록에 `.featured-card` 추가만), `tests/specs/featured.spec.js`
+- 목적: §8.5 baseline과 §8.6 plan을 계약대로만 생성(색 변경 필요 target은 blocked).
+- 예상 20분 이하(초과 산정 시 즉시 재계획) / 선행 0~33 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §7.2, §8.3, §8.5, §8.6, §16.3; `axe-collected.json`
+- tracked 허용(exact): `tests/fixtures/axe-baseline.json`(신규), `tests/fixtures/axe-remediation-plan.json`(신규)
 - runtime: R0
-- 금지: §15.7, `css/themes.css`, 새 색 선언, hero 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
+- 금지: §15.7, 사이트 파일, helper·spec·axe-collected.json, §8.5·§8.6 밖 필드
 
-## 작업 (TDD)
+## 작업
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step34` → `python3 -I tests/scripts/design-intake-check.py`
-2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role·aria-label·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용; `.featured-card` computed color·background-color·border-color가 `#projectGrid .project-card`와 같음.
-3. data.js 3줄, index.html 마크업, main.js(`esc()` 이스케이프), style.css.
-4. axe 새 target은 허용 파일 안에서 색 변경 없이 고치고, 식별 손실이면 중단·재계획.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step34`
+2. 시간 산정 먼저. 20분 초과면 쓰지 않고 재계획. 위반 0건이면 baseline `[]`, plan `{ "groups": [] }`.
+3. 조사: `tests/.tmp` 임시 Playwright 스크립트(`prepareForAxe`)로 fixKind 판별.
+4. baseline: collected entry마다 §8.5 형식(fixes는 targets 순서 1:1, fixFiles는 FIX_FILES_BY_KIND).
+5. plan: §8.6 형식(PlanTarget 정렬, id 정렬, coverage 완전, blocked·reason 규칙). blocked가 있으면 AC의 `--check-executable`이 실패해 재계획으로 끝난다.
 
 ## AC
 
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step34.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-baseline-match --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --coverage && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/fixtures/axe-collected.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step34.json --allow tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json` → exit 0

@@ -1,18 +1,18 @@
-# Step 42 — print-pdf
+# Step 42 — focus-trap-lightbox
 
-- 목적: 인쇄 스타일(line clamp 해제 포함)과 PDF 검증.
+- 목적: lightbox trap, 기존 Tab 리스너 제거, focus-visible(BASE 토큰만).
 - 예상 17분 / 선행 0~41 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §10, §16.2; `@media print`, `ensureLightbox`
-- tracked 허용(exact): `css/style.css`(`@media print` 블록만), `tests/specs/print.spec.js`
+- read-first: 설계 §8.2(step 42), §16.4(`:focus-visible` 예외)
+- tracked 허용(exact): `js/main.js`(lightbox trap·리스너 제거만), `css/style.css`(`:focus-visible`만), `tests/specs/focus-lightbox.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, `css/themes.css`, PDF 파서 의존성, 색 선언
+- 금지: §15.7, `index.html`, `js/data.js`, 새 색, trapFocus 시그니처·모달 연결, focus-modal.spec
 
 ## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step42`
-2. `print.spec.js`(desktop-dark/light): `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length` 자체 검증; A: 본문·featured visible·opacity 1, reveal 비어 있지 않음, 인터랙션·modal 숨김, lightbox 없음 또는 none, print 미디어에서 `.featured-blurb`·카드 blurb의 `-webkit-line-clamp`가 `none`/`unset`, PDF > 10240바이트·count ≥ 1; B: screen에서 lightbox visible → print에서 lightbox·modal none, PDF 조건 동일.
-3. `@media print` 수정.
+2. spec(desktop-dark/light) 먼저 실패 확인: lightbox 순환; Esc 1회·2회 복귀; 3회 반복 후 Tab 한 칸; 키보드 도달 요소 outline-style ≠ none.
+3. 구현.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- print.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step42.json --allow css/style.css,tests/specs/print.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step42.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → exit 0

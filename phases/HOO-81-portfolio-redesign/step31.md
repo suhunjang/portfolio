@@ -1,17 +1,17 @@
-# Step 31 — axe-regression-prune
+# Step 31 — axe-current-checks
 
-- 목적: plan 수정 전 회귀 gate와 plan 정리 도구.
-- 예상 19분 / 선행 0~30 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(step 31, REGRESSION_GATE)
+- 목적: 현재 수집 결과 판정(PlanTarget 단위 group done·coverage, 위반 0).
+- 예상 17분 / 선행 0~30 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.3(step 31), §8.6
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(독립 디렉터리 사본만)
+- runtime: R0(독립 디렉터리)
 - 금지: §15.7, 이전 helper 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step31`
-2. 설계 §8.3 step 31 계약 구현.
-3. spec(desktop-dark): checkCollectedRegression 5사례; prunePlan 제거·삭제·부분집합·id 유지·추가 없음·blocked 불변·입력 불변; CLI check-regression 0/1; prune-plan 회귀·파일 오류 시 exit 1·bytes·mtime 불변, 체인 실패 시 불변, 정상 시 target 제거·검증 통과.
+2. 설계 §8.3 step 31 계약(remaining·uncovered는 `{key, target}` 정렬 배열).
+3. spec(desktop-dark): checkGroupDone done·remaining 정확한 PlanTarget·무영향·unknown·invalid collected; coverage ok·uncovered·입력 불변; countCollectedTargets; CLI 각 0/1; baseline 잔존 target이 수집에 있으면 `--assert-no-violations` 1.
 
 ## AC
 

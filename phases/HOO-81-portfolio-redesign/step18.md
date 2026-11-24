@@ -1,19 +1,19 @@
-# Step 18 — content-static-baseline
+# Step 18 — content-data-baseline
 
-- 목적: 정적 본문 추출과 허용 예외 판정.
-- 예상 17분 / 선행 0~17 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §6, §7.2, §7.3; 셀렉터 `.nav-link`, `.hero-eyebrow`, `.hero-cta .btn`, `.section-kicker`, `.section-title`, `.section-sub`, `.about-text p`, `.about-points li`, `.about-meta dt`, `.contact-text`, `.footer-note`, `.footer-top`
-- tracked 허용(exact): `tests/fixtures/content-exceptions.json`(신규), `tests/helpers/content.js`(`extractStatic` 추가만), `tests/specs/content-static.spec.js`(신규)
+- 목적: BASE data·index fixture와 데이터 보존 검사(PROJECTS 13개·순서 포함).
+- 예상 16분 / 선행 0~17 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §3, §6, §7.1, §7.2-1, §7.3
+- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` 추가만)
 - runtime: R0
-- 금지: §15.7, fixture 생성 스크립트·baseline 파일·content-data.spec, content.js 기존 함수
+- 금지: §15.7, `extractStatic`
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step18`
-2. `content-exceptions.json`: `kickers.base/final`, `titles.base/final`, `featured.indexes` [1,5,7], `subsectionTitleFinal`.
-3. `extractStatic(page)`: 모두 norm, `navLabels`만 정렬.
-4. `content-static.spec.js`(6 project): baseline-index.html을 `javaScriptEnabled: false` context `setContent`로 추출해 현재와 비교. kickers·sectionTitles는 base 또는 final과 순서까지 일치, final이면 subsection h3 1개, 나머지 필드는 BASE와 같다. 예외 판정 합성: base 통과, final 통과, 혼합 거부, 한 글자 차이 거부.
+2. `make-fixtures.mjs`(BASE data.js vm 평가, BASE index.html), `fixtures` script 추가 후 실행.
+3. `content.js` 3함수.
+4. `content-data.spec.js`(6 project): normalizeFeatured 불변·throw; baseline deep-equal; featured 1·5·7만; 빈 연락처; 렌더 개수(stats 4, timeline = CAREER, project-card 13, strengths 6); `#projectGrid` 카드 `data-project` 0~12 순서와 제목 배열 = baseline.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-static.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step18.json --allow tests/fixtures/content-exceptions.json,tests/helpers/content.js,tests/specs/content-static.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step18.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0

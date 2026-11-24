@@ -1,18 +1,18 @@
-# Step 37 — section-structure
+# Step 37 — hero-two-column
 
-- 목적: FINAL 섹션 순서·nav·kicker·heading 재구성(§6).
-- 예상 19분 / 선행 0~36 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §5, §6, §7, §8.3, §11.4, §12(step 37 예외), §16(DESIGN_HASH_CHECK 후 `DesktopExplore.dc.html` 읽기 전용); content-exceptions final
-- tracked 허용(exact): `index.html`(hero 밖 섹션 subtree 이동·kicker·Stack &amp; Contact 분리·nav 순서·scroll-hint 위치; 속성 변경은 설계 §12의 (a)·(b)만), `js/main.js`(스크롤스파이 배열과 skill-group h4만), `tests/specs/structure.spec.js`
+- 목적: desktop(≥1024px) 2열 좌측 정렬 hero와 1열 전환(CSS만).
+- 예상 17분 / 선행 0~36 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §5, §9, §16(DESIGN_HASH_CHECK 후 `Main.dc.html`·`DesktopTop.dc.html`·`Mobile.dc.html` 읽기 전용); fixture tokens
+- tracked 허용(exact): `css/style.css`(`.hero`·`.hero-inner`와 직계 자식의 grid·정렬·간격만), `tests/specs/hero-layout.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `css/*`, `js/data.js`, hero 내부, 표에 없는 문구, (a)·(b) 밖 속성 변경, 새 섹션·이미지·아이콘
+- 금지: §15.7, `index.html`, `js/*`, DOM 순서 변경, 색·서체 asset, hero `min-height`·scroll-hint 위치 변경
 
 ## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step37` → `python3 -I tests/scripts/design-intake-check.py`
-2. `structure.spec.js`(6 project): 섹션·nav·kicker·h2가 §6과 일치, section `class` 정확히 §6 표, subsection h3 1개, skillsGrid는 about 안·h4, contact, `.scroll-hint` `href === '#career'`, heading 계층, `#heroFeatured` 유지, PROJECTS 카드 13개 순서 불변, desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#about"]'); await link.click(); await expect(link).toHaveClass(/active/);`.
-3. index.html·main.js 변경. axe canonical 점검(식별 손실이면 중단·재계획).
+2. `hero-layout.spec.js`(6 project, tokens는 fixture): 1280 — `.hero-inner` grid, areas = tokens.heroAreas(공백 정규화), column-gap 48px, `#heroName` 오른쪽 ≤ `#heroSummary` 왼쪽, `.hero-cta` 왼쪽 = `#heroSummary` 왼쪽 ±1px, `#heroStats`·`#heroFeatured` 폭 ≥ content 폭 × 0.95, text-align `left`/`start`; 375·768 — 8개 직계 자식 left = content-box left ±1px, top이 DOM 순서대로 증가, 좌측 정렬; DOM 순서 불변; 가로 스크롤 없음.
+3. style.css(≥1024px 미디어 쿼리).
 
 ## AC
 
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step37.json --allow index.html,js/main.js,tests/specs/structure.spec.js` → exit 0, content-static.spec에서 final 성립
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- hero-layout.spec.js hero.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step37.json --allow css/style.css,tests/specs/hero-layout.spec.js --require-absent tests/specs/hero-layout.spec.js` → exit 0

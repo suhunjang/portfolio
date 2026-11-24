@@ -1,19 +1,19 @@
-# Step 46 — final-verification
+# Step 46 — axe-finalize
 
-- 목적: 스크린샷 spec과 최종 통합 검증(intake·guard 포함, PR 준비까지만).
-- 예상 17분 / 선행 0~45 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 전체; 모든 specs·scripts(with-env.sh, start-snapshot.py, scope-snapshot.mjs, design-intake-check.py, verify-scope.mjs, make-fixtures.mjs)·helpers·fixtures(claude-design-intake, axe-baseline, axe-remediation-plan, axe-collected) 존재
-- tracked 허용(exact): `tests/specs/screenshots.spec.js`
-- runtime: R0 + `tests/screenshots/**`
-- 금지: §15.7, 사이트 파일, 기존 spec·helper·fixtures·scripts·`tests/.gitignore`(실패 시 원인 step 보고·중단)
+- 목적: 위반 0 전제 확인 후 baseline을 `[]`로 확정(§8.5 빈 배열).
+- 예상 16분 / 선행 0~45 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.3, §8.5
+- tracked 허용(exact): `tests/fixtures/axe-baseline.json`(`[]`로 바꾸는 것만)
+- runtime: R0
+- 금지: §15.7, 사이트 파일, helper·spec·다른 fixture
 
 ## 작업
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step46` → `python3 -I tests/scripts/design-intake-check.py`
-2. `screenshots.spec.js`: 각 화면 `prepareForAxe` 후 촬영, 6 project page, desktop 대표 모달 3개·lightbox·print, 모달 SVG text font-family Space Grotesk 확인. 먼저 단독 통과.
-3. 아래 AC 체인 후 결과 요약(§16 허용 패턴 반영 목록, 제외 항목 guard 통과, step 0~11 재검증 로그 포함). 이후 exact-commit Astra 리뷰·push·PR은 하네스가 수행한다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step46`
+2. 전제(실패 시 중단): `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --require-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-no-violations --collected tests/.tmp/axe-current.json`
+3. baseline을 `[]`로 바꾸고 일반 axe 전체 실행.
 
 ## AC
 
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- screenshots.spec.js design-guard.spec.js design-intake.spec.js && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --require-empty && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope -- --final && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step46.json --allow tests/specs/screenshots.spec.js` → exit 0
-- final: data.js BASE→HEAD/index/worktree 각각 정확히 3줄, index→worktree 0~3줄.
+- 작업 2 전제가 exit 0
+- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-empty && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step46.json --allow tests/fixtures/axe-baseline.json` → exit 0
