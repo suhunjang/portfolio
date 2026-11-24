@@ -198,7 +198,10 @@
     {
       "step": 22,
       "name": "scope-paths",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:57:00+0900",
+      "completed_at": "2026-11-24T19:59:56+0900",
+      "summary": "step22: added tests/scripts/verify-scope.mjs (frozen GIT_DIFF_PATH_ARGS ['--no-renames','--name-only'] / GIT_DIFF_PATCH_ARGS ['--no-renames','--unified=0']; read-only collectInput({git}) = name-only diffs committed BASE..HEAD, staged --cached HEAD, worktree + ls-files --others/ls-files, data.js patch for 4 intervals baseHead/baseIndex/indexWorktree/baseWorktree; pure evaluatePaths: §8.1 builder paths allowed, runtime-exempt .harness/** (except lock/policy) .venv/** phases/HOO-81-portfolio-redesign/**, harness-owned (CLAUDE.md, pytest.ini, .python-version, .gitattributes, root .gitignore, .claude/**, .codex/**, lock, policy, design doc, legacy scripts/** templates/** harness-manifest.json, harness seed docs/PRD.md docs/UI_GUIDE.md phases/index.json) committed-exempt/uncommitted harness-uncommitted, runtime-tracked, root-package-json, themes-changed, else outside-scope; CLI no args 'verify-scope: OK (paths)', --self-test covering constants, fake git call record, normal 0, all listed violations/allowances and 4 rename-bypass cases) and tests/package.json verify-scope + verify-scope:selftest scripts; RED confirmed (module missing), SNAP 22 created, selftest OK, VS OK, FULL 175 passed, GATE 22 scope-snapshot: OK"
     },
     {
       "step": 23,
