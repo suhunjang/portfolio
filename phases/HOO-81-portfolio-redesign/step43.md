@@ -5,7 +5,7 @@
 - read-first: 설계 §6, §9, §16(DESIGN_HASH_CHECK 후 `DesktopExplore.dc.html`·`Mobile.dc.html`·`Foundations.dc.html` 읽기 전용); fixture tokens
 - tracked 허용(exact): `css/style.css`(섹션 padding, Career, 그리드 gap·열, 섹션 제목·`.subsection-title` 비색 타이포만), `tests/specs/layout.spec.js`
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, 색·서체 asset, BASE `font-family`·`font` 선언 삭제·이동, BASE 밖 font-weight
+- 금지: §15.7, `index.html`, `js/*`, 색·서체 asset, BASE `font-family`·`font` 선언 삭제·이동·featured 대응 외 확장, BASE 밖 font-weight
 
 ## 작업 (TDD)
 

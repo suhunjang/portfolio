@@ -14,7 +14,7 @@
 3. `design-guard-color.spec.js`(node 전용, desktop-dark만; 합성 BASE style `:root{--card:#fff;--accent:var(--brand);--pad:16px} .project-card{background:var(--card);padding:var(--pad)} @media (max-width: 768px){.nav-link{color:var(--accent)}} .strength-card::before{background:var(--accent)}`, themes `:root{--brand:#3355ff}`)
    - `checkColorTokens` 단위: 변경 없음 `[]`; token 값 변경 `--card:#fafafa` → `color-token-changed:--card`; 삭제 → `color-token-removed:--card`; 별칭 재정의 `--accent:var(--card)` → `color-token-changed:--accent`; 다른 위치 재정의 `.btn{--accent:#000}` → `color-token-redefined:--accent`; 새 별칭 `--btn-bg: var(--brand)` → `color-token-added:--btn-bg`; 새 `--ring: currentColor` → `color-token-added:--ring`; 새 `--card2:#000` → `color-token-added:--card2`; 비색 token을 색으로 `--pad: red` → `color-token-added:--pad`; 새 비색 `--section-pad: 96px` 허용
    - `checkColors` 통합 허용 → `[]`: 변경 없음; featured 대응 추가; stripe 삭제; 비색 선언·`--section-pad`; `:focus-visible` outline(BASE token)
-   - `checkColors` 통합 거부: step 15 규칙 위반 1건(`.project-card, .hero-name` → `selector-extended:…`)과 token 위반 1건(`--card:#fafafa`)을 동시에 넣으면 두 문자열이 모두 결과에 있음(규칙 위반이 먼저); `.x{color:var(--card)}` 신규 → 결과에 `color-decl-new:.x`만(token 위반 없음); 기존 `.project-card`에 `border-top-color:var(--accent)` 추가 → 결과 정확히 `["color-decl-new:.project-card"]`
+   - `checkColors` 통합 거부: step 15 규칙 위반 1건(`.project-card, .hero-name` → `selector-extended:…`)과 token 위반 1건(`--card:#fafafa`)을 동시에 넣으면 두 문자열이 모두 결과에 있음(규칙 위반이 먼저); `.x{color:var(--card)}` 신규 → 결과에 `color-decl-new:.x`만(token 위반 없음); 기존 `.project-card`에 `border-top-color:var(--accent)` 추가 → 결과 정확히 `["color-decl-new:.project-card"]`; `.project-card`에 `background:var(--accent)` 후행 추가 → 결과 정확히 `["color-decl-new:.project-card"]`
    - 입력 불변
 
 ## AC
