@@ -118,7 +118,10 @@
     {
       "step": 12,
       "name": "claude-design-intake",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:37:05+0900",
+      "completed_at": "2026-11-24T19:39:00+0900",
+      "summary": "step12: added tests/fixtures/claude-design-intake.json (byte-identical to design §11.1 block), tests/scripts/design-intake-check.py (§11.1 contract: unsafe→files→hash→summary, read-only O_NOFOLLOW), tests/specs/design-intake.spec.js (3 passed desktop-dark; synthetic bundle OK/hash/files/symlink/summary cases, copy unchanged, cleaned); SNAP 12 created, DI OK on real bundle, FULL 84 passed, GATE 12 scope-snapshot: OK"
     },
     {
       "step": 13,
