@@ -111,7 +111,10 @@
     {
       "step": 11,
       "name": "scope-snapshot-parity-artifacts",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T09:06:12+0900",
+      "completed_at": "2026-11-24T09:08:44+0900",
+      "summary": "step11 시작 snapshot(created→reused), scope-snapshot-parity-artifacts.spec.js(desktop-dark 전용, 코드 추가 없음) 작성: 사례마다 새 합성 저장소(.gitignore 'tests/.tmp/'·lock·tracked.txt·a.spec.js commit, BASE verify 대체 git 래퍼로 parity-1 snapshot, runtime 비노출 확인, 외부 secret.txt 고유 sentinel)에서 기록 대상 FIFO tests/specs/p.fifo / symlink link-x × 기존 after.z 있음(고정 bytes)/없음 4조합 — runCheck(기록 fs, allow [그 경로]) code 1·stderr 정확히 [non-regular:tests/specs/p.fifo | symlink:link-x]·after.z open/쓰기 없음, C subprocess exit 1·같은 stderr, after.z bytes·mtime 불변 또는 미생성, snapshot sha256·mtime 불변, 저장소(.git 제외)·외부 inventory 불변, sentinel 미출력; CLI tests/.tmp→<outside>/tmpdir 링크 → exit 1 'unsafe path: symlink:tests/.tmp'·외부 after.z 미생성·inventory 불변·sentinel 미출력; 실제 저장소 parity-<pid*1000+701> after.z FIFO → exit 1 'unsafe path: non-regular:…-after.z'·FIFO 유지; identity 7개 변형(projectRoot·head·base·harness.sourceCommit·manifestHash·distributionVersion·lockSha256 각각 별도 parity-<n>) → exit 1 'start snapshot identity mismatch: {field}'·snapshot sha256 불변·after.z 미생성·git status 원문·tests 밖 ls-files sha256·tests/.tmp inventory 불변, 모든 subprocess timeout 10초, finally cleanup/삭제. 테스트만 추가라 처음부터 통과(RED 없음). AC1(spec 7 passed·전체 80 passed·S reused·CLI scope-snapshot: OK)·AC2(inline C scope-snapshot: OK, sandbox가 heredoc 임시파일을 막아 설계 블록 본문을 stdin 파이프로 전달) 통과"
     },
     {
       "step": 12,
