@@ -1358,3 +1358,188 @@ test.describe('step 36 axe-plan-executable', () => {
     expect(chain.stderr).toBe('groups[0]: blocked-required\n');
   });
 });
+
+// step 37 — axe current checks (설계 §6.2 step 37·§6.5): checkGroupDone · checkCollectedCoverage ·
+// countCollectedTargets · CLI --check-group-done <id> / --check-coverage / --assert-no-violations
+import { checkGroupDone, checkCollectedCoverage, countCollectedTargets, CURRENT_COLLECTED_PATH } from '../helpers/axe.js';
+
+const S37_KEY_LB = 'lightbox:desktop-dark:color-contrast';
+const S37_KEY_LB_LIGHT = 'lightbox:desktop-light:color-contrast';
+const T_SHOT = 'color-contrast::#lightbox::Shot';
+// collected entry(MergedEntry 7필드)
+const cEntry = (key, targets) => {
+  const [scenario, project, ruleId] = key.split(':');
+  return { key, scenario, project, ruleId, impact: 'serious', targets, selectors: [] };
+};
+// 두 그룹: kicker(page cc 2 target + lightbox:desktop-dark 1 target), toggle(target-size 1)
+const S37_PLAN = {
+  groups: [
+    group({
+      id: 'kicker',
+      targets: [pt(S37_KEY_LB, T_SHOT), pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_PROJECTS)],
+      fixFiles: ['css/style.css'],
+    }),
+    group({ id: 'toggle', targets: [pt(S35_KEY_TS, T_TOGGLE)], fixFiles: ['css/style.css'] }),
+  ],
+};
+
+let s37Seq = 0;
+function s37Dir() {
+  s37Seq += 1;
+  const rel = `tests/.tmp/axe-helper-s37-${process.pid}-${s37Seq}`;
+  fs.mkdirSync(path.join(S32_REPO, rel), { recursive: true });
+  return rel;
+}
+
+test.describe('step 37 axe-current-checks', () => {
+  let before;
+  const made = [];
+  const dir = () => {
+    const d = s37Dir();
+    made.push(d);
+    return d;
+  };
+
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'desktop-dark 전용');
+    before = s32State();
+  });
+
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.project.name !== 'desktop-dark') return;
+    for (const d of made.splice(0)) fs.rmSync(path.join(S32_REPO, d), { recursive: true, force: true });
+    expect(s32State()).toEqual(before);
+  });
+
+  test('checkGroupDone: done·remaining 정렬·다른 그룹 무영향·throw', () => {
+    expect(CURRENT_COLLECTED_PATH).toBe('tests/.tmp/axe-current.json');
+    // 그룹 target이 collected에 하나도 없음 → done
+    expect(checkGroupDone([], S37_PLAN, 'kicker')).toEqual({ done: true, remaining: [] });
+    // 다른 그룹(toggle)의 잔여는 kicker에 영향 없음
+    const onlyToggle = [cEntry(S35_KEY_TS, [T_TOGGLE])];
+    expect(checkGroupDone(onlyToggle, S37_PLAN, 'kicker')).toEqual({ done: true, remaining: [] });
+    expect(checkGroupDone(onlyToggle, S37_PLAN, 'toggle')).toEqual({ done: false, remaining: [pt(S35_KEY_TS, T_TOGGLE)] });
+    // lightbox:desktop-dark:*에만 남음 → remaining 1 (desktop-light 같은 target은 그룹 밖)
+    const lbOnly = [cEntry(S37_KEY_LB, [T_SHOT]), cEntry(S37_KEY_LB_LIGHT, [T_SHOT])];
+    expect(checkGroupDone(lbOnly, S37_PLAN, 'kicker')).toEqual({ done: false, remaining: [pt(S37_KEY_LB, T_SHOT)] });
+    // 같은 key의 다른 target은 무관, remaining은 {key, target} 정렬
+    const many = [
+      cEntry(S35_KEY_CC, [T_EXTRA, T_PROJECTS, T_CAREER]),
+      cEntry(S37_KEY_LB, [T_SHOT]),
+      cEntry(S35_KEY_TS, [T_TOGGLE]),
+    ];
+    expect(checkGroupDone(many, S37_PLAN, 'kicker')).toEqual({
+      done: false,
+      remaining: [pt(S37_KEY_LB, T_SHOT), pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_PROJECTS)],
+    });
+    // throw: 없는 id·형식 오류 id·비배열 collected
+    expect(() => checkGroupDone([], S37_PLAN, 'nope')).toThrow(new Error('unknown group id: nope'));
+    expect(() => checkGroupDone([], S37_PLAN, 'Bad Id')).toThrow(new Error('unknown group id: Bad Id'));
+    expect(() => checkGroupDone([], S37_PLAN, '')).toThrow(new Error('unknown group id: '));
+    expect(() => checkGroupDone({}, S37_PLAN, 'kicker')).toThrow(new Error('invalid collected'));
+    expect(() => checkGroupDone(null, S37_PLAN, 'kicker')).toThrow(new Error('invalid collected'));
+    // 입력 불변
+    const cs = clone(many);
+    const ps = clone(S37_PLAN);
+    checkGroupDone(many, S37_PLAN, 'kicker');
+    expect(many).toEqual(cs);
+    expect(S37_PLAN).toEqual(ps);
+  });
+
+  test('checkCollectedCoverage·countCollectedTargets', () => {
+    // 모든 collected target이 plan 안 → ok
+    const covered = [cEntry(S35_KEY_CC, [T_CAREER, T_PROJECTS]), cEntry(S35_KEY_TS, [T_TOGGLE])];
+    expect(checkCollectedCoverage(covered, S37_PLAN)).toEqual({ ok: true, uncovered: [] });
+    expect(checkCollectedCoverage([], S37_PLAN)).toEqual({ ok: true, uncovered: [] });
+    // plan 밖 1 → uncovered 1
+    const outside = [cEntry(S35_KEY_CC, [T_EXTRA, T_CAREER]), cEntry(S35_KEY_TS, [T_TOGGLE])];
+    expect(checkCollectedCoverage(outside, S37_PLAN)).toEqual({ ok: false, uncovered: [pt(S35_KEY_CC, T_EXTRA)] });
+    // 빈 groups + 잔여 → 전부 uncovered, 정렬
+    const rest = [cEntry(S35_KEY_TS, [T_TOGGLE]), cEntry(S35_KEY_CC, [T_PROJECTS, T_CAREER])];
+    expect(checkCollectedCoverage(rest, { groups: [] })).toEqual({
+      ok: false,
+      uncovered: [pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_PROJECTS), pt(S35_KEY_TS, T_TOGGLE)],
+    });
+    expect(() => checkCollectedCoverage({}, S37_PLAN)).toThrow(new Error('invalid collected'));
+    // 입력 불변
+    const rs = clone(rest);
+    const ps = clone(S37_PLAN);
+    checkCollectedCoverage(rest, S37_PLAN);
+    expect(rest).toEqual(rs);
+    expect(S37_PLAN).toEqual(ps);
+
+    expect(countCollectedTargets([])).toBe(0);
+    expect(countCollectedTargets([cEntry(S35_KEY_CC, [T_CAREER, T_PROJECTS]), cEntry(S35_KEY_TS, [T_TOGGLE])])).toBe(3);
+    // 같은 target 문자열이 두 entry(다른 key)에 → 2
+    expect(countCollectedTargets([cEntry(S37_KEY_LB, [T_SHOT]), cEntry(S37_KEY_LB_LIGHT, [T_SHOT])])).toBe(2);
+    expect(() => countCollectedTargets({})).toThrow(new Error('invalid collected'));
+  });
+
+  test('CLI --check-group-done·--check-coverage·--assert-no-violations', async () => {
+    const d = dir();
+    const write = (name, data) => {
+      const rel = `${d}/${name}`;
+      fs.writeFileSync(path.join(S32_REPO, rel), typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+      return rel;
+    };
+    const plan = write('plan.json', S37_PLAN);
+    const cEmpty = write('c-empty.json', []);
+    const cLb = write('c-lb.json', [cEntry(S37_KEY_LB, [T_SHOT])]);
+    const cOutside = write('c-outside.json', [cEntry(S35_KEY_CC, [T_EXTRA, T_CAREER])]);
+    const missing = `${d}/nope.json`;
+
+    // --check-group-done
+    expect(await s32Cli(['--check-group-done', 'kicker', '--collected', cEmpty, '--plan', plan])).toEqual({
+      code: 0,
+      stdout: 'check-group-done: OK (kicker)\n',
+      stderr: '',
+    });
+    const gd = await s32Cli(['--check-group-done', 'kicker', '--collected', cLb, '--plan', plan]);
+    expect(gd).toEqual({ code: 1, stdout: '', stderr: `remaining:${S37_KEY_LB}|${T_SHOT}\n` });
+    const gdUnknown = await s32Cli(['--check-group-done', 'nope', '--collected', cEmpty, '--plan', plan]);
+    expect(gdUnknown).toEqual({ code: 1, stdout: '', stderr: 'unknown group id: nope\n' });
+    expect((await s32Cli(['--check-group-done', 'kicker', '--collected', missing, '--plan', plan])).code).toBe(1);
+    expect((await s32Cli(['--check-group-done', 'kicker', '--collected', cEmpty, '--plan', missing])).code).toBe(1);
+    expect((await s32Cli(['--check-group-done', '--collected', cEmpty, '--plan', plan])).code).toBe(1);
+    const gdObj = await s32Cli(['--check-group-done', 'kicker', '--collected', write('c-obj.json', {}), '--plan', plan]);
+    expect(gdObj.code).toBe(1);
+    expect(gdObj.stdout).toBe('');
+
+    // --check-coverage
+    expect(await s32Cli(['--check-coverage', '--collected', cLb, '--plan', plan])).toEqual({
+      code: 0,
+      stdout: 'check-coverage: OK\n',
+      stderr: '',
+    });
+    expect(await s32Cli(['--check-coverage', '--collected', cOutside, '--plan', plan])).toEqual({
+      code: 1,
+      stdout: '',
+      stderr: `uncovered:${S35_KEY_CC}|${T_EXTRA}\n`,
+    });
+    expect((await s32Cli(['--check-coverage', '--collected', missing, '--plan', plan])).code).toBe(1);
+
+    // --assert-no-violations
+    expect(await s32Cli(['--assert-no-violations', '--collected', cEmpty])).toEqual({
+      code: 0,
+      stdout: 'assert-no-violations: OK\n',
+      stderr: '',
+    });
+    expect(await s32Cli(['--assert-no-violations', '--collected', cOutside])).toEqual({
+      code: 1,
+      stdout: '',
+      stderr: 'violations: 2\n',
+    });
+    expect((await s32Cli(['--assert-no-violations', '--collected', missing])).code).toBe(1);
+    expect((await s32Cli(['--assert-no-violations', '--collected', cEmpty, '--plan', plan])).code).toBe(1);
+
+    // checkRegression이 []이어도(baseline 그대로 남음) 잔여가 있으면 --assert-no-violations 1
+    const violations = FIXTURE_OK.map((e) => ({ ruleId: e.ruleId, impact: e.impact, targets: e.targets, selectors: e.selectors }));
+    expect(checkRegression(violations, FIXTURE_OK, 'page', 'desktop-dark')).toEqual([]);
+    const residual = write('c-residual.json', FIXTURE_OK.map((e) => projectEntry(e)));
+    expect(await s32Cli(['--assert-no-violations', '--collected', residual])).toEqual({
+      code: 1,
+      stdout: '',
+      stderr: 'violations: 1\n',
+    });
+  });
+});

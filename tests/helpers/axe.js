@@ -817,6 +817,59 @@ export function validateRemediationExecutable(plan, baseline) {
   return errors;
 }
 
+// §6.2 step 37: 현재 collected 검사. collected = MergedEntry 배열(key·targets만 읽음). PlanTarget 단위, 순수·입력 불변.
+export const CURRENT_COLLECTED_PATH = 'tests/.tmp/axe-current.json';
+
+// collected → 정렬된 고유 PlanTarget 목록. 비배열·형식 오류 entry는 Error('invalid collected').
+function collectedTargets(collected) {
+  if (!Array.isArray(collected)) throw new Error('invalid collected');
+  const map = new Map();
+  for (const e of collected) {
+    if (!isPlainObject(e) || typeof e.key !== 'string' || !Array.isArray(e.targets)) throw new Error('invalid collected');
+    for (const target of e.targets) {
+      if (typeof target !== 'string') throw new Error('invalid collected');
+      map.set(ptId(e.key, target), { key: e.key, target });
+    }
+  }
+  return [...map.values()].sort(cmpPlanTarget);
+}
+
+const planGroups = (plan) => (isPlainObject(plan) && Array.isArray(plan.groups) ? plan.groups : []);
+
+export function checkGroupDone(collected, plan, id) {
+  const present = new Set(collectedTargets(collected).map((t) => ptId(t.key, t.target)));
+  const g = planGroups(plan).find((x) => isPlainObject(x) && typeof id === 'string' && x.id === id);
+  if (!g) throw new Error(`unknown group id: ${id}`);
+  const seen = new Set();
+  const remaining = [];
+  for (const t of Array.isArray(g.targets) ? g.targets : []) {
+    if (!isPlainObject(t) || typeof t.key !== 'string' || typeof t.target !== 'string') continue;
+    const k = ptId(t.key, t.target);
+    if (present.has(k) && !seen.has(k)) {
+      seen.add(k);
+      remaining.push({ key: t.key, target: t.target });
+    }
+  }
+  remaining.sort(cmpPlanTarget);
+  return { done: remaining.length === 0, remaining };
+}
+
+export function checkCollectedCoverage(collected, plan) {
+  const all = collectedTargets(collected);
+  const inPlan = new Set();
+  for (const g of planGroups(plan)) {
+    if (!isPlainObject(g) || !Array.isArray(g.targets)) continue;
+    for (const t of g.targets) if (isPlainObject(t)) inPlan.add(ptId(t.key, t.target));
+  }
+  const uncovered = all.filter((t) => !inPlan.has(ptId(t.key, t.target)));
+  return { ok: uncovered.length === 0, uncovered };
+}
+
+// (key, target) 위반 건수. 같은 target 문자열도 key가 다르면 따로 센다.
+export function countCollectedTargets(collected) {
+  return collectedTargets(collected).length;
+}
+
 function parseCliArgs(argv) {
   const opts = {
     cmd: null,
@@ -827,10 +880,19 @@ function parseCliArgs(argv) {
     plan: undefined,
     coverage: false,
     requireEmpty: false,
+    groupId: undefined,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (
+    if (a === '--check-group-done' || a === '--check-coverage' || a === '--assert-no-violations') {
+      if (opts.cmd) throw new Error(`axe.js: duplicate command ${a}`);
+      opts.cmd = a.slice(2);
+      if (a === '--check-group-done') {
+        const v = argv[++i];
+        if (v === undefined || v.startsWith('--')) throw new Error(`axe.js: ${a} requires a group id`);
+        opts.groupId = v;
+      }
+    } else if (
       a === '--reset' ||
       a === '--merge' ||
       a === '--assert-empty' ||
@@ -854,6 +916,20 @@ function parseCliArgs(argv) {
   }
   if (!opts.cmd) {
     throw new Error('axe.js: command required (--reset | --merge | --assert-empty | --check-baseline-match | --check-plan | --check-executable)');
+  }
+  if (opts.cmd === 'check-group-done' || opts.cmd === 'check-coverage' || opts.cmd === 'assert-no-violations') {
+    const planAllowed = opts.cmd !== 'assert-no-violations';
+    if (
+      opts.dir !== undefined ||
+      opts.out !== undefined ||
+      opts.baseline !== undefined ||
+      opts.coverage ||
+      opts.requireEmpty ||
+      (!planAllowed && opts.plan !== undefined)
+    ) {
+      throw new Error(`axe.js: --${opts.cmd} takes only --collected${planAllowed ? ' and --plan' : ''}`);
+    }
+    return opts;
   }
   if (opts.cmd === 'check-executable') {
     if (opts.dir !== undefined || opts.out !== undefined || opts.collected !== undefined || opts.coverage || opts.requireEmpty) {
@@ -920,6 +996,35 @@ export function runCli(argv) {
         return 1;
       }
       process.stdout.write('check-executable: OK\n');
+      return 0;
+    }
+    if (opts.cmd === 'check-group-done' || opts.cmd === 'check-coverage' || opts.cmd === 'assert-no-violations') {
+      const collected = loadBaseline(opts.collected ?? CURRENT_COLLECTED_PATH);
+      if (opts.cmd === 'assert-no-violations') {
+        const n = countCollectedTargets(collected);
+        if (n > 0) {
+          process.stderr.write(`violations: ${n}\n`);
+          return 1;
+        }
+        process.stdout.write('assert-no-violations: OK\n');
+        return 0;
+      }
+      const plan = loadPlan(opts.plan ?? PLAN_PATH);
+      if (opts.cmd === 'check-group-done') {
+        const r = checkGroupDone(collected, plan, opts.groupId);
+        if (!r.done) {
+          for (const t of r.remaining) process.stderr.write(`remaining:${t.key}|${t.target}\n`);
+          return 1;
+        }
+        process.stdout.write(`check-group-done: OK (${opts.groupId})\n`);
+        return 0;
+      }
+      const r = checkCollectedCoverage(collected, plan);
+      if (!r.ok) {
+        for (const t of r.uncovered) process.stderr.write(`uncovered:${t.key}|${t.target}\n`);
+        return 1;
+      }
+      process.stdout.write('check-coverage: OK\n');
       return 0;
     }
     if (opts.cmd === 'check-baseline-match') {
