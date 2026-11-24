@@ -286,7 +286,10 @@
     {
       "step": 33,
       "name": "axe-baseline-regression",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:01:03+0900",
+      "completed_at": "2026-11-24T21:07:58+0900",
+      "summary": "step33: tests/helpers/axe.js append (step-28/32 behavior unchanged; CLI parser only extended): BASELINE_PATH tests/fixtures/axe-baseline.json, COLLECTED_PATH (=DEFAULT_MERGE_OUT), PLAN_PATH tests/fixtures/axe-remediation-plan.json, frozen FIX_FILES_BY_KIND, baselineExists, loadBaseline (missing/invalid json/non-array throw), resolveBaselineMode({baselinePath,collectedPath,planPath}) check/pending/throw with no env bypass, validateBaseline per §6.4 (entry fields -> scenario/project/ruleId/key-mismatch (only when the 3 are valid)/impact/targets/selectors/fixes count; fix not-object/fields/target-mismatch/bad-fixKind (skips fixFiles + kind rule)/fixFiles-mismatch/bad-requiresColorChange (non-boolean or kind rule: css-token true, css-rule both, others false); union-mismatch only when no fix errors; duplicate-key, unsorted), checkRegression (new-key/new-target, sorted unique, inputs unmutated), assertEmptyFile, CLI --assert-empty [--baseline f]; tests/specs/axe-helper.spec.js append-only step-33 describe (8 tests desktop-dark, 6 §6.5 fixture constants, §6.4 A-E, rcc cases, other single errors, checkRegression, resolveBaselineMode incl. AXE_ALLOW_MISSING_BASELINE=1, loadBaseline, --assert-empty CLI; tmp dirs under tests/.tmp cleaned, real fixtures untouched); RED confirmed (BASELINE_PATH export missing), SNAP 33 created, T axe-helper 26 passed, FULL 389 passed, VS OK, GATE 33 scope-snapshot: OK"
     },
     {
       "step": 34,
