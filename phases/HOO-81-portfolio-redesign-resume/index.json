@@ -86,7 +86,10 @@
     {
       "step": 8,
       "name": "axe-classify-occ-batch-7",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T23:48:03+0900",
+      "completed_at": "2026-11-24T23:55:39+0900",
+      "summary": "RSNAP 8(step108) · OCC_RUN 7(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 7 occurrence 10개 axe 재현 — 전부 nested-interactive(mobile-dark project:1~8,11,12 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-7.json·server-7.json 기록. OCC_CHECK 7 'occ-check 7: OK 10' · FULL 429 passed(1차 OCC_RUN은 page.goto timeout flake로 exit 1, 재실행 통과) · VS OK · RGATE 8 '' OK"
     },
     {
       "step": 9,
