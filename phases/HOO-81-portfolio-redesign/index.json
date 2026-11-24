@@ -214,7 +214,10 @@
     {
       "step": 24,
       "name": "content-data-baseline",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:03:05+0900",
+      "completed_at": "2026-11-24T20:05:54+0900",
+      "summary": "step24: added tests/scripts/make-fixtures.mjs (git show BASE:js/data.js evaluated in node:vm -> tests/fixtures/baseline-data.json {PROFILE,STATS,CAREER,VIS_ACCENT,PROJECTS,STRENGTHS,SKILLS}; git show BASE:index.html byte-identical -> tests/fixtures/baseline-index.html), tests/package.json fixtures script (run), tests/helpers/content.js (norm, readLiveData via page globals, normalizeFeatured: structuredClone, drops featured only at index 1/5/7 when === true, else throw), tests/specs/content-data.spec.js (7 tests x 6 projects: fixture shape, norm, normalizeFeatured immutability/throw, live data = baseline + featured none or 1/5/7 + empty email/phone/social, stats 4/timeline=CAREER/project-card 13/strengths 6, #projectGrid data-project 0..12 order + titles = baseline); RED confirmed (module missing), SNAP 24 created, T content-data 42 passed, FULL 217 passed, VS OK, GATE 24 scope-snapshot: OK"
     },
     {
       "step": 25,
