@@ -182,7 +182,10 @@
     {
       "step": 20,
       "name": "design-guard-integration",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:52:57+0900",
+      "completed_at": "2026-11-24T19:55:01+0900",
+      "summary": "step20: added tests/helpers/design-guard.js (GUARD_BASE; checkMarkupPatch scans only added lines inside hunks for <img/<svg/<picture/<video/<i /<i>/<link/<script/<font/style= (case-insensitive) and .style.color/.style.background/.style.font -> 'markup-asset:{kind}:{new-file line from hunk header}', ignoring headers/deleted/context/'\\' lines; collectGuardInput({git,fs,root}) reads git show BASE:css/style.css, BASE:css/themes.css, fs.readFile of both worktree CSS, git diff --no-renames --unified=0 BASE -- index.html, -- js/main.js; runGuard = [...checkCss, ...checkMarkupPatch(html,'index.html'), ...checkMarkupPatch(js,'js/main.js')]) and tests/specs/design-guard.spec.js (4 passed desktop-dark: asset kinds with line numbers, ignored lines/normal [], fake git/fs call record + runGuard, real repo runGuard(await collectGuardInput()) -> []); RED confirmed (module missing), SNAP 20 created, T GS 61 passed, FULL 145 passed, GATE 20 scope-snapshot: OK"
     },
     {
       "step": 21,
