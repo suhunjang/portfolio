@@ -310,7 +310,10 @@
     {
       "step": 36,
       "name": "axe-plan-executable",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:19:56+0900",
+      "completed_at": "2026-11-24T21:25:17+0900",
+      "summary": "step36: tests/helpers/axe.js append (step-28/32~35 behavior unchanged; CLI parser only extended): EXECUTABLE_HEADER 'Harness 재계획 필요: 실행 불가 remediation 그룹', validateRemediationExecutable(plan, baseline) pure (premise validateRemediationPlan [] ; per group in order, blocked true only: blocked-group:{id} -> text-change:{id}:{key}:{target} for text-change fixes -> empty-fixfiles:{id}; no requiresColorChange re-judgement), CLI --check-executable [--plan] [--baseline] (stdout 'check-executable: OK', blocked -> stderr header + lines exit 1, missing plan/invalid baseline JSON exit 1); tests/specs/axe-helper.spec.js append-only step-36 describe (2 tests desktop-dark: every input first validateRemediationPlan [] then empty/OK/RULE_PLAIN false [], THEMES/RULE_COLOR/manual blocked-group, text-only baseline -> blocked-group+text-change+empty-fixfiles, MIXED and COLOR_PLAIN blocked-only, immutability; CLI 0/1 cases + RULE_COLOR blocked-false --check-plan exit 1 stops sh '&&' chain before --check-executable); RED confirmed (export missing), SNAP 36 created, T axe-helper 37 passed, FULL 400 passed, VS OK, GATE 36 scope-snapshot: OK"
     },
     {
       "step": 37,
