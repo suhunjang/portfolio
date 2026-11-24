@@ -1,15 +1,14 @@
-# Resume Step 15 — axe-classify-merge
+# Resume Step 15 — axe-classify-occ-batch-14
 
-- 목적: §R7 — pairs.json 결정을 12 entry·139 occurrence로 확장해 원 §6.4 baseline·§6.5 plan 작성, strict 검증.
-- 18분 / 선행 0~14 / 공통 §R1 / gate `RGATE 15`
-- 허용(exact): `tests/fixtures/axe-baseline.json`, `tests/fixtures/axe-remediation-plan.json`(신규)
-- runtime: R0
-- 추가 금지: batch·pairs·collected·helper·spec·사이트 수정, pairs 결정과 다른 `fixKind`·`requiresColorChange`, manual block 생성, 계약 밖 필드
+- 목적: §R5 batch 14(정렬 occurrence 131~139) 분류.
+- 19분(2 + 2 + 9 + 6) / 선행 0~14 / 공통 §R1 / gate `RGATE 15`
+- 허용(exact): 없음
+- runtime: R0 + `tests/.tmp/axe-classify/occ-batch-14.json`, `tests/.tmp/axe-classify/server-14.json`(이 두 파일만)
+- 추가 금지: 다른 batch·pairs 파일 수정·작성, 조사 스크립트 파일 저장, baseline·plan 작성, 사이트·helper·spec·config·collected 수정, 이 step이 띄우지 않은 프로세스 종료, §R5.1 고정 골격 변경
 
 ## 작업
 1. `RSNAP 15`
-2. pairs.json 읽기 → baseline 작성 → plan 작성(`requiredBlockReason`으로 blocked·reason).
-3. blocked 그룹이 있거나 executable 실패면 원 §6.2 remediation 재계획 경로로 중단·보고.
+2. `OCC_RUN 14`(§R5.1, step 2와 같은 절차) → `occ-batch-14.json`.
 
 ## AC
-- `MERGE_CHECK && AXE --check-baseline-match --collected tests/fixtures/axe-collected.json && AXE --check-plan --coverage && AXE --check-executable && AXE --check-regression --collected tests/fixtures/axe-collected.json && FULL && VS && RGATE 15 tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json`(첫 명령 stdout `merge-check: OK 25 139`)
+- `OCC_CHECK 14 && FULL && VS && RGATE 15 ''`(첫 명령 stdout `occ-check 14: OK 9`)

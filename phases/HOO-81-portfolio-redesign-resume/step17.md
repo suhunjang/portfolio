@@ -1,15 +1,15 @@
-# Resume Step 17 — hero-first-screen (원 step 42)
+# Resume Step 17 — axe-classify-merge
 
-- 목적: 원 §3 hero DOM 순서·tagline·첫 화면 AC(2열은 resume 18).
-- 20분 / 선행 0~16 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 17`
-- 허용(exact): `index.html`(section#hero 내부: 직계 8개 순서·tagline·`#heroFeatured` 위치), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄), `css/style.css`(hero 1열 간격·STATS·featured 반응형·`.hero-tagline` 비색 타이포만), `tests/specs/hero.spec.js`
+- 목적: §R7 — pairs.json 결정을 12 entry·139 occurrence로 확장해 원 §6.4 baseline·§6.5 plan 작성, strict 검증.
+- 18분 / 선행 0~16 / 공통 §R1 / gate `RGATE 17`
+- 허용(exact): `tests/fixtures/axe-baseline.json`, `tests/fixtures/axe-remediation-plan.json`(신규)
 - runtime: R0
-- 추가 금지: `js/data.js`, 원 §11.3, 문구 변경, 렌더 로직, 섹션·nav
+- 추가 금지: batch·pairs·collected·helper·spec·사이트 수정, pairs 결정과 다른 `fixKind`·`requiresColorChange`, manual block 생성, 계약 밖 필드
 
 ## 작업
-1. `RSNAP 17` → `DI`(`DesktopTop.dc.html`·`Mobile.dc.html` 읽기만).
-2. RED spec(6 project): 상수 `STAT_ITEM`·`STAT_VALUE`·`STAT_LABEL`; 직계 자식 원 §3 순서; `#heroTagline` = `PROFILE.tagline`; CTA·eyebrow·typed·`#heroFeatured` role·label 유지; STATS 375 2×2·768/1280 4×1, featured 1/2/3열; desktop-dark/light `expectInFirstScreen` = 원 §3 첫 화면 AC 전부.
-3. 구현.
+1. `RSNAP 17`
+2. pairs.json 읽기 → baseline 작성 → plan 작성(`requiredBlockReason`으로 blocked·reason).
+3. blocked 그룹이 있거나 executable 실패면 원 §6.2 remediation 재계획 경로로 중단·보고.
 
 ## AC
-- `DI && T hero.spec.js GS && FULL && VS && RGATE 17 index.html,js/main.js,css/style.css,tests/specs/hero.spec.js`
+- `MERGE_CHECK && AXE --check-baseline-match --collected tests/fixtures/axe-collected.json && AXE --check-plan --coverage && AXE --check-executable && AXE --check-regression --collected tests/fixtures/axe-collected.json && FULL && VS && RGATE 17 tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json`(첫 명령 stdout `merge-check: OK 25 139`)

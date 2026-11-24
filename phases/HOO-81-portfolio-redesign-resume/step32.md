@@ -1,16 +1,18 @@
-# Resume Step 32 — final-verification (원 step 57)
+# Resume Step 32 — axe-remediation-recheck (원 step 55, §R8 변경형)
 
-- 목적: 스크린샷 spec과 최종 통합 검증(PR 준비까지).
-- 17분 / 선행 0~31 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 32`
-- 허용(exact): `tests/specs/screenshots.spec.js`
-- runtime: R0 + `tests/screenshots/**`
-- 추가 금지: 사이트 파일, 기존 spec·helper·fixtures·scripts·`tests/.gitignore`(실패 시 원인 step 보고·중단)
+- 목적: remediation 후 재수집·회귀 확인 → 작업 부분에서만 prune → plan 빔·위반 0 확인. no-op 규칙 대상 아님.
+- 18분 / 선행 0~31 + 재계획 `axe-remediation-*` 전부 / 공통 원 §9 + §R1·§R8 / gate `RGATE 32`
+- 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만)
+- runtime: R0(COLLECT_DIR, `tests/.tmp/axe-current.json`, `tests/.tmp/resume-sha/`)
+- 추가 금지: 사이트 파일, baseline·collected·helper·spec, plan 임의 비우기, AC·probe에서 `--prune-plan` 실행, 변경 후 no-op 선언
 
 ## 작업
-1. `RSNAP 32` → `DI`
-2. spec(§THEME `test`): 화면마다 `prepareForAxe` 후 촬영, 6 project page, desktop 대표 모달 3·lightbox·print, 모달 SVG text font-family Space Grotesk. 먼저 단독 통과.
-3. AC 후 요약(원 §11.2 반영 목록, guard 통과, 원 phase step 0~39 결과, resume 0 verify-scope 호환·1 preflight·occ-batch 1~12·integrate·merge·prune 로그). exact-commit 리뷰·push·PR·SHA 동일 확인은 하네스(§R FLOW).
+1. `RSNAP 32`
+2. 사전 검사(쓰기 없음): `COLLECT_CHAIN --out tests/.tmp/axe-current.json && REGRESSION_GATE`(실패면 중단).
+3. `SHA_SAVE tests/fixtures/axe-remediation-plan.json plan-32`
+4. 변경: `AXE --prune-plan --collected tests/.tmp/axe-current.json`
+5. `SHA_DIFF tests/fixtures/axe-remediation-plan.json plan-32 plan-pruned`
+6. AC 실행. 실패 시 남은 그룹·target 보고 후 재계획.
 
-## AC
-- `DI && W node tests/scripts/make-state-colors.mjs --check && T screenshots.spec.js design-intake.spec.js hero-layout.spec.js component-hit.spec.js state-sequence.spec.js state-colors.spec.js component-hover.spec.js verify-scope-resume.spec.js GS && W npm --prefix tests run verify-scope:selftest && AXE --assert-empty && AXE --check-plan --require-empty && FULL && VS -- --final && RGATE 32 tests/specs/screenshots.spec.js`
-- final: data.js BASE→HEAD/index/worktree 각각 정확히 3줄, index→worktree 0~3줄.
+## AC (작업 4 뒤, 모두 쓰기 없음)
+- `REGRESSION_GATE && AXE --check-coverage --collected tests/.tmp/axe-current.json && AXE --check-plan && AXE --check-executable && AXE --check-plan --require-empty && AXE --assert-no-violations --collected tests/.tmp/axe-current.json && FULL && VS && RGATE 32 tests/fixtures/axe-remediation-plan.json`

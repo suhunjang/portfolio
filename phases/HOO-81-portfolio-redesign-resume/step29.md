@@ -1,18 +1,15 @@
-# Resume Step 29 — axe-remediation-gate (원 step 54, §R8 변경형)
+# Resume Step 29 — focus-trap-lightbox (원 step 52)
 
-- 목적: 원 §6.2 gate — 재수집·회귀 확인 후 작업 부분에서만 prune, 이어 coverage·plan·executable 검증. no-op 규칙 대상 아님.
-- 18분 / 선행 0~28 / 공통 원 §9 + §R1·§R8 / gate `RGATE 29`
-- 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만)
-- runtime: R0(COLLECT_DIR, `tests/.tmp/axe-current.json`, `tests/.tmp/resume-sha/`)
-- 추가 금지: 사이트 파일, baseline·collected·helper·spec, AC·probe에서 `--prune-plan` 실행, 변경 후 no-op 선언
+- 목적: 원 §6.1 lightbox trap, 기존 Tab 리스너 제거, focus-visible(BASE token만).
+- 17분 / 선행 0~28 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 29`
+- 허용(exact): `js/main.js`(lightbox trap·리스너 제거만), `css/style.css`(`:focus-visible` outline·outline-offset만), `tests/specs/focus-lightbox.spec.js`(신규)
+- runtime: R0
+- 추가 금지: `index.html`, `js/data.js`, 새 색·named·`currentColor`, 색 규칙 순서, trapFocus 시그니처·모달 연결, focus-modal.spec
 
 ## 작업
 1. `RSNAP 29`
-2. 사전 검사(쓰기 없음): `COLLECT_CHAIN --out tests/.tmp/axe-current.json && REGRESSION_GATE`(회귀 실패면 plan 불변 중단).
-3. `SHA_SAVE tests/fixtures/axe-remediation-plan.json plan-29`
-4. 변경: `AXE --prune-plan --collected tests/.tmp/axe-current.json`
-5. `SHA_DIFF tests/fixtures/axe-remediation-plan.json plan-29 plan-pruned`(로그 `plan-pruned: changed|unchanged`).
-6. AC 실행. groups `[]`면 로그 `remediation 불필요`, 남으면 `Harness 재계획 필요`+그룹 상세(재계획 `axe-remediation-{id}`는 resume 29와 30 사이, `css/themes.css` 포함이면 생성 안 함). coverage·plan·executable 실패는 재계획 사유.
+2. RED spec(desktop-dark/light): 모달 → `.shot-zoom` lightbox Tab/Shift+Tab 내부 순환; Esc 1회 lightbox 닫힘·`.shot-zoom` 복귀·모달 순환; Esc 2회 모달 닫힘·트리거 복귀; 3회 반복 후 Tab 한 칸; 키보드 도달 `.featured-card`·`.project-card`·모달 닫기·`.shot-zoom` outline-style ≠ none.
+3. 구현.
 
-## AC (작업 4 뒤, 모두 쓰기 없음)
-- `REGRESSION_GATE && AXE --check-coverage --collected tests/.tmp/axe-current.json && AXE --check-plan && AXE --check-executable && FULL && VS && RGATE 29 tests/fixtures/axe-remediation-plan.json`
+## AC
+- `T focus-lightbox.spec.js focus-modal.spec.js GS && FULL && VS && RGATE 29 js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js`

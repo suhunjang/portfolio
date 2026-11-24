@@ -1,18 +1,15 @@
-# Resume Step 18 — hero-two-column (원 step 43)
+# Resume Step 18 — featured-projects (원 step 41)
 
-- 목적: 원 §11.2 hero 2열·5:7 열 폭·1023/1024 전환(CSS만).
+- 목적: 원 §3 대표 카드 3개·모달 연결(색은 featured 대응 선택자 추가로만).
 - 19분 / 선행 0~17 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 18`
-- 허용(exact): `css/style.css`(`.hero`·`.hero-inner`·직계 자식 grid·정렬·간격, `@media (min-width: 1024px)`), `tests/specs/hero-layout.spec.js`(신규)
+- 허용(exact): `index.html`(`#heroStats` 바로 뒤 `#heroFeatured`만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, 위임만), `css/style.css`(`.featured-*` 비색 배치와 기존 `.project-card` 색 규칙(`:hover`·`:active` 포함) 선택자에 featured 대응 추가만), `tests/specs/featured.spec.js`
 - runtime: R0
-- 추가 금지: `index.html`, `js/*`, DOM 순서, 색·서체 asset, hero `min-height`·scroll-hint 위치
+- 추가 금지: 원 §11.3 전체(새 색 선언·순서 변경·token 중복 포함), hero 순서·tagline·섹션·nav, 기존 tests, 새 axe target 편입
 
 ## 작업
-1. `RSNAP 18` → `DI`(`Main.dc.html`·`DesktopTop.dc.html`·`Mobile.dc.html` 읽기만).
-2. RED spec(6 project, tokens는 fixture; `heroColumns(page)` = computed `grid-template-columns` px 배열, `contentWidth(page)` = `clientWidth − paddingLeft − paddingRight`):
-   - 1280: `display: grid`; areas = tokens.heroAreas(공백 정규화); column-gap 48px; columns 2개·원 §11.2 5:7·합 허용 오차 ≤1; `#heroName` 오른쪽 ≤ `#heroSummary` 왼쪽; `.hero-cta` 왼쪽 = `#heroSummary` 왼쪽 ±1; `#heroStats`·`#heroFeatured` 폭 ≥ W×0.95; `#heroName`·`#heroSummary` text-align `left`/`start`
-   - desktop에서 `setViewportSize`: 1023×800 → columns ≤1 또는 grid 아님·8개 left ±1·top DOM 순 증가; 1024×800 → grid·2열 계약 전체(W 재측정)
-   - 375·768: 8개 left ±1·top 증가·좌측 정렬; 모든 project DOM 순서 불변·가로 스크롤 없음
-3. style.css(guard 통과).
+1. `RSNAP 18` → `DI`(이후 `DesktopTop.dc.html`·`Components.dc.html` 읽기만).
+2. RED spec(6 project): 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트, span block, background-image none; click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`는 grid만; `.featured-card` 색 3속성 = `#projectGrid .project-card`.
+3. 구현(`esc()`, 그리드 직후). axe 새 target은 색 변경 없이 해결, 식별 손실이면 중단·재계획.
 
 ## AC
-- `DI && T hero-layout.spec.js hero.spec.js GS && FULL && VS && RGATE 18 css/style.css,tests/specs/hero-layout.spec.js tests/specs/hero-layout.spec.js`
+- `DI && T featured.spec.js GS && FULL && VS && RGATE 18 index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js`

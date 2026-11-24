@@ -1,15 +1,14 @@
-# Resume Step 16 — featured-projects (원 step 41)
+# Resume Step 16 — axe-classify-pair-integrate
 
-- 목적: 원 §3 대표 카드 3개·모달 연결(색은 featured 대응 선택자 추가로만).
-- 19분 / 선행 0~15 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 16`
-- 허용(exact): `index.html`(`#heroStats` 바로 뒤 `#heroFeatured`만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, 위임만), `css/style.css`(`.featured-*` 비색 배치와 기존 `.project-card` 색 규칙(`:hover`·`:active` 포함) 선택자에 featured 대응 추가만), `tests/specs/featured.spec.js`
-- runtime: R0
-- 추가 금지: 원 §11.3 전체(새 색 선언·순서 변경·token 중복 포함), hero 순서·tagline·섹션·nav, 기존 tests, 새 axe target 편입
+- 목적: §R6 — occ-batch 1~14의 139 occurrence를 25 pair로 통합, 배치를 넘는 pair 포함 모든 occurrence 판정 일치 검사.
+- 12분 / 선행 0~15 / 공통 §R1 / gate `RGATE 16`
+- 허용(exact): 없음
+- runtime: R0 + `tests/.tmp/axe-classify/pairs.json`(이 파일만)
+- 추가 금지: occ-batch·server 파일 수정, baseline·plan 작성, 사이트·helper·spec·collected 수정, 불일치 pair 임의 결정
 
 ## 작업
-1. `RSNAP 16` → `DI`(이후 `DesktopTop.dc.html`·`Components.dc.html` 읽기만).
-2. RED spec(6 project): 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트, span block, background-image none; click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`는 grid만; `.featured-card` 색 3속성 = `#projectGrid .project-card`.
-3. 구현(`esc()`, 그리드 직후). axe 새 target은 색 변경 없이 해결, 식별 손실이면 중단·재계획.
+1. `RSNAP 16`
+2. 14개 배치 읽기(누락·중복이면 중단) → pair별 판정 일치 확인(불일치면 `classification-inconsistent:{pair}` exit 1, 파일 미작성, 재계획) → `pairs.json` 작성(§R6 형식).
 
 ## AC
-- `DI && T featured.spec.js GS && FULL && VS && RGATE 16 index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js`
+- `INTEGRATE_CHECK && FULL && VS && RGATE 16 ''`(첫 명령 stdout `integrate-check: OK 25 139`)

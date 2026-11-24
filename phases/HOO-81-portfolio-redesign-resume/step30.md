@@ -1,18 +1,15 @@
-# Resume Step 30 — axe-remediation-recheck (원 step 55, §R8 변경형)
+# Resume Step 30 — print-pdf (원 step 53)
 
-- 목적: remediation 후 재수집·회귀 확인 → 작업 부분에서만 prune → plan 빔·위반 0 확인. no-op 규칙 대상 아님.
-- 18분 / 선행 0~29 + 재계획 `axe-remediation-*` 전부 / 공통 원 §9 + §R1·§R8 / gate `RGATE 30`
-- 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만)
-- runtime: R0(COLLECT_DIR, `tests/.tmp/axe-current.json`, `tests/.tmp/resume-sha/`)
-- 추가 금지: 사이트 파일, baseline·collected·helper·spec, plan 임의 비우기, AC·probe에서 `--prune-plan` 실행, 변경 후 no-op 선언
+- 목적: 원 §7 인쇄(clamp 해제)·PDF.
+- 17분 / 선행 0~29 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 30`
+- 허용(exact): `css/style.css`(`@media print`만, 색 선언 없음), `tests/specs/print.spec.js`
+- runtime: R0
+- 추가 금지: `index.html`, `js/*`, 색 규칙 순서, PDF 파서 의존성
 
 ## 작업
 1. `RSNAP 30`
-2. 사전 검사(쓰기 없음): `COLLECT_CHAIN --out tests/.tmp/axe-current.json && REGRESSION_GATE`(실패면 중단).
-3. `SHA_SAVE tests/fixtures/axe-remediation-plan.json plan-30`
-4. 변경: `AXE --prune-plan --collected tests/.tmp/axe-current.json`
-5. `SHA_DIFF tests/fixtures/axe-remediation-plan.json plan-30 plan-pruned`
-6. AC 실행. 실패 시 남은 그룹·target 보고 후 재계획.
+2. RED spec(desktop-dark/light): `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length` 자체 검증(`/Pages`만 0, `/Page` 1, `/Type/Page` 1); A: 본문·featured visible·opacity 1, reveal 비어 있지 않음, 인터랙션·modal 숨김, lightbox 없음/none, print에서 `.featured-blurb`·카드 blurb clamp `none`/`unset`, PDF > 10240·count ≥ 1; B: screen lightbox visible → print에서 lightbox·modal none, PDF 동일.
+3. `@media print`.
 
-## AC (작업 4 뒤, 모두 쓰기 없음)
-- `REGRESSION_GATE && AXE --check-coverage --collected tests/.tmp/axe-current.json && AXE --check-plan && AXE --check-executable && AXE --check-plan --require-empty && AXE --assert-no-violations --collected tests/.tmp/axe-current.json && FULL && VS && RGATE 30 tests/fixtures/axe-remediation-plan.json`
+## AC
+- `T print.spec.js GS && FULL && VS && RGATE 30 css/style.css,tests/specs/print.spec.js`
