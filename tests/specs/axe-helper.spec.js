@@ -391,3 +391,330 @@ test.describe('step 32 axe-collect-tooling', () => {
     expect(u.code).toBe(1);
   });
 });
+
+// step 33 — axe baseline·regression (설계 §6.2 step 33·§6.4·§6.5 fixture)
+import {
+  BASELINE_PATH,
+  COLLECTED_PATH,
+  PLAN_PATH,
+  FIX_FILES_BY_KIND,
+  baselineExists,
+  loadBaseline,
+  resolveBaselineMode,
+  validateBaseline,
+  checkRegression,
+  assertEmptyFile,
+} from '../helpers/axe.js';
+
+const T_CAREER = 'color-contrast::#career::## — Career';
+const T_PROJECTS = 'color-contrast::#projects::## — Projects';
+const T_HERO = 'aria-allowed-attr::#heroFeatured::대표 프로젝트';
+const T_TOGGLE = 'target-size::#themeToggle::#';
+
+const FIXTURE_OK = [
+  {
+    key: 'page:desktop-dark:aria-allowed-attr',
+    scenario: 'page',
+    project: 'desktop-dark',
+    ruleId: 'aria-allowed-attr',
+    impact: 'serious',
+    targets: [T_HERO],
+    selectors: ['#heroFeatured'],
+    fixes: [{ target: T_HERO, fixKind: 'static-markup', fixFiles: ['index.html'], requiresColorChange: false }],
+    fixFiles: ['index.html'],
+  },
+];
+const FIXTURE_THEMES = [
+  {
+    key: 'page:desktop-dark:color-contrast',
+    scenario: 'page',
+    project: 'desktop-dark',
+    ruleId: 'color-contrast',
+    impact: 'serious',
+    targets: [T_CAREER],
+    selectors: ['#career .section-kicker'],
+    fixes: [{ target: T_CAREER, fixKind: 'css-token', fixFiles: ['css/themes.css'], requiresColorChange: true }],
+    fixFiles: ['css/themes.css'],
+  },
+];
+const FIXTURE_RULE_PLAIN = [
+  {
+    key: 'page:desktop-dark:target-size',
+    scenario: 'page',
+    project: 'desktop-dark',
+    ruleId: 'target-size',
+    impact: 'serious',
+    targets: [T_TOGGLE],
+    selectors: ['#themeToggle'],
+    fixes: [{ target: T_TOGGLE, fixKind: 'css-rule', fixFiles: ['css/style.css'], requiresColorChange: false }],
+    fixFiles: ['css/style.css'],
+  },
+];
+const FIXTURE_RULE_COLOR = [
+  {
+    ...FIXTURE_THEMES[0],
+    fixes: [{ target: T_CAREER, fixKind: 'css-rule', fixFiles: ['css/style.css'], requiresColorChange: true }],
+    fixFiles: ['css/style.css'],
+  },
+];
+const FIXTURE_MIXED = [
+  {
+    key: 'page:desktop-dark:color-contrast',
+    scenario: 'page',
+    project: 'desktop-dark',
+    ruleId: 'color-contrast',
+    impact: 'serious',
+    targets: [T_CAREER, T_PROJECTS],
+    selectors: ['#career .section-kicker', '#projects .section-kicker'],
+    fixes: [
+      { target: T_CAREER, fixKind: 'css-rule', fixFiles: ['css/style.css'], requiresColorChange: true },
+      { target: T_PROJECTS, fixKind: 'text-change', fixFiles: [], requiresColorChange: false },
+    ],
+    fixFiles: ['css/style.css'],
+  },
+];
+const FIXTURE_COLOR_PLAIN = [...FIXTURE_RULE_COLOR, ...FIXTURE_RULE_PLAIN];
+
+const clone = (x) => structuredClone(x);
+// fixture를 복제해 entry 0 / fix 0을 고친 baseline.
+const themesWith = (fn) => {
+  const b = clone(FIXTURE_THEMES);
+  fn(b[0], b[0].fixes[0]);
+  return b;
+};
+const okWith = (fn) => {
+  const b = clone(FIXTURE_OK);
+  fn(b[0], b[0].fixes[0]);
+  return b;
+};
+const BAD_RCC = ['baseline[0].fixes[0]: bad-requiresColorChange'];
+
+let s33Seq = 0;
+function s33Dir() {
+  s33Seq += 1;
+  const rel = `tests/.tmp/axe-helper-s33-${process.pid}-${s33Seq}`;
+  fs.mkdirSync(path.join(S32_REPO, rel), { recursive: true });
+  return rel;
+}
+
+test.describe('step 33 axe-baseline-regression', () => {
+  let before;
+  const made = [];
+  const dir = () => {
+    const d = s33Dir();
+    made.push(d);
+    return d;
+  };
+
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'desktop-dark 전용');
+    before = s32State();
+  });
+
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.project.name !== 'desktop-dark') return;
+    for (const d of made.splice(0)) fs.rmSync(path.join(S32_REPO, d), { recursive: true, force: true });
+    expect(s32State()).toEqual(before);
+  });
+
+  test('경로 상수·FIX_FILES_BY_KIND', () => {
+    expect(BASELINE_PATH).toBe('tests/fixtures/axe-baseline.json');
+    expect(COLLECTED_PATH).toBe('tests/fixtures/axe-collected.json');
+    expect(PLAN_PATH).toBe('tests/fixtures/axe-remediation-plan.json');
+    expect(FIX_FILES_BY_KIND).toEqual({
+      'css-token': ['css/themes.css'],
+      'css-rule': ['css/style.css'],
+      'js-render': ['js/main.js'],
+      'static-markup': ['index.html'],
+      'text-change': [],
+    });
+    expect(Object.isFrozen(FIX_FILES_BY_KIND)).toBe(true);
+  });
+
+  test('validateBaseline 통과 []: §6.5 fixture 6개·빈 배열·text-change만 entry', () => {
+    for (const b of [FIXTURE_THEMES, FIXTURE_OK, FIXTURE_RULE_PLAIN, FIXTURE_RULE_COLOR, FIXTURE_MIXED, FIXTURE_COLOR_PLAIN, []]) {
+      const snapshot = clone(b);
+      expect(validateBaseline(b)).toEqual([]);
+      expect(b).toEqual(snapshot);
+    }
+    const textOnly = okWith((e, f) => {
+      f.fixKind = 'text-change';
+      f.fixFiles = [];
+      f.requiresColorChange = false;
+      e.fixFiles = [];
+    });
+    expect(validateBaseline(textOnly)).toEqual([]);
+  });
+
+  test('validateBaseline §6.4 오류 예 A·B·C·D·E', () => {
+    expect(validateBaseline(themesWith((e) => (e.note = 'x')))).toEqual(['baseline[0]: fields missing=[] extra=[note]']);
+    expect(validateBaseline(themesWith((e, f) => (f.fixKind = 'css-rule')))).toEqual([
+      'baseline[0].fixes[0]: fixFiles-mismatch',
+    ]);
+    expect(validateBaseline(themesWith((e) => (e.fixFiles = ['css/style.css'])))).toEqual([
+      'baseline[0]: fixFiles union-mismatch',
+    ]);
+    expect(validateBaseline(themesWith((e, f) => (f.requiresColorChange = false)))).toEqual(BAD_RCC);
+    expect(validateBaseline(themesWith((e, f) => delete f.requiresColorChange))).toEqual([
+      'baseline[0].fixes[0]: fields missing=[requiresColorChange] extra=[]',
+    ]);
+  });
+
+  test('validateBaseline requiresColorChange 추가 사례·fix extraField', () => {
+    expect(validateBaseline(themesWith((e, f) => (f.requiresColorChange = 'yes')))).toEqual(BAD_RCC);
+    expect(validateBaseline(themesWith((e, f) => (f.requiresColorChange = null)))).toEqual(BAD_RCC);
+    expect(validateBaseline(okWith((e, f) => (f.requiresColorChange = true)))).toEqual(BAD_RCC);
+    const jsRender = okWith((e, f) => {
+      f.fixKind = 'js-render';
+      f.fixFiles = ['js/main.js'];
+      f.requiresColorChange = true;
+      e.fixFiles = ['js/main.js'];
+    });
+    expect(validateBaseline(jsRender)).toEqual(BAD_RCC);
+    const textTrue = okWith((e, f) => {
+      f.fixKind = 'text-change';
+      f.fixFiles = [];
+      f.requiresColorChange = true;
+      e.fixFiles = [];
+    });
+    expect(validateBaseline(textTrue)).toEqual(BAD_RCC);
+    expect(validateBaseline(themesWith((e, f) => (f.requiresColorChange = false)))).toEqual(BAD_RCC);
+    expect(validateBaseline(themesWith((e, f) => (f.extraField = 1)))).toEqual([
+      'baseline[0].fixes[0]: fields missing=[] extra=[extraField]',
+    ]);
+  });
+
+  test('validateBaseline 그 밖 오류 각 한 항목', () => {
+    expect(validateBaseline({})).toEqual(['baseline: not-array']);
+    expect(validateBaseline([null])).toEqual(['baseline[0]: not-object']);
+    expect(validateBaseline(themesWith((e) => delete e.impact))).toEqual([
+      'baseline[0]: fields missing=[impact] extra=[]',
+    ]);
+    expect(validateBaseline(themesWith((e) => (e.scenario = 'dialog')))).toEqual(['baseline[0]: bad-scenario']);
+    expect(validateBaseline(themesWith((e) => (e.project = 'desktop-blue')))).toEqual(['baseline[0]: bad-project']);
+    expect(validateBaseline(themesWith((e) => (e.ruleId = 'a:b')))).toEqual(['baseline[0]: bad-ruleId']);
+    expect(validateBaseline(themesWith((e) => (e.key = 'page:desktop-dark:image-alt')))).toEqual([
+      'baseline[0]: key-mismatch',
+    ]);
+    expect(validateBaseline(themesWith((e) => (e.impact = 'minor')))).toEqual(['baseline[0]: bad-impact']);
+    expect(
+      validateBaseline(
+        themesWith((e) => {
+          e.targets = [];
+          e.fixes = [];
+          e.fixFiles = [];
+        }),
+      ),
+    ).toEqual(['baseline[0]: targets empty']);
+    expect(
+      validateBaseline(
+        themesWith((e, f) => {
+          e.targets = [T_CAREER, T_CAREER];
+          e.fixes = [f, clone(f)];
+        }),
+      ),
+    ).toEqual(['baseline[0]: targets duplicate']);
+    const unsorted = clone(FIXTURE_MIXED);
+    unsorted[0].targets.reverse();
+    unsorted[0].fixes.reverse();
+    expect(validateBaseline(unsorted)).toEqual(['baseline[0]: targets unsorted']);
+    const selUnsorted = clone(FIXTURE_MIXED);
+    selUnsorted[0].selectors.reverse();
+    expect(validateBaseline(selUnsorted)).toEqual(['baseline[0]: selectors unsorted']);
+    expect(validateBaseline(themesWith((e) => (e.fixes = [])))).toEqual(['baseline[0]: fixes count']);
+    expect(validateBaseline(themesWith((e, f) => (f.target = T_PROJECTS)))).toEqual([
+      'baseline[0].fixes[0]: target-mismatch',
+    ]);
+    // fixKind가 유효하지 않으면 fixFiles·kind별 requiresColorChange 판정 생략
+    expect(validateBaseline(themesWith((e, f) => (f.fixKind = 'css-magic')))).toEqual([
+      'baseline[0].fixes[0]: bad-fixKind',
+    ]);
+    expect(
+      validateBaseline(
+        themesWith((e, f) => {
+          f.fixKind = 'css-magic';
+          f.requiresColorChange = false;
+        }),
+      ),
+    ).toEqual(['baseline[0].fixes[0]: bad-fixKind']);
+    expect(validateBaseline([...clone(FIXTURE_THEMES), ...clone(FIXTURE_THEMES)])).toEqual([
+      'baseline: duplicate-key page:desktop-dark:color-contrast',
+    ]);
+    expect(validateBaseline([...clone(FIXTURE_RULE_PLAIN), ...clone(FIXTURE_RULE_COLOR)])).toEqual(['baseline: unsorted']);
+  });
+
+  test('checkRegression: 새 key·새 target 실패, 사라짐 허용, dark 전용 target → light new-key, 입력 불변', () => {
+    const baseline = clone(FIXTURE_MIXED);
+    const V33 = (ruleId, targets) => ({ ruleId, impact: 'serious', targets, selectors: [] });
+    const violations = [V33('color-contrast', [T_CAREER]), V33('image-alt', ['image-alt::#a::x'])];
+    const snapB = clone(baseline);
+    const snapV = clone(violations);
+    expect(checkRegression(violations, baseline, 'page', 'desktop-dark')).toEqual(['new-key:page:desktop-dark:image-alt']);
+    expect(baseline).toEqual(snapB);
+    expect(violations).toEqual(snapV);
+    expect(
+      checkRegression([V33('color-contrast', [T_CAREER, 'color-contrast::#about::x'])], baseline, 'page', 'desktop-dark'),
+    ).toEqual(['new-target:page:desktop-dark:color-contrast:color-contrast::#about::x']);
+    expect(checkRegression([], baseline, 'page', 'desktop-dark')).toEqual([]);
+    expect(checkRegression([V33('color-contrast', [T_PROJECTS])], baseline, 'page', 'desktop-dark')).toEqual([]);
+    expect(checkRegression([V33('color-contrast', [T_CAREER])], baseline, 'page', 'desktop-light')).toEqual([
+      'new-key:page:desktop-light:color-contrast',
+    ]);
+    expect(checkRegression([V33('color-contrast', [T_CAREER])], baseline, 'modal', 'desktop-dark')).toEqual([
+      'new-key:modal:desktop-dark:color-contrast',
+    ]);
+  });
+
+  test('resolveBaselineMode·baselineExists·loadBaseline', () => {
+    const d = dir();
+    const p = (f) => `${d}/${f}`;
+    const write = (f, s) => fs.writeFileSync(path.join(S32_REPO, p(f)), s);
+    const opts = { baselinePath: p('baseline.json'), collectedPath: p('collected.json'), planPath: p('plan.json') };
+    const saved = process.env.AXE_ALLOW_MISSING_BASELINE;
+    try {
+      delete process.env.AXE_ALLOW_MISSING_BASELINE;
+      expect(baselineExists(opts.baselinePath)).toBe(false);
+      expect(() => resolveBaselineMode(opts)).toThrow();
+      process.env.AXE_ALLOW_MISSING_BASELINE = '1';
+      expect(() => resolveBaselineMode(opts)).toThrow();
+      delete process.env.AXE_ALLOW_MISSING_BASELINE;
+      write('collected.json', '[]\n');
+      expect(resolveBaselineMode(opts)).toBe('pending');
+      write('plan.json', '{"groups":[]}\n');
+      expect(() => resolveBaselineMode(opts)).toThrow();
+      write('baseline.json', '[]\n');
+      expect(baselineExists(opts.baselinePath)).toBe(true);
+      expect(resolveBaselineMode(opts)).toBe('check');
+    } finally {
+      if (saved === undefined) delete process.env.AXE_ALLOW_MISSING_BASELINE;
+      else process.env.AXE_ALLOW_MISSING_BASELINE = saved;
+    }
+    expect(loadBaseline(p('baseline.json'))).toEqual([]);
+    write('ok.json', JSON.stringify(FIXTURE_THEMES));
+    expect(loadBaseline(p('ok.json'))).toEqual(FIXTURE_THEMES);
+    expect(() => loadBaseline(p('missing.json'))).toThrow();
+    write('broken.json', '[{');
+    expect(() => loadBaseline(p('broken.json'))).toThrow();
+    write('obj.json', '{}');
+    expect(() => loadBaseline(p('obj.json'))).toThrow();
+  });
+
+  test('assertEmptyFile·CLI --assert-empty: [] 0, [{}]·{}·깨짐·없음 1', async () => {
+    const d = dir();
+    const cases = [
+      ['empty.json', '[]\n', 0],
+      ['one.json', '[{}]\n', 1],
+      ['obj.json', '{}\n', 1],
+      ['broken.json', '[', 1],
+      ['missing.json', null, 1],
+    ];
+    for (const [f, body, code] of cases) {
+      const rel = `${d}/${f}`;
+      if (body !== null) fs.writeFileSync(path.join(S32_REPO, rel), body);
+      if (code === 0) expect(() => assertEmptyFile(rel)).not.toThrow();
+      else expect(() => assertEmptyFile(rel)).toThrow();
+      const r = await s32Cli(['--assert-empty', '--baseline', rel]);
+      expect(r.code, f).toBe(code);
+    }
+  });
+});

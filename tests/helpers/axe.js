@@ -320,14 +320,215 @@ export function mergeCollected({ collectDir, out } = {}) {
   return merged;
 }
 
+// step 33 — axe baseline·regression (설계 §6.2 step 33·§6.4)
+// BASELINE_PATH · COLLECTED_PATH · PLAN_PATH · FIX_FILES_BY_KIND · baselineExists · loadBaseline · resolveBaselineMode ·
+// validateBaseline · checkRegression · assertEmptyFile · CLI `--assert-empty [--baseline f]`
+export const BASELINE_PATH = 'tests/fixtures/axe-baseline.json';
+export const COLLECTED_PATH = DEFAULT_MERGE_OUT;
+export const PLAN_PATH = 'tests/fixtures/axe-remediation-plan.json';
+export const FIX_FILES_BY_KIND = Object.freeze({
+  'css-token': Object.freeze(['css/themes.css']),
+  'css-rule': Object.freeze(['css/style.css']),
+  'js-render': Object.freeze(['js/main.js']),
+  'static-markup': Object.freeze(['index.html']),
+  'text-change': Object.freeze([]),
+});
+// kind별 허용 requiresColorChange 값(§6.4).
+const RCC_ALLOWED = Object.freeze({
+  'css-token': [true],
+  'css-rule': [true, false],
+  'js-render': [false],
+  'static-markup': [false],
+  'text-change': [false],
+});
+const ENTRY_FIELDS = ['key', 'scenario', 'project', 'ruleId', 'impact', 'targets', 'selectors', 'fixes', 'fixFiles'];
+const FIX_FIELDS = ['target', 'fixKind', 'fixFiles', 'requiresColorChange'];
+
+const repoAbs = (p) => path.resolve(REPO_ROOT, p);
+const isPlainObject = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+const sameArray = (a, b) => Array.isArray(a) && a.length === b.length && a.every((x, i) => x === b[i]);
+
+export function baselineExists(baselinePath = BASELINE_PATH) {
+  return fs.existsSync(repoAbs(baselinePath));
+}
+
+// JSON 배열이 아니면(없음·깨짐·비배열) throw. 스키마 검증은 validateBaseline 담당.
+export function loadBaseline(baselinePath = BASELINE_PATH) {
+  let text;
+  try {
+    text = fs.readFileSync(repoAbs(baselinePath), 'utf8');
+  } catch (e) {
+    throw new Error(`loadBaseline: missing: ${baselinePath}`, { cause: e });
+  }
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    throw new Error(`loadBaseline: invalid json: ${baselinePath}`, { cause: e });
+  }
+  if (!Array.isArray(data)) throw new Error(`loadBaseline: not-array: ${baselinePath}`);
+  return data;
+}
+
+// baseline 있음 → 'check'; 없음 + collected 있음 + plan 없음 → 'pending'; 그 밖 throw. 환경변수 우회 없음.
+export function resolveBaselineMode({
+  baselinePath = BASELINE_PATH,
+  collectedPath = COLLECTED_PATH,
+  planPath = PLAN_PATH,
+} = {}) {
+  if (baselineExists(baselinePath)) return 'check';
+  if (!fs.existsSync(repoAbs(collectedPath))) {
+    throw new Error(`resolveBaselineMode: baseline and collected missing: ${baselinePath}, ${collectedPath}`);
+  }
+  if (fs.existsSync(repoAbs(planPath))) {
+    throw new Error(`resolveBaselineMode: plan without baseline: ${planPath}`);
+  }
+  return 'pending';
+}
+
+function fieldsProblem(obj, fields) {
+  const keys = Object.keys(obj);
+  const missing = fields.filter((f) => !Object.prototype.hasOwnProperty.call(obj, f));
+  const extra = keys.filter((k) => !fields.includes(k)).sort(byCodeUnit);
+  if (missing.length === 0 && extra.length === 0) return null;
+  return `fields missing=[${missing.join(',')}] extra=[${extra.join(',')}]`;
+}
+
+// 문자열 배열 검사: not-string → duplicate → unsorted 중 첫 문제(없으면 null).
+function stringListProblem(xs) {
+  if (!Array.isArray(xs) || xs.some((x) => typeof x !== 'string')) return 'not-string';
+  if (new Set(xs).size !== xs.length) return 'duplicate';
+  for (let i = 1; i < xs.length; i++) if (byCodeUnit(xs[i - 1], xs[i]) > 0) return 'unsorted';
+  return null;
+}
+
+const validToken = (v) => typeof v === 'string' && v !== '' && !v.includes(':');
+
+// §6.4 baseline 검증 → 오류 문자열 배열(발견 순). 입력 불변.
+export function validateBaseline(baseline) {
+  if (!Array.isArray(baseline)) return ['baseline: not-array'];
+  const errors = [];
+  const keys = [];
+  baseline.forEach((entry, i) => {
+    const at = `baseline[${i}]`;
+    if (!isPlainObject(entry)) {
+      errors.push(`${at}: not-object`);
+      return;
+    }
+    if (typeof entry.key === 'string') keys.push(entry.key);
+    const fp = fieldsProblem(entry, ENTRY_FIELDS);
+    if (fp) {
+      errors.push(`${at}: ${fp}`);
+      return;
+    }
+    const okScenario = SCENARIOS.includes(entry.scenario);
+    const okProject = PROJECTS.includes(entry.project);
+    const okRule = validToken(entry.ruleId);
+    if (!okScenario) errors.push(`${at}: bad-scenario`);
+    if (!okProject) errors.push(`${at}: bad-project`);
+    if (!okRule) errors.push(`${at}: bad-ruleId`);
+    if (okScenario && okProject && okRule) {
+      const want = makeEntryKey({ scenario: entry.scenario, project: entry.project, ruleId: entry.ruleId });
+      if (entry.key !== want) errors.push(`${at}: key-mismatch`);
+    }
+    if (!Object.prototype.hasOwnProperty.call(IMPACT_RANK, entry.impact)) {
+      errors.push(`${at}: bad-impact`);
+    }
+    const targets = entry.targets;
+    if (Array.isArray(targets) && targets.length === 0) errors.push(`${at}: targets empty`);
+    else {
+      const tp = stringListProblem(targets);
+      if (tp) errors.push(`${at}: targets ${tp}`);
+    }
+    const sp = stringListProblem(entry.selectors);
+    if (sp) errors.push(`${at}: selectors ${sp}`);
+
+    const fixes = entry.fixes;
+    if (!Array.isArray(fixes) || !Array.isArray(targets) || fixes.length !== targets.length) {
+      errors.push(`${at}: fixes count`);
+      return;
+    }
+    let fixError = false;
+    const union = new Set();
+    fixes.forEach((fix, j) => {
+      const fat = `${at}.fixes[${j}]`;
+      const before = errors.length;
+      if (!isPlainObject(fix)) {
+        errors.push(`${fat}: not-object`);
+      } else {
+        const ffp = fieldsProblem(fix, FIX_FIELDS);
+        if (ffp) errors.push(`${fat}: ${ffp}`);
+        else {
+          if (fix.target !== targets[j]) errors.push(`${fat}: target-mismatch`);
+          const kindOk = typeof fix.fixKind === 'string' && Object.prototype.hasOwnProperty.call(FIX_FILES_BY_KIND, fix.fixKind);
+          if (!kindOk) errors.push(`${fat}: bad-fixKind`);
+          else if (!sameArray(fix.fixFiles, FIX_FILES_BY_KIND[fix.fixKind])) errors.push(`${fat}: fixFiles-mismatch`);
+          const rcc = fix.requiresColorChange;
+          if (typeof rcc !== 'boolean' || (kindOk && !RCC_ALLOWED[fix.fixKind].includes(rcc))) {
+            errors.push(`${fat}: bad-requiresColorChange`);
+          }
+          if (Array.isArray(fix.fixFiles)) for (const f of fix.fixFiles) union.add(f);
+        }
+      }
+      if (errors.length !== before) fixError = true;
+    });
+    if (!fixError && !sameArray(entry.fixFiles, [...union].sort(byCodeUnit))) {
+      errors.push(`${at}: fixFiles union-mismatch`);
+    }
+  });
+  const seen = new Set();
+  const reported = new Set();
+  for (const k of keys) {
+    if (seen.has(k) && !reported.has(k)) {
+      errors.push(`baseline: duplicate-key ${k}`);
+      reported.add(k);
+    }
+    seen.add(k);
+  }
+  for (let i = 1; i < keys.length; i++) {
+    if (byCodeUnit(keys[i - 1], keys[i]) > 0) {
+      errors.push('baseline: unsorted');
+      break;
+    }
+  }
+  return errors;
+}
+
+// runAxe 결과를 baseline과 비교: baseline에 없는 key → `new-key:{key}`, key의 새 target → `new-target:{key}:{target}`.
+// 사라진 key·target은 허용. 결과는 고유·코드 유닛 정렬. 입력 불변.
+export function checkRegression(violations, baseline, scenario, project) {
+  if (!Array.isArray(violations)) throw new Error('checkRegression: violations not-array');
+  if (!Array.isArray(baseline)) throw new Error('checkRegression: baseline not-array');
+  const byKey = new Map();
+  for (const e of baseline) if (isPlainObject(e) && typeof e.key === 'string') byKey.set(e.key, e);
+  const out = new Set();
+  for (const v of violations) {
+    const key = makeEntryKey({ scenario, project, ruleId: v?.ruleId });
+    const entry = byKey.get(key);
+    if (!entry) {
+      out.add(`new-key:${key}`);
+      continue;
+    }
+    const known = new Set(Array.isArray(entry.targets) ? entry.targets : []);
+    for (const t of v.targets || []) if (!known.has(t)) out.add(`new-target:${key}:${t}`);
+  }
+  return [...out].sort(byCodeUnit);
+}
+
+// 파일이 정확히 JSON 빈 배열이 아니면(없음·깨짐·비배열·비어 있지 않음) throw.
+export function assertEmptyFile(file = BASELINE_PATH) {
+  const data = loadBaseline(file);
+  if (data.length !== 0) throw new Error(`assertEmptyFile: expected [], got ${data.length} entries: ${file}`);
+}
+
 function parseCliArgs(argv) {
-  const opts = { cmd: null, dir: undefined, out: undefined };
+  const opts = { cmd: null, dir: undefined, out: undefined, baseline: undefined };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--reset' || a === '--merge') {
+    if (a === '--reset' || a === '--merge' || a === '--assert-empty') {
       if (opts.cmd) throw new Error(`axe.js: duplicate command ${a}`);
       opts.cmd = a.slice(2);
-    } else if (a === '--dir' || a === '--out') {
+    } else if (a === '--dir' || a === '--out' || a === '--baseline') {
       const v = argv[++i];
       if (v === undefined || v.startsWith('--')) throw new Error(`axe.js: ${a} requires a value`);
       opts[a.slice(2)] = v;
@@ -335,8 +536,12 @@ function parseCliArgs(argv) {
       throw new Error(`axe.js: unknown argument ${a}`);
     }
   }
-  if (!opts.cmd) throw new Error('axe.js: command required (--reset | --merge)');
+  if (!opts.cmd) throw new Error('axe.js: command required (--reset | --merge | --assert-empty)');
   if (opts.cmd === 'reset' && opts.out !== undefined) throw new Error('axe.js: --out only with --merge');
+  if (opts.cmd !== 'assert-empty' && opts.baseline !== undefined) throw new Error('axe.js: --baseline only with --assert-empty');
+  if (opts.cmd === 'assert-empty' && (opts.dir !== undefined || opts.out !== undefined)) {
+    throw new Error('axe.js: --assert-empty takes only --baseline');
+  }
   return opts;
 }
 
@@ -347,6 +552,12 @@ export function runCli(argv) {
     if (opts.cmd === 'reset') {
       const abs = resetCollected(opts.dir);
       process.stdout.write(`axe reset: ${path.relative(REPO_ROOT, abs)}\n`);
+      return 0;
+    }
+    if (opts.cmd === 'assert-empty') {
+      const file = opts.baseline ?? BASELINE_PATH;
+      assertEmptyFile(file);
+      process.stdout.write(`axe assert-empty: OK (${file})\n`);
       return 0;
     }
     const out = opts.out ?? DEFAULT_MERGE_OUT;
