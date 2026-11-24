@@ -33,3 +33,33 @@ export function normalizeFeatured(data) {
   });
   return out;
 }
+
+// step 25 — StaticContent(설계 §5): 정적 본문을 norm한 값으로 추출한다(JS 꺼진 페이지 기준).
+export async function extractStatic(page) {
+  return page.evaluate(() => {
+    const n = (s) => String(s).replace(/\s+/g, ' ').trim();
+    const all = (sel) => Array.from(document.querySelectorAll(sel), (e) => n(e.textContent));
+    const one = (sel) => {
+      const e = document.querySelector(sel);
+      return e ? n(e.textContent) : null;
+    };
+    const desc = document.querySelector('meta[name="description"]');
+    return {
+      title: n(document.title),
+      metaDescription: desc ? n(desc.getAttribute('content') ?? '') : null,
+      navLabels: all('.nav-link').sort(),
+      heroEyebrow: one('.hero-eyebrow'),
+      ctaLabels: all('.hero-cta .btn'),
+      kickers: all('.section-kicker'),
+      sectionTitles: all('.section-title'),
+      sectionSubs: all('.section-sub'),
+      aboutParagraphs: all('.about-text p:not([id])'),
+      aboutPoints: all('.about-points li'),
+      aboutMetaTerms: all('.about-meta dt'),
+      contactHeading: one('.contact-text h3'),
+      contactText: one('.contact-text p'),
+      footerNote: one('.footer-note'),
+      footerTop: one('.footer-top'),
+    };
+  });
+}
