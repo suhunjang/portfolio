@@ -294,7 +294,10 @@
     {
       "step": 34,
       "name": "axe-baseline-projection",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T21:07:58+0900",
+      "completed_at": "2026-11-24T21:13:29+0900",
+      "summary": "step34: tests/helpers/axe.js append (step-28/32/33 behavior unchanged; CLI parser only extended): frozen PROJECTION_FIELDS [key,scenario,project,ruleId,impact,targets,selectors]; projectEntry (7 fields only, targets/selectors sorted unique, not-object/missing field/non-string list/key-mismatch throw, fixes/fixFiles/requiresColorChange excluded, input unmutated); compareCollectedBaseline(collected, baseline) -> {ok, missingEntries, extraEntries, missingTargets [{key,target}], extraTargets, fieldMismatches [{key,field}] over scenario/project/ruleId/impact/selectors}, all sorted, duplicate key throw, inputs unmutated; CLI --check-baseline-match [--collected] [--baseline] (defaults tests/fixtures/axe-collected.json / axe-baseline.json, stdout 'baseline-match: OK', mismatch stderr missing-entry/extra-entry/missing-target/extra-target/field-mismatch in that order exit 1, missing file/invalid JSON exit 1); tests/specs/axe-helper.spec.js append-only step-34 describe (4 tests desktop-dark on 2-entry strict baseline FIXTURE_OK+FIXTURE_RULE_COLOR: projection keys, requiresColorChange flip still ok, 5 mismatch kinds + duplicate throw, CLI exact lines/mixed order/0/1 cases; tmp dirs under tests/.tmp cleaned, real fixtures untouched); RED confirmed (PROJECTION_FIELDS export missing), SNAP 34 created, T axe-helper 30 passed, FULL 393 passed, VS OK, GATE 34 scope-snapshot: OK"
     },
     {
       "step": 35,
