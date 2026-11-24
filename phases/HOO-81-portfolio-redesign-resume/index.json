@@ -150,7 +150,10 @@
     {
       "step": 16,
       "name": "axe-classify-pair-integrate",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-25T00:53:02+0900",
+      "completed_at": "2026-11-25T01:08:48+0900",
+      "summary": "RSNAP 16(step116) · occ-batch 1→14를 배열 순서로 읽어 139 occurrence를 25 pair로 통합. 누락·중복 없고 batch 간 판정도 모두 일치(color-contrast 12 pair css-rule·true, nested-interactive 13 pair js-render·false). evidence는 순회 순서 그대로 '; '.join, occurrenceCount 3~6. pairs.json만 작성(O_EXCL). INTEGRATE_CHECK 'integrate-check: OK 25 139' · FULL 429 passed(앞선 3회는 실행마다 다른 1건 flake: scope-snapshot-parity-artifacts의 tests/.tmp race 2건, modal-regression 1건. 4번째 실행 통과) · VS OK · RGATE 16 '' OK"
     },
     {
       "step": 17,
