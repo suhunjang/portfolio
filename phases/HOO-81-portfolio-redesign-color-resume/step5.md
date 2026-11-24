@@ -1,26 +1,42 @@
-# Color-resume Step 5 — final-verification
+# Color-resume Step 5 — coordinator-manifest-validate
 
-- 존재 이유: 통합된 최종 상태에서 전체 suite, UI·시각, 접근성, print, focus, design-intake, VS final을 1회 수행하고 PR 준비 요약을 남긴다.
-- 시간: agent 예상 ≤20분, Harness hard timeout 30분. 선행 0~4. 공통 규칙: 원 §9 + §C1. gate: `XGATE 5`.
-- 허용(exact): `tests/specs/screenshots.spec.js`(신규, resume step34 작업 2 기준)
-- runtime: R0 + `tests/screenshots/**`
-- 추가 금지: 사이트 파일, 기존 spec·helper·fixtures·scripts 수정. 실패하면 원인 wave·lane을 보고하고 중단한다.
+- 존재 이유: wave 2 manifest의 tagged-union 계약과 최소 권한 검증, 그리고 manifest에서 wave 2 contract를 도출하는 기능을 확정한다(Astra v59 #7·#8).
+- 시간: agent 예상 ≤20분. 근거: 검증 함수 1개, contract 도출 함수 1개, 표 기반 spec. owner map은 step 2를 재사용한다. Harness hard timeout은 30분.
+- 선행: 0~4
+- 공통 규칙: 원 §9 + §C1·§C5·§C9
+- gate: `XGATE 5`
+- 허용(exact): `tests/helpers/parallel-wave-manifest.js`, `tests/specs/parallel-wave-manifest.spec.js`(둘 다 신규), `tests/scripts/parallel-wave.mjs`(dispatch 추가만)
+- runtime: R0 + `tests/.tmp/parallel/**`
+- 추가 금지: guard 상수 정의(step 7에서 함), 사이트 수정, 다른 파일 수정
 
 ## 작업
-1. `XSNAP 5` → `DI`
-2. `screenshots.spec.js`(§THEME `test`)를 작성하고 단독으로 통과시킨다.
-   - 화면마다 `prepareForAxe`를 거친 뒤 촬영한다.
-   - 6 project 각각의 page
-   - desktop에서 대표 모달 3개, lightbox, print
-   - 모달 SVG text의 font-family가 Space Grotesk인지 확인한다.
-3. 아래 AC를 1회 실행한 뒤 요약을 남긴다. 요약 항목:
-   - 승계 범위(원 0~39, resume 0~16)
-   - wave 1 lane 결과와 integration commit
-   - wave 2 rule·shard와 `HOO81_COLOR_V52_ALLOW`
-   - axe 위반 0
-   - 보존 항목(텍스트·숫자·서체·6 섹션·13 PROJECTS·순서·레이아웃)
-- exact-commit Astra 리뷰, push, OPEN PR, tested = reviewed = pushed = PR-head SHA 확인은 §C FLOW를 따른다.
+1. `XSNAP 5`
+2. `parallel-wave-manifest.js`를 작성한다.
+   - export: `validateManifest`, `wave2Contract`
+   - 동작은 §C9 검사 전부다. guard 상수는 주입한 경로에서 import한다. 기본 경로는 `tests/helpers/design-guard-color-rules.js`이고 상수가 없으면 `[]`로 본다.
+   - `registerWaveContract(2, wave2Contract)`로 등록한다.
+3. CLI에 `validate-manifest`를 연결한다.
+4. spec을 작성한다. synthetic collected, CSS, JS, proof를 쓴다.
+   - 정상 color·nested 혼합 → PASS
+   - 실패 사례:
+     - collectedSha 불일치
+     - target 누락
+     - target 중복
+     - 허용되지 않은 rule
+     - 잘못된 change type
+     - change.targets ⊄ shard.targets
+     - change.file ∉ shard.files
+     - shard.files·anchors가 최소 집합이 아님
+     - color base가 실제와 불일치
+     - `to` token이 정의되지 않음
+     - proof sha 불일치
+     - nested anchor가 없음
+     - nested `before` 불일치
+     - requiredCommands가 다름
+     - color 투영 불일치
+     - 위반 0인데 shard가 비어 있지 않음
+   - 위반 0이고 모든 배열이 빔 → PASS
+   - `wave2Contract`의 lane이 `steps: ['focus']`, `checkpointSteps: ['focus']`, requiredCommands, port 4180~4184, importOrder로 정확하다.
 
 ## AC
-- `DI && W node tests/scripts/make-state-colors.mjs --check && T screenshots.spec.js featured.spec.js hero.spec.js hero-layout.spec.js structure.spec.js layout.spec.js component-hit.spec.js state-sequence.spec.js state-colors.spec.js component-hover.spec.js component-clamp.spec.js focus-modal.spec.js focus-lightbox.spec.js print.spec.js axe.spec.js design-intake.spec.js verify-scope-resume.spec.js parallel-wave.spec.js GS && W npm --prefix tests run verify-scope:selftest && AXE --assert-empty && AXE --check-plan --require-empty && FULL && VS -- --final && XGATE 5 tests/specs/screenshots.spec.js tests/specs/screenshots.spec.js`
-- final 조건: data.js는 BASE→HEAD, index, worktree 각각에서 정확히 3줄(`featured: true,`)이고, index→worktree 차이는 0~3줄이다.
+- `T parallel-wave-manifest.spec.js parallel-wave-record.spec.js parallel-wave-contract.spec.js && FULL && VS && XGATE 5 tests/helpers/parallel-wave-manifest.js,tests/specs/parallel-wave-manifest.spec.js,tests/scripts/parallel-wave.mjs tests/helpers/parallel-wave-manifest.js,tests/specs/parallel-wave-manifest.spec.js`

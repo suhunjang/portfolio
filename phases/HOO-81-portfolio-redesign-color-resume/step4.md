@@ -1,22 +1,40 @@
-# Color-resume Step 4 — a11y-wave-verify
+# Color-resume Step 4 — coordinator-record-verify
 
-- 존재 이유: coordinator wave 2(manifest shard별 direct Claude worktree worker)의 integration을 검증한다. 위반 0을 확인한 뒤 baseline과 plan을 빈 상태로 확정한다.
-- 시간: agent 예상 ≤20분, Harness hard timeout 30분. gate: `XGATE 4`.
-- 선행: step 0~3과 coordinator wave 2. wave 2 완료 조건은 runtime·external record가 있고 integration commit이 HEAD인 것이다. `shards: []`였다면 coordinator가 빈 lane 목록 record를 만들고 integration commit은 parallelBase와 같다.
-- 공통 규칙: 원 §9 + §C1·§C7.
-- 허용(exact): `tests/fixtures/axe-baseline.json`, `tests/fixtures/axe-remediation-plan.json`(둘 다 신규)
-- runtime: R0 + `tests/.tmp/axe-current.json`, `tests/.tmp/parallel/idx-*`
-- 추가 금지: 사이트·helper·spec 수정, 위반이 남은 상태에서 baseline·plan 작성, manifest 밖 변경 수용
+- 존재 이유: 자기참조가 없는 envelope, attempt 기반 record, current pointer, git object 재구성 검증(`verify-record`)을 확정한다(Astra v59 #4·#5·#8).
+- 시간: agent 예상 ≤20분. 근거: 직렬화 1개, 검증 함수 1개(step 2·3 함수 재사용), synthetic repo 시나리오 spec. Harness hard timeout은 30분.
+- 선행: 0~3
+- 공통 규칙: 원 §9 + §C1·§C8
+- gate: `XGATE 4`
+- 허용(exact): `tests/helpers/parallel-wave-record.js`, `tests/specs/parallel-wave-record.spec.js`(둘 다 신규), `tests/scripts/parallel-wave.mjs`(dispatch 추가만)
+- runtime: R0 + `tests/.tmp/parallel/**`
+- 추가 금지: 실제 SCR 경로에 쓰기, 다른 파일 수정
 
 ## 작업
-1. `XSNAP 4`. record가 없으면 `wave-record-missing`으로 fail-closed한다.
-2. `PW verify-record --wave 2 --runtime tests/.tmp/parallel/wave-2.json --external <SCR>/record-wave-2.json --manifest tests/.tmp/a11y-wave/components.json`
-3. `PW validate-manifest`를 다시 실행하고 `GS`를 돌린다. 색 변경이 상수의 정확한 `to`뿐인지 확인하기 위해서다.
-4. `COLLECT_CHAIN --out tests/.tmp/axe-current.json && AXE --assert-no-violations --collected tests/.tmp/axe-current.json`. 실패하면 남은 target을 보고하고 중단한다. 파일은 쓰지 않는다.
-5. baseline과 plan을 쓴다.
-   - baseline: 정확히 `[]` + 끝 개행
-   - plan: 정확히 `{ "groups": [] }`을 2칸 들여쓰기 + 끝 개행으로
-6. 아래 AC가 PASS한 뒤에만 coordinator가 wave 2 cleanup을 할 수 있다.
+1. `XSNAP 4`
+2. `parallel-wave-record.js`를 작성한다.
+   - export: `canon`, `envelope`, `record`, `verifyRecord`, `readCurrent`
+   - 동작은 §C8 그대로다.
+3. CLI에 연결한다.
+4. spec을 작성한다. synthetic repo를 쓴다.
+   - envelope:
+     - 정상 → PASS
+     - payload 변조 → `record:hash`
+     - payloadSha256 변조 → `record:hash`
+     - runtime과 external이 1byte 다름 → `record:mismatch`
+   - record dry-run → 파일·pointer 불변. `--apply` → 세 파일 생성
+   - 정상 시나리오: wave 1 prologue와 lane 3개 → verify PASS
+   - retry 시나리오: overlap → retry → adopt → verify PASS
+   - 실패 사례:
+     - 잘못된 attempt base → `record:attempt-base`
+     - 없는 adopt id → `record:adopt`
+     - integration tree 불일치 → `record:composite`
+     - HEAD 불일치 → `record:head`
+   - wave 2:
+     - 정상 lane(`steps: ['focus']`) → PASS
+     - focus checkpoint 누락 → `lane:checkpoints`
+     - 잘못된 command → `lane:commands:focus`
+     - 빈 wave(`lanes: []`, `importOrder: []`) → verify PASS
+   - pointer: runRoot prefix가 다르면 `runroot:invalid`
 
 ## AC
-- `PW verify-record --wave 2 --runtime tests/.tmp/parallel/wave-2.json --external <SCR>/record-wave-2.json --manifest tests/.tmp/a11y-wave/components.json && PW validate-manifest --collected tests/.tmp/axe-final/collected.json --manifest tests/.tmp/a11y-wave/components.json && GS && AXE --assert-no-violations --collected tests/.tmp/axe-current.json && AXE --assert-empty && AXE --check-plan --require-empty && FULL && VS && XGATE 4 tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json`
+- `T parallel-wave-record.spec.js parallel-wave-run.spec.js parallel-wave-anchor.spec.js && FULL && VS && XGATE 4 tests/helpers/parallel-wave-record.js,tests/specs/parallel-wave-record.spec.js,tests/scripts/parallel-wave.mjs tests/helpers/parallel-wave-record.js,tests/specs/parallel-wave-record.spec.js`

@@ -1,54 +1,37 @@
-# Color-resume Step 1 — parallel-coordinator
+# Color-resume Step 1 — coordinator-contract-doctor-prepare
 
-- 존재 이유: coordinator 절차(§C4~§C7)를 실행·검증할 수 있는 코드와 spec으로 고정한다. 이 step은 실제 worktree를 만들거나 worker를 실행하지 않는다.
-- 시간: agent 예상 ≤20분, Harness hard timeout 30분. 선행 0. 공통 규칙: 원 §9 + §C1. gate: `XGATE 1`.
-- 허용(exact): `tests/scripts/parallel-wave.mjs`, `tests/specs/parallel-wave.spec.js`(둘 다 신규)
-- runtime: R0 + `tests/.tmp/parallel/**`(spec의 synthetic repo와 임시 index)
+- 존재 이유: CLI 골격, `--apply` 공통 규칙, `WAVE1_CONTRACT`·fileRules 상수, `doctor`, `prepare`를 확정한다(Astra v59 #1·#2·#4).
+- 시간: agent 예상 ≤20분. 근거: 상수 선언, 인자 파서, 외부 명령 2종 검사, 경로·argv 생성 함수, synthetic repo 1개로 테스트. Harness hard timeout은 30분.
+- 선행: 0
+- 공통 규칙: 원 §9 + §C1·§C4·§C5
+- gate: `XGATE 1`
+- 허용(exact): `tests/scripts/parallel-wave.mjs`, `tests/helpers/parallel-wave-contract.js`, `tests/specs/parallel-wave.spec.js`, `tests/specs/parallel-wave-contract.spec.js`(모두 신규)
+- runtime: R0 + `tests/.tmp/parallel/**`
 - 추가 금지:
-  - 다른 helper·spec·사이트 수정
-  - schema fixture 파일 추가(코드 상수만 사용)
   - 실제 `claude` 실행
-  - 실제 외부 `SCR` 경로 쓰기
-  - `--apply` 경로를 canonical 저장소에 실행
-  - 생성 명령에 `--bare`·`--dangerously-skip-permissions`·OpenRouter 포함
+  - 실제 `SCR_PREFIX` 경로에 쓰기. spec은 테스트 전용 prefix를 주입하는 export 옵션을 쓴다.
+  - 생성 argv에 `--bare`·`--dangerously-skip-permissions` 포함
+  - schema fixture 파일 추가
+  - 다른 파일 수정
 
 ## 작업
 1. `XSNAP 1`
-2. `parallel-wave.mjs`를 구현한다.
-   - subcommand 9개: `doctor`, `prepare`, `validate-lane`, `check-overlap`, `fan-in`, `record`, `verify-record`, `validate-manifest`와 §C4의 인자·출력·실패 코드를 그대로 따른다.
-   - `WAVE1_CONTRACT`(§C5)를 코드 상수로 둔다.
-   - envelope 직렬화는 §C6을 따른다.
-   - semantic anchor 판정은 §C4를 따른다.
-   - 직렬 재시도 base 계산 함수를 export한다.
-3. `parallel-wave.spec.js`를 작성한다. node, desktop-dark 기준이며 synthetic repo는 `tests/.tmp/parallel/spec-<pid>/`에 git init하고 finally에서 그 디렉터리만 삭제한다.
-   - doctor: 가짜 help text에 flag가 다 있으면 PASS. `--setting-sources`가 빠지면 `doctor:flag-missing`. `OPENROUTER_API_KEY`가 설정돼 있으면 `doctor:forbidden-env`.
-   - prepare dry-run: lane 6개의 worktree·branch·port·argv가 정확하다. argv에 `--setting-sources user`가 있고 `--bare`·`--dangerously-skip-permissions`가 없다. allowlist는 requiredCommands의 exact `Bash(...)`다.
-   - validate-lane:
-     - PASS 사례 1개
-     - 잘못된 base → `lane:bad-base`
-     - 허용 밖 파일 → `lane:files`
-     - 허용 밖 anchor → `lane:anchor`
-     - 누락 명령이나 exit≠0 → `lane:commands`
-     - 누락 checkpoint → `lane:checkpoints`
-     - 변조된 result → FAIL
-   - check-overlap:
-     - 같은 파일 disjoint hunk + 다른 anchor → PASS
-     - 교차하는 hunk → FAIL
-     - 같은 anchor → FAIL
-   - fan-in dry-run: composite tree가 예상과 같다. 순서를 바꾸거나 패치를 변조하면 결과가 달라지거나 FAIL이다.
-   - record·verify-record:
-     - 정상 envelope → PASS
-     - payload 변조 → `record:hash`
-     - payloadSha256 변조 → `record:hash`
-     - external과 runtime 1byte 차이 → `record:mismatch`
-     - integration tree가 composite와 다름 → `record:composite`
-   - validate-manifest:
-     - 정상 → PASS
-     - collectedSha 불일치, target 누락, target 중복, 허용 밖 rule, 잘못된 change type, color 투영 불일치 → 각각 FAIL
-     - 위반 0인데 shard가 비어 있지 않음 → FAIL
-     - 위반 0 + 빈 배열 → PASS
+2. `parallel-wave-contract.js`를 작성한다.
+   - export: `WAVE1_CONTRACT`(§C5 그대로), `FILE_RULE_TYPES`, `SCR_PREFIX`, `RUN_ID_RE`, `assertRunRoot`, `doctor`, `prepare`
+   - wave 2 contract 공급 함수를 등록하는 hook `registerWaveContract(2, fn)`를 둔다. 구현은 step 5에서 한다.
+3. `parallel-wave.mjs`를 작성한다. 하위 명령 dispatch, 인자 오류 exit 2, `--apply` 공통 규칙을 넣고, `doctor`·`prepare`를 연결한다.
+4. spec을 작성한다. synthetic repo는 `tests/.tmp/parallel/spec-<pid>-*`에 git init하고 finally에서 그 디렉터리만 지운다.
+   - `parallel-wave.spec.js`:
+     - 알 수 없는 하위 명령 → exit 2
+     - `--apply` 없는 prepare → canonical 파일·index·ref와 runRoot가 불변(전후 hash 비교)
+     - `--apply` prepare → worktree·branch·symlink·prompt·run JSON attempt가 생성됨
+     - 잘못된 runRoot → `runroot:invalid`
+   - `parallel-wave-contract.spec.js`:
+     - WAVE1_CONTRACT의 lane·steps·port·importOrder·fileRules 경로 목록이 §C5와 exact로 같다. 신규 spec 13개, helper 2개, script, fixture, `js/data.js`가 포함돼 있다.
+     - doctor 정상 사례 PASS
+     - doctor 실패 사례: `--setting-sources` 누락 → `doctor:flag-missing`, `OPENROUTER_API_KEY` 설정 → `doctor:forbidden-env`, 포트 점유 → `doctor:port-busy`
+     - prepare argv에 `--setting-sources user`가 있고 금지 flag는 없다. allowlist는 requiredCommands를 `Bash(<exact>)`로 감싼 것이다.
 
 ## AC
-- `T parallel-wave.spec.js && PW prepare --wave 1 --run-root /Users/hoon/.hermes/profiles/ryan/cache/scratch/HOO-81-parallel-dryrun01 --base $(git rev-parse HEAD) && FULL && VS && XGATE 1 tests/scripts/parallel-wave.mjs,tests/specs/parallel-wave.spec.js tests/scripts/parallel-wave.mjs,tests/specs/parallel-wave.spec.js`
-- prepare dry-run은 stdout JSON만 내고 파일을 쓰지 않는다.
-- 실제 `PW doctor`는 coordinator가 wave 1 직전에 canonical에서 실행한다. 실패하면 실행 전 blocker로 보고한다.
+- `T parallel-wave.spec.js parallel-wave-contract.spec.js && PW prepare --wave 1 --run-root /Users/hoon/.hermes/profiles/ryan/cache/scratch/HOO-81-parallel-dryrun01 --base $(git rev-parse HEAD) --lanes A,B,C,D,E && FULL && VS && XGATE 1 tests/scripts/parallel-wave.mjs,tests/helpers/parallel-wave-contract.js,tests/specs/parallel-wave.spec.js,tests/specs/parallel-wave-contract.spec.js tests/scripts/parallel-wave.mjs,tests/helpers/parallel-wave-contract.js,tests/specs/parallel-wave.spec.js,tests/specs/parallel-wave-contract.spec.js`
+- 여기의 prepare는 dry-run이라 파일을 쓰지 않는다.
