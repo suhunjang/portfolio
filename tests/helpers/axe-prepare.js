@@ -122,3 +122,77 @@ export async function prepareModal(page, { projectIndex = 0, timeoutMs = 10000 }
   await assertContentLoaded(page.locator(MODAL_ROOT), timeoutMs, { textLocator: page.locator(MODAL_BODY_TEXT) });
   return { include: MODAL_ROOT };
 }
+
+// step 31 — lightbox·overlay·진입점 (설계 §6.3): prepareLightbox · prepareOverlay · prepareForAxe
+const LIGHTBOX_ROOT = '.lightbox';
+const SHOT_ZOOM = `${MODAL_ROOT} .shot-zoom`;
+const MODAL_CLOSE = `${MODAL_ROOT} .modal-close[data-modal-close]`;
+const OVERLAY_SCENARIOS = ['modal', 'lightbox'];
+
+async function closeModalForScan(page, timeoutMs) {
+  await page.locator(MODAL_CLOSE).first().click({ timeout: timeoutMs });
+  await page.waitForFunction(
+    (sel) => {
+      const m = document.querySelector(sel);
+      return !!m && m.hidden && !document.body.classList.contains('modal-open');
+    },
+    MODAL_ROOT,
+    { timeout: timeoutMs },
+  );
+}
+
+// 열린 모달의 첫 .shot-zoom을 눌러 lightbox를 띄우고, 보임·포커스 내부·내용 로딩을 확인한다.
+async function openLightboxFromModal(page, projectIndex, timeoutMs) {
+  if ((await page.locator(SHOT_ZOOM).count()) === 0) throw prepareError('lightbox-not-open');
+  await withPrepareCode('lightbox-not-open', async () => {
+    await page.locator(SHOT_ZOOM).first().click({ timeout: timeoutMs });
+    await page.waitForFunction(
+      (sel) => {
+        const lb = [...document.querySelectorAll(sel)].find((el) => !el.hidden);
+        return !!lb && !!document.activeElement && lb.contains(document.activeElement);
+      },
+      LIGHTBOX_ROOT,
+      { timeout: timeoutMs },
+    );
+  });
+  await assertContentLoaded(page.locator(`${LIGHTBOX_ROOT}:not([hidden])`), timeoutMs);
+  return { include: LIGHTBOX_ROOT, projectIndex };
+}
+
+// projectIndex 지정: 그 grid 카드 모달에서 lightbox를 연다(.shot-zoom 없으면 lightbox-not-open).
+// 미지정: #projectGrid 카드를 DOM 순서로 열어 .shot-zoom이 있는 첫 모달을 연 채로 쓰고, 없는 모달은 닫는다.
+// 끝까지 없으면 no-shots-project. 대표 영역 버튼은 건드리지 않는다.
+export async function prepareLightbox(page, { projectIndex, timeoutMs = 10000 } = {}) {
+  if (projectIndex !== undefined && projectIndex !== null) {
+    await prepareModal(page, { projectIndex, timeoutMs });
+    return openLightboxFromModal(page, projectIndex, timeoutMs);
+  }
+  const indexes = await page
+    .locator('#projectGrid .project-card[data-project]')
+    .evaluateAll((els) => els.map((el) => Number(el.getAttribute('data-project'))));
+  for (const n of indexes) {
+    await prepareModal(page, { projectIndex: n, timeoutMs });
+    if ((await page.locator(SHOT_ZOOM).count()) > 0) return openLightboxFromModal(page, n, timeoutMs);
+    await closeModalForScan(page, timeoutMs);
+  }
+  throw prepareError('no-shots-project');
+}
+
+// overlay 시나리오(modal·lightbox)만 받는다. 그 외는 unknown-scenario.
+export async function prepareOverlay(page, { scenario, projectIndex, timeoutMs = 10000 } = {}) {
+  if (!OVERLAY_SCENARIOS.includes(scenario)) throw prepareError('unknown-scenario');
+  if (scenario === 'modal') {
+    const idx = projectIndex ?? 0;
+    const res = await prepareModal(page, { projectIndex: idx, timeoutMs });
+    return { include: res.include, projectIndex: idx };
+  }
+  return prepareLightbox(page, { projectIndex, timeoutMs });
+}
+
+// axe 실행 전 단일 진입점: page → preparePage만, modal·lightbox → preparePage 후 prepareOverlay.
+export async function prepareForAxe(page, { scenario, projectIndex, timeoutMs = 10000 } = {}) {
+  if (scenario !== 'page' && !OVERLAY_SCENARIOS.includes(scenario)) throw prepareError('unknown-scenario');
+  await preparePage(page, { timeoutMs });
+  if (scenario === 'page') return { include: 'body', projectIndex: null };
+  return prepareOverlay(page, { scenario, projectIndex, timeoutMs });
+}
