@@ -14,7 +14,7 @@
 3. `color-vocab.spec.js`(node 전용, desktop-dark만, 합성 CSS를 `parseCssRules`로 변환)
    - 어휘: `NAMED_COLORS` 크기 149, `navy`·`RebeccaPurple`·`transparent` 포함; `isColorLiteralValue` true — `#fff`, `#0d0f12`, `rgb(0 0 0)`, `hsla(0,0%,0%,.5)`, `color-mix(in srgb, red, blue)`, `navy`, `NAVY`, `currentColor`, `1px solid red`; false — `16px`, `var(--navy)`, `url(navy.png)`, `"navy"`, `none`
    - `varRefs`: `var(--a)` → `['--a']`, `var(--a, var(--b))` → `['--a','--b']`
-   - `isColorDecl`: `color`·`fill` true, `border: 0`·`border: none` false, `border: 1px solid var(--x)` true, `padding` false
+   - `isColorDecl`: `color`·`fill` true, `border: 0`·`border: none` false, `border: 1px solid var(--x)` true, `padding` false, `['--card', '#fff']` false
    - 그래프(합성 style `:root{--card:#fff;--accent:var(--brand);--pad:16px;--alias:var(--accent);--ring:var(--pad)} .a{background:var(--card)} .b{color:var(--alias)}`, themes `:root{--brand:#3355ff}`): `colorTokenSet` = `--card`, `--accent`, `--brand`, `--alias`(양방향 별칭 사슬), `--pad`·`--ring` 제외; 색 선언이 직접 참조하지 않아도 리터럴 정의(`--brand`)는 포함
    - `isColorValue('var(--alias)', set)` true, `isColorValue('var(--pad)', set)` false
    - 입력 불변

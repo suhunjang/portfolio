@@ -5,7 +5,7 @@
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
 - 범위 변경: 대표 결정 `scope-change-claude-design-v27`·`scope-change-claude-design-v28-compact` — Claude Design 패턴(레이아웃·컴포넌트·간격·타이포 위계만)을 구현 기준으로 추가. 이전 Harness 2.0.1 계획·리뷰·승인은 재사용하지 않는다.
-- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`: 규칙 구조 CSS guard, baseline(§8.5)·plan(§8.6) schema, component state 측정, `css/themes.css` 제외, §17 preflight 28개 경로. 33차 `review-resume-d032b938c536-v30`: 색 custom property 의존 그래프, CSS guard step 분할, step 6·8·32 완전 기술, baseline 오류 예 교정, component state 3분할. 34차 `review-resume-16ea71f32fac-v31`(record `16ea71f32fac1d6b759e4c0fe09511bc62418caf65ebbd06cf38adfde62a6e98`, major 3건): 고정 S·C `parse_status`가 UTF-8 decode 실패를 `ValueError('bad status record')`로 변환하도록 설계 소유자가 exact 본문 확정(step 0이 저장, 빌더 수정 금지), step 6 합성 저장소 공통 준비에 regular `.harness/harness.lock.json`(identity 3값)·regular 조상 디렉터리와 S 호출 전 유형 확인 명시, 색 guard를 어휘·그래프(step 14)·규칙 대응(step 15)·token 보존·통합(step 16)으로 3분할, step 0~53 재번호.
+- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`: 규칙 구조 CSS guard, baseline(§8.5)·plan(§8.6) schema, component state 측정, `css/themes.css` 제외, §17 preflight 28개 경로. 33차 `review-resume-d032b938c536-v30`: 색 custom property 의존 그래프, CSS guard step 분할, step 6·8·32 완전 기술, baseline 오류 예 교정, component state 3분할. 34차 `review-resume-16ea71f32fac-v31`: 고정 S·C `parse_status`의 UTF-8 decode 실패 → `ValueError('bad status record')` 변환(설계 소유자 확정), step 6 합성 저장소 lock·조상 준비, 색 guard 3분할(step 14~16), step 0~53 재번호. 35차 `review-resume-6a5d82a7db93-v32`(record `6a5d82a7db9327845ac1b1a429b2113f20fff779984eecc4fc27f7eba059c7b7`, major 2건): step 15 `checkColorRules`의 규칙 4·5에서 custom property 정의 제외(정의 검사는 step 16 `checkColorTokens` 전담) 및 회귀 사례 추가, step 33·34 plan 검증 fixture를 §8.6 정상 예와 정확히 대응하는 `aria-allowed-attr` baseline(FIXTURE_OK)과 themes blocked 전용 `color-contrast` baseline(FIXTURE_THEMES)으로 분리(§8.6).
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`을 직접 읽어 확인): sourceCommit `e7a03919a460f975149f7c55343ca4b34d3d2352`, manifestHash `b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372`, distributionVersion 2.0.1
 - 진행 순서: materialize → 새 plan commit → Astra `gpt-6-astra` 계획 리뷰 CLEAN → 대표 exact 승인(§17 경로 목록 포함) → §17 preflight → fresh runner(step 0~53) → 전체 테스트 → exact-commit Astra 리뷰 CLEAN → feature push → OPEN PR. merge·deploy·main 직접 변경 없음.
 
@@ -145,7 +145,7 @@ helper (`tests/helpers/axe.js`):
   - `fixes`: targets와 같은 길이, `fixes[j].target === targets[j]`. Fix 필드는 정확히 `target, fixKind, fixFiles`. `fixKind` ∈ `css-token|css-rule|js-render|static-markup|text-change`. `fixFiles`는 `FIX_FILES_BY_KIND[fixKind]`와 정확히 같은 배열(css-token `["css/themes.css"]`, css-rule `["css/style.css"]`, js-render `["js/main.js"]`, static-markup `["index.html"]`, text-change `[]`).
   - entry `fixFiles`: 모든 fixes의 fixFiles 합집합, 고유, 오름차순(전부 text-change면 `[]`).
 - `validateBaseline(baseline) → string[]` 오류 형식(발견 순서): `baseline: not-array`; `baseline[{i}]: not-object`; `baseline[{i}]: fields missing=[a,b] extra=[c]`; `baseline[{i}]: bad-scenario|bad-project|bad-ruleId|key-mismatch|bad-impact`; `baseline[{i}]: targets empty|not-string|duplicate|unsorted`; `baseline[{i}]: selectors not-string|duplicate|unsorted`; `baseline[{i}]: fixes count`; `baseline[{i}].fixes[{j}]: not-object|fields missing=[..] extra=[..]|target-mismatch|bad-fixKind|fixFiles-mismatch`; `baseline[{i}]: fixFiles union-mismatch`(fix 오류가 하나도 없는 entry에서만 판정); `baseline: duplicate-key {key}`; `baseline: unsorted`. 오류 없으면 `[]`.
-- 정상 예:
+- 정상 예(아래 FIXTURE_THEMES와 같은 내용):
 
 ```
 [
@@ -180,8 +180,13 @@ helper (`tests/helpers/axe.js`):
 - coverage(`--coverage`): baseline의 모든 (key, target)이 정확히 한 그룹에 있다. requireEmpty: `groups.length === 0`.
 - `validateRemediationPlan` 오류 형식: `plan: not-object`, `plan: fields missing=[..] extra=[..]`, `plan: groups not-array`, `groups[{i}]: not-object|fields missing=[..] extra=[..]|bad-id|targets empty|fixFiles-mismatch|bad-difficulty|bad-estMinutes|bad-blocked|reason-required|reason-must-be-empty|blocked-required`, `groups[{i}].targets[{j}]: not-object|fields missing=[..] extra=[..]|unknown-target`, `groups[{i}]: targets duplicate|targets unsorted`, `plan: duplicate-id {id}`, `plan: groups unsorted`, `plan: target-in-multiple-groups {key}|{target}`, `plan: uncovered {key}|{target}`, `groups: expected empty, got {n}`.
 - prune(`prunePlan`): collected에 없는 PlanTarget 제거 → fixFiles 재계산 → 빈 그룹 삭제 → 나머지 필드·순서 유지, 추가 없음. `checkGroupDone`·`checkCollectedCoverage`도 PlanTarget 단위로 비교한다.
-- 정상 예: `{ "groups": [ { "id": "hero-featured-aria", "targets": [ { "key": "page:desktop-dark:aria-allowed-attr", "target": "aria-allowed-attr::#heroFeatured::대표 프로젝트" } ], "fixFiles": ["index.html"], "difficulty": "low", "estMinutes": 6, "blocked": false, "reason": "" } ] }`
-- 오류 예: target을 문자열로 쓰면 `groups[0].targets[0]: not-object`; `blocked: true`, `reason: ""`이면 `groups[0]: reason-required`.
+- 테스트 fixture(step 33·34 공용, spec 안 상수):
+  - FIXTURE_OK(정상 plan 검증 전용 baseline, 정확히 1 entry): `{ "key": "page:desktop-dark:aria-allowed-attr", "scenario": "page", "project": "desktop-dark", "ruleId": "aria-allowed-attr", "impact": "serious", "targets": ["aria-allowed-attr::#heroFeatured::대표 프로젝트"], "selectors": ["#heroFeatured"], "fixes": [{ "target": "aria-allowed-attr::#heroFeatured::대표 프로젝트", "fixKind": "static-markup", "fixFiles": ["index.html"] }], "fixFiles": ["index.html"] }`
+  - FIXTURE_THEMES(`css/themes.css` blocked 검증 전용 baseline): §8.5 정상 예와 같은 내용.
+  - 두 fixture는 `validateBaseline`이 `[]`를 반환해야 한다.
+- 정상 예(FIXTURE_OK 기준, coverage 포함 통과): `{ "groups": [ { "id": "hero-featured-aria", "targets": [ { "key": "page:desktop-dark:aria-allowed-attr", "target": "aria-allowed-attr::#heroFeatured::대표 프로젝트" } ], "fixFiles": ["index.html"], "difficulty": "low", "estMinutes": 6, "blocked": false, "reason": "" } ] }`
+- 오류 예(FIXTURE_OK 기준): target을 문자열로 쓰면 정확히 `groups[0].targets[0]: not-object`; `blocked: true`, `reason: ""`이면 정확히 `groups[0]: reason-required`.
+- themes 예(FIXTURE_THEMES 기준): `{ "groups": [ { "id": "career-kicker-contrast", "targets": [ { "key": "page:desktop-dark:color-contrast", "target": "color-contrast::#career::## — Career" } ], "fixFiles": ["css/themes.css"], "difficulty": "low", "estMinutes": 5, "blocked": false, "reason": "" } ] }` → 정확히 `["groups[0]: blocked-required"]`; `blocked: true`, `reason: "color change excluded (HOO-81 §16.3)"`이면 `[]`.
 
 ## 9. 반응형 (§16 tokens 반영)
 
@@ -783,23 +788,23 @@ step 14 색 어휘·의존 그래프(`tests/helpers/color-vocab.js`, 순수, ste
 - `NAMED_COLORS`: CSS Color 4 named color 148개 + `transparent`. `COLOR_PROPS`: `color, background, background-color, background-image, border, border-top, border-right, border-bottom, border-left, border-color, outline, outline-color, fill, stroke, box-shadow, text-shadow, text-decoration-color, caret-color, accent-color, column-rule-color`(`border*` 값이 `0`·`none`이면 비색). `COLOR_LITERAL_RE`: `#[0-9a-fA-F]{3,8}\b`, `rgb(`, `rgba(`, `hsl(`, `hsla(`, `hwb(`, `lab(`, `lch(`, `oklab(`, `oklch(`, `color-mix(`.
 - `valueIdentifiers(value)`: 문자열·`url()` 내용·`var()` 인자 이름을 제외한 식별자 목록. `varRefs(value)`: `var(--x)`·중첩 fallback의 `--x` 이름 목록.
 - `isColorLiteralValue(value)`: 색 리터럴, `NAMED_COLORS` 식별자(대소문자 무시), `currentColor` 중 하나라도 있으면 true.
-- `isColorDecl([prop, value])`: prop ∈ COLOR_PROPS(border 예외 반영).
+- `isColorDecl([prop, value])`: prop ∈ COLOR_PROPS(border 예외 반영). custom property(`--x`) 선언은 항상 false.
 - `customPropertyDefs(rules) → Array<{ file, chain, selectors, name, value }>`.
 - `colorTokenSet(rules) → Set<string>`: 정의를 노드, `varRefs` 참조를 간선으로 둔다. 시작 집합 = `isColorLiteralValue(value)`인 정의 이름 ∪ 색 선언이 `var()`로 참조하는 이름. 별칭 간선을 양방향(참조하는 쪽·참조되는 쪽)으로 따라가는 고정점이 color token 집합이다.
 - `isColorValue(value, colorTokens)`: `isColorLiteralValue(value)` 또는 `varRefs(value)` 중 colorTokens에 있는 이름이 있음.
 
-step 15 색 규칙 대응(`tests/helpers/design-guard-color-rules.js`, 순수, step 13·14 import):
+step 15 색 규칙 대응(`tests/helpers/design-guard-color-rules.js`, 순수, step 13·14 import). 이 step의 모든 규칙은 custom property(`--x`) 선언을 검사하지 않는다(정의의 추가·변경·삭제는 step 16 `checkColorTokens` 전담):
 - `featuredCounterpart(selector)`: `.project-card`를 포함한 선택자의 모든 `.project-card`를 `.featured-card`로 바꾼 문자열(없으면 null).
-- `pairColorRules(baseRules, currentRules) → Array<{ base, current|null }>`: BASE 색 Rule(색 선언이 있는 Rule)마다 같은 file·chain에서 selectors ⊇ base.selectors인 현재 Rule을 찾는다. 같은 file·chain·selectors의 BASE Rule이 여러 개면 현재 후보를 등장 순서로 1:1 짝짓는다.
+- `pairColorRules(baseRules, currentRules) → Array<{ base, current|null }>`: BASE 색 Rule(custom property가 아닌 색 선언이 있는 Rule)마다 같은 file·chain에서 selectors ⊇ base.selectors인 현재 Rule을 찾는다. 같은 file·chain·selectors의 BASE Rule이 여러 개면 현재 후보를 등장 순서로 1:1 짝짓는다.
 - `checkColorRules({ baseRules, currentRules, colorTokens }) → string[]`:
   1. 짝이 없는 BASE 색 Rule: selectors가 모두 `.strength-card::before`이면 허용, 아니면 `color-rule-missing:{chain}|{selectors}`(chain은 ` > `로, selectors는 `, `로 연결; 대상 교체·미디어 조건 변경·삭제 포함).
   2. 짝의 추가 선택자가 base selectors의 featured 대응 선택자가 아니면 `selector-extended:{현재 selectors}`.
-  3. 짝의 색 선언 집합(prop·정규화 value)이 base와 다르면 `color-decl-changed:{base selectors}`.
-  4. 짝지어지지 않은 현재 Rule의 색 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 `isColorLiteralValue`가 거짓이고 `varRefs`가 모두 colorTokens에 있음.
-  5. 비색 선언 값에 `currentColor`·named color가 새로 나타나면(같은 file·chain·selectors·선언이 BASE에 없으면) `color-decl-new:{selectors}`.
+  3. 짝의 색 선언 집합(custom property 제외, prop·정규화 value)이 base와 다르면 `color-decl-changed:{base selectors}`.
+  4. 짝지어지지 않은 현재 Rule의 custom property가 아닌 선언 중 색 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 `isColorLiteralValue`가 거짓이고 `varRefs`가 모두 colorTokens에 있음.
+  5. custom property가 아닌 비색 선언 값에 `currentColor`·named color가 새로 나타나면(같은 file·chain·selectors·선언이 BASE에 없으면) `color-decl-new:{selectors}`.
 
 step 16 token 보존·통합(`tests/helpers/design-guard-color.js`, 순수, step 13~15 import):
-- `checkColorTokens({ baseRules, currentRules, colorTokens }) → string[]`:
+- `checkColorTokens({ baseRules, currentRules, colorTokens }) → string[]`(custom property 정의만 검사):
   1. BASE color token 정의(file·chain·selectors·name·value)마다 현재에 같은 file·chain·selectors·name 정의가 정확히 하나: 없으면 `color-token-removed:--x`, value 다르면 `color-token-changed:--x`.
   2. BASE에 같은 file·chain·selectors·name이 없는 현재 정의: name이 colorTokens에 있으면 `color-token-redefined:--x`, 아니고 `isColorValue(value, colorTokens)`면 `color-token-added:--x`.
   3. BASE 비색 custom property의 값이 현재 `isColorValue`가 참으로 바뀌면 `color-token-added:--x`.

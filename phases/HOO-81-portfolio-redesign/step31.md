@@ -12,7 +12,7 @@
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step31`
 2. 설계 §8.3 step 31 계약. `validateBaseline`은 §8.5 규칙·오류 형식 그대로.
 3. spec(desktop-dark):
-   - 통과: §8.5 정상 예 → `[]`; `[]` → `[]`; text-change fix(`fixFiles: []`)만 있는 entry와 entry `fixFiles: []` → `[]`
+   - 통과: §8.5 정상 예 → `[]`; §8.6 FIXTURE_OK → `[]`; `[]` → `[]`; text-change fix(`fixFiles: []`)만 있는 entry와 entry `fixFiles: []` → `[]`
    - §8.5 오류 예 A → 정확히 `["baseline[0]: fields missing=[] extra=[note]"]`
    - §8.5 오류 예 B(fixKind만 `css-rule`, fix·entry fixFiles 유지) → 정확히 `["baseline[0].fixes[0]: fixFiles-mismatch"]`
    - §8.5 오류 예 C(fix 정상, entry `fixFiles`만 `["css/style.css"]`) → 정확히 `["baseline[0]: fixFiles union-mismatch"]`
