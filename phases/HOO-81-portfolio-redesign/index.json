@@ -158,7 +158,10 @@
     {
       "step": 17,
       "name": "design-guard-color-tokens",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:47:39+0900",
+      "completed_at": "2026-11-24T19:49:40+0900",
+      "summary": "step17: added tests/helpers/design-guard-color.js (checkColorTokens over position key (file,chain,selectors,name): rule 0 duplicate definition '색 토큰 중복 정의: <name> @ <file> <chain|-> <selectors> (count=N)' first in current key order when name in colorTokens or any value isColorValue, those keys excluded from 1-3; rule 1 color-token-removed/changed (BASE order), rule 2 color-token-redefined/added (current order, exactly one), rule 3 non-color BASE prop turned color -> color-token-added; global dedup, no sorting, inputs unmutated; checkColors = [...checkColorRules, ...checkColorTokens] with colorTokenSet(baseRules)) and tests/specs/design-guard-color.spec.js (7 passed desktop-dark: preservation, color()/CoLoR() add, duplicates a-i, checkColors allow/reject, immutability); SNAP 17 created, T color+rules+pairs+color-vocab+css-parse 49 passed, FULL 133 passed, GATE 17 scope-snapshot: OK"
     },
     {
       "step": 18,
