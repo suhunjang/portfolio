@@ -254,7 +254,10 @@
     {
       "step": 29,
       "name": "axe-prepare-page",
-      "status": "pending"
+      "status": "error",
+      "started_at": "2026-11-24T20:29:06+0900",
+      "error_message": "[3회 시도 후 실패] Step이 RESULT_FILE에 결과를 남기지 않음",
+      "failed_at": "2026-11-24T20:34:12+0900"
     },
     {
       "step": 30,
