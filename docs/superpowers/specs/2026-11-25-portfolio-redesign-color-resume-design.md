@@ -1,26 +1,44 @@
-# HOO-81 color-resume 설계 (representative v52 색 결정 · v56 필수 범위 · v57 direct worktree 실행)
+# HOO-81 color-resume 설계 (v52 색 결정 · v56 필수 범위 · v57 direct worktree · v58 Astra 교정)
 
-- phase: `HOO-81-portfolio-redesign-color-resume` (step 0~4). 원 설계 `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md`(§n), resume 설계 `docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md`(§R n)는 유효하며 수정 금지. 이 문서 절은 `§C n`.
-- 결정: 대표 `representative-color-scope-v52`(color-contrast 위반은 기존 token을 쓴 최소 색 변경으로 수정 허용), `final-required-scope-parallel-v56`(resume 18~30 필수 범위, 병렬 wave), `executable-direct-worktree-v57`(Harness 2.0.1은 linked worktree를 project root로 거부하고 parallel runner가 없음 → direct Claude worktree worker + canonical Harness 검증). v55의 범위 제외 문구는 철회됐다.
-- BASE_HEAD(불변): `aa6f37c803ffaf8712418e94971ed4567e2a390d`(`chore(HOO-81): record color scope blocker`). 이력 commit: `1d5d27b0377ef575b9e54d79b7f8178e9af3daad`(원 phase 마지막 구현), `dce163d89666acdd30a49705ebc4e93c6dba4636`(resume 마지막 성공 출력).
-- 승계(재실행 없음): 원 phase step 0~39 completed·40 blocked, resume phase step 0~16 completed·17 blocked(`color change excluded`). 분류 evidence: `tests/.tmp/axe-classify/pairs.json` sha256 `1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1`, `tests/fixtures/axe-collected.json` sha256 `ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c`(color-contrast 12 pair/61 occurrence css-rule·색 변경 필요, nested-interactive 13 pair/78 occurrence js-render). 이 두 파일은 이력 seed로만 보존하고, wave 2 final collect가 정본이다.
-- 보존: 텍스트·숫자·서체 asset·weight, 정보 구조 6개 섹션, PROJECTS 13개·순서, 이미지·아이콘, 완료된 레이아웃·컴포넌트·간격·타이포. 팔레트 재설계·장식 색 변경·새 color token·리터럴 색·`css/themes.css` 변경 금지.
-- §C FLOW: materialize → plan-only commit → GPT-6 Astra 리뷰 1회(확인된 major/blocker만 교정, 비차단은 HOO-107) → 새 대표 exact 승인 → Harness step 0 → coordinator wave 1 → Harness step 1 → Harness step 2 → coordinator wave 2 → Harness step 3 → Harness step 4 → exact-commit Astra CLEAN → feature push → OPEN PR → tested = reviewed = pushed = PR-head SHA. 진행 보고는 시작·fan-out·실패/재시도·통합·최종 검증·완료 때만.
+- phase: `HOO-81-portfolio-redesign-color-resume`(step 0~5). 원 설계 `docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md`(§n)와 resume 설계 `docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md`(§R n)는 유효하며 수정하지 않는다. 이 문서의 절 번호는 `§C n`이다.
+- 결정:
+  - `representative-color-scope-v52`: color-contrast는 기존 token만 쓰는 최소 색 변경으로 고친다.
+  - `final-required-scope-parallel-v56`: resume 18~30이 필수 범위다.
+  - `executable-direct-worktree-v57`: Harness 2.0.1은 linked worktree를 project root로 받지 않고 parallel runner도 없다. 따라서 direct Claude worktree worker가 작업하고 canonical Harness가 검증한다.
+  - Astra record `a39a4d9240abbbdf8a3f29d6462cc8cd3cce67f8279821b9e150addb418852c9`의 major 6건을 반영했다(§C4~§C7).
+  - v57 계획 commit은 리뷰 이력으로 보존한다.
+- BASE_HEAD(불변): `aa6f37c803ffaf8712418e94971ed4567e2a390d`. 이력 commit: `1d5d27b0377ef575b9e54d79b7f8178e9af3daad`, `dce163d89666acdd30a49705ebc4e93c6dba4636`.
+- 승계(재실행하지 않음): 원 phase는 step 0~39 completed, 40 blocked. resume phase는 step 0~16 completed, 17 blocked. 아래 두 hash는 이력 seed다(color 12 pair/61 occurrence, nested 13 pair/78 occurrence). 정본은 step 3의 final collect다.
+  - `tests/.tmp/axe-classify/pairs.json` sha256 `1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1`
+  - `tests/fixtures/axe-collected.json` sha256 `ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c`
+- 작업 지시서: `phases/HOO-81-portfolio-redesign-resume/step18.md`~`step30.md`를 읽기 전용으로 승계한다. 허용 anchor·RED spec·AC(`REQ`·`RBRANCH`·§R10·§R11 포함)를 그대로 따르고, 내용을 복사하지 않는다.
+- 보존 대상: 텍스트·숫자, 서체 asset·weight, 6개 섹션, PROJECTS 13개와 순서, 이미지·아이콘, 완료된 레이아웃·컴포넌트·간격·타이포.
+- 금지: 팔레트 재설계, 새 token, 리터럴 색, `css/themes.css` 변경.
+- §C FLOW: materialize → plan-only commit → GPT-6 Astra 리뷰 1회(비차단 개선은 HOO-107로) → 새 대표 exact 승인 → Harness step 0 → step 1 → coordinator `doctor`와 wave 1 → step 2 → step 3 → coordinator wave 2 → step 4 → step 5 → exact-commit Astra CLEAN → feature push → OPEN PR → tested = reviewed = pushed = PR-head SHA. 진행 보고는 시작·fan-out·실패/재시도·통합·최종 검증·완료 때만 한다.
 
 ## C1. 불변·금지
 
-- 원 §9 공통 금지와 resume §R1 유지. 원 phase·resume phase 디렉터리, 원·resume 설계, `CLAUDE.md`, `tests/fixtures/axe-collected.json`은 읽기만.
-- `git reset/restore/checkout/clean`, 광범위 삭제, main 직접 변경, merge, cherry-pick, deploy, runner·worker push 금지. Harness linked worktree 우회·Harness 내부 함수 호출 금지.
-- 허용 git 쓰기: Harness runner의 step commit, coordinator의 `git worktree add`·lane local commit·canonical 결정적 `git apply --index`+integration commit·검증된 lane의 exact `git worktree remove <path>`·exact local branch 삭제. worker는 git 쓰기 없음.
-- 각 Harness step 30분 이하. Harness step은 background worker를 기다리지 않는다.
+- 원 §9와 resume §R1을 유지한다. 원 phase·resume phase, 두 설계 문서, `CLAUDE.md`, `tests/fixtures/axe-collected.json`은 읽기만 한다.
+- 금지:
+  - `git reset/restore/checkout/clean`, 광범위 삭제
+  - main 직접 변경, merge, cherry-pick, deploy, runner·worker의 push
+  - Harness linked root 호출, Harness 내부 함수 호출
+- 허용하는 git 쓰기:
+  - Harness runner의 step commit
+  - coordinator의 `git worktree add`, lane local commit, canonical `git apply --index`, integration commit, 검증된 lane의 exact `git worktree remove <path>`·`git branch -D <branch>`
+  - `parallel-wave.mjs`의 composite tree 계산에 한해, `tests/.tmp/parallel/idx-*`를 임시 index(`GIT_INDEX_FILE`)로 써서 `git read-tree`·`git apply --cached`·`git write-tree`를 실행하는 것. object만 생성하고 ref·canonical index·worktree는 바꾸지 않는다.
+- worker는 git 쓰기를 하지 않는다.
+- 시간: 모든 step에서 agent 예상 작업은 **20분 이하**다. **Harness hard timeout은 30분**으로 따로 둔다. 테스트 subprocess timeout은 기존 설정(`tests/playwright.config.js`와 각 spec의 `test.setTimeout`)을 따르고, agent 예상 작업 시간과 구분한다.
+- Harness step은 background worker를 기다리지 않는다.
 
 ## C2. 약어 (원 §8.5·resume §R2에 추가)
 
-- `XSNAP k` = `python3 -I tests/scripts/start-snapshot.py step{200+k}`; `XGATE k <A> [<R>]` = `W node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step{200+k}.json --allow <A> [--require-absent <R>]`.
-- `PREFLIGHT` = `python3 -I - <<'PY'` + §C3 블록 + `PY`; `WAVE_CHECK w` = `python3 -I - w <<'PY'` + §C6 블록 + `PY`.
-- `W`·`T`·`FULL`·`VS`·`DI`·`GS`·`AXE`·`COLLECT_CHAIN`·`REGRESSION_GATE`는 원 §8.5 그대로. `REQ`·`RBRANCH`·`RGATE_B`는 resume §R10·§R11 블록을 worker가 lane 안에서 판정 용도로만 사용(snapshot 대신 lane base 기준).
-- W1_FILES(wave 1 허용 파일, resume step18~30 허용 파일 합집합): `index.html`, `js/data.js`, `js/main.js`, `css/style.css`, `tests/specs/featured.spec.js`, `tests/specs/hero.spec.js`, `tests/specs/hero-layout.spec.js`, `tests/specs/structure.spec.js`, `tests/specs/layout.spec.js`, `tests/specs/component-hit.spec.js`, `tests/specs/state-sequence.spec.js`, `tests/specs/state-colors.spec.js`, `tests/specs/component-hover.spec.js`, `tests/specs/component-clamp.spec.js`, `tests/specs/focus-modal.spec.js`, `tests/specs/focus-lightbox.spec.js`, `tests/specs/print.spec.js`, `tests/helpers/component-state.js`, `tests/helpers/state-sequence.js`, `tests/scripts/make-state-colors.mjs`, `tests/fixtures/component-state-colors.json`.
-- W1_SPECS = 위 `tests/specs/*` 13개 이름(`featured.spec.js` … `print.spec.js`).
+- `XSNAP k` = `python3 -I tests/scripts/start-snapshot.py step{200+k}`
+- `XGATE k <A> [<R>]` = `W node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step{200+k}.json --allow <A> [--require-absent <R>]`
+- `PREFLIGHT` = `python3 -I - <<'PY'` + §C3 블록 + `PY`
+- `PW` = `W node tests/scripts/parallel-wave.mjs`
+- `SCR` = `/Users/hoon/.hermes/profiles/ryan/cache/scratch/HOO-81-parallel-<run>`
+- `<run>`은 `^[a-z0-9]{6,32}$`를 만족해야 한다.
 
 ## C3. step 0 preflight 블록
 
@@ -61,96 +79,229 @@ if any(o[n]['status'] != 'completed' for n in range(40)) or o[40]['status'] != '
 r = {s['step']: s for s in json.loads(git('show', BASE_HEAD + ':phases/HOO-81-portfolio-redesign-resume/index.json'))['steps']}
 if any(r[n]['status'] != 'completed' for n in range(17)) or r[17]['status'] != 'blocked' or 'color change excluded' not in r[17].get('blocked_reason', ''):
     sys.exit('preflight: resume-phase-state')
-need = ['tests/package.json', 'tests/playwright.config.js', 'tests/node_modules/@playwright/test/index.js', 'tests/scripts/with-env.sh', 'tests/scripts/start-snapshot.py', 'tests/scripts/scope-snapshot.mjs', 'tests/scripts/verify-scope.mjs', 'tests/helpers/axe.js', 'tests/helpers/axe-prepare.js', 'tests/helpers/theme.js', 'tests/helpers/design-guard.js', 'tests/helpers/design-guard-color-rules.js', 'tests/specs/design-guard-color-rules.spec.js', 'tests/specs/axe.spec.js', 'tests/specs/smoke.spec.js', 'tests/specs/verify-scope-resume.spec.js'] + ['phases/HOO-81-portfolio-redesign-resume/step%d.md' % n for n in range(18, 31)]
+need = ['tests/package.json', 'tests/playwright.config.js', 'tests/node_modules/@playwright/test/index.js', 'tests/scripts/with-env.sh', 'tests/scripts/start-snapshot.py', 'tests/scripts/scope-snapshot.mjs', 'tests/scripts/verify-scope.mjs', 'tests/helpers/css-parse.js', 'tests/helpers/axe.js', 'tests/helpers/axe-prepare.js', 'tests/helpers/theme.js', 'tests/helpers/design-guard.js', 'tests/helpers/design-guard-color-rules.js', 'tests/specs/design-guard-color-rules.spec.js', 'tests/specs/axe.spec.js', 'tests/specs/smoke.spec.js', 'tests/specs/verify-scope-resume.spec.js'] + ['phases/HOO-81-portfolio-redesign-resume/step%d.md' % n for n in range(18, 31)]
 miss = [p for p in need if not os.path.isfile(p) or os.path.islink(p)]
 if miss:
     sys.exit('preflight: missing:' + ','.join(miss))
-late = [p for p in ('tests/fixtures/axe-baseline.json', 'tests/fixtures/axe-remediation-plan.json') if os.path.lexists(p)]
+late = [p for p in ('tests/fixtures/axe-baseline.json', 'tests/fixtures/axe-remediation-plan.json', 'tests/scripts/parallel-wave.mjs', 'tests/specs/parallel-wave.spec.js') if os.path.lexists(p)]
 if late:
-    sys.exit('preflight: classify-output-exists:' + ','.join(late))
+    sys.exit('preflight: output-exists:' + ','.join(late))
 print('color-resume-preflight: OK')
 ```
 
-## C4. coordinator 실행 절차 (Ryan/Hermes, Harness 밖)
+## C4. `tests/scripts/parallel-wave.mjs` 인터페이스 (step 1)
 
-- 전제(실행 전, 불성립이면 실행 전 blocker 보고): `claude --help`에서 `-p`, `--permission-mode`, `--allowedTools`, `--max-turns`, `--add-dir`, project hooks를 로드하지 않는 설정 옵션(예: `--setting-sources user`)이 실제로 존재·동작함을 확인. `--bare`·OpenRouter·`--dangerously-skip-permissions` 사용 금지.
-- 경로: `SCR=/Users/hoon/.hermes/profiles/ryan/cache/scratch/HOO-81-parallel-<run>`, lane worktree `$SCR/lane-<id>`, evidence `$SCR/evidence/lane-<id>/`, 외부 record `$SCR/record-wave-<w>.json`. local branch `hoo81-<run>-w<w>-lane-<id>`(push 없음).
-- worktree 생성: canonical에서 `git worktree add -b <branch> $SCR/lane-<id> <BASE>`. 생성 직후 lane worktree에만 symlink 2개 `tests/node_modules` → canonical `tests/node_modules`, `tests/.pw-browsers` → canonical `tests/.pw-browsers`(ignore 경로, patch 포함 금지, 읽기 전용 사용).
-- port: wave 1 lane P 4174, A 4175, B 4176, C 4177, D 4178, E 4179; wave 2 shard 1~5 = 4180~4184. worker는 `PW_PORT=<port>`로만 테스트 실행.
-- worker 명령: `cd $SCR/lane-<id> && PW_PORT=<port> claude -p "$(cat $SCR/evidence/lane-<id>/prompt.md)" <hooks 미로드 설정> --permission-mode acceptEdits --add-dir $SCR/evidence/lane-<id> --max-turns 200 --allowedTools '<Read,Glob,Grep,Edit,Write, 원 §8.5 T·GS·DI 명령 prefix와 W node tests/scripts/make-state-colors.mjs prefix의 Bash 패턴, Bash(git diff:*), Bash(git status:*)>' --output-format json > $SCR/evidence/lane-<id>/result.json 2> $SCR/evidence/lane-<id>/stderr.log &` — PID 기록.
-- prompt 고정 내용: 프로젝트 `CLAUDE.md` 전문, 원 설계 §9·§11.3 금지, 승계 step 파일 전문(wave 1: `phases/HOO-81-portfolio-redesign-resume/step{N}.md`, wave 2: 해당 shard manifest), exact 허용 파일·anchor, lane 내부 step 순서, focused test 명령, 금지(git 쓰기·phase/index/docs/shared fixture/canonical 수정·네트워크 설치·다른 lane 경로), step마다 `$SCR/evidence/lane-<id>/checkpoint-<step>.json` = `{lane, step, at, focused:[{cmd, exit}], result}` 기록.
-- 감시: 20분 동안 새 checkpoint가 없으면 그 lane의 기록된 PID만 종료하고 같은 base에서 1회 재시도(worktree·branch 새 이름), 재실패면 그 lane만 block·보존. 성공 lane은 보존.
-- lane 검증·commit: worker 종료 후 coordinator가 `git -C <wt> status --porcelain`·diff 파일 ⊆ lane 허용 파일·anchor 범위(승계 step 파일 허용 서술) 확인, lane focused test 결과 exit 0 확인 → `git -C <wt> add <exact files>` → lane local commit.
-- fan-in: lane patch = `git diff --binary --no-renames <BASE> <laneCommit>`. 파일별 hunk 범위(BASE 줄 기준) 교집합 없음 + semantic anchor(CSS selector·declaration, JS function, HTML 요소 id) 중복 없음 확인. 같은 파일의 disjoint hunk 허용. 겹치면 fail-closed, 그 두 lane만 직렬 재실행(앞 lane 통합 결과를 base로). 통과하면 canonical에서 고정 순서로 `git apply --index --check` → `git apply --index`, 적용 후 각 파일 sha256을 lane 결과 합성 기대값과 비교 → integration commit. merge·cherry-pick 금지.
-- record: canonical 런타임 `tests/.tmp/parallel/wave-<w>.json`(§C6 스키마)과 외부 record 동일 내용. cleanup: integration commit과 bytes 검증이 끝난 lane만 exact `git worktree remove $SCR/lane-<id>`와 exact `git branch -D <branch>`, 실패·불명 lane은 보존(`cleanup: kept`).
+- 공통 규칙:
+  - Node ESM이며 의존성은 node 내장 모듈과 저장소 helper(`tests/helpers/css-parse.js`, `tests/helpers/design-guard-color-rules.js`)뿐이다.
+  - 성공하면 stdout에 `parallel-wave <sub>: OK …`를 쓰고 exit 0.
+  - 계약 위반이면 stderr에 `parallel-wave: <code>:<detail>`을 쓰고 exit 1.
+  - 인자 오류는 exit 2.
+  - `--apply`가 없는 모든 명령은 파일·git 쓰기를 하지 않는다. 예외는 §C1의 임시 index object 생성뿐이다.
 
-## C5. wave 정의
+### `doctor [--claude-bin <path>] [--help-text <file>]`
 
-- wave 1(design): waveBase = Harness step 0 출력 commit 뒤 canonical HEAD. prologue lane P = resume step 18 → 검증·적용·commit = PARALLEL_BASE. 이어 PARALLEL_BASE에서 동시 실행: A 19→20, B 21→22, C 23→24→25→26→27, D 28→29, E 30(lane 내부 직렬, step마다 그 step 파일의 AC 중 `FULL`·`VS`·`RGATE`·`RGATE_B`·`XGATE`를 뺀 focused 부분(`REQ`·`RBRANCH`·`DI`·`T`·`GS`·`make-state-colors --check`) 실행 후 checkpoint). import 순서 A→B→C→D→E.
-- wave 2(a11y): Harness step 2가 만든 `tests/.tmp/a11y-wave/components.json`의 shard(최대 5)마다 lane 1개, PARALLEL_BASE = step 2 출력 commit. worker는 shard의 exact anchor·planned change만 적용하고 focused check(`COLLECT_CHAIN --out tests/.tmp/axe-shard.json` 후 shard target 부재·새 위반 없음, nested shard는 `T modal-regression.spec.js featured.spec.js focus-modal.spec.js focus-lightbox.spec.js component-hit.spec.js`) 1회. import 순서 = shard id 오름차순.
+- `<claude-bin> --help` 출력(spec에서는 `--help-text`)에 `-p`·`--print`, `--permission-mode`, `--allowedTools`, `--max-turns`, `--add-dir`, `--setting-sources`, `--output-format`이 모두 있어야 한다.
+- 함께 확인하는 것:
+  - `git worktree list`가 동작한다.
+  - canonical의 `tests/node_modules/@playwright/test/index.js`와 `tests/.pw-browsers`가 존재한다.
+  - 127.0.0.1 포트 4174~4184가 모두 연결 거부 상태다.
+  - 환경변수에 `OPENROUTER_API_KEY`·`ANTHROPIC_BASE_URL`이 없다.
+- 생성 명령에는 `--bare`·`--dangerously-skip-permissions`가 들어갈 수 없다. 코드 상수로 금지한다.
+- 실패 코드: `doctor:flag-missing:<f>`, `doctor:dep-missing:<p>`, `doctor:port-busy:<n>`, `doctor:forbidden-env:<k>`.
 
-## C6. `WAVE_CHECK w` 블록
+### `prepare --wave <1|2> --run-root <SCR> --base <sha> [--manifest <path>] [--apply]`
 
-```
-import hashlib, json, os, subprocess, sys
-w = int(sys.argv[1])
-PHASE = 'HOO-81-portfolio-redesign-color-resume'
-SCR = '/Users/hoon/.hermes/profiles/ryan/cache/scratch/HOO-81-parallel-'
-W1 = {'index.html', 'js/data.js', 'js/main.js', 'css/style.css', 'tests/specs/featured.spec.js', 'tests/specs/hero.spec.js', 'tests/specs/hero-layout.spec.js', 'tests/specs/structure.spec.js', 'tests/specs/layout.spec.js', 'tests/specs/component-hit.spec.js', 'tests/specs/state-sequence.spec.js', 'tests/specs/state-colors.spec.js', 'tests/specs/component-hover.spec.js', 'tests/specs/component-clamp.spec.js', 'tests/specs/focus-modal.spec.js', 'tests/specs/focus-lightbox.spec.js', 'tests/specs/print.spec.js', 'tests/helpers/component-state.js', 'tests/helpers/state-sequence.js', 'tests/scripts/make-state-colors.mjs', 'tests/fixtures/component-state-colors.json'}
-W1_LANES = [('P', [18]), ('A', [19, 20]), ('B', [21, 22]), ('C', [23, 24, 25, 26, 27]), ('D', [28, 29]), ('E', [30])]
-def git(*a):
-    return subprocess.run(['git', *a], check=True, capture_output=True).stdout
-def sha(b):
-    return hashlib.sha256(b).hexdigest()
-p = 'tests/.tmp/parallel/wave-%d.json' % w
-if not os.path.isfile(p) or os.path.islink(p):
-    sys.exit('wave-record-missing:' + p)
-r = json.load(open(p, encoding='utf-8'))
-K = {'schemaVersion', 'wave', 'phase', 'externalRecord', 'externalRecordSha256', 'waveBase', 'parallelBase', 'integrationCommit', 'combinedDiffSha256', 'importOrder', 'lanes'}
-if not isinstance(r, dict) or set(r) != K or r['schemaVersion'] != 1 or r['wave'] != w or r['phase'] != PHASE:
-    sys.exit('wave-check: shape')
-ext = r['externalRecord']
-if not ext.startswith(SCR) or not os.path.isfile(ext) or sha(open(ext, 'rb').read()) != r['externalRecordSha256'] or json.load(open(ext, encoding='utf-8')) != r:
-    sys.exit('wave-check: external-record')
-head = git('rev-parse', 'HEAD').decode().strip()
-if r['integrationCommit'] != head:
-    sys.exit('wave-check: head')
-hist = git('log', '--format=%H', 'HEAD').decode().split()
-if r['waveBase'] not in hist or r['parallelBase'] not in hist:
-    sys.exit('wave-check: ancestry')
-if sha(git('diff', '--binary', '--no-renames', r['waveBase'], head)) != r['combinedDiffSha256']:
-    sys.exit('wave-check: combined-diff')
-files = set(p for p in git('diff', '--no-renames', '--name-only', r['waveBase'], head).decode().split('\n') if p)
-if w == 1:
-    allowed, lanes = W1, W1_LANES
-else:
-    m = json.load(open('tests/.tmp/a11y-wave/components.json', encoding='utf-8'))
-    allowed = set(f for s in m['shards'] for f in s['files'])
-    lanes = [(s['id'], []) for s in m['shards']]
-if files - allowed:
-    sys.exit('wave-check: files-outside:' + ','.join(sorted(files - allowed)))
-LK = {'id', 'steps', 'worktree', 'branch', 'baseSha', 'pid', 'sessionId', 'port', 'laneCommit', 'diffSha256', 'files', 'focusedTests', 'checkpoints', 'result', 'cleanup'}
-if [(x.get('id'), x.get('steps')) for x in r['lanes']] != lanes:
-    sys.exit('wave-check: lanes')
-for x in r['lanes']:
-    if set(x) != LK or x['result'] != 'pass' or x['cleanup'] not in ('removed', 'kept') or not x['worktree'].startswith(SCR) or not set(x['files']) <= allowed:
-        sys.exit('wave-check: lane:' + str(x.get('id')))
-    if not x['focusedTests'] or any(t.get('exit') != 0 for t in x['focusedTests']):
-        sys.exit('wave-check: focused:' + x['id'])
-    if [c.get('step') for c in x['checkpoints']] != x['steps'] or any(c.get('result') != 'pass' for c in x['checkpoints']):
-        sys.exit('wave-check: checkpoints:' + x['id'])
-if r['importOrder'] != [i for i, _ in lanes if not (w == 1 and i == 'P')]:
-    sys.exit('wave-check: import-order')
-print('wave-check %d: OK %d lanes' % (w, len(r['lanes'])))
-```
+- lane contract(§C5)로부터 lane별 다음 값을 확정한다:
+  - `worktree` = `<SCR>/lane-<id>`
+  - `branch` = `hoo81-<run>-w<wave>-lane-<id>`
+  - `port`
+  - `evidence` = `<SCR>/evidence/lane-<id>`
+  - `prompt` = `<evidence>/prompt.md`
+  - `argv`
+- `argv` = `['claude', '-p', <prompt 내용>, '--setting-sources', 'user', '--permission-mode', 'acceptEdits', '--add-dir', <evidence>, '--max-turns', '200', '--output-format', 'json', '--allowedTools', <allowlist>]`, 환경변수 `PW_PORT=<port>`.
+- `<allowlist>` = `Read`, `Glob`, `Grep`, `Edit`, `Write`, 그리고 contract `requiredCommands`의 각 명령을 `Bash(<정확한 명령>)`으로 감싼 것, `Bash(git diff:*)`, `Bash(git status:*)`.
+- prompt는 다음을 고정한다:
+  - `CLAUDE.md` 전문, 원 §9·§11.3 금지
+  - 승계 step 파일 전문(wave 2는 shard 항목)
+  - 허용 파일·anchor, lane 내부 step 순서, requiredCommands
+  - checkpoint 형식 `<evidence>/checkpoint-<step>.json` = `{lane, step, commands: [{cmd, exit}], result}`
+  - 금지 목록
+- 출력: `--apply`가 없으면 위 내용을 정렬된 JSON으로 stdout에 낸다.
+- `--apply`일 때만 수행하는 것:
+  - `git worktree add -b <branch> <worktree> <base>`
+  - lane worktree에 symlink 2개(`tests/node_modules`, `tests/.pw-browsers` → canonical)
+  - prompt 파일 작성
+- wave 2는 먼저 `validate-manifest`를 통과해야 한다. 통과하지 못하면 `prepare:manifest-invalid`.
 
-- wave 2에서 `steps`는 `[]`, `checkpoints`도 `[]`(focused 1회만)로 기록한다.
+### `validate-lane --wave <w> --lane <id> --base <sha> --lane-commit <sha> --result <evidence dir>`
 
-## C7. 색 변경 범위 (step 2)
+- `<lane-commit>`의 first parent가 `<base>`여야 한다. 아니면 `lane:bad-base`.
+- `git diff --binary --no-renames base laneCommit`에서 다음을 계산해 contract와 대조한다. 위반 코드는 `lane:files`, `lane:anchor:<file>:<anchor>`.
+  - diff sha256
+  - 변경 파일 ⊆ contract의 `files`
+  - 각 hunk의 semantic anchor ⊆ contract의 `anchors`
+- checkpoint 파일 집합의 step 목록이 contract `steps`와 정확히 같고 모두 `result: 'pass'`여야 한다(`lane:checkpoints`).
+- 각 step의 `commands`가 contract `requiredCommands[step]`과 정확히 같은 목록이고 모두 `exit: 0`이어야 한다(`lane:commands:<step>`).
+- 출력: `{lane, diffSha256, files, anchors}`.
 
-- 대상: final collect의 color-contrast target만. 색 출처 선언은 `css/style.css` 기존 선언(예: `.stat-label`·`.about-meta dt`·`.footer-inner`의 `color: var(--text-faint)`, `.btn-primary`·`.brand-mark`·`.about-avatar`의 강조색 위 전경색). 후보 = 기존 color token `var(--x)`, 6 project 모두 axe 통과·양 테마 base 계산색과 sRGB 거리 합 최소·동률이면 token 이름 코드 포인트 순. 해결 불가면 `color-scope-themes-required:{target}` 중단(themes.css는 재계획·재리뷰 없이 다루지 않음).
-- design guard 예외: `tests/helpers/design-guard-color-rules.js`에 상수 `HOO81_COLOR_V52_ALLOW` 1개(decision `representative-color-scope-v52`, 항목 `{file: 'css/style.css', selectors, prop, base, to}` 정렬). 그 정확한 위치에서 값이 `base` 그대로이거나 정확히 `to`일 때만 색 규칙 위반에서 제외. 그 밖 판정 불변. `tests/specs/design-guard-color-rules.spec.js`에 회귀 1개(목록 밖 위치·목록 위치의 다른 값은 여전히 위반, 목록 위치의 `to`는 통과).
-- `tests/specs/component-hover.spec.js`는 같은 상수를 import해 해당 (selector, prop)에 대응하는 측정 id·prop만 BASE fixture 색 비교에서 제외한다(그 밖 비교 불변).
-- nested-interactive: `js/main.js` project-card 렌더(현재 `role="button" tabindex="0"` article 안 `button.project-more`)와 위임 처리 anchor. 승인된 기존 spec(modal·featured·focus·hit)을 바꿔야만 해결되면 중단·보고.
-- 다른 rule이 나오면 그 rule만 `a11y: out-of-scope-rule:{ruleId}` blocker 보고, 임의 수정 금지.
-- manifest `tests/.tmp/a11y-wave/components.json` = `{schemaVersion: 1, collectedSha256, rules, shards: [{id: 's1'…, files, anchors, targets: [{key, target}], changes: [{file, selectors, prop, base, to}]}]}`; shard = edit anchor 연결 성분, 5개 초과면 anchor 첫 등장 순으로 인접 성분 병합해 5개 이하.
+### semantic anchor 판정 (validate-lane·check-overlap 공통)
+
+- CSS: `css-parse.js`로 hunk 줄이 속한 rule의 `(at-rule chain, selectors)`를 구한다.
+- HTML: hunk 시작 줄에서 가장 가까운 조상 요소의 `id`. 조상에 id가 없으면 `body`.
+- JS: hunk 시작 줄에서 위로 중괄호 깊이를 세어 가장 안쪽 enclosing 시그니처를 찾는다.
+  - `function NAME(` → `fn:NAME`
+  - `X.addEventListener("E"` → `listener:X:E`
+  - `const NAME =` → `const:NAME`
+  - 어디에도 속하지 않으면 `module`이다. 이때 hunk의 추가 줄 전부가 contract `linePatterns` 중 하나와 맞아야 한다.
+
+### `check-overlap --wave <w> --lanes <id>=<base>..<commit>[,…]`
+
+- lane 쌍마다 다음 중 하나라도 있으면 overlap이다:
+  - 같은 파일에서 base 줄 범위가 교차하는 hunk
+  - 같은 (file, anchor)
+- overlap 출력: `overlap:<a>,<b>:<file>:<anchor|lines>`.
+- 같은 파일이라도 hunk가 disjoint이고 anchor가 다르면 허용한다.
+
+### `fan-in --wave <w> --canonical <repo> --lanes <id>=<base>..<commit>[,…] [--apply]`
+
+- 먼저 `check-overlap`을 통과해야 한다.
+- 순서는 contract의 `importOrder`를 따른다.
+- `--apply`가 없으면: 임시 index에서 import 기준 tree에 lane patch를 순서대로 `apply --cached`하고 composite tree hash만 출력한다.
+- `--apply`면:
+  1. canonical에서 `git apply --index --check`, 이어서 `git apply --index`
+  2. 적용 후 `git write-tree`(canonical index)가 composite tree와 같은지 확인한다. 다르면 `fan-in:bytes`.
+  3. `<SCR>/fanin-<w>.json`(lane별 diffSha256, compositeTree)을 기록한다.
+- integration commit은 coordinator가 만든다. merge·cherry-pick은 쓰지 않는다.
+
+### `record --wave <w> --run-root <SCR> --runtime tests/.tmp/parallel/wave-<w>.json --external <SCR>/record-wave-<w>.json --wave-base <sha> --parallel-base <sha> --integration <sha> --lanes <id>=<base>..<commit>[,…] [--manifest <path>]`
+
+- §C6 envelope를 두 경로에 같은 bytes로 쓴다.
+- lane 필드는 `validate-lane` 결과, `<SCR>/run-<w>.json`(coordinator가 기록한 pid·sessionId·worktree·branch·port), checkpoint로부터 만든다.
+
+### `verify-record --wave <w> --runtime <p> --external <p> [--manifest <p>]`
+
+- 실패 코드는 다음과 같다.
+  - 두 파일이 byte 단위로 다름 → `record:mismatch`
+  - envelope 키가 정확히 `schemaVersion`·`payload`·`payloadSha256`가 아님, 또는 `schemaVersion`이 1이 아님 → `record:envelope`
+  - payload hash 재계산 결과가 다름 → `record:hash`
+  - `payload.phase`·`wave` 불일치 → `record:phase`
+  - `integrationCommit`이 HEAD가 아님 → `record:head`
+  - `waveBase`·`parallelBase`가 HEAD의 조상이 아님 → `record:ancestry`
+  - lane 목록이 contract와 다름 → `record:lanes`
+- 각 lane에 대해 `validate-lane`과 같은 검사를 git object에서 다시 수행한다(`lane:*`).
+- composite tree 검증:
+  - wave 1: `waveBase` + P 패치 = `parallelBase` tree이고, `parallelBase` + A→E 패치 = `integrationCommit` tree여야 한다.
+  - wave 2: `parallelBase` + shard 패치 = `integrationCommit` tree여야 한다.
+  - 하나라도 다르면 `record:composite`.
+- 출력: `parallel-wave verify-record: OK wave <w> <n> lanes`.
+
+### `validate-manifest --collected <p> --manifest <p>`
+
+- §C7 계약을 검사한다.
+- 출력: `parallel-wave validate-manifest: OK <targets> targets <shards> shards`.
+
+### 직렬 재시도 계약 (coordinator)
+
+- `check-overlap`이 실패하면 겹친 두 lane 중 import 순서가 뒤인 lane만 다시 실행한다. 새 base는 앞 lane까지 통합한 상태다. lane id 뒤에 `r1`을 붙이고, 1회만 재시도한다.
+- canonical 통합 후 Harness checkpoint에서 실패한 spec이 있으면, 그 spec을 소유한 lane만 같은 방식으로 다시 실행한다. spec 소유자는 contract의 `files`로 정한다.
+- 성공한 다른 lane은 보존한다. 재시도에서 다시 실패하면 그 lane을 block 처리하고 보존한다.
+
+## C5. lane contract
+
+- 공통: `baseSha`는 실행 시 주입한다(wave 1 P는 `waveBase`, A~E는 `parallelBase`).
+- 각 step의 `requiredCommands`는 승계 step 파일 AC에서 `FULL`·`VS`·`RGATE`·`RGATE_B`를 뺀 명령을 정확한 문자열 그대로 쓴다. 해당 step의 `REQ`·`RBRANCH` probe도 포함한다.
+- 아래 표는 코드 상수 `WAVE1_CONTRACT`(importOrder `['A','B','C','D','E']`)다.
+- P · port 4174 · steps `[18]`
+  - files: `index.html`, `js/data.js`, `js/main.js`, `css/style.css`, `tests/specs/featured.spec.js`
+  - anchors:
+    - html `hero`
+    - js `fn:renderFeaturedProjects`, `fn:openProjectModal`, `listener:heroFeatured:click`, `listener:heroFeatured:keydown`
+    - `module` + linePatterns `^\s*renderFeaturedProjects\(\);?$`
+    - data `featured: true,` 줄
+    - css selector `^\.featured-`와 `.project-card`를 포함한 기존 color rule에 `.featured-card` 대응 선택자를 추가하는 것
+  - requiredCommands: 18 = `DI`, `T featured.spec.js GS`
+- A · port 4175 · steps `[19, 20]`
+  - files: `index.html`, `js/main.js`, `css/style.css`, `tests/specs/hero.spec.js`, `tests/specs/hero-layout.spec.js`
+  - anchors:
+    - html `hero`
+    - js `module` + linePatterns `^\s*setText\('heroTagline', PROFILE\.tagline\);$`
+    - css selector `^(\.hero|#hero|\.stat|\.featured-)`, 그리고 `@media (min-width: 1024px)` 안의 같은 선택자
+  - requiredCommands:
+    - 19 = `DI`, `T hero.spec.js GS`
+    - 20 = `RBRANCH 20 tests/specs/hero-layout.spec.js`, `DI`, `T hero-layout.spec.js hero.spec.js GS`
+- B · port 4176 · steps `[21, 22]`
+  - files: `index.html`, `js/main.js`, `css/style.css`, `tests/specs/structure.spec.js`, `tests/specs/layout.spec.js`
+  - anchors:
+    - html: `hero` 밖 섹션 id와 `nav`, 그리고 `.scroll-hint` 줄
+    - js `fn:onScroll`, `const:items`
+    - css selector `^(section|\.section|#career|#projects|#strengths|#about|#contact|\.career|#projectGrid|#strengthsGrid|#skillsGrid|\.subsection-title|h2)`
+  - requiredCommands:
+    - 21 = `DI`, `T structure.spec.js GS`
+    - 22 = `DI`, `T layout.spec.js GS`
+- C · port 4177 · steps `[23, 24, 25, 26, 27]`
+  - files: `css/style.css`, `tests/helpers/component-state.js`, `tests/specs/component-hit.spec.js`, `tests/helpers/state-sequence.js`, `tests/specs/state-sequence.spec.js`, `tests/scripts/make-state-colors.mjs`, `tests/fixtures/component-state-colors.json`, `tests/specs/state-colors.spec.js`, `tests/specs/component-hover.spec.js`, `tests/specs/component-clamp.spec.js`
+  - anchors: css selector `^(\.nav-link|#menuToggle|#themeToggle|\.hero-cta \.btn|\.featured-card|\.featured-blurb|#projectGrid \.project-card|\.project-blurb|#contactActions a|\.scroll-hint|\.strength-card::before)`의 비색 선언, 그리고 `:hover`·`:active`
+  - requiredCommands:
+    - 23 = `RBRANCH 23 tests/helpers/component-state.js,tests/specs/component-hit.spec.js`, `DI`, `T component-hit.spec.js GS`
+    - 24 = `RBRANCH 24 tests/helpers/state-sequence.js,tests/specs/state-sequence.spec.js`, `T state-sequence.spec.js component-hit.spec.js`
+    - 25 = `RBRANCH 25 tests/scripts/make-state-colors.mjs,tests/fixtures/component-state-colors.json,tests/specs/state-colors.spec.js`, `W node tests/scripts/make-state-colors.mjs --check`, `T state-colors.spec.js state-sequence.spec.js`
+    - 26 = `RBRANCH 26 tests/specs/component-hover.spec.js`, `DI`, `W node tests/scripts/make-state-colors.mjs --check`, `T component-hover.spec.js state-sequence.spec.js state-colors.spec.js component-hit.spec.js GS`
+    - 27 = `RBRANCH 27 tests/specs/component-clamp.spec.js`, `DI`, `T component-clamp.spec.js component-hover.spec.js component-hit.spec.js GS`
+- D · port 4178 · steps `[28, 29]`
+  - files: `js/main.js`, `css/style.css`, `tests/specs/focus-modal.spec.js`, `tests/specs/focus-lightbox.spec.js`
+  - anchors:
+    - js `fn:trapFocus`, `fn:openProjectModal`, `fn:closeProjectModal`, `fn:ensureLightbox`, `fn:openLightbox`, `fn:closeLightbox`, `listener:document:keydown`, `listener:lightbox:keydown`
+    - css selector에 `:focus-visible`가 있는 rule
+  - requiredCommands:
+    - 28 = `T focus-modal.spec.js`
+    - 29 = `T focus-lightbox.spec.js focus-modal.spec.js GS`
+- E · port 4179 · steps `[30]`
+  - files: `css/style.css`, `tests/specs/print.spec.js`
+  - anchors: css at-rule chain `@media print` 안의 rule
+    - `.featured-blurb`와 카드 blurb에 `-webkit-line-clamp: unset`을 반드시 포함한다. C(27)의 clamp에 대응하기 위해서다.
+  - requiredCommands: 30 = `T print.spec.js GS`
+- wave 2 contract는 검증된 manifest에서 만든다.
+  - lane id = shard id(`s1`~`s5`), port 4180~4184, steps `[]`, checkpoint는 `[]` 대신 `focus` 1개
+  - files·anchors는 shard 값 그대로다
+  - requiredCommands = `COLLECT_CHAIN --out tests/.tmp/axe-shard.json`, 그리고 shard 안 nested change의 `requiredCommands`
+  - importOrder는 shard id 오름차순이다.
+
+## C6. record envelope
+
+- `canon(v)`: 객체 키를 코드 단위 순서로 재귀 정렬한다.
+- `payloadBytes` = `JSON.stringify(canon(payload), null, 2) + '\n'`
+- `payloadSha256` = sha256(payloadBytes)
+- 파일 bytes = `JSON.stringify({ schemaVersion: 1, payload: canon(payload), payloadSha256 }, null, 2) + '\n'`. envelope 자체는 hash하지 않는다.
+- runtime과 external은 byte 단위로 같아야 한다.
+- payload 필드: `{wave, phase, runId, waveBase, parallelBase, integrationCommit, integrationTree, compositeTree, importOrder, manifestSha256|null, lanes: [{id, steps, port, worktree, branch, baseSha, laneCommit, diffSha256, files, anchors, pid, sessionId, commands: [{step, cmd, exit}], checkpoints: [{step, result}], result, cleanup}]}`
+- `cleanup`은 기록 시점에 항상 `pending`이다.
+- 실제 cleanup은 Harness verify step(2·4)이 PASS한 뒤에만 한다. 대상은 exact `git worktree remove <worktree>`와 `git branch -D <branch>`이고, 결과는 `<SCR>/cleanup-<w>.json`에 남긴다. 실패했거나 결과가 불명확한 lane은 보존한다.
+
+## C7. wave 2 manifest·색 범위 (step 3)
+
+- `tests/.tmp/a11y-wave/components.json` = `{schemaVersion: 1, collectedSha256, rules, shards: [{id, files, anchors, targets: [{key, target}]}], changes: [...]}`
+- `changes`는 tagged union이다:
+  - `{type: 'color-declaration', shard, file: 'css/style.css', selectors, prop, base, to, targets}`
+    - `to`는 기존 color token `var(--x)`만 허용한다.
+  - `{type: 'nested-interactive', shard, file: 'js/main.js', anchor, before, after, interaction, targets, requiredCommands}`
+    - `anchor`는 §C4 JS anchor다.
+    - `before`·`after`는 카드 article과 내부 `button.project-more`의 role·tabindex·aria 구조 계약이다.
+    - `interaction`은 card click 위임으로 모달이 열리는지, keyboard로 모달 진입과 닫힌 뒤 트리거 복귀가 되는지에 대한 계약이다.
+    - `requiredCommands`는 정확히 `T modal-regression.spec.js featured.spec.js focus-modal.spec.js focus-lightbox.spec.js component-hit.spec.js`다.
+- 색 후보 선택: 6 project 모두에서 axe를 통과하는 token 중, 양 테마에서 base 계산색과의 sRGB 거리 합이 가장 작은 것. 동률이면 token 이름의 코드 포인트 순서. 해결할 수 없으면 `color-scope-themes-required:{target}`로 중단한다.
+- rule이 color-contrast·nested-interactive 밖이면 `a11y: out-of-scope-rule:{ruleId}`로 중단·보고하고 수정하지 않는다.
+- shard는 anchor 연결 성분이다. 5개를 넘으면 anchor가 처음 등장한 순서로 인접 성분을 병합한다. id는 `s1`부터 순서대로 붙인다.
+- `HOO81_COLOR_V52_ALLOW`(`tests/helpers/design-guard-color-rules.js` export)에는 `color-declaration`만 `{file, selectors, prop, base, to}`로 정렬해 투영한다. nested 항목은 절대 넣지 않는다.
+  - guard는 그 정확한 위치에서 값이 `base` 그대로이거나 정확히 `to`인 경우만 색 규칙에서 제외한다.
+  - `component-hover.spec.js`는 이 상수에 대응하는 측정 id·prop만 BASE fixture 비교에서 제외한다.
+- `validate-manifest` 검사 항목:
+  - collected 파일 bytes sha256 = `collectedSha256`, `schemaVersion` 1
+  - `rules` ⊆ {color-contrast, nested-interactive}이고 collected의 실제 rule 집합과 같음
+  - collected의 모든 (key, target)이 정확히 shard 1개에 배정됨(중복·누락 0)
+  - shard 수 5 이하, id는 `s1..sn` 순서
+  - files·anchors 형식
+  - change `type`은 두 종류만, 필드 집합 정확
+  - color target 집합 = color-declaration targets 합집합, nested target 집합 = nested-interactive targets 합집합
+  - 각 change의 `shard`가 존재하고 그 shard의 targets를 포함함
+  - `HOO81_COLOR_V52_ALLOW`가 import 결과로 color 투영과 정확히 같음
+  - 위반 0이면 `rules: []`, `shards: []`, `changes: []`만 허용하고, 이때 `HOO81_COLOR_V52_ALLOW`도 `[]`
