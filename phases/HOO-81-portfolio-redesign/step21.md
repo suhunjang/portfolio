@@ -1,18 +1,14 @@
-# Step 21 — scope-paths
+# Step 21 — tests-browser-smoke
 
-- 목적: verify-scope 경로 정책(`css/themes.css` 변경 위반 포함)과 diff 인자 분리.
-- 예상 19분 / 선행 0~20 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §11.1, §11.5, §12
-- tracked 허용(exact): `tests/scripts/verify-scope.mjs`(신규), `tests/package.json`(`verify-scope`, `verify-scope:selftest` 추가만)
-- runtime: R0
-- 금지: §15.7
+- 목적: 브라우저 설치, 테마 fixture·콘솔 수집 helper, 6 project smoke(§12 제거 파일은 새로 작성).
+- 15분 / 선행 0~20 / 공통 §9 / gate GATE
+- 허용(exact): `tests/helpers/theme.js`, `tests/specs/smoke.spec.js`
+- runtime: R0 + `tests/.pw-browsers/**`
+- 추가 금지: §12 backup 참조·복원
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step21`
-2. `GIT_DIFF_PATH_ARGS`, `GIT_DIFF_PATCH_ARGS`, `collectInput({ git = runGit })`, `evaluatePaths(input)`.
-3. CLI: 인자 없음 → `verify-scope: OK (paths)`. `--self-test`: 상수; 가짜 git 호출 기록(경로 층 PATH 인자만, data.js PATCH 인자만); 정상 0; 위반 — worktree `docs/other.md`, README stage 후 원복, assets 추가, 루트 package.json, `CLAUDE.md` 미커밋, `tests/node_modules/x` 추적, `.harness/harness.lock.json` 미커밋, worktree `css/themes.css` 수정; 허용 — committed `scripts/harness.py`, untracked `.harness/runtime/x.json`, worktree phases index; rename 우회 위반(README→tests/fixtures/x.md, assets/favicon.svg→tests/fixtures/f.svg, docs/superpowers/plans/…→tests/fixtures/p.md, .claude/settings.json→tests/fixtures/s.json).
+1. `SNAP 21` → `W npm --prefix tests run browsers:install`.
+2. `theme.js`: `THEME_KEY` null일 때만 주입, §8.3 `collectConsoleErrors`. spec(6 project): goto, heroName·테마, finish 두 배열 `[]`, 비동기 throw 시 pageErrors 1건.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step21.json --allow tests/scripts/verify-scope.mjs,tests/package.json` → exit 0
+- `T smoke.spec.js && FULL && GATE 21 tests/helpers/theme.js,tests/specs/smoke.spec.js tests/helpers/theme.js,tests/specs/smoke.spec.js`

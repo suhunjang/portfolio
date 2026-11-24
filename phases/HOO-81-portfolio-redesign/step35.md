@@ -1,18 +1,15 @@
-# Step 35 — axe-plan-executable
+# Step 35 — axe-remediation-plan-schema
 
-- 목적: blocked·text-change·빈 fixFiles 그룹에서 중단하는 실행 가능성 검사.
-- 예상 15분 / 선행 0~34 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §7.2, §8.3(step 35, 재계획 조건), §8.6(FIXTURE_OK·FIXTURE_THEMES), §16.3
-- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- 목적: §6.2 step 35, §6.5 `validateRemediationPlan`.
+- 19분 / 선행 0~34 / 공통 §9 / gate GATE
+- 허용(exact): `tests/helpers/axe.js`, `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, 이전 helper 동작, 실제 fixtures
+- 추가 금지: 이전 helper 동작, 실제 fixtures
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step35`
-2. `validateRemediationExecutable(plan, baseline)`, CLI `--check-executable`.
-3. spec(desktop-dark, step 34의 FIXTURE_OK·FIXTURE_THEMES 상수 재사용): `{ groups: [] }` → `[]`; FIXTURE_OK + §8.6 정상 예 → `[]`; FIXTURE_THEMES + blocked true themes 그룹 → 정확히 `["blocked-group:career-kicker-contrast"]`; text-change fix 하나뿐인 합성 baseline + 그 그룹(blocked, fixFiles `[]`) → `blocked-group:{id}`·`text-change:{id}:{key}:{target}`·`empty-fixfiles:{id}`; 정상+blocked 혼합 → blocked 관련만; 입력 불변; CLI 빈 0·가능만 0·blocked 1(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`)·plan 없음·baseline JSON 오류 1.
+1. `SNAP 35`
+2. CLI `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`.
+3. spec: FIXTURE_OK·FIXTURE_THEMES 상수(§6.5) 둘 다 `validateBaseline` → `[]`. FIXTURE_OK: 정상 예 + coverage → `[]`; 오류 예 2종 정확; id 통과 `color-token-1`·`a`·`x2`, 거부 `Group-1`·`a--b`·`-a`·`a-`·`a_b`·빈(`bad-id`); `plan: duplicate-id {id}`; `plan: groups unsorted`; PlanTarget 여분 → `fields missing=[] extra=[x]`; `unknown-target`; `targets duplicate`; `targets unsorted`; `plan: target-in-multiple-groups {key}|{target}`; fixFiles `["css/style.css"]` → `fixFiles-mismatch`; `bad-difficulty`; `bad-estMinutes`(0·21·1.5); `bad-blocked`; `reason-must-be-empty`; `{ groups: [] }`+coverage → `plan: uncovered page:desktop-dark:aria-allowed-attr|aria-allowed-attr::#heroFeatured::대표 프로젝트`; requireEmpty 빈 통과·1개 `groups: expected empty, got 1`. FIXTURE_THEMES: themes 예 → `["groups[0]: blocked-required"]`, blocked true+reason → `[]`. CLI: 정상 0, 오류 1, themes blocked false 1, `--require-empty` 0/1, plan 없음·JSON 오류 1.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step35.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `T axe-helper.spec.js && FULL && VS && GATE 35 tests/helpers/axe.js,tests/specs/axe-helper.spec.js`

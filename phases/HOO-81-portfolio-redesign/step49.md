@@ -1,18 +1,15 @@
-# Step 49 — component-clamp-stripe
+# Step 49 — component-hover-active
 
-- 목적: blurb line clamp 3, 본문 보존, 선택적 strength 장식 stripe 제거.
-- 예상 15분 / 선행 0~48 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3, §16.2(측정 helper, step 49), §16.4(strength stripe 예외, DESIGN_HASH_CHECK 후 `DesktopExplore.dc.html`·`Components.dc.html` 읽기 전용); main.js 카드 blurb 렌더 요소(spec 상수 `CARD_BLURB`로 확정); `tests/helpers/component-state.js`(import만)
-- tracked 허용(exact): `css/style.css`(`.featured-blurb`·`CARD_BLURB` 대상의 line clamp 비색 규칙과 BASE `.strength-card::before` 규칙 삭제만), `tests/specs/component-clamp.spec.js`(신규)
+- 목적: §11.2 step 49 비색 hover·active와 상태별 BASE 색 보존.
+- 16분 / 선행 0~48 / 공통 §9 / gate GATE
+- 허용(exact): `css/style.css`(`.hero-cta .btn`·`.featured-card`·`#projectGrid .project-card`의 `:hover`·`:active`에서 transform·opacity·transition만), `tests/specs/component-hover.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, 색 선언, 기존 색 규칙 순서 변경, 그 밖 strength 규칙 변경, print 규칙(step 52), helper·기존 spec 수정
+- 추가 금지: `index.html`, `js/*`, 색 선언·순서, hit·clamp, focus-visible, helper·generator·fixture·기존 spec, `measureStateSequence` 밖 측정
 
-## 작업 (TDD)
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step49` → `python3 -I tests/scripts/design-intake-check.py`
-2. `component-clamp.spec.js`(6 project) 먼저 실패 확인(computed 값 읽기 전 대상에 `waitForFiniteAnimations`): `.featured-blurb` 3개와 `#projectGrid` 13개 카드의 `CARD_BLURB` computed `-webkit-line-clamp`가 `3`(tokens.blurbLineClamp); 각 textContent(norm) = 해당 `PROJECTS[i].blurb`(norm); 카드 0을 열었을 때 `.modal-blurb`의 `-webkit-line-clamp`가 `none`이고 텍스트 전문; `.strength-card` 6개 텍스트가 `STRENGTHS` 순서·내용과 같음(stripe 유무 무관).
-3. style.css(guard 통과, stripe 삭제는 선택).
+## 작업
+1. `SNAP 49` → `DI`(`Components.dc.html` 읽기만).
+2. RED spec(`desktop-dark`·`desktop-light`, 테스트 `context`·url `/`, `measureStateSequence`만): `hero-cta-btn-{i}`·`grid-card-0`·`grid-card-1` 상태별 색 3속성 = fixture; 첫 `.featured-card` = `grid-card-1`; hover·active 각각 transform 또는 opacity ≠ default; outline-color = default.
+3. style.css(guard 통과).
 
 ## AC
-
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- component-clamp.spec.js component-hover.spec.js component-hit.spec.js css-parse.spec.js color-vocab.spec.js design-guard-color-pairs.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step49.json --allow css/style.css,tests/specs/component-clamp.spec.js --require-absent tests/specs/component-clamp.spec.js` → exit 0
+- `DI && W node tests/scripts/make-state-colors.mjs --check && T component-hover.spec.js state-sequence.spec.js state-colors.spec.js component-hit.spec.js GS && FULL && VS && GATE 49 css/style.css,tests/specs/component-hover.spec.js tests/specs/component-hover.spec.js`

@@ -1,18 +1,15 @@
-# Step 50 — focus-trap-modal
+# Step 50 — component-clamp-stripe
 
-- 목적: `trapFocus` 구현과 모달 연결.
-- 예상 17분 / 선행 0~49 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.2(step 50); `openProjectModal`, `closeProjectModal`, `lastFocused`, lightbox 코드 위치(수정 금지)
-- tracked 허용(exact): `js/main.js`(`trapFocus`와 모달 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
+- 목적: blurb line clamp 3, 본문 보존, 선택적 stripe 제거.
+- 15분 / 선행 0~49 / 공통 §9 / gate GATE
+- 허용(exact): `css/style.css`(`.featured-blurb`·`CARD_BLURB` line clamp 비색 규칙, BASE `.strength-card::before` 삭제만), `tests/specs/component-clamp.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 코드
+- 추가 금지: `index.html`, `js/*`, 색 선언·순서, 그 밖 strength 규칙, print(53), helper·기존 spec
 
-## 작업 (TDD)
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step50`
-2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 마지막→Tab→첫, 첫→Shift+Tab→마지막, 모달 밖으로 나가지 않음; button·backdrop·esc 닫기 후 트리거 복귀; `#heroFeatured`·`#projectGrid` 트리거 양쪽; 연속 2회 열고 닫아도 Tab 한 칸만 이동.
-3. main.js(§8.2 계약).
+## 작업
+1. `SNAP 50` → `DI`(`DesktopExplore.dc.html`·`Components.dc.html` 읽기만).
+2. RED spec(6 project, 읽기 전 `waitForFiniteAnimations`, spec 상수 `CARD_BLURB`): `.featured-blurb` 3·grid 카드 13 `-webkit-line-clamp` = `3`; textContent(norm) = `PROJECTS[i].blurb`; 카드 0 모달 `.modal-blurb` clamp `none`·전문; `.strength-card` 6개 = `STRENGTHS` 순서·내용.
+3. style.css.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step50.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0
+- `DI && T component-clamp.spec.js component-hover.spec.js component-hit.spec.js GS && FULL && VS && GATE 50 css/style.css,tests/specs/component-clamp.spec.js tests/specs/component-clamp.spec.js`

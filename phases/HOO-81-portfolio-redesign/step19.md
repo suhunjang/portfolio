@@ -1,21 +1,18 @@
-# Step 19 — design-guard-integration
+# Step 19 — design-guard-css
 
-- 목적: markup 판정, Git 입력 수집, 실저장소 통합 guard(이후 모든 step의 전체 테스트에서 위반 0).
-- 예상 15분 / 선행 0~18 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §16.3, §16.4(step 19); `tests/helpers/design-guard-css.js`(import만)
-- tracked 허용(exact): `tests/helpers/design-guard.js`(신규), `tests/specs/design-guard.spec.js`(신규)
+- 목적: 설계 §11.4 step 19 — import·font-face·URL·content·weight·unknown-token, `checkTypeAndAssets`(서체 결과 선행), `checkCss`.
+- 18분(작성 10, 단독 1, 누적 GUARD 2, FULL 4, gate 1) / 선행 0~18 / 공통 §9 / gate GATE
+- 허용(exact): `tests/helpers/design-guard-css.js`, `tests/specs/design-guard-css.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 사이트 파일, step 13~18 helper·spec 수정, Git 상태 변경
+- 추가 금지: 사이트 파일, step 13~18 수정(정규화·서체 판정 재구현 금지)
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step19`
-2. `design-guard.js` 추가 API: `checkMarkupPatch(patch, kind)`, `collectGuardInput({ git = runGit, fs })`, `runGuard(input)`.
-3. `design-guard.spec.js`(node 전용, desktop-dark만)
-   - 단위: 추가 줄 `<img src="a.png">`·`<svg>`·`<i class="x">`·`style="color:red"`·`el.style.color = x` → `markup-asset:{kind}:{n}`(n은 patch 안 줄 번호); 삭제 줄·문맥·헤더 줄 무시; 정상 patch `[]`
-   - 가짜 git 호출 기록: `show <BASE>:css/style.css`, `show <BASE>:css/themes.css`, `diff --no-renames --unified=0 <BASE> -- index.html`, 같은 인자 `-- js/main.js`만 호출되고 변경 명령 없음; fs는 `css/style.css`·`css/themes.css` 읽기만
-   - 실저장소: `runGuard(await collectGuardInput())` → `[]`
+1. `SNAP 19` → RED → 구현 → GREEN.
+2. BASE style `@import url("a.css") screen and (min-width: 10px); body{font-family:"Pretendard",sans-serif;font-weight:400} h2{font-weight:700} .project-card{font:500 1rem/1.5 "Pretendard",sans-serif} :root{--pad:16px}`, themes `:root{--brand:#3355ff}`:
+   - `[]`: 변경 없음; `@import url("a.css")   screen and (min-width:   10px);`; `@import` 삭제; `.x{font-weight:700;font-size:1.25rem;letter-spacing:.01em}`; `.y{content:none}`; `.z{padding:var(--pad)}`; `--gap:24px`+`var(--gap)`; featured 확장 font
+   - 정확히: `@import url("b.css") screen and (min-width: 10px);` → `["asset:@import"]`; `@import url("a.css") screen and (min-width: 20px);` → `["asset:@import"]`; `@import url(f.css);` 추가 → `["asset:@import"]`; `@font-face{font-family:X;src:url(x.woff2)}` → `["font-asset:@font-face", "asset:@font-face"]`; `.x{font-weight:800}` → `["font-weight:800"]`; `.x{background-image:url(a.png)}` → `["asset:.x"]`; `.x::after{content:'★'}` → `["content:.x::after"]`; `.x{margin:var(--nope)}` → `["unknown-token:--nope"]`; body font-family 삭제 + `.x{font-weight:800}` → `["font-decl-missing:|body|font-family", "font-weight:800"]`; `.x{font-weight:800;font-family:Inter}` → `["font-asset:.x", "font-weight:800"]`
+   - `checkCss` 포함: `.x{background-image:url(a.png)}` → `asset:.x`·`color-decl-new:.x`; themes 변경 → `themes-changed`; body font-family 삭제 → `font-decl-missing:|body|font-family`; import URL 변경 → `asset:@import`; themes `--brand` 중복 → `색 토큰 중복 정의: --brand @ css/themes.css - :root (count=2)`·`themes-changed`; 변경 없음 `[]`
+   - 입력 불변
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- design-guard.spec.js design-guard-css.spec.js design-guard-color.spec.js design-guard-color-rules.spec.js design-guard-color-pairs.spec.js color-vocab.spec.js css-parse.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step19.json --allow tests/helpers/design-guard.js,tests/specs/design-guard.spec.js --require-absent tests/helpers/design-guard.js,tests/specs/design-guard.spec.js` → exit 0
+- `T design-guard-css.spec.js design-guard-font.spec.js design-guard-color.spec.js design-guard-color-rules.spec.js design-guard-color-pairs.spec.js color-vocab.spec.js css-parse.spec.js && FULL && GATE 19 tests/helpers/design-guard-css.js,tests/specs/design-guard-css.spec.js tests/helpers/design-guard-css.js,tests/specs/design-guard-css.spec.js`

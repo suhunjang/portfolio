@@ -1,19 +1,15 @@
-# Step 23 — content-data-baseline
+# Step 23 — scope-content
 
-- 목적: BASE data·index fixture와 데이터 보존 검사(PROJECTS 13개·순서 포함).
-- 예상 16분 / 선행 0~22 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3, §6, §7.1, §7.2-1, §7.3
-- tracked 허용(exact): `tests/scripts/make-fixtures.mjs`, `tests/fixtures/baseline-data.json`, `tests/fixtures/baseline-index.html`, `tests/helpers/content.js`(신규: `norm`, `readLiveData`, `normalizeFeatured`만), `tests/specs/content-data.spec.js`, `tests/package.json`(`fixtures` 추가만)
+- 목적: verify-scope 내용 판정과 `--final`.
+- 19분 / 선행 0~22 / 공통 §9 / gate GATE
+- 허용(exact): `tests/scripts/verify-scope.mjs`
 - runtime: R0
-- 금지: §15.7, `extractStatic`
+- 추가 금지: 두 diff 인자 상수 값
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step23`
-2. `make-fixtures.mjs`: `git show BASE:js/data.js`를 vm 평가 → `baseline-data.json`, `git show BASE:index.html` → `baseline-index.html`. `fixtures` script 추가 후 실행.
-3. `content.js`: `norm`, `readLiveData`, `normalizeFeatured`(structuredClone, index 1·5·7만, 그 밖·true 아님 throw).
-4. `content-data.spec.js`(6 project): normalizeFeatured 불변·throw; `normalizeFeatured(await readLiveData(page))` = baseline deep-equal; featured 없음 또는 1·5·7만; email·phone·social 빈 값; 렌더 개수 stats 4·timeline = CAREER 길이·project-card 13·strengths 6; `#projectGrid` 카드 `data-project` 0~12 순서와 제목 배열 = baseline.
+1. `SNAP 23`
+2. `checkGitignore`, `checkDataJsDiff(patch, { requireExactly3 })`(삭제 0, 추가는 trim 후 `featured: true,`만, ≤3줄), `evaluateContent(input, { final })`, `evaluateScope`(기본 `verify-scope: OK`, `--final`).
+3. self-test: patch 합성(PATCH+data.js면 3줄, `--name-only`면 이름만) → final 0; `+    title: 'x',` 위반; name-only 3줄 미달; data.js 위반(삭제, featured 외, 4줄, stage 후 원복); final 정상·위반(BASE→HEAD 0줄, BASE→index 2줄, index→worktree featured 외); Space Grotesk 제거 stage 후 원복; gitignore 위반(추가·중복·빈 줄·순서·주석·CRLF·index만), 끝 개행 없음 통과.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- content-data.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step23.json --allow tests/scripts/make-fixtures.mjs,tests/fixtures/baseline-data.json,tests/fixtures/baseline-index.html,tests/helpers/content.js,tests/specs/content-data.spec.js,tests/package.json` → exit 0
+- `W npm --prefix tests run verify-scope:selftest && VS && FULL && GATE 23 tests/scripts/verify-scope.mjs`

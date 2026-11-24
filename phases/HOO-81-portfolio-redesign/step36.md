@@ -1,18 +1,14 @@
-# Step 36 — axe-current-checks
+# Step 36 — axe-plan-executable
 
-- 목적: 현재 수집 결과 판정(PlanTarget 단위 group done·coverage, 위반 0).
-- 예상 17분 / 선행 0~35 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(step 36), §8.6
-- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- 목적: §6.2 step 36.
+- 15분 / 선행 0~35 / 공통 §9 / gate GATE
+- 허용(exact): `tests/helpers/axe.js`, `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
-- 금지: §15.7, 이전 helper 동작, 실제 fixtures
+- 추가 금지: 이전 helper 동작, 실제 fixtures
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step36`
-2. 설계 §8.3 step 36 계약(remaining·uncovered는 정렬된 `{key, target}` 배열, 비배열 collected `Error('invalid collected')`, 없는 id `Error('unknown group id: {id}')`).
-3. spec(desktop-dark): checkGroupDone 사라짐 done·`lightbox:desktop-dark:*`에만 남음 remaining 1(정확한 PlanTarget)·다른 그룹 잔여 무영향·unknown·형식 오류 id·`{}` collected throw; coverage 전부 포함 ok·plan 밖 1개 uncovered·빈 groups+잔여·입력 불변; countCollectedTargets `[]` 0·2+1 → 3·같은 target 두 entry → 2; CLI group-done·coverage·assert-no-violations 각 0/1/없음 1; baseline과 수집에 같은 target이 남으면 checkRegression `[]`이어도 `--assert-no-violations` 1.
+1. `SNAP 36`
+2. spec(step 35 상수 재사용): `{ groups: [] }` → `[]`; FIXTURE_OK+정상 예 → `[]`; FIXTURE_THEMES+blocked true → 정확히 `["blocked-group:career-kicker-contrast"]`; text-change 하나뿐 baseline+그 그룹(blocked, fixFiles `[]`) → `blocked-group:{id}`·`text-change:{id}:{key}:{target}`·`empty-fixfiles:{id}`; 혼합 → blocked 관련만; 입력 불변; CLI 빈 0·가능만 0·blocked 1(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`)·plan 없음·baseline JSON 오류 1.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step36.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `T axe-helper.spec.js && FULL && VS && GATE 36 tests/helpers/axe.js,tests/specs/axe-helper.spec.js`

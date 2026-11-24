@@ -1,18 +1,14 @@
-# Step 30 — axe-prepare-lightbox
+# Step 30 — axe-prepare-modal
 
-- 목적: lightbox 준비와 `prepareForAxe`.
-- 예상 19분 / 선행 0~29 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3(lightbox), §7.4, §8.4(step 30, 합성 fixture)
-- tracked 허용(exact): `tests/helpers/axe-prepare.js`(추가만: `prepareLightbox`, `prepareOverlay`, `prepareForAxe`), `tests/specs/axe-prepare-lightbox.spec.js`(신규)
+- 목적: §6.3 step 30.
+- 18분 / 선행 0~29 / 공통 §9 / gate GATE
+- 허용(exact): `tests/helpers/axe-prepare.js`(추가만: `MODAL_ROOT`, `MODAL_BODY_TEXT`, `assertContentLoaded`, `prepareModal`), `tests/specs/axe-prepare-modal.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, step 28·29 함수 동작
+- 추가 금지: modal.js·axe.js(import만), step 29 동작
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step30`
-2. 설계 §8.4 step 30 계약.
-3. spec(desktop-dark/light): page → `body`·null, modal → `#projectModal`, lightbox → `.lightbox`·img 로딩·포커스 내부; shots 없는 grid index → `lightbox-not-open`; `page.route`로 이미지 abort → `content-not-loaded:img`; `scenario: 'x'`·`prepareOverlay({ scenario: 'page' })` → `unknown-scenario`; no-shots fixture(grid 0·1 shots 없음 + 대표 버튼 0) → `findProjectWithShots` null·`__opens === 2`·`__closes === 2`·대표 click 0·lightbox `no-shots-project`; shots fixture(1에만 `.shot-zoom` + 대표 버튼 1) → 1·opens/closes 2·대표 0; `.modal-section` 안 깨진 img → `content-not-loaded:img`, 0×0 svg → `content-not-loaded:svg`.
+1. `SNAP 30`
+2. spec(desktop-dark/light): `prepareModal(page)` → include `#projectModal`·`modal-open`·제목 `PROJECTS[0].title`·본문; 동작 fixture에서 대표 버튼과 grid `data-project="1"` 공존 → grid click 1·대표 0·`__opens === 1`; grid 밖만(`data-project="3"`) → `project-card-not-found:3`; handler 없음 + 500ms → `modal-not-open`; `.modal-blurb` 빈·`.modal-section` 0 → `content-not-loaded:text`; 텍스트 없는 div + null 통과, textLocator 지정 시 text 실패.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-lightbox.spec.js axe-prepare-modal.spec.js axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step30.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-lightbox.spec.js` → exit 0
+- `T axe-prepare-modal.spec.js axe-prepare-page.spec.js && FULL && VS && GATE 30 tests/helpers/axe-prepare.js,tests/specs/axe-prepare-modal.spec.js`

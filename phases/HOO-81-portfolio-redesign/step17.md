@@ -1,22 +1,18 @@
 # Step 17 — design-guard-color-tokens
 
-- 목적: color token 정의 보존·허용 예외(custom property 정의 검사 전담)와 `checkColors` 통합(설계 §16.4 step 17), 합성 통합 테스트.
-- 예상 17분 / 선행 0~16 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §16.3, §16.4(step 13~17); `tests/helpers/css-parse.js`, `tests/helpers/color-vocab.js`, `tests/helpers/design-guard-color-pairs.js`, `tests/helpers/design-guard-color-rules.js`(import만)
-- tracked 허용(exact): `tests/helpers/design-guard-color.js`(신규), `tests/specs/design-guard-color.spec.js`(신규)
+- 목적: 설계 §11.4 step 17 — 같은 위치 키 중복 정의 거부(먼저), 정확히 하나일 때만 보존 검사, `checkColors`.
+- 19분(작성 11, 단독 1, 누적 color 2, FULL 4, gate 1) / 선행 0~16 / 공통 §9 / gate GATE
+- 허용(exact): `tests/helpers/design-guard-color.js`, `tests/specs/design-guard-color.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 사이트 파일, step 13~16 helper·spec 수정, Git·파일 시스템 접근
+- 추가 금지: 사이트 파일, step 13~16 수정, 중복 키 값·위치 비교, 결과 정렬, 오류 문자열 형식 변경
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step17`
-2. `design-guard-color.js` 추가 API: `checkColorTokens({ baseRules, currentRules, colorTokens })`, `checkColors({ baseRules, currentRules })` — 설계 §16.4 step 17 그대로.
-3. `design-guard-color.spec.js`(node 전용, desktop-dark만; 합성 BASE style `:root{--card:#fff;--accent:var(--brand);--pad:16px} .project-card{background:var(--card);padding:var(--pad)} @media (max-width: 768px){.nav-link{color:var(--accent)}} .strength-card::before{background:var(--accent)}`, themes `:root{--brand:#3355ff}`)
-   - `checkColorTokens` 단위: 변경 없음 `[]`; token 값 변경 `--card:#fafafa` → `color-token-changed:--card`; 삭제 → `color-token-removed:--card`; 별칭 재정의 `--accent:var(--card)` → `color-token-changed:--accent`; 다른 위치 재정의 `.btn{--accent:#000}` → `color-token-redefined:--accent`; 새 별칭 `--btn-bg: var(--brand)` → `color-token-added:--btn-bg`; 새 `--ring: currentColor` → `color-token-added:--ring`; 새 `--card2:#000` → `color-token-added:--card2`; 비색 token을 색으로 `--pad: red` → `color-token-added:--pad`; 새 비색 `--section-pad: 96px` 허용
-   - `checkColors` 통합 허용 → `[]`: 변경 없음; featured 대응 추가; stripe 삭제; 비색 선언·`--section-pad`; `:focus-visible` outline(BASE token)
-   - `checkColors` 통합 거부: step 15 위반 1건(`.project-card, .hero-name` → `selector-extended:…`)과 token 위반 1건(`--card:#fafafa`)을 동시에 넣으면 두 문자열이 모두 결과에 있음(규칙 위반이 먼저); `.x{color:var(--card)}` 신규 → 결과에 `color-decl-new:.x`만(token 위반 없음); 기존 `.project-card`에 `border-top-color:var(--accent)` 추가 → 결과 정확히 `["color-decl-new:.project-card"]`; `.project-card`에 `background:var(--accent)` 후행 추가 → 결과 정확히 `["color-decl-new:.project-card"]`; `.project-card`와 `.nav-link` 미디어 규칙 순서 뒤바꿈 → 결과 정확히 `["color-rule-reordered:.project-card|.nav-link"]`
+1. `SNAP 17` → RED → 구현 → GREEN.
+2. style `parseCssRules(t, 'css/style.css')` + themes `parseCssRules(t, 'css/themes.css')`. BASE style `:root{--card:#fff;--accent:var(--brand);--pad:16px} .project-card{background:var(--card);padding:var(--pad)} @media (max-width: 768px){.nav-link{color:var(--accent)}} .strength-card::before{background:var(--accent)}`, themes `:root{--brand:#3355ff}`.
+   - 보존: 변경 없음 `[]`; `--card:#fafafa` → `color-token-changed:--card`; 삭제 → `color-token-removed:--card`; `--accent:var(--card)` → `color-token-changed:--accent`; `.btn{--accent:#000}` → `color-token-redefined:--accent`; `--btn-bg: var(--brand)` → `color-token-added:--btn-bg`; `--ring: currentColor` → `color-token-added:--ring`; `--card2:#000` → `color-token-added:--card2`; `--pad: red` → `color-token-added:--pad`; `--section-pad: 96px` 허용
+   - 중복(정확히): (a) `:root{--card:#fff;--card:#fff;--accent:var(--brand);--pad:16px}` → `["색 토큰 중복 정의: --card @ css/style.css - :root (count=2)"]`; (b) 같은 Rule `--card:#fff;--card:#fafafa` → 같은 배열(changed 없음); (c) 기존 뒤 `:root{--card:#fff}` → 같은 배열; (d) 기존 뒤 `:root{--card:#fafafa}` → 같은 배열; (e) 같은 Rule 2회 + 별도 1회 → `["색 토큰 중복 정의: --card @ css/style.css - :root (count=3)"]`; (f) `@media (min-width: 1024px){:root{--card:#fff;--card:#fff}}` 추가 → `["색 토큰 중복 정의: --card @ css/style.css @media (min-width: 1024px) :root (count=2)"]`(redefined 없음); (g) themes `:root{--brand:#3355ff;--brand:#3355ff}` → `["색 토큰 중복 정의: --brand @ css/themes.css - :root (count=2)"]`; (h) `--pad:16px;--pad:16px` → `[]`; (i) (a)에서 `--pad:red` → `["색 토큰 중복 정의: --card @ css/style.css - :root (count=2)", "color-token-added:--pad"]`
+   - `checkColors` `[]`: 변경 없음, featured 대응, stripe 삭제, 비색·`--section-pad`, `:focus-visible` outline(BASE token). 거부: `selector-extended` + `--card:#fafafa` 동시 → 둘 다 포함(규칙 위반 먼저); `.x{color:var(--card)}` → `color-decl-new:.x`만; `border-top-color:var(--accent)` 추가 → `["color-decl-new:.project-card"]`; `background:var(--accent)` 후행 → `["color-decl-new:.project-card"]`; `.project-card`·`.nav-link` 미디어 규칙 뒤바꿈 → `["color-rule-reordered:.project-card|.nav-link"]`; 중복 (c) → `["색 토큰 중복 정의: --card @ css/style.css - :root (count=2)"]`
    - 입력 불변
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- design-guard-color.spec.js design-guard-color-rules.spec.js design-guard-color-pairs.spec.js color-vocab.spec.js css-parse.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step17.json --allow tests/helpers/design-guard-color.js,tests/specs/design-guard-color.spec.js --require-absent tests/helpers/design-guard-color.js,tests/specs/design-guard-color.spec.js` → exit 0
+- `T design-guard-color.spec.js design-guard-color-rules.spec.js design-guard-color-pairs.spec.js color-vocab.spec.js css-parse.spec.js && FULL && GATE 17 tests/helpers/design-guard-color.js,tests/specs/design-guard-color.spec.js tests/helpers/design-guard-color.js,tests/specs/design-guard-color.spec.js`

@@ -1,18 +1,13 @@
-# Step 27 — axe-canonical
+# Step 27 — ui-regression
 
-- 목적: axe canonical target 식별 helper.
-- 예상 19분 / 선행 0~26 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.1, §8.3(step 27)
-- tracked 허용(exact): `tests/helpers/axe.js`(신규), `tests/specs/axe-helper.spec.js`(신규)
+- 목적: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion 회귀.
+- 17분 / 선행 0~26 / 공통 §9 / gate GATE
+- 허용(exact): `tests/specs/ui-regression.spec.js`, `tests/specs/first-visit.spec.js`
 - runtime: R0
-- 금지: §15.7
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step27`
-2. `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe`.
-3. spec(desktop-dark, setContent + 실제 axe): section#career subtree 이동·h3→span·01→04에도 key 같음; h3만 section 밖 이동하면 다름; `[data-project=5]` 안 div→p 같음; 텍스트 다르면 다름; `project:5`≠`featured:5`; alias 적용 시 같음.
+1. `SNAP 27`
+2. ui-regression(6 project): 토글 `data-theme`·`THEME_KEY` 새로고침 유지; mobile `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 §4 정확한 문법(projects); typing 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`. first-visit: fixture 없이 desktop-dark, colorScheme light·dark 따름.
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `T ui-regression.spec.js first-visit.spec.js && FULL && VS && GATE 27 tests/specs/ui-regression.spec.js,tests/specs/first-visit.spec.js`

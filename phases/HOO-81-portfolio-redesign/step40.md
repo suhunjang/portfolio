@@ -1,18 +1,15 @@
-# Step 40 — featured-projects
+# Step 40 — axe-classify
 
-- 목적: 대표 프로젝트 3개 카드와 모달 연결(색은 기존 `.project-card` 색 규칙의 featured 대응 선택자 추가로만).
-- 예상 19분 / 선행 0~39 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §5, §7, §8.3, §16(DESIGN_HASH_CHECK 후 `DesktopTop.dc.html`·`Components.dc.html` 읽기 전용), §16.4
-- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤 `#heroFeatured` 마크업만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, 위임만), `css/style.css`(`.featured-*` 비색 배치 규칙과 기존 `.project-card` 색 규칙(`:hover`·`:active` 포함) 선택자 목록에 featured 대응 선택자 추가만), `tests/specs/featured.spec.js`
+- 목적: §6.4 baseline·§6.5 plan을 계약대로만 생성(색 변경 필요 target은 blocked).
+- ≤20분(초과 산정 시 즉시 재계획) / 선행 0~39 / 공통 §9 / gate GATE
+- 허용(exact): `tests/fixtures/axe-baseline.json`, `tests/fixtures/axe-remediation-plan.json`(신규)
 - runtime: R0
-- 금지: §15.7, 새 색 선언(기존 규칙에 색 선언·같은 prop 다른 값 추가·색 선언 순서 변경 포함), 기존 색 규칙 순서 변경, hero 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
+- 추가 금지: 사이트 파일, helper·spec·axe-collected.json, 계약 밖 필드
 
-## 작업 (TDD)
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step40` → `python3 -I tests/scripts/design-intake-check.py`
-2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용; `.featured-card` 색 3속성이 `#projectGrid .project-card`와 같음.
-3. 구현(`esc()` 이스케이프, 그리드 직후 호출). axe 새 target은 색 변경 없이 허용 파일 안에서 해결, 식별 손실이면 중단·재계획.
+## 작업
+1. `SNAP 40`
+2. 산정(묶음별 2분 + target×1분, 합 + 6분) > 20이면 쓰지 않고 재계획. 위반 0이면 `[]`·`{ "groups": [] }`.
+3. `tests/.tmp` 임시 Playwright 스크립트(`W`, `prepareForAxe`)로 fixKind 판별 → baseline(fixes 1:1, FIX_FILES_BY_KIND, 합집합) → plan(정렬, coverage 완전, blocked·reason). blocked가 있으면 `--check-executable` 실패로 재계획.
 
 ## AC
-
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js css-parse.spec.js color-vocab.spec.js design-guard-color-pairs.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step40.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0
+- `AXE --check-baseline-match --collected tests/fixtures/axe-collected.json && AXE --check-plan --coverage && AXE --check-executable && AXE --check-regression --collected tests/fixtures/axe-collected.json && FULL && VS && GATE 40 tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json`

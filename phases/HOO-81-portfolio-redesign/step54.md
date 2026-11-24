@@ -1,17 +1,15 @@
-# Step 54 — axe-remediation-recheck
+# Step 54 — axe-remediation-gate
 
-- 목적: remediation 후 gate 재실행, plan 비었음과 현재 위반 0 확인.
-- 예상 18분 / 선행 0~53 + 재계획 `axe-remediation-*` 전부 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3, §8.6, `step53.md`
-- tracked 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만)
-- runtime: R0
-- 금지: §15.7, 사이트 파일, baseline·collected·helper·spec, plan 임의 비우기
+- 목적: §6.2 gate(재수집·회귀·prune·coverage·실행 가능성), 재계획 입력.
+- 18분 / 선행 0~53 / 공통 §9 / gate GATE
+- 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만)
+- runtime: R0(COLLECT_DIR, `axe-current.json`)
+- 추가 금지: 사이트 파일, baseline·collected·helper·spec
 
 ## 작업
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step54`
-2. step 53 체인 + `--check-plan --require-empty` + `--assert-no-violations`. 실패 시 남은 그룹·target 보고 후 재계획.
+1. `SNAP 54`
+2. AC 순차. 회귀 실패 시 plan 불변 중단, coverage·executable 실패는 재계획 사유.
+3. 로그: groups `[]`면 `remediation 불필요`, 남으면 `Harness 재계획 필요`+그룹 상세(재계획은 54와 55 사이, `css/themes.css` 포함이면 생성 안 함).
 
 ## AC
-
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --prune-plan --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-coverage --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --require-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-no-violations --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step54.json --allow tests/fixtures/axe-remediation-plan.json` → exit 0
+- `COLLECT_CHAIN --out tests/.tmp/axe-current.json && REGRESSION_GATE && AXE --prune-plan --collected tests/.tmp/axe-current.json && AXE --check-coverage --collected tests/.tmp/axe-current.json && AXE --check-plan && AXE --check-executable && FULL && VS && GATE 54 tests/fixtures/axe-remediation-plan.json`

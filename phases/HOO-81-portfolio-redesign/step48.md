@@ -1,21 +1,16 @@
-# Step 48 — component-hover-active
+# Step 48 — state-colors-fixture
 
-- 목적: desktop dark/light hover·active 비색 상태(transform·opacity만)와 상태별 BASE 색 보존 검증.
-- 예상 16분 / 선행 0~47 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §16.2(step 46 helper, step 47 fixture, step 48 hover·active), §16.4(DESIGN_HASH_CHECK 후 `Components.dc.html` 읽기 전용); `tests/helpers/state-sequence.js`(import만), `tests/fixtures/component-state-colors.json`(읽기만)
-- tracked 허용(exact): `css/style.css`(`.hero-cta .btn`·`.featured-card`·`#projectGrid .project-card`의 `:hover`·`:active` 규칙에서 transform·opacity·transition만), `tests/specs/component-hover.spec.js`(신규)
-- runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, 색 선언(기존 규칙에 추가·순서 변경 포함), 기존 색 규칙 순서 변경, hit target·clamp 규칙, focus-visible, helper·generator·fixture·기존 spec 수정, `measureStateSequence` 밖의 상태 측정
+- 목적: §11.2 BASE 상태 색 fixture generator·fixture·`--check`(정상·변형 별도 test, 각 75초).
+- 19분(작성 9, 생성 1, 단독 3, FULL 5, gate 1) / 선행 0~47 / 공통 §9 / gate GATE
+- 허용(exact): `tests/scripts/make-state-colors.mjs`, `tests/fixtures/component-state-colors.json`, `tests/specs/state-colors.spec.js`(신규)
+- runtime: R0 + 브라우저(`tests/.tmp/state-colors-<pid>/`)
+- 추가 금지: 사이트 파일, helper·기존 spec, fixture 손편집, `measureStateSequence` 밖 측정, Git 쓰기, 정상·변형 한 test 묶기, 실행별 다른 timeout
 
-## 작업 (TDD)
-
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step48` → `python3 -I tests/scripts/design-intake-check.py`
-2. `component-hover.spec.js`(`desktop-dark`·`desktop-light`만, 나머지 `test.skip`) 먼저 실패 확인. 테스트 `context`(project 테마 fixture 적용)와 url `/`로 `measureStateSequence`만 호출:
-   - `.hero-cta .btn` 각각(`hero-cta-btn-{i}`)과 `grid-card-0`·`grid-card-1`: default·hover·active 각 상태의 현재 색 3속성 = fixture[테마][키][같은 상태]
-   - 첫 `.featured-card`(data-project 1): 각 상태 색 3속성 = fixture[테마][`grid-card-1`][같은 상태]
-   - hover와 active 각각에서 transform 또는 opacity가 그 요소의 default와 다름; outline-color는 그 요소 default와 같음
-3. style.css(guard 통과).
+## 작업
+1. `SNAP 48`
+2. generator(`W`, Git은 `git show <BASE>:<path>`만): `chromium`, 테마(dark, light)마다 context 1개(1280×800), `route('http://base.invalid/**')`로 BASE 파일 제공(없음 404, Google Fonts 통과), BASE `js/main.js`에서 `THEME_KEY` 정규식 추출 → `addInitScript`; 키마다 `measureStateSequence(context, { url: 'http://base.invalid/index.html', selector, nth })`(`hero-cta-btn-{i}` = `.hero-cta .btn` nth i(BASE 개수), `grid-card-0`·`grid-card-1`), color·backgroundColor·borderColor만. 출력 `{ "schemaVersion": 1, "base": "<BASE>", "themes": { "dark": { "<key>": { "default": {…}, "hover": {…}, "active": {…} } }, "light": {…} } }` 키 정렬·2칸·끝 개행 1. 인자 없음 → fixture 쓰기; `--check [--fixture <path>]` → 다르면 stderr `state-colors: mismatch` exit 1, 같으면 stdout `state-colors: OK` 0; 그 밖 2.
+3. 생성 `W node tests/scripts/make-state-colors.mjs`.
+4. spec(node, desktop-dark; 독립 test 4개): `schema`(키 `schemaVersion, base, themes`·1·BASE·`dark, light`·키 = `hero-cta-btn-0..n-1`(n ≥ 1 = `tests/fixtures/baseline-index.html`의 `.hero-cta .btn` 수) ∪ `grid-card-0`·`grid-card-1`·상태 3·필드 3 비어 있지 않은 문자열); `serialization`(bytes = 키 정렬 `JSON.stringify(…, null, 2) + '\n'`); `check-ok`(첫 줄 정확히 `test.setTimeout(75000)`, `--check` subprocess timeout 60000ms → 0·`state-colors: OK`, 원본 불변); `check-mismatch`(첫 줄 정확히 `test.setTimeout(75000)`, `tests/.tmp/state-colors-<pid>/` 사본 값 하나 변경 → `--check --fixture <사본>` subprocess 60000ms → 1·`state-colors: mismatch`, 원본 불변, finally 사본 삭제).
 
 ## AC
-
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh node tests/scripts/make-state-colors.mjs --check && sh tests/scripts/with-env.sh npm --prefix tests test -- component-hover.spec.js state-sequence.spec.js state-colors.spec.js component-hit.spec.js css-parse.spec.js color-vocab.spec.js design-guard-color-pairs.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step48.json --allow css/style.css,tests/specs/component-hover.spec.js --require-absent tests/specs/component-hover.spec.js` → exit 0 (두 번째 명령 stdout `state-colors: OK`)
+- `W node tests/scripts/make-state-colors.mjs --check && T state-colors.spec.js state-sequence.spec.js && FULL && VS && GATE 48 tests/scripts/make-state-colors.mjs,tests/fixtures/component-state-colors.json,tests/specs/state-colors.spec.js tests/scripts/make-state-colors.mjs,tests/fixtures/component-state-colors.json,tests/specs/state-colors.spec.js`(첫 명령 `state-colors: OK`)
