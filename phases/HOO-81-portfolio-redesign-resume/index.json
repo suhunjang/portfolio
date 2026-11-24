@@ -62,7 +62,10 @@
     {
       "step": 5,
       "name": "axe-classify-occ-batch-4",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T23:09:26+0900",
+      "completed_at": "2026-11-24T23:15:10+0900",
+      "summary": "RSNAP 5(step105) · OCC_RUN 4(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 4 occurrence 10개 axe 재현 — color-contrast 4(desktop-light #heroStats .stat-label 3개·footer span.footer-note(.footer-inner 상속) --text-faint #8a8a93 on #fafafa 3.27:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 6(project:0,1,2,10,11,12 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-4.json·server-4.json 기록. OCC_CHECK 4 'occ-check 4: OK 10' · FULL 429 passed · VS OK · RGATE 5 '' OK"
     },
     {
       "step": 6,
