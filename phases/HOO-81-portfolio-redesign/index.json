@@ -278,7 +278,10 @@
     {
       "step": 32,
       "name": "axe-collect-tooling",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:54:50+0900",
+      "completed_at": "2026-11-24T21:01:03+0900",
+      "summary": "step32: tests/helpers/axe.js append-only (step-28 code untouched): makeEntryKey (`${scenario}:${project}:${ruleId}`, empty/':' throw), SCENARIOS/PROJECTS, COLLECT_DIR 'tests/.tmp/axe-collected', EXPECTED_FILES 10 sorted '{scenario}--{project}.json' (page x6, modal/lightbox x desktop-dark/light), resolveCollectDir (arg > AXE_COLLECT_DIR > COLLECT_DIR, repo-root relative, strictly under tests/.tmp, symlink components rejected), resetCollected (rm+mkdir), violationsToEntries (same ruleId merged, targets/selectors unique sorted, higher impact, key sorted, input unmutated), writeCollected(scenario,project,violations,{dir}) -> {scenario,project,entries} (bad scenario/project/unexpected pair throw), mergeCollected({collectDir,out}) -> 7-field MergedEntry key-sorted, missing:/extra:/invalid: problems thrown as Error.problems without writing, out limited to tests/fixtures/axe-collected.json (CLI default) or tests/.tmp/**; CLI --reset [--dir], --merge [--dir] [--out] (problems to stderr, exit 1); tests/specs/axe-helper.spec.js append-only step-32 describe (9 tests desktop-dark, tests/.tmp/axe-helper-test-<pid>-N dirs cleaned, real COLLECT_DIR and tests/fixtures/axe-collected.json state asserted unchanged after each test); RED confirmed (COLLECT_DIR export missing), SNAP 32 created, T axe-helper 18 passed, FULL 381 passed, VS OK, GATE 32 scope-snapshot: OK"
     },
     {
       "step": 33,
