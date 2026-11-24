@@ -78,7 +78,10 @@
     {
       "step": 7,
       "name": "scope-snapshot-identity",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:32:48+0900",
+      "completed_at": "2026-11-24T19:33:37+0900",
+      "summary": "reverify step7: no-op — SNAP 7 created→reused, scope-snapshot-identity.spec.js 9 passed (desktop-dark), FULL 81 passed, CGATE 7 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 8,
