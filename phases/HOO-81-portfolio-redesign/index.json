@@ -238,7 +238,10 @@
     {
       "step": 27,
       "name": "ui-regression",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:19:57+0900",
+      "completed_at": "2026-11-24T20:25:26+0900",
+      "summary": "step27: added tests/specs/ui-regression.spec.js (§THEME test, 6 projects: theme toggle flips html[data-theme] + localStorage THEME_KEY (regex from js/main.js) and persists across reload both ways; mobile-only #menuToggle -> #navLinks.open + aria-expanded=true, .nav-link[href=#projects] click closes (aria-expanded=false); desktop-only §4 exact scrollspy syntax for projects -> toHaveClass(/active/); typing: #typed takes >=3 distinct values, all prefixes of baseline PROFILE.roles; test.use reducedMotion 'reduce': all .reveal have .in right after load, #typed = roles[0] stays fixed) and tests/specs/first-visit.spec.js (desktop-dark only, browser.newContext without installProjectTheme for colorScheme light/dark -> data-theme = colorScheme, localStorage THEME_KEY null); regression tests over existing BASE behavior so no implementation change (no RED phase); SNAP 27 created, T 24 passed/18 skipped (repeat-each 3: 72 passed), FULL 315 passed, VS OK, GATE 27 scope-snapshot: OK"
     },
     {
       "step": 28,
