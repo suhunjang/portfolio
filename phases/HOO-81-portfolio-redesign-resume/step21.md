@@ -1,15 +1,16 @@
 # Resume Step 21 — section-structure (원 step 44)
 
 - 목적: 원 §4 FINAL 섹션·nav·kicker·heading.
-- 19분 / 선행 0~20 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 21`
+- 19분 / 선행 0~20 / 공통 원 §9 + §R1·§R2 no-op·§R11 / gate `RGATE 21`
 - 허용(exact): `index.html`(hero 밖 섹션 subtree 이동·kicker·Stack &amp; Contact 분리·nav 순서·scroll-hint, 속성은 원 §9 (a)·(b)만), `js/main.js`(스크롤스파이 배열·skill-group h4만), `tests/specs/structure.spec.js`
+- 필수 산출물(REQ): `tests/specs/structure.spec.js,index.html,js/main.js`
 - runtime: R0
 - 추가 금지: `css/*`, `js/data.js`, hero 내부, 표에 없는 문구, (a)·(b) 밖 속성, 새 섹션·이미지·아이콘
 
 ## 작업
-1. `RSNAP 21` → `DI`(`DesktopExplore.dc.html` 읽기만).
-2. RED spec(6 project): 섹션·nav·kicker·h2·section `class` 정확히 원 §4; subsection h3 1개; skillsGrid about 안·h4; contact; `.scroll-hint` `href === '#career'`; heading 계층; `#heroFeatured` 유지; 카드 13개 순서; 스크롤스파이 원 §4 문법(about).
+1. `RSNAP 21` → no-op 첫 probe `REQ 21 tests/specs/structure.spec.js,index.html,js/main.js`. PASS면 나머지 AC 실행 → 통과 시 `resume step21: no-op`. REQ FAIL 또는 AC 실패면 아래 작업 후 완전한 AC 재실행.
+2. `DI`(`DesktopExplore.dc.html` 읽기만). RED spec(6 project): 섹션·nav·kicker·h2·section `class` 정확히 원 §4; subsection h3 1개; skillsGrid about 안·h4; contact; `.scroll-hint` `href === '#career'`; heading 계층; `#heroFeatured` 유지; 카드 13개 순서; 스크롤스파이 원 §4 문법(about).
 3. subtree 통째 이동, axe canonical 점검(식별 손실이면 중단·재계획).
 
 ## AC
-- `DI && T structure.spec.js GS && FULL && VS && RGATE 21 index.html,js/main.js,tests/specs/structure.spec.js`(content-static.spec에서 final 성립)
+- `REQ 21 tests/specs/structure.spec.js,index.html,js/main.js && DI && T structure.spec.js GS && FULL && VS && RGATE 21 index.html,js/main.js,tests/specs/structure.spec.js`(첫 명령 stdout `required-artifacts step121: OK 3`; content-static.spec에서 final 성립)
