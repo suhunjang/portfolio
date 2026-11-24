@@ -86,7 +86,10 @@
     {
       "step": 8,
       "name": "scope-snapshot-cli",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:33:37+0900",
+      "completed_at": "2026-11-24T19:34:21+0900",
+      "summary": "reverify step8: no-op — SNAP 8 created→reused, scope-snapshot-cli+identity specs 18 passed (desktop-dark), FULL 81 passed, GATE 8 OK, CGATE 8 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 9,
