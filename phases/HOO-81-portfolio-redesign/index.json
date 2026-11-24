@@ -270,7 +270,10 @@
     {
       "step": 31,
       "name": "axe-prepare-lightbox",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:45:02+0900",
+      "completed_at": "2026-11-24T20:54:50+0900",
+      "summary": "step31: tests/helpers/axe-prepare.js append-only (prepareLightbox(page,{projectIndex?,timeoutMs=10000}): index given -> prepareModal + first #projectModal .shot-zoom click (none -> lightbox-not-open), else scans #projectGrid cards in DOM order opening each modal, keeps first with .shot-zoom open, closes others via .modal-close[data-modal-close] (none -> no-shots-project); lightbox wait visible .lightbox + focus inside (withPrepareCode lightbox-not-open) then assertContentLoaded -> {include:'.lightbox',projectIndex}; prepareOverlay modal|lightbox else unknown-scenario; prepareForAxe validates scenario page|modal|lightbox (else unknown-scenario) -> preparePage -> page {include:'body',projectIndex:null} | overlay) and tests/specs/axe-prepare-lightbox.spec.js (10 tests desktop-dark/light: page/modal/lightbox real page, overlay index 1, no-shots index -> lightbox-not-open, image abort -> content-not-loaded:img, unknown-scenario, no-shots fixture null/opens 2/closes 2/featured 0/no-shots-project, shots fixture -> 1 with opens 2 closes 1 then 2 after Esc x2, broken img/0x0 svg); RED confirmed (export missing), SNAP 31 created, T lightbox+modal+page 48 passed, FULL 372 passed, VS OK, GATE 31 scope-snapshot: OK. Note: step-30 prepareModal fails content-not-loaded:img on real project 2 (lazy shot imgs below modal fold) — not changed (step 30 behavior frozen)."
     },
     {
       "step": 32,
