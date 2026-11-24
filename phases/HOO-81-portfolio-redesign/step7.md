@@ -11,7 +11,7 @@
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step7`
 2. AC 실행 → 통과면 no-op, 실패면 계약 안에서 수정.
-3. 계약: step 7 API. spec: `checkIdentity` 필드별·순서; `computeIdentity` parity 일치·다른 root throw·root symlink·`.harness` 조상 symlink·lock FIFO에서 BASE verify·lock open 없음; 변경 판정 표; unsafe 우선; 전체 순서; 입력 불변.
+3. 계약: step 7 API. spec: `checkIdentity` 같음 `[]`, projectRoot·head·base·harness 4하위 필드 각각 `identity-mismatch:{field}`, 여러 필드 순서; `computeIdentity` 실제 parity 일치·다른 root(`tests/.tmp`) throw·가짜 fs/git의 root symlink·`.harness` 조상 symlink·lock FIFO → `UnsafePathError`, `rev-parse --verify`·lock open 없음; 변경 판정(`CLAUDE.md` 시작 ` M`/h1 그대로 0·원복 `outside-tests:`·삭제·내용 변경; `tests/playwright.config.js` allow 밖 `tests-changed:`·allow 안 0; 깨끗한 tests 파일 변경·사라진 untracked·walk 전용 fixture 변경 `tests-changed:`; `README.md` xy만 → `status-changed:`; 새 `?? docs/x.md` `outside-tests:`; EXEMPT 0; GUARDED `outside-tests:`; `?? tests/node_modules/…` `runtime-visible:`; rename 양쪽); unsafe 우선(`['symlink:b','non-regular:a']` + 변경 + require-absent → 정확히 snapshot-not-first, `non-regular:a`, `symlink:b`, allow 무관); 전체 순서; 입력 불변.
 
 ## AC (모두 exit 0)
 

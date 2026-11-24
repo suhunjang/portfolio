@@ -11,7 +11,7 @@
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step10`
 2. AC 실행 → 통과면 no-op, 실패면 spec만 수정.
-3. 계약: step 9 준비 + 외부 sentinel; 정상 identity 유지한 채 `files`에 `../<pid>-outside/secret.txt` 또는 외부 절대 경로 key; C(harness·subprocess)·`runCheck`·CLI 모두 정확히 `bad start snapshot: paths: tests/.tmp/start-snapshot-parity-1.json`, 외부 접근 0, identity·수집·after.z 미호출, 파일 bytes·mtime 불변.
+3. 계약: step 9와 같은 합성 준비 + `<outside>/secret.txt` sentinel; 정상 snapshot JSON에 `files` key 하나만 추가 — 변형 A `../<pid>-outside/secret.txt`(null), 변형 B `<outside>/secret.txt` 절대 경로(null); after.z에 고정 bytes; C(`runHarness`와 subprocess `python3 -I - parity-1 '' ''`)·`runCheck`(기록용 fs)·CLI subprocess(`node <프로젝트>/tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-parity-1.json --allow ''`) 모두 exit/code 1, 메시지 정확히 `bad start snapshot: paths: tests/.tmp/start-snapshot-parity-1.json`, 외부 경로 lstat·open·read 0, C의 `os.open`은 snapshot 1회·git 호출은 toplevel만, `runCheck`의 `computeIdentity`·`takeCurrent`·`writeAfterZ` 미호출; snapshot·after.z·외부 파일 bytes·mtime 불변, sentinel 미출력.
 
 ## AC (한 셸에서 순서대로, 모두 exit 0)
 

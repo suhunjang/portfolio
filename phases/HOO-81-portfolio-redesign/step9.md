@@ -11,7 +11,7 @@
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step9`
 2. AC 실행 → 통과면 no-op, 실패면 spec만 수정.
-3. 계약: 첫 commit에 루트 `.gitignore` 정확히 `tests/.tmp/`·lock(identity 3값)·`tracked.txt`·`tests/specs/a.spec.js`; BASE verify만 대체한 git 래퍼로 `parity-1`; snapshot·after.z 생성 직후 runtime 경로 status 비노출; (i) OK, (ii) `outside-tests:tracked.txt`, (iii) `tests-changed:tests/specs/x.spec.js`, (iv) `snapshot-not-first:tracked.txt`, (v) ` M` snapshot 후 같은 내용 stage → `' M'`·`'M '`·SHA 동일 확인 후 `status-changed:tracked.txt`; 결과·after.z 동일.
+3. 계약: 첫 commit에 루트 `.gitignore` 정확히 `tests/.tmp/`·`.harness/harness.lock.json`(identity 3값)·`tracked.txt`·`tests/specs/a.spec.js`; `rev-parse --verify BASE^{commit}`만 성공으로 대체한 git 래퍼로 `computeIdentity`·`takeCurrent`를 써서 `tests/.tmp/start-snapshot-parity-1.json` 생성; snapshot·after.z 생성 직후 `git -C <dir> status --porcelain=v1 -z --untracked-files=all`을 `parseStatusZ`로 파싱해 두 runtime 경로 없음 assert; C(cwd dir + C 블록)와 `runCheck` 각각: (i) 변경 없음 code 0·`scope-snapshot: OK`, (ii) `tracked.txt` 수정 → 정확히 `outside-tests:tracked.txt`, (iii) 새 `tests/specs/x.spec.js` → `tests-changed:tests/specs/x.spec.js`, (iv) `--require-absent tracked.txt` → `snapshot-not-first:tracked.txt`, (v) `tracked.txt` 수정·미stage 상태에서 snapshot 생성 → 같은 내용으로 `git -C <dir> add tracked.txt` → 시작 xy `' M'`·현재 `'M '`·SHA 동일 확인 후 `status-changed:tracked.txt`; 두 결과의 code·위반 줄·after.z 내용 동일.
 
 ## AC (한 셸에서 순서대로, 모두 exit 0)
 

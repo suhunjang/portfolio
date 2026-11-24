@@ -1,17 +1,32 @@
 # Step 6 — scope-snapshot-special-files (재검증)
 
-- 목적: FIFO·디렉터리·조상 symlink(`tests/.tmp` 외부 링크 포함)를 S·C·loader가 open/write 전에 거부하고 산출물이 불변임을 확인한다(테스트만). §11.6 재검증 모드.
+- 목적: FIFO·디렉터리·조상 symlink(`tests/.tmp` 외부 링크 포함)를 S·C·loader·`takeCurrent`가 open/write 전에 거부하고 산출물이 불변임을 확인한다(테스트만). §11.6 재검증 모드.
 - 예상 19분 / 선행 0~5 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
 - read-first: 설계 §11.6, §11.7, §12; `tests/helpers/synthetic-repo.js`
 - tracked 허용(exact): `tests/specs/scope-snapshot-special.spec.js`
-- runtime: R0(합성 저장소, 실제 저장소 parity 위치 FIFO·디렉터리)
+- runtime: R0(합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`·`<pid>-outside/`, 실제 저장소 `tests/.tmp/start-snapshot-parity-<m>.json` 위치)
 - 금지: §15.7, 도구·helper 수정, 비runtime symlink·FIFO
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step6`
-2. AC 실행 → 통과면 no-op, 실패면 spec만 수정.
-3. 계약(timeout 10초, 전후 목록·sha256·mtime·유형 비교): S 합성 (a)~(f), S 실제 저장소 재사용 분기 FIFO·디렉터리, C 합성 (g)~(j), JS loader, `takeCurrent` (c)(d)(e). 모두 멈추지 않고 거부, 산출물 불변.
+2. AC 실행 → 통과면 no-op, 실패면 spec만 아래 계약대로 수정.
+3. 공통: 각 사례 새 `makeSyntheticRepo()`(초기 commit에 `.gitignore`(`tests/.tmp/`), `tracked.txt`, `lib/x.txt`, `tests/specs/a.spec.js`), 거부 상태는 실행 전에 만들고 실행 중 바꾸지 않음, FIFO는 `python3 -I -c "import os,sys; os.mkfifo(sys.argv[1])" <path>`, 모든 subprocess timeout 10초(timeout은 실패), 실행 전후 대상 디렉터리의 파일 목록·regular sha256·mtime·유형 비교, `<outside>`에는 sentinel 파일 `secret.txt`.
+4. S 합성 — cwd `dir`, 명령 `python3 -I <프로젝트>/tests/scripts/start-snapshot.py parity-1`, 합성 저장소에는 BASE가 없으므로 유형 검사 실패가 먼저 나와야 함. 각 사례 exit ≠ 0, stderr가 정확히 아래 한 줄:
+   - (a) `tests/.tmp/start-snapshot-parity-1.json`이 FIFO(재사용 분기 대상 경로) → `unsafe path: non-regular:tests/.tmp/start-snapshot-parity-1.json`; FIFO 유지, `tests/.tmp`에 새 파일 없음
+   - (b) 같은 경로가 디렉터리(안에 파일 `x`) → `unsafe path: non-regular:tests/.tmp/start-snapshot-parity-1.json`; 디렉터리 내용 불변
+   - (c) `tests/.tmp` 없음(생성 분기) + untracked `tests/specs/p.fifo` FIFO → `unsafe path: non-regular:tests/specs/p.fifo`; `tests/.tmp` 미생성, 다른 파일 sha256 불변
+   - (d) commit된 `tracked.txt`를 지우고 같은 이름 디렉터리(안에 `x`) 생성(생성 분기) → `unsafe path: non-regular:tracked.txt`; `tests/.tmp` 미생성
+   - (e) commit된 `lib` 디렉터리를 지우고 `lib → <outside>` symlink로 교체(생성 분기) → `unsafe path: symlink:lib`; sentinel 미출력
+   - (f) `tests/.tmp → <outside>/tmpdir` symlink(`tmpdir`에 sentinel과 정상 형식 snapshot 사본) → `unsafe path: symlink:tests/.tmp`; `<outside>/tmpdir` 목록·bytes·mtime 불변
+5. S 실제 저장소(재사용 분기, 실제 BASE) — `tests/.tmp/start-snapshot-parity-<m>.json`을 FIFO로, 이어 디렉터리로 만들고 각각 `python3 -I tests/scripts/start-snapshot.py parity-<m>` → exit ≠ 0, stderr `unsafe path: non-regular:tests/.tmp/start-snapshot-parity-<m>.json`, 멈추지 않음, 다른 parity 파일 sha256 불변; finally 삭제.
+6. C 합성 — cwd `dir`, 명령 `python3 -I - parity-1 '' ''` + `designBlock('inline 범위 검사 C')`. 정상 start = 키 집합만 맞춘 `tests/.tmp/start-snapshot-parity-1.json`(stepId `parity-1`, files `{}`, xy `{}`). 각 사례 exit 1, stderr 정확히:
+   - (g) (f)와 같은 `tests/.tmp` 외부 링크 → `unsafe path: symlink:tests/.tmp`; `<outside>/tmpdir`에 `-after.z` 미생성, 외부 bytes·mtime 불변
+   - (h) 정상 start + `tests/.tmp/start-snapshot-parity-1-after.z` FIFO → `unsafe path: non-regular:tests/.tmp/start-snapshot-parity-1-after.z`; FIFO 유지
+   - (i) 정상 start + after.z가 `<outside>/after-target`(sentinel) symlink → `unsafe path: symlink:tests/.tmp/start-snapshot-parity-1-after.z`; 대상 bytes 불변
+   - (j) start 파일 자체가 FIFO → `unsafe path: non-regular:tests/.tmp/start-snapshot-parity-1.json`; 멈추지 않음
+7. JS loader 합성 — `loadStartSnapshot('tests/.tmp/start-snapshot-parity-1.json', { root: dir, fs: 기록용 fs })`: (f) 상태 → `Error('unsafe path: symlink:tests/.tmp')`, 기록은 root·`tests`·`tests/.tmp`의 `lstatSync`뿐(외부 대상 open·read·stat·readlink·realpath 0); snapshot FIFO 또는 디렉터리 → `Error('unsafe path: non-regular:tests/.tmp/start-snapshot-parity-1.json')`, `openSync` 0.
+8. JS `takeCurrent` 합성 — `takeCurrent(null, { git: 실제 git 래퍼, fs: 기록용 fs, root: dir })`: (c) 상태 → `unsafe`에 `non-regular:tests/specs/p.fifo`; (d) → `non-regular:tracked.txt`; (e) → `symlink:lib`; 세 경우 모두 `files` `{}`, 해당 경로 `openSync` 0.
 
 ## AC (모두 exit 0)
 

@@ -12,10 +12,10 @@
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step2`
 2. AC 실행 → 통과면 no-op. status parser 동일성 검증이 없거나 `parseStatusZ`가 계약과 다르면 허용 파일 안에서 추가·수정.
 3. spec 계약(node 전용, desktop-dark, timeout 10초)
-   - `isRepoRelative`: true 4종, false 15종(빈 문자열·절대·`..`·`.`·빈 구성요소·NUL·비문자열); S 블록 `rel_ok`와 결과 일치
-   - `parseStatusZ` 기본 사례
-   - 동일성: S·C `parse_status` 정의 bytes 동일; 입력 — 정상 4종(빈, ` M a.txt`+NUL, 두 레코드, rename), 형식 거부 9종(`M`, `?? `, `MMxa.txt`, 중간 빈 레코드, NUL 두 개, `R  new.txt`, `R  new.txt`+NUL+NUL, `C  new.txt`+NUL, `?? `+0xFF), 경로 거부 5종(` M ../x`, `?? /abs/x`, ` M a//b`, ` M ./a`, `R  new.txt`+NUL+`../old.txt`) → JS 범주와 S·C 추출 함수 `ValueError` 범주 일치, 다른 예외 없음; 정상은 세 구현 xy 동일; 프로그램 수준(로컬 exec harness, status bytes 지정, `tests/.tmp/status-harness-<pid>/`, C용 키만 맞춘 `parity-1` start) 거부 입력마다 S·C `SystemExit` 정확히 `bad git status`, `ls-files` 0, S `os.makedirs` 0, C `os.walk` 0·after.z 없음; 정상은 `ls-files` 기록; 디렉터리 삭제
-   - `scanJsonTopLevel`·`isSchemaVersion1` 기존 사례, 입력 불변
+   - `isRepoRelative`: true — `a`, `tests/specs/a.spec.js`, `.harness/policy.json`, `a..b/c`; false — 빈 문자열, `/abs`, `/`, `../outside.txt`, `a/../b`, `./a`, `a/./b`, `..`, `.`, `a//b`, `a/`, NUL 포함, `null`, 숫자, 객체; S 블록 `rel_ok`와 결과 일치
+   - `parseStatusZ` 기본: ` M CLAUDE.md`·`?? docs/a.md`, rename origPath·`statusXyMap` 두 경로 `R `, 빈 입력 `[]`, 끝 NUL 허용
+   - 동일성: S·C `parse_status` 정의 bytes 동일. 입력 — 정상: 빈 bytes, ` M a.txt`+NUL, ` M a.txt`+NUL+`?? b.txt`+NUL, `R  new.txt`+NUL+`old.txt`+NUL; 형식 거부: `M`, `?? `, `MMxa.txt`, ` M a.txt`+NUL+NUL+` M b.txt`+NUL, NUL 두 개, `R  new.txt`, `R  new.txt`+NUL+NUL, `C  new.txt`+NUL, `?? `+0xFF; 경로 거부: ` M ../x`, `?? /abs/x`, ` M a//b`, ` M ./a`, `R  new.txt`+NUL+`../old.txt` → JS throw 접두어(`bad status record:`/`bad path:`)와 S·C 추출 함수 `ValueError` 메시지(`bad status record`/`bad path`) 범주 일치, 다른 예외 없음; 정상은 세 구현 xy 동일; 프로그램 수준(spec 내부 로컬 exec harness, status bytes 지정, cwd·toplevel `tests/.tmp/status-harness-<pid>/`, C용 키 집합만 맞춘 `tests/.tmp/start-snapshot-parity-1.json`) 거부 입력마다 S·C `SystemExit` 정확히 `bad git status`, `ls-files` 호출 0, S `os.makedirs` 0·snapshot 없음, C `os.walk` 0·after.z 없음; 정상은 `ls-files` 호출 기록; 디렉터리 삭제
+   - `scanJsonTopLevel`: 최상위 token만, 문자열·중첩 무시, 중복·이스케이프 key throw, `[1]` → `[]`; `isSchemaVersion1` 6사례; 입력 불변
 
 ## AC (모두 exit 0)
 

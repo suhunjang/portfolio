@@ -1,19 +1,18 @@
-# Step 47 — final-verification
+# Step 47 — print-pdf
 
-- 목적: 스크린샷 spec과 최종 통합 검증(intake·guard 포함, PR 준비까지만).
+- 목적: 인쇄 스타일(line clamp 해제 포함)과 PDF 검증.
 - 예상 17분 / 선행 0~46 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 전체; 모든 specs·scripts·helpers·fixtures 존재
-- tracked 허용(exact): `tests/specs/screenshots.spec.js`
-- runtime: R0 + `tests/screenshots/**`
-- 금지: §15.7, 사이트 파일, 기존 spec·helper·fixtures·scripts·`tests/.gitignore`(실패 시 원인 step 보고·중단)
+- read-first: 설계 §10, §16.2
+- tracked 허용(exact): `css/style.css`(`@media print` 블록만, 색 선언 없음), `tests/specs/print.spec.js`
+- runtime: R0
+- 금지: §15.7, `index.html`, `js/*`, PDF 파서 의존성
 
-## 작업
+## 작업 (TDD)
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step47` → `python3 -I tests/scripts/design-intake-check.py`
-2. `screenshots.spec.js`: 각 화면 `prepareForAxe` 후 촬영, 6 project page, desktop 대표 모달 3개·lightbox·print, 모달 SVG text font-family Space Grotesk. 먼저 단독 통과.
-3. AC 체인 후 요약(§16 반영 목록, guard 통과, step 0~11 재검증 로그). 이후 exact-commit Astra 리뷰·push·PR은 하네스가 수행한다.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step47`
+2. `print.spec.js`(desktop-dark/light): `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length` 자체 검증(`/Pages`만 0, `/Page` 1, `/Type/Page` 1); A: 본문·featured visible·opacity 1, reveal 비어 있지 않음, 인터랙션·modal 숨김, lightbox 없음 또는 none, print 미디어에서 `.featured-blurb`·카드 blurb `-webkit-line-clamp` `none`/`unset`, PDF > 10240바이트·count ≥ 1; B: screen에서 lightbox visible → print에서 lightbox·modal none, PDF 조건 동일.
+3. `@media print`.
 
 ## AC
 
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- screenshots.spec.js design-guard-css.spec.js design-guard.spec.js design-intake.spec.js && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope:selftest && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --require-empty && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope -- --final && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step47.json --allow tests/specs/screenshots.spec.js` → exit 0
-- final: data.js BASE→HEAD/index/worktree 각각 정확히 3줄, index→worktree 0~3줄.
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- print.spec.js css-parse.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step47.json --allow css/style.css,tests/specs/print.spec.js` → exit 0

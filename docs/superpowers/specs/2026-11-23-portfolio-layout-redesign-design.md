@@ -5,9 +5,9 @@
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
 - 범위 변경: 대표 결정 `scope-change-claude-design-v27`·`scope-change-claude-design-v28-compact` — Claude Design 패턴(레이아웃·컴포넌트·간격·타이포 위계만)을 구현 기준으로 추가. 이전 Harness 2.0.1 계획·리뷰·승인은 재사용하지 않는다.
-- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력의 이전 설계 문서). 31차 범위 변경(intake·guard·hero 2열·component state·재검증 모드·preflight). 32차 `review-resume-c57f750bfd7a-v29`(Astra record `c57f750bfd7a1be73f0f846c9cf0559c304b9f4f82f21cc24e26bb671b29d5c7`, 6건 + 실행 blocker): CSS guard를 규칙 구조 비교로 바꿔 기존 색 규칙의 선택자 보존·승인된 featured 대응 선택자 추가·strength stripe 제거만 허용(대상 교체·임의 확장·미디어 조건 변경 거부), guard step을 CSS(step 13)와 markup·통합(step 14)으로 분할, axe baseline entry·fixes schema(§8.5)와 remediation plan schema(§8.6) 고정, menu open은 `mobile-dark`에서만·modal open은 6 project에서 측정 요소·시점 명시, `css/themes.css`를 allowedPaths에서 제외, 2.0.0 identity로 남은 runtime snapshot 26개 경로를 §17에 열거하고 승인 후 backup·exact 제거, step 0~47로 재번호.
+- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`(record `c57f750b…29d5c7`): 규칙 구조 CSS guard, guard step 분할, baseline(§8.5)·plan(§8.6) schema 고정, component state 측정 project·시점, `css/themes.css` allowedPaths 제외, §17 preflight 28개 exact 경로. 33차 `review-resume-d032b938c536-v30`(record `d032b938c5360690f60fe2b6052aa97f62a0b4ff07e21f83320859969447a051`, major 5건): CSS guard에 색 custom property 의존 그래프(별칭·named color·`currentColor` 포함) 추가, CSS guard를 parser(step 13)·색/token 보존(step 14)·서체/asset/unknown-token(step 15) 세 step + 통합(step 16)으로 분할, step 6·8·30의 사례·spy 단계·결과를 step 안에 완전 기술, step 29 baseline 오류 예 교정(`fixFiles-mismatch`와 `union-mismatch` 분리), component state를 hit·menu·modal(step 42)·hover·active(step 43)·clamp·stripe(step 44)로 분할, step 0~51 재번호.
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`을 직접 읽어 확인): sourceCommit `e7a03919a460f975149f7c55343ca4b34d3d2352`, manifestHash `b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372`, distributionVersion 2.0.1
-- 진행 순서: materialize → 새 plan commit → Astra `gpt-6-astra` 계획 리뷰 CLEAN → 대표 exact 승인(§17 경로 목록 포함) → §17 preflight → fresh runner(step 0~47) → 전체 테스트 → exact-commit Astra 리뷰 CLEAN → feature push → OPEN PR. merge·deploy·main 직접 변경 없음.
+- 진행 순서: materialize → 새 plan commit → Astra `gpt-6-astra` 계획 리뷰 CLEAN → 대표 exact 승인(§17 경로 목록 포함) → §17 preflight → fresh runner(step 0~51) → 전체 테스트 → exact-commit Astra 리뷰 CLEAN → feature push → OPEN PR. merge·deploy·main 직접 변경 없음.
 
 ## 1. 의도
 
@@ -78,7 +78,7 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. 레이아웃�
 ## 7. 콘텐츠 보존과 예외
 
 ### 7.1 기준
-- `BaselineData`: BASE data.js 평가 결과(step 18). `StaticContent`: BASE index.html 정적 본문(step 19).
+- `BaselineData`: BASE data.js 평가 결과(step 20). `StaticContent`: BASE index.html 정적 본문(step 21).
 
 ### 7.2 허용 예외
 1. index 1, 5, 7의 `featured: true`
@@ -92,10 +92,10 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. 레이아웃�
 - `norm(s) = String(s).replace(/\s+/g, ' ').trim()`
 - `BaselineData = { PROFILE, STATS, CAREER, VIS_ACCENT, PROJECTS, STRENGTHS, SKILLS }`
 - `StaticContent`(모두 norm): `title`, `metaDescription`, `navLabels`(정렬), `heroEyebrow`, `ctaLabels`, `kickers`, `sectionTitles`, `sectionSubs`, `aboutParagraphs`(`.about-text p:not([id])`), `aboutPoints`, `aboutMetaTerms`, `contactHeading`, `contactText`, `footerNote`, `footerTop`
-- step 18: `readLiveData(page)`, `normalizeFeatured(data)`. step 19: `extractStatic(page)`
+- step 20: `readLiveData(page)`, `normalizeFeatured(data)`. step 21: `extractStatic(page)`
 
-### 7.4 회귀 spec (step 20, 21)
-- step 20 `modal-regression.spec.js` + `tests/helpers/modal.js`. step 21 `ui-regression.spec.js` + `first-visit.spec.js`.
+### 7.4 회귀 spec (step 22, 23)
+- step 22 `modal-regression.spec.js` + `tests/helpers/modal.js`. step 23 `ui-regression.spec.js` + `first-visit.spec.js`.
 - `modal.js`: `GRID_CARD = '#projectGrid .project-card'`; `gridCard(page, N)` = 정확히 `page.locator('#projectGrid .project-card[data-project="' + N + '"]')`; `openFirstProjectByClick`, `openFirstProjectByEnter`; `closeVia(page, 'button'|'backdrop'|'esc')`(button `#projectModal .modal-close[data-modal-close]`, backdrop `{x:5, y:5}`); `expectFocused`; `modalTitle(page)`; `findProjectWithShots(page): number|null`(grid 카드만).
 
 ## 8. 접근성
@@ -103,48 +103,48 @@ A(선택, Q1): 절제 톤 유지 + 레이아웃·구조 재구성. 레이아웃�
 ### 8.1 axe
 - wcag2a·wcag2aa serious/critical 0건. 시나리오 10개: page 3 viewport × 2 테마, modal × dark/light, lightbox × dark/light. `prepareForAxe` 통과 후에만 실행.
 
-### 8.2 포커스 트랩 (step 41, 42)
+### 8.2 포커스 트랩 (step 45, 46)
 - `trapFocus(container, { returnFocusTo? }): () => void` — 스택, 최상위만 Tab 순환, document Tab 핸들러 1개, `release()` 다중 호출 안전.
-- step 41: 구현 + 모달 push/release. step 42: lightbox push(`.shot-zoom`), 모달 trap 일시정지·재개, 기존 lightbox Tab 리스너 제거, `:focus-visible` outline 검증.
+- step 45: 구현 + 모달 push/release. step 46: lightbox push(`.shot-zoom`), 모달 trap 일시정지·재개, 기존 lightbox Tab 리스너 제거, `:focus-visible` outline 검증.
 
 ### 8.3 axe 식별·도구
 
-canonical target (step 22): `{ruleId}::{anchor}::{textSig}`. anchor: `[data-featured-card][data-project]`→`featured:{N}`, `[data-project]`→`project:{N}`, `[id]`→`#{id}`, landmark→태그명, 없으면 `document`. textSig: norm(textContent) → aria-label → alt → title → src 파일명, 숫자는 `#`, 80자 자름. alias: `## — Stack & Contact`→`## — Contact`, `기술 스택 & 연락처`→`연락처`.
+canonical target (step 24): `{ruleId}::{anchor}::{textSig}`. anchor: `[data-featured-card][data-project]`→`featured:{N}`, `[data-project]`→`project:{N}`, `[id]`→`#{id}`, landmark→태그명, 없으면 `document`. textSig: norm(textContent) → aria-label → alt → title → src 파일명, 숫자는 `#`, 80자 자름. alias: `## — Stack & Contact`→`## — Contact`, `기술 스택 & 연락처`→`연락처`.
 
-entry key (step 26): `makeEntryKey({ scenario, project, ruleId })` = `${scenario}:${project}:${ruleId}`(빈 값·`:` 포함 throw). (key, target) 쌍이 위반 1건.
+entry key (step 28): `makeEntryKey({ scenario, project, ruleId })` = `${scenario}:${project}:${ruleId}`(빈 값·`:` 포함 throw). (key, target) 쌍이 위반 1건.
 
 helper (`tests/helpers/axe.js`):
-- step 22: `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe(page, { include }) → Violation[]`
-- step 26: `makeEntryKey`, `COLLECT_DIR`(`tests/.tmp/axe-collected`), `EXPECTED_FILES` 10개, `resolveCollectDir`, `resetCollected`, `writeCollected`, `mergeCollected({ collectDir, out })`(MergedEntry = §8.5의 앞 7필드, key 정렬), CLI `--reset`, `--merge [--dir] [--out]`.
-- step 27: `BASELINE_PATH`, `COLLECTED_PATH`, `PLAN_PATH`, `FIX_FILES_BY_KIND`, `baselineExists`, `loadBaseline`, `resolveBaselineMode`(`check`/`pending`/throw, 환경변수 우회 없음), `validateBaseline`(§8.5 그대로), `checkRegression(violations, baseline, scenario, project)`(`new-key:{key}`, `new-target:{key}:{target}`), `assertEmptyFile`, CLI `--assert-empty`.
-- step 28: `PROJECTION_FIELDS`, `projectEntry`, `compareCollectedBaseline`, CLI `--check-baseline-match`.
-- step 29: `GROUP_ID_RE`, `loadPlan`, `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`(§8.6 그대로), CLI `--check-plan [--coverage] [--require-empty]`.
-- step 30: `validateRemediationExecutable`(`blocked-group:{id}`, `text-change:{id}:{key}:{target}`, `empty-fixfiles:{id}`), CLI `--check-executable`(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`).
-- step 31: `checkGroupDone(collected, plan, id) → { done, remaining: PlanTarget[] }`, `checkCollectedCoverage → { ok, uncovered: PlanTarget[] }`, `countCollectedTargets`, CLI `--check-group-done <id>`, `--check-coverage`, `--assert-no-violations`(`--collected` 기본 `tests/.tmp/axe-current.json`).
-- step 32: `checkCollectedRegression`, `prunePlan(plan, collected, baseline)`(§8.6 prune 규칙), CLI `--check-regression`, `--prune-plan`(회귀 실패 시 쓰지 않음, 통과 시 `JSON.stringify(plan, null, 2) + '\n'`).
+- step 24: `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe(page, { include }) → Violation[]`
+- step 28: `makeEntryKey`, `COLLECT_DIR`(`tests/.tmp/axe-collected`), `EXPECTED_FILES` 10개, `resolveCollectDir`, `resetCollected`, `writeCollected`, `mergeCollected({ collectDir, out })`(MergedEntry = §8.5의 앞 7필드, key 정렬), CLI `--reset`, `--merge [--dir] [--out]`.
+- step 29: `BASELINE_PATH`, `COLLECTED_PATH`, `PLAN_PATH`, `FIX_FILES_BY_KIND`, `baselineExists`, `loadBaseline`, `resolveBaselineMode`(`check`/`pending`/throw, 환경변수 우회 없음), `validateBaseline`(§8.5 그대로), `checkRegression(violations, baseline, scenario, project)`(`new-key:{key}`, `new-target:{key}:{target}`), `assertEmptyFile`, CLI `--assert-empty`.
+- step 30: `PROJECTION_FIELDS = ['key','scenario','project','ruleId','impact','targets','selectors']`, `projectEntry`, `compareCollectedBaseline(collected, baseline) → { ok, missingEntries: string[], extraEntries: string[], missingTargets: PlanTarget[], extraTargets: PlanTarget[], fieldMismatches: Array<{ key, field }> }`(missingEntries = collected에만 있는 key, extraEntries = baseline에만 있는 key, missingTargets = 같은 key에서 collected에만 있는 target, extraTargets = baseline에만 있는 target, fieldMismatches = 같은 key에서 scenario·project·ruleId·impact·selectors 중 다른 필드, 모두 정렬, ok = 다섯 배열이 모두 비었는가), CLI `--check-baseline-match [--collected] [--baseline]`(불일치 시 stderr에 `missing-entry:{key}`, `extra-entry:{key}`, `missing-target:{key}|{target}`, `extra-target:{key}|{target}`, `field-mismatch:{key}|{field}` 줄을 이 순서로, exit 1).
+- step 31: `GROUP_ID_RE`, `loadPlan`, `validateRemediationPlan(plan, baseline, { coverage, requireEmpty })`(§8.6 그대로), CLI `--check-plan [--coverage] [--require-empty]`.
+- step 32: `validateRemediationExecutable`(`blocked-group:{id}`, `text-change:{id}:{key}:{target}`, `empty-fixfiles:{id}`), CLI `--check-executable`(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`).
+- step 33: `checkGroupDone(collected, plan, id) → { done, remaining: PlanTarget[] }`, `checkCollectedCoverage → { ok, uncovered: PlanTarget[] }`, `countCollectedTargets`, CLI `--check-group-done <id>`, `--check-coverage`, `--assert-no-violations`(`--collected` 기본 `tests/.tmp/axe-current.json`).
+- step 34: `checkCollectedRegression`, `prunePlan(plan, collected, baseline)`(§8.6 prune), CLI `--check-regression`, `--prune-plan`(회귀 실패 시 쓰지 않음, 통과 시 `JSON.stringify(plan, null, 2) + '\n'`).
 
-실행 모드: 공통 `prepareForAxe` → `runAxe`. 수집(`AXE_COLLECT=1`) `writeCollected`만. 일반: `resolveBaselineMode()`; `check`면 checkRegression·validateBaseline(desktop-dark 1회)·plan 있으면 validateRemediationPlan(coverage false); `pending`이면 `test.skip(true, 'axe classification pending (step 34)')`.
+실행 모드: 공통 `prepareForAxe` → `runAxe`. 수집(`AXE_COLLECT=1`) `writeCollected`만. 일반: `resolveBaselineMode()`; `check`면 checkRegression·validateBaseline(desktop-dark 1회)·plan 있으면 validateRemediationPlan(coverage false); `pending`이면 `test.skip(true, 'axe classification pending (step 36)')`.
 - COLLECT_CHAIN: `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge [--out <f>]`
 - REGRESSION_GATE: `sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json`
 
-단계: step 33 수집(`pending`으로 종료) → step 34 분류(§8.5·§8.6 계약으로만 생성, 예상 = 묶음별(2분 + target × 1분) + 6분, 20분 초과면 재계획) → step 35~43 새 key/target은 실패(색 변경 없이 그 step에서 해결) → step 44 gate(COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan` → `--check-coverage` → `--check-plan` → `--check-executable`, 그룹이 남으면 하네스가 44와 45 사이에 `axe-remediation-{id}` 재계획) → step 45 recheck(+ `--require-empty`, `--assert-no-violations`) → step 46 finalize(baseline `[]`).
-- 재계획 그룹 step: `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`일 때만. allowedPaths = 그룹 fixFiles(언제나 index.json allowedPaths의 부분집합이어야 하며 `css/themes.css`가 들어가면 생성하지 않음), 20분 이하, 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`, AC: COLLECT_CHAIN && REGRESSION_GATE && `--check-group-done {id}` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`.
+단계: step 35 수집(`pending`으로 종료) → step 36 분류(§8.5·§8.6 계약으로만 생성, 예상 = 묶음별(2분 + target × 1분) + 6분, 20분 초과면 재계획) → step 37~47 새 key/target은 실패(색 변경 없이 그 step에서 해결) → step 48 gate(COLLECT_CHAIN(`--out tests/.tmp/axe-current.json`) → REGRESSION_GATE → `--prune-plan` → `--check-coverage` → `--check-plan` → `--check-executable`, 그룹이 남으면 하네스가 48과 49 사이에 `axe-remediation-{id}` 재계획) → step 49 recheck(+ `--require-empty`, `--assert-no-violations`) → step 50 finalize(baseline `[]`).
+- 재계획 그룹 step: `--check-executable` 통과·`blocked === false`·`fixFiles.length >= 1`일 때만. allowedPaths = 그룹 fixFiles(index.json allowedPaths의 부분집합, `css/themes.css`가 있으면 생성하지 않음), 20분 이하, 첫 동작 `python3 -I tests/scripts/start-snapshot.py axe-remediation-{id}`, AC: COLLECT_CHAIN && REGRESSION_GATE && `--check-group-done {id}` && `npm --prefix tests test` && verify-scope && `scope-snapshot.mjs --check tests/.tmp/start-snapshot-axe-remediation-{id}.json --allow {fixFiles}`.
 
 ### 8.4 axe 시나리오 준비 (`tests/helpers/axe-prepare.js`)
-- step 23: `PREPARE_PREFIX = 'prepareForAxe: '`, `prepareError(code, cause?)`, `withPrepareCode(code, fn)`, `preparePage(page, { timeoutMs = 10000 })`(`fonts-not-ready`, `reveal-hidden:{n}`).
-- step 24: `MODAL_ROOT`, `MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section'`, `assertContentLoaded(locator, timeoutMs, { textLocator = null })`(`content-not-loaded:img|svg|text`), `prepareModal(page, { projectIndex = 0 })`(`project-card-not-found:{N}`, `modal-not-open`).
-- step 25: `prepareLightbox`(`no-shots-project`, `lightbox-not-open`), `prepareOverlay`(`unknown-scenario`), `prepareForAxe(page, { scenario, projectIndex? })`.
+- step 25: `PREPARE_PREFIX = 'prepareForAxe: '`, `prepareError(code, cause?)`, `withPrepareCode(code, fn)`, `preparePage(page, { timeoutMs = 10000 })`(`fonts-not-ready`, `reveal-hidden:{n}`).
+- step 26: `MODAL_ROOT`, `MODAL_BODY_TEXT = '#modalBody .modal-blurb, #modalBody .modal-section'`, `assertContentLoaded(locator, timeoutMs, { textLocator = null })`(`content-not-loaded:img|svg|text`), `prepareModal(page, { projectIndex = 0 })`(`project-card-not-found:{N}`, `modal-not-open`).
+- step 27: `prepareLightbox`(`no-shots-project`, `lightbox-not-open`), `prepareOverlay`(`unknown-scenario`), `prepareForAxe(page, { scenario, projectIndex? })`.
 - 합성 fixture: 동작 모달 fixture(`window.__opens`·`__closes`·`__clicks`)와 handler 없는 fixture.
 
-### 8.5 axe baseline schema (고정, step 27 이전 확정)
+### 8.5 axe baseline schema (고정, step 29 이전 확정)
 
 - 파일: JSON 배열. 원소는 key 오름차순(코드 유닛 비교), key 고유. 빈 배열 허용.
 - BaselineEntry 필드는 정확히 `key, scenario, project, ruleId, impact, targets, selectors, fixes, fixFiles`(누락·여분 금지).
-  - `scenario` ∈ `page|modal|lightbox`; `project` ∈ 6 project 이름(`mobile-dark`, `mobile-light`, `tablet-dark`, `tablet-light`, `desktop-dark`, `desktop-light`); `ruleId` 비어 있지 않고 `:` 없음; `key === makeEntryKey({ scenario, project, ruleId })`; `impact` ∈ `serious|critical`.
+  - `scenario` ∈ `page|modal|lightbox`; `project` ∈ `mobile-dark`, `mobile-light`, `tablet-dark`, `tablet-light`, `desktop-dark`, `desktop-light`; `ruleId` 비어 있지 않고 `:` 없음; `key === makeEntryKey({ scenario, project, ruleId })`; `impact` ∈ `serious|critical`.
   - `targets`: 비어 있지 않은 문자열 배열, 고유, 오름차순. `selectors`: 문자열 배열, 고유, 오름차순.
-  - `fixes`: targets와 같은 길이, `fixes[j].target === targets[j]`(같은 순서로 1:1). Fix 필드는 정확히 `target, fixKind, fixFiles`. `fixKind` ∈ `css-token|css-rule|js-render|static-markup|text-change`. `fixFiles`는 `FIX_FILES_BY_KIND[fixKind]`와 정확히 같은 배열(css-token `["css/themes.css"]`, css-rule `["css/style.css"]`, js-render `["js/main.js"]`, static-markup `["index.html"]`, text-change `[]`).
+  - `fixes`: targets와 같은 길이, `fixes[j].target === targets[j]`. Fix 필드는 정확히 `target, fixKind, fixFiles`. `fixKind` ∈ `css-token|css-rule|js-render|static-markup|text-change`. `fixFiles`는 `FIX_FILES_BY_KIND[fixKind]`와 정확히 같은 배열(css-token `["css/themes.css"]`, css-rule `["css/style.css"]`, js-render `["js/main.js"]`, static-markup `["index.html"]`, text-change `[]`).
   - entry `fixFiles`: 모든 fixes의 fixFiles 합집합, 고유, 오름차순(전부 text-change면 `[]`).
-- `validateBaseline(baseline) → string[]` 오류 형식(발견 순서): `baseline: not-array`; `baseline[{i}]: not-object`; `baseline[{i}]: fields missing=[a,b] extra=[c]`(이름 오름차순); `baseline[{i}]: bad-scenario|bad-project|bad-ruleId|key-mismatch|bad-impact`; `baseline[{i}]: targets empty|not-string|duplicate|unsorted`; `baseline[{i}]: selectors not-string|duplicate|unsorted`; `baseline[{i}]: fixes count`; `baseline[{i}].fixes[{j}]: not-object|fields missing=[..] extra=[..]|target-mismatch|bad-fixKind|fixFiles-mismatch`; `baseline[{i}]: fixFiles union-mismatch`; `baseline: duplicate-key {key}`; `baseline: unsorted`. 오류가 없으면 `[]`.
+- `validateBaseline(baseline) → string[]` 오류 형식(발견 순서): `baseline: not-array`; `baseline[{i}]: not-object`; `baseline[{i}]: fields missing=[a,b] extra=[c]`; `baseline[{i}]: bad-scenario|bad-project|bad-ruleId|key-mismatch|bad-impact`; `baseline[{i}]: targets empty|not-string|duplicate|unsorted`; `baseline[{i}]: selectors not-string|duplicate|unsorted`; `baseline[{i}]: fixes count`; `baseline[{i}].fixes[{j}]: not-object|fields missing=[..] extra=[..]|target-mismatch|bad-fixKind|fixFiles-mismatch`; `baseline[{i}]: fixFiles union-mismatch`(entry `fixFiles`를 유효한 fixes의 fixFiles 합집합과 비교, fixFiles-mismatch가 난 fix는 합집합 계산에서 그 fixKind의 `FIX_FILES_BY_KIND` 값을 쓴다); `baseline: duplicate-key {key}`; `baseline: unsorted`. 오류 없으면 `[]`.
 - 정상 예:
 
 ```
@@ -163,8 +163,10 @@ helper (`tests/helpers/axe.js`):
 ]
 ```
 
-- 오류 예: 위 entry에 `"note": "x"` 추가 → `baseline[0]: fields missing=[] extra=[note]`; fix의 `fixKind`를 `css-rule`로 바꾸고 fixFiles 유지 → `baseline[0].fixes[0]: fixFiles-mismatch`와 `baseline[0]: fixFiles union-mismatch`.
-- step 34는 이 계약으로만 baseline을 생성하고, step 27·28·32·46이 같은 계약을 쓴다.
+- 오류 예 A: 위 entry에 `"note": "x"` 추가 → 정확히 `["baseline[0]: fields missing=[] extra=[note]"]`.
+- 오류 예 B: fix의 `fixKind`만 `css-rule`로 바꾸고 fix `fixFiles`(`["css/themes.css"]`)와 entry `fixFiles`는 유지 → 정확히 `["baseline[0].fixes[0]: fixFiles-mismatch"]`(합집합은 css-rule 기준 `["css/style.css"]`이므로 entry `fixFiles`와 다르지만, fixFiles-mismatch가 난 entry에서는 union-mismatch를 보고하지 않는다).
+- 오류 예 C: fix는 정상 그대로 두고 entry `fixFiles`만 `["css/style.css"]`로 바꿈 → 정확히 `["baseline[0]: fixFiles union-mismatch"]`.
+- step 36은 이 계약으로만 baseline을 생성하고, step 29·30·34·50이 같은 계약을 쓴다.
 
 ### 8.6 remediation plan schema (고정)
 
@@ -174,7 +176,7 @@ helper (`tests/helpers/axe.js`):
   - `targets`: 비어 있지 않은 PlanTarget 배열. PlanTarget 필드는 정확히 `key, target`(둘 다 문자열). (key, target) 오름차순(key 먼저), 그룹 안 중복 없음. 각 PlanTarget은 baseline에 그 key의 entry가 있고 그 entry `targets`에 target이 있어야 한다. 같은 PlanTarget이 두 그룹에 있으면 안 된다.
   - `fixFiles`: 그룹 PlanTarget들에 대응하는 baseline fix의 fixFiles 합집합, 고유, 오름차순.
   - `difficulty` ∈ `low|medium|high`. `estMinutes`: 정수 1~20.
-  - `blocked`: boolean. `reason`: 문자열; `blocked === true`면 비어 있지 않아야 하고 `false`면 `""`. 그룹에 text-change fix가 하나라도 있거나 fixFiles에 `css/themes.css`가 있으면 `blocked === true`, reason은 각각 `text change excluded` 또는 `color change excluded (HOO-81 §16.3)`(둘 다면 `; `로 이어 그 순서). 색 값·색 역할 변경이 필요한 css-rule 그룹도 reason `color change excluded (HOO-81 §16.3)`로 blocked.
+  - `blocked`: boolean. `reason`: 문자열; `blocked === true`면 비어 있지 않고 `false`면 `""`. text-change fix가 있거나 fixFiles에 `css/themes.css`가 있으면 `blocked === true`, reason은 각각 `text change excluded` / `color change excluded (HOO-81 §16.3)`(둘 다면 그 순서로 `; ` 연결). 색 값·색 역할 변경이 필요한 css-rule 그룹도 reason `color change excluded (HOO-81 §16.3)`로 blocked.
 - coverage(`--coverage`): baseline의 모든 (key, target)이 정확히 한 그룹에 있다. requireEmpty: `groups.length === 0`.
 - `validateRemediationPlan` 오류 형식: `plan: not-object`, `plan: fields missing=[..] extra=[..]`, `plan: groups not-array`, `groups[{i}]: not-object|fields missing=[..] extra=[..]|bad-id|targets empty|fixFiles-mismatch|bad-difficulty|bad-estMinutes|bad-blocked|reason-required|reason-must-be-empty|blocked-required`, `groups[{i}].targets[{j}]: not-object|fields missing=[..] extra=[..]|unknown-target`, `groups[{i}]: targets duplicate|targets unsorted`, `plan: duplicate-id {id}`, `plan: groups unsorted`, `plan: target-in-multiple-groups {key}|{target}`, `plan: uncovered {key}|{target}`, `groups: expected empty, got {n}`.
 - prune(`prunePlan`): collected에 없는 PlanTarget 제거 → fixFiles 재계산 → 빈 그룹 삭제 → 나머지 필드·순서 유지, 추가 없음. `checkGroupDone`·`checkCollectedCoverage`도 PlanTarget 단위로 비교한다.
@@ -247,13 +249,13 @@ npm·node·playwright는 모두 이 래퍼로 실행한다. 하네스 testComman
 - `collectConsoleErrors(page)`: 즉시 listener, pageerror 전부, console.error는 Google Fonts 두 도메인만 제외, `finish()`는 networkidle 후 `{ pageErrors, consoleErrors }`.
 
 ### 11.5 `tests/scripts/verify-scope.mjs`
-- step 16 경로: `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`, `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']`(data.js 4구간). `collectInput({ git = runGit })`(Git 읽기만). 경로 정책: 빌더 허용 = §11.1 tracked(`css/themes.css` 변경은 위반). 하네스 소유(`CLAUDE.md`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, `.claude/**`, `.codex/**`, `.harness/harness.lock.json`, `.harness/policy.json`, 이 설계 문서, 레거시 `scripts/**`·`templates/**`·`harness-manifest.json`)은 committed 면제·미커밋 위반. 하네스 런타임 면제: 위 두 `.harness` 파일 외 `.harness/**`, `.venv/**`, `phases/HOO-81-portfolio-redesign/**`. runtime 경로 추적·루트 package.json은 위반.
-- step 17 내용: `checkDataJsDiff(patch, { requireExactly3 })`, `--final`, index.html 3종 `Space+Grotesk`, gitignore(index, worktree).
+- step 18 경로: `GIT_DIFF_PATH_ARGS = ['--no-renames', '--name-only']`, `GIT_DIFF_PATCH_ARGS = ['--no-renames', '--unified=0']`(data.js 4구간). `collectInput({ git = runGit })`(Git 읽기만). 경로 정책: 빌더 허용 = §11.1 tracked(`css/themes.css` 변경은 위반). 하네스 소유(`CLAUDE.md`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, `.claude/**`, `.codex/**`, `.harness/harness.lock.json`, `.harness/policy.json`, 이 설계 문서, 레거시 `scripts/**`·`templates/**`·`harness-manifest.json`)은 committed 면제·미커밋 위반. 하네스 런타임 면제: 위 두 `.harness` 파일 외 `.harness/**`, `.venv/**`, `phases/HOO-81-portfolio-redesign/**`. runtime 경로 추적·루트 package.json은 위반.
+- step 19 내용: `checkDataJsDiff(patch, { requireExactly3 })`, `--final`, index.html 3종 `Space+Grotesk`, gitignore(index, worktree).
 
 ### 11.6 통합 AC와 재검증 모드
 - 모든 step: 첫 동작 §11.7 시작 snapshot, 종료 시 기본 testCommand 통과, AC 마지막 범위 gate.
 - 종료 gate: step 0~11은 S `reused` 직후 inline C. step 12부터(재계획 `axe-remediation-{id}` 포함) CLI `scope-snapshot.mjs --check`.
-- step 16 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate. 시각 step(35~40)과 47은 `python3 -I tests/scripts/design-intake-check.py`와 guard spec 2개(`design-guard-css.spec.js`, `design-guard.spec.js`)를 AC에 포함한다.
+- step 18 이후 기본: 자기 spec 단독 → `npm --prefix tests test` → `verify-scope` → 범위 gate. 시각 step(37~44)과 51은 `python3 -I tests/scripts/design-intake-check.py`와 GUARD_SPECS(`css-parse.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js`)를 AC에 포함한다.
 - 재검증 모드(step 0~11): HEAD에 그 step의 tracked 허용 파일이 이미 commit되어 있으면 재검증 모드. 시작 snapshot → AC 실행 → 통과면 파일을 바꾸지 않고 범위 gate 실행, 로그 `reverify step{N}: no-op` → 불일치면 그 step의 허용 파일 안에서만 고쳐 통과시키고 로그 `reverify step{N}: fixed <파일 목록>`. 재검증 모드의 inline C 세 번째 인자(require-absent)는 `''`. step 0의 `step0 start clean` 조건은 최초 구축에만 적용. 기능 추가 없음.
 
 ### 11.7 시작 snapshot과 범위 gate
@@ -607,14 +609,14 @@ print('scope-snapshot: OK')
 
 S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 받아 `subprocess.run`(`rev-parse --show-toplevel`은 지정 경로, `status`는 지정한 bytes, 그 밖 git은 기록 후 예외), `os.lstat`·`os.walk`·`os.open`·`os.makedirs`·`builtins.open`을 기록용 래퍼로 감싸 `exec`하고 `SystemExit` 메시지·그 밖 예외 유형·호출 기록을 JSON으로 출력한다.
 
-비교 도구 `tests/scripts/scope-snapshot.mjs` (S·C와 같은 판정, step별 추가만): step 1 상수·`UnsafePathError`·`checkRoot`·`pathKind`·`checkPath`·`readRegular`; step 2 `isRepoRelative`·`parseStatusZ`(엄격 UTF-8)·`statusXyMap`·`scanJsonTopLevel`·`isSchemaVersion1`; step 3 `loadStartSnapshot`; step 4 `scanProject`·`hashPath`·`takeCurrent`; step 5·6 코드 없음; step 7 `computeIdentity`·`checkIdentity`·`diffAgainstStart`·`classifyChanges`·`checkRuntimeVisible`·`checkSnapshotFirst`·`evaluateGate`; step 8 `writeAfterZ`·`runCheck`·CLI `--check <start.json> --allow <list> [--require-absent <list>]`(인자 오류 exit 2); step 9~11 코드 없음.
+비교 도구 `tests/scripts/scope-snapshot.mjs` (S·C와 같은 판정, step별 추가만): step 1 상수·`UnsafePathError`·`checkRoot`·`pathKind`·`checkPath`·`readRegular`; step 2 `isRepoRelative`·`parseStatusZ`(엄격 UTF-8)·`statusXyMap`·`scanJsonTopLevel`·`isSchemaVersion1`; step 3 `loadStartSnapshot`; step 4 `scanProject`·`hashPath`·`takeCurrent`; step 5·6 코드 없음; step 7 `computeIdentity`·`checkIdentity`·`diffAgainstStart`·`classifyChanges`·`checkRuntimeVisible`·`checkSnapshotFirst`·`evaluateGate`; step 8 `writeAfterZ`·`runCheck(opts, deps)`(deps `{ git, fs, root, impl? }`; `impl`은 테스트 전용으로 `checkRoot`, `loadStartSnapshot`, `computeIdentity`, `checkIdentity`, `takeCurrent`, `writeAfterZ`, `evaluateGate`를 바꿔 끼우는 객체, 없으면 실제 함수)·CLI `--check <start.json> --allow <list> [--require-absent <list>]`(인자 오류 exit 2); step 9~11 코드 없음.
 
 테스트 격리 규칙: 실제 저장소에는 runtime 경로(`tests/.tmp/start-snapshot-parity-{숫자}.json`과 after.z, `tests/.tmp/snapshot-probes/__retry_probe.txt`, `tests/.tmp/status-harness-<pid>/`, `tests/.tmp/design-intake-<pid>/`)만 쓴다. 비runtime 검증은 합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`(+`<pid>-outside`, `<pid>-link`, `<pid>-file`)에서 한다. subprocess timeout 10초.
 
 ## 12. 변경 허용 경로와 운영 경계
 
 - index.json allowedPaths: `index.html`, `css/style.css`, `js/main.js`, `js/data.js`, `tests/`. `css/themes.css`, Harness managed·policy·lock·state, 외부 evidence는 제외. 각 step의 tracked 허용 파일 = 범위 gate `--allow`.
-- `index.html` 구조 변경은 step 35·36·38만. 속성 변경은 remediation 그룹 step만 허용하며 예외는 step 38의 두 가지: (a) `.scroll-hint` `href`를 `#career`로, (b) §6 표대로 section `class`.
+- `index.html` 구조 변경은 step 37·38·40만. 속성 변경은 remediation 그룹 step만 허용하며 예외는 step 40의 두 가지: (a) `.scroll-hint` `href`를 `#career`로, (b) §6 표대로 section `class`.
 - 빌더 허용 명령: Git 읽기(rev-parse, diff, show, ls-files, ls-tree, status, log, `-w` 없는 hash-object), §11.7 snapshot·검사, §16.1 intake 검사(외부 evidence 읽기 전용). 하네스 전용: 프로젝트 저장소 Git 상태 변경, Harness 운영 명령, §17 preflight. main 직접 변경·merge·deploy 금지.
 - 합성 저장소 예외: `tests/.tmp/synthetic-repos/<pid>/`에서만 `git -C <dir> init -q`, `add -A`/정확한 경로 add, `-c user.name=t -c user.email=t@example.invalid commit -q -m <msg>`.
 - 빌더 수정 금지: `CLAUDE.md`, `docs/**`, `phases/**`, `.harness/**`, `.claude/**`, `.codex/**`, `pytest.ini`, `.python-version`, `.gitattributes`, 루트 `.gitignore`, `css/themes.css`, 시작 snapshot 파일, 외부 evidence.
@@ -631,53 +633,57 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 | 5 | scope-snapshot-symlink (재검증) | 18 | S reused + C |
 | 6 | scope-snapshot-special-files (재검증) | 19 | S reused + C |
 | 7 | scope-snapshot-identity (재검증) | 18 | S reused + C |
-| 8 | scope-snapshot-cli (재검증) | 17 | S reused + C |
+| 8 | scope-snapshot-cli (재검증) | 18 | S reused + C |
 | 9 | scope-snapshot-parity-core (재검증) | 19 | S reused + C |
 | 10 | scope-snapshot-parity-paths (재검증) | 17 | S reused + C |
 | 11 | scope-snapshot-parity-artifacts (재검증) | 19 | S reused + C |
 | 12 | claude-design-intake | 15 | CLI (첫 CLI gate) |
-| 13 | design-guard-css | 19 | CLI |
-| 14 | design-guard-markup | 16 | CLI |
-| 15 | tests-browser-smoke | 15 | CLI |
-| 16 | scope-paths | 19 | CLI |
-| 17 | scope-content | 19 | CLI |
-| 18 | content-data-baseline | 16 | CLI |
-| 19 | content-static-baseline | 17 | CLI |
-| 20 | modal-regression | 18 | CLI |
-| 21 | ui-regression | 17 | CLI |
-| 22 | axe-canonical | 19 | CLI |
-| 23 | axe-prepare-page | 15 | CLI |
-| 24 | axe-prepare-modal | 18 | CLI |
-| 25 | axe-prepare-lightbox | 19 | CLI |
-| 26 | axe-collect-tooling | 19 | CLI |
-| 27 | axe-baseline-regression | 19 | CLI |
-| 28 | axe-baseline-projection | 17 | CLI |
-| 29 | axe-remediation-plan-schema | 19 | CLI |
-| 30 | axe-plan-executable | 15 | CLI |
-| 31 | axe-current-checks | 17 | CLI |
-| 32 | axe-regression-prune | 19 | CLI |
-| 33 | axe-collect | 17 | CLI |
-| 34 | axe-classify | ≤20 (초과 시 재계획) | CLI |
-| 35 | featured-projects | 19 | CLI |
-| 36 | hero-first-screen | 20 | CLI |
-| 37 | hero-two-column | 17 | CLI |
-| 38 | section-structure | 19 | CLI |
-| 39 | section-layout | 17 | CLI |
-| 40 | component-states | 19 | CLI |
-| 41 | focus-trap-modal | 17 | CLI |
-| 42 | focus-trap-lightbox | 17 | CLI |
-| 43 | print-pdf | 17 | CLI |
-| 44 | axe-remediation-gate | 18 | CLI |
+| 13 | css-parser | 17 | CLI |
+| 14 | design-guard-color | 19 | CLI |
+| 15 | design-guard-type-asset | 15 | CLI |
+| 16 | design-guard-integration | 15 | CLI |
+| 17 | tests-browser-smoke | 15 | CLI |
+| 18 | scope-paths | 19 | CLI |
+| 19 | scope-content | 19 | CLI |
+| 20 | content-data-baseline | 16 | CLI |
+| 21 | content-static-baseline | 17 | CLI |
+| 22 | modal-regression | 18 | CLI |
+| 23 | ui-regression | 17 | CLI |
+| 24 | axe-canonical | 19 | CLI |
+| 25 | axe-prepare-page | 15 | CLI |
+| 26 | axe-prepare-modal | 18 | CLI |
+| 27 | axe-prepare-lightbox | 19 | CLI |
+| 28 | axe-collect-tooling | 19 | CLI |
+| 29 | axe-baseline-regression | 19 | CLI |
+| 30 | axe-baseline-projection | 17 | CLI |
+| 31 | axe-remediation-plan-schema | 19 | CLI |
+| 32 | axe-plan-executable | 15 | CLI |
+| 33 | axe-current-checks | 17 | CLI |
+| 34 | axe-regression-prune | 19 | CLI |
+| 35 | axe-collect | 17 | CLI |
+| 36 | axe-classify | ≤20 (초과 시 재계획) | CLI |
+| 37 | featured-projects | 19 | CLI |
+| 38 | hero-first-screen | 20 | CLI |
+| 39 | hero-two-column | 17 | CLI |
+| 40 | section-structure | 19 | CLI |
+| 41 | section-layout | 17 | CLI |
+| 42 | component-hit-open | 18 | CLI |
+| 43 | component-hover-active | 15 | CLI |
+| 44 | component-clamp-stripe | 15 | CLI |
+| 45 | focus-trap-modal | 17 | CLI |
+| 46 | focus-trap-lightbox | 17 | CLI |
+| 47 | print-pdf | 17 | CLI |
+| 48 | axe-remediation-gate | 18 | CLI |
 | (재계획) | axe-remediation-{id} | ≤20 | CLI |
-| 45 | axe-remediation-recheck | 18 | CLI |
-| 46 | axe-finalize | 16 | CLI |
-| 47 | final-verification | 17 | CLI |
+| 49 | axe-remediation-recheck | 18 | CLI |
+| 50 | axe-finalize | 16 | CLI |
+| 51 | final-verification | 17 | CLI |
 
-각 step의 선행은 그보다 작은 번호 전부(45는 재계획 그룹 포함).
+각 step의 선행은 그보다 작은 번호 전부(49는 재계획 그룹 포함).
 
 ## 14. 빌더 재량
 
-§16.2 tokens 안의 비색 타이포 세부값, CSS 클래스 구조(명시된 id·data 속성·클래스 유지), 테스트 helper 분할.
+§16.2 tokens 안의 비색 타이포 세부값, CSS 클래스 구조(명시된 id·data 속성·클래스 유지), 테스트 helper 내부 구조.
 
 ## 15. step 공통 절차
 
@@ -687,7 +693,7 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 4. 실행: npm·node는 래퍼로, Playwright `workers: 1`, §11.7 실행 전제 준수.
 5. 첫 동작: 시작 snapshot(`python3 -I tests/scripts/start-snapshot.py step{N}`, step 0은 heredoc S). `created`/`reused`가 아니면 중단·보고.
 6. runtime 쓰기 기본 R0: `tests/.tmp/**`, `tests/.npm-cache/**`, `tests/test-results/**`, `tests/playwright-report/**`.
-7. 공통 수정 금지: step 허용 목록 밖 파일, 이전 step 함수 동작, 시작 snapshot, 비runtime symlink·특수 파일, §16.3 제외 항목.
+7. 공통 수정 금지: step 허용 목록 밖 파일, 이전 step 함수 동작, 이전 step spec, 시작 snapshot, 비runtime symlink·특수 파일, §16.3 제외 항목.
 8. 종료 조건: 기본 testCommand 통과 + AC 마지막 범위 gate 통과.
 9. step 0~11은 §11.6 재검증 모드.
 
@@ -737,36 +743,48 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 ### 16.2 허용 패턴 (구현 기준)
 
 - Explore surface: PROJECTS 13개 전체를 기존 순서로 card grid, card → modal 탐색 유지.
-- hero(step 36·37): `.hero-inner` 직계 자식 8개. viewport ≥ 1024px에서 `display: grid`, `grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)`, column-gap 48px, `grid-template-areas: "eyebrow summary" "name summary" "tagline summary" "role cta" "stats stats" "featured featured"`(DOM 순서 불변), 좌측 정렬. 1024px 미만 1열.
+- hero(step 38·39): `.hero-inner` 직계 자식 8개. viewport ≥ 1024px에서 `display: grid`, `grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)`, column-gap 48px, `grid-template-areas: "eyebrow summary" "name summary" "tagline summary" "role cta" "stats stats" "featured featured"`(DOM 순서 불변), 좌측 정렬. 1024px 미만 1열.
 - 섹션 padding·card gap: §9 표.
-- component state(step 40): 대상 `.nav-link`, `#menuToggle`, `#themeToggle`, `.hero-cta .btn`, `.featured-card`, `#projectGrid .project-card`, `#projectModal .modal-close`, `#contactActions a`, `.scroll-hint`(보일 때). default/hover/active는 비색 속성(transform·opacity)만 다르고 color·background-color·border-color·outline-color는 default와 같다. focus-visible은 기존 outline(step 42). 측정 시점: 상태 진입 후 `document.getAnimations().length === 0`이 될 때까지 `expect.poll`한 뒤 `getComputedStyle`·`boundingBox`.
-  - hit target(6 project): 그 project에서 기본 상태로 보이는 대상의 bbox width·height ≥ 44px.
-  - menu open(`mobile-dark` 전용, 다른 project는 `test.skip`): 열기 전 `#menuToggle`의 color·background-color·border-color 측정 → `#menuToggle` click → `aria-expanded="true"`·`#navLinks.open` → 보이는 `.nav-link` 각각 bbox ≥ 44px → `#menuToggle` 색 3속성이 열기 전과 같음 → 닫기 후 `aria-expanded="false"`.
-  - modal open(6 project): 열기 전 `#projectGrid .project-card[data-project="0"]` 색 3속성 측정 → 그 카드 click → body `modal-open`·`#projectModal` visible → `#projectModal .modal-close` bbox ≥ 44px → button으로 닫기 → `modal-open` 해제 후 같은 카드 색 3속성이 열기 전과 같음.
+- component state(step 42~44): 대상 `.nav-link`, `#menuToggle`, `#themeToggle`, `.hero-cta .btn`, `.featured-card`, `#projectGrid .project-card`, `#projectModal .modal-close`, `#contactActions a`, `.scroll-hint`(보일 때). 측정 시점: 상태 진입 후 `document.getAnimations().length === 0`이 될 때까지 `expect.poll`한 뒤 `getComputedStyle`·`boundingBox`. 색 3속성 = color·background-color·border-color.
+  - step 42 hit target(6 project): 그 project에서 기본 상태로 보이는 대상의 bbox width·height ≥ 44px.
+  - step 42 menu open(`mobile-dark` 전용, 다른 project는 `test.skip`): 열기 전 `#menuToggle` 색 3속성 측정 → `#menuToggle` click → `aria-expanded="true"`·`#navLinks.open` → 보이는 `.nav-link` 각각 bbox ≥ 44px → `#menuToggle` 색 3속성이 열기 전과 같음 → 다시 click → `aria-expanded="false"`.
+  - step 42 modal open(6 project): 열기 전 `#projectGrid .project-card[data-project="0"]` 색 3속성 측정 → 그 카드 click → body `modal-open`·`#projectModal` visible → `#projectModal .modal-close` bbox ≥ 44px → button으로 닫기 → `modal-open` 해제 후 같은 카드 색 3속성이 열기 전과 같음.
+  - step 43 hover·active(`desktop-dark`·`desktop-light`): `.hero-cta .btn`(각각), `.featured-card`(첫 번째), `#projectGrid .project-card[data-project="0"]`에 대해 default 측정 → `hover()` 후 측정 → `mouse.down()` 상태 측정 → `mouse.up()`; hover와 active 각각에서 `transform` 또는 `opacity`가 default와 다르고 색 3속성과 outline-color는 default와 같다.
+  - step 44 line clamp: `.featured-blurb`와 `#projectGrid` 카드 blurb에 screen `-webkit-line-clamp: 3`(DOM 텍스트 전문 유지, 모달·print는 전문). strength 장식 stripe: BASE `.strength-card::before` 규칙은 제거 가능(선택).
+- focus-visible은 기존 outline(step 46).
 - typography hierarchy: font-size·line-height·letter-spacing·margin 위계만. font-weight는 BASE `css/style.css`에 쓰인 값(400·500·600·700)만.
-- line clamp: `.featured-blurb`와 `#projectGrid` 카드 blurb에 screen `-webkit-line-clamp: 3`(DOM 텍스트 전문 유지, 모달·print는 전문).
-- strength 장식 stripe: BASE `.strength-card::before` 규칙은 제거 가능(선택).
 
 ### 16.3 제외(절대 반영 금지)
 
-새 색상 값, 기존 색상의 역할·적용 위치 변경(특히 button/logo dark text `#0d0f12`, muted grey 재배정), 서체 family/weight asset 변경, 새 문구·수치·통계·섹션·이미지·아이콘, 프로젝트 순서·정보구조 변경, mockup placeholder 실콘텐츠화, `css/themes.css` 변경. bundle의 hero `min-height`·card thumb 비율 등 허용 목록 밖 제안도 반영하지 않는다.
+새 색상 값, 기존 색상의 역할·적용 위치 변경(특히 button/logo dark text `#0d0f12`, muted grey 재배정), 색 custom property의 추가·재정의·삭제·별칭 변경, named color·`currentColor`를 통한 색 역할 변경, 서체 family/weight asset 변경, 새 문구·수치·통계·섹션·이미지·아이콘, 프로젝트 순서·정보구조 변경, mockup placeholder 실콘텐츠화, `css/themes.css` 변경. bundle의 hero `min-height`·card thumb 비율 등 허용 목록 밖 제안도 반영하지 않는다.
 
-### 16.4 design guard
+### 16.4 design guard (step 13~16)
 
-step 13 CSS 판정(`tests/helpers/design-guard-css.js`, 순수):
-- `parseCssRules(text) → Rule[]`: 주석 제거, 따옴표 문자열 안의 괄호 무시, 중첩 at-rule 지원. Rule = `{ chain: string[], selectors: string[], decls: Array<[prop, value]>, index }`(chain은 바깥부터의 at-rule prelude를 공백 정규화한 목록, selectors는 쉼표로 나눠 공백 정규화, `@font-face`·`@import`는 chain에 그 at-rule 이름을 가진 Rule로 기록).
-- 색 선언: prop이 `color|background|background-color|background-image|border|border-top|border-right|border-bottom|border-left|border-color|outline|outline-color|fill|stroke|box-shadow|text-shadow|text-decoration-color|caret-color|accent-color|column-rule-color`이거나, 값에 색 리터럴(`#[0-9a-fA-F]{3,8}\b`, `rgb(`, `rgba(`, `hsl(`, `hsla(`, `hwb(`, `lab(`, `lch(`, `oklab(`, `oklch(`, `color-mix(`)이 있거나, custom property(`--x`) 값에 색 리터럴이 있는 선언. 단 `border*` 값이 `0`·`none`이면 색 선언이 아니다.
+step 13 parser(`tests/helpers/css-parse.js`, 순수):
+- `parseCssRules(text, file) → Rule[]`. 주석(`/* */`) 제거, 따옴표 문자열(`'…'`, `"…"`, 백슬래시 이스케이프) 안의 `{`·`}`·`;`·`,`는 구조로 보지 않음, `url(…)` 안의 `;` 무시, 중첩 at-rule(`@media`, `@supports`, `@layer`, `@container`) 재귀, 블록 없는 at-rule(`@import`, `@charset`)과 `@font-face`는 Rule로 기록.
+- Rule = `{ file, chain: string[], selectors: string[], decls: Array<[prop, value]>, atRule: string|null, index }`. chain은 바깥 at-rule prelude(공백 정규화) 목록, selectors는 최상위 쉼표로만 분리(`:is(a, b)`·`[data-x="a,b"]` 안 쉼표는 분리하지 않음)하고 공백 정규화, prop은 소문자(custom property는 원문), value는 trim·공백 정규화, `!important` 유지.
+- `splitSelectors(text)`, `normalizeValue(value)` export.
+
+step 14 색·token 보존(`tests/helpers/design-guard-color.js`, 순수, step 13 import):
+- `NAMED_COLORS`: CSS Color 4 named color 148개 + `transparent`. `COLOR_PROPS`: `color, background, background-color, background-image, border, border-top, border-right, border-bottom, border-left, border-color, outline, outline-color, fill, stroke, box-shadow, text-shadow, text-decoration-color, caret-color, accent-color, column-rule-color`(`border*` 값이 `0`·`none`이면 비색).
+- 색 값 판정 `isColorValue(value, colorTokens)`: 색 리터럴(`#[0-9a-fA-F]{3,8}\b`, `rgb(`, `rgba(`, `hsl(`, `hsla(`, `hwb(`, `lab(`, `lch(`, `oklab(`, `oklch(`, `color-mix(`), `NAMED_COLORS`의 식별자(대소문자 무시, 문자열·`url()`·`var()` 이름 밖), `currentColor`, 또는 `var(--x)`의 x가 colorTokens에 있음.
+- 색 token 그래프 `colorTokenSet(rules)`: 두 파일(style·themes)의 모든 custom property 정의를 노드로, `var(--y)` 참조를 간선으로 둔다. 시작 집합 = 값이 색 리터럴·named color·`currentColor`인 정의의 이름 ∪ 색 선언(COLOR_PROPS)이 `var()`로 참조하는 이름. 이 집합을 별칭 사슬로 양방향(참조하는 쪽·참조되는 쪽) 닫은 고정점이 color token 집합이다. BASE 그래프로 계산한다.
 - featured 대응 선택자: `.project-card`를 포함한 BASE 선택자의 모든 `.project-card`를 `.featured-card`로 바꾼 문자열.
-- `checkCss({ baseCss, currentCss, baseThemes, currentThemes }) → string[]`:
-  1. BASE의 색 Rule R마다(같은 chain·selectors가 여러 번이면 등장 순서로 짝지음): selectors가 모두 `.strength-card::before`인 R은 현재에 없어도 되고 있으면 아래 규칙을 따른다. 그 밖의 R은 현재에서 chain이 정확히 같고 selectors ⊇ R.selectors인 Rule이 정확히 하나 있어야 한다(없으면 `color-rule-missing:{chain}|{selectors}` — 대상 교체·미디어 조건 변경·삭제 포함). 그 Rule의 추가 선택자는 R의 featured 대응 선택자만 허용(그 밖이면 `selector-extended:{selectors}`). 그 Rule의 색 선언 집합(prop·value)은 R과 정확히 같아야 한다(`color-decl-changed:{selectors}`).
-  2. 1에서 R과 짝지어지지 않은 현재 Rule에 색 선언이 있으면 `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 값에 색 리터럴이 없고 `var(--x)`가 BASE에 정의된 토큰만 쓰는 경우.
-  3. BASE에 같은 chain·selectors·선언으로 없는 `font-family`·`font` 선언, `@font-face`·`@import` → `font-asset:{selectors}`; `font-weight` 값이 BASE 값 집합 밖 → `font-weight:{value}`; 새 `url(` → `asset:{selectors}`; 새 `content` 값이 `none`·`''`·`""`·`normal` 밖 → `content:{selectors}`; `var(--x)`의 x가 BASE style·themes와 현재의 비색 custom property 정의에 없으면 → `unknown-token:--x`.
-  4. `currentThemes !== baseThemes` → `themes-changed`.
+- `checkColors({ baseRules, currentRules }) → string[]`:
+  1. BASE 색 Rule R(COLOR_PROPS 선언이 있는 Rule)마다(같은 file·chain·selectors가 여러 번이면 등장 순서로 짝지음): selectors가 모두 `.strength-card::before`인 R은 현재에 없어도 된다. 그 밖의 R은 현재에 file·chain이 정확히 같고 selectors ⊇ R.selectors인 Rule이 정확히 하나 있어야 한다(없으면 `color-rule-missing:{chain}|{selectors}`; 대상 교체·미디어 조건 변경·삭제 포함). 추가 선택자는 R의 featured 대응 선택자만(그 밖 `selector-extended:{selectors}`). 색 선언 집합(prop·정규화 value)은 R과 같아야 한다(`color-decl-changed:{selectors}`).
+  2. 짝지어지지 않은 현재 Rule의 COLOR_PROPS 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 값의 `var(--x)`가 BASE color token만 참조하고 리터럴·named color·`currentColor`가 없음.
+  3. BASE color token 정의(file·chain·selectors·name·value)마다 현재에 같은 정의가 정확히 하나 있어야 한다: 없으면 `color-token-removed:--x`, 값이 다르면 `color-token-changed:--x`.
+  4. 현재 정의 중 BASE에 같은 (file·chain·selectors·name)이 없는 것: 이름이 BASE color token이면 `color-token-redefined:--x`, 값이 `isColorValue(value, BASE color tokens)`이면 `color-token-added:--x`. BASE 비색 custom property의 값을 색 값으로 바꾸면 `color-token-added:--x`.
+  5. 비색 선언의 값에 `currentColor`·named color가 새로 나타나면(같은 선언이 BASE에 없으면) `color-decl-new:{selectors}`.
 
-step 14 markup·통합(`tests/helpers/design-guard.js`):
+step 15 서체·asset·token(`tests/helpers/design-guard-css.js`, 순수, step 13·14 import):
+- `checkTypeAndAssets({ baseRules, currentRules }) → string[]`: BASE에 같은 file·chain·selectors·선언으로 없는 `font-family`·`font` 선언과 `@font-face`·`@import` → `font-asset:{selectors|atRule}`; `font-weight` 값이 BASE style.css 값 집합 밖 → `font-weight:{value}`; 새 `url(` → `asset:{selectors}`; 새 `content` 값이 `none`·`''`·`""`·`normal` 밖 → `content:{selectors}`; `var(--x)`의 x가 BASE 두 파일과 현재의 비색 custom property 정의 어디에도 없으면 → `unknown-token:--x`.
+- `checkCss({ baseCss, currentCss, baseThemes, currentThemes }) → string[]` = 네 텍스트를 parse해 `[...checkColors(...), ...checkTypeAndAssets(...)]`, 그리고 `currentThemes !== baseThemes`면 `themes-changed`.
+
+step 16 markup·통합(`tests/helpers/design-guard.js`):
 - `checkMarkupPatch(patch, kind)`: `git diff --unified=0` patch의 추가 줄에 `<img`, `<svg`, `<picture`, `<video`, `<i `, `<i>`, `<link`, `<script`, `<font`, `style=`, `.style.color`, `.style.background`, `.style.font`가 있으면 `markup-asset:{kind}:{n}`.
-- `collectGuardInput({ git, fs })`: `git show <BASE>:css/style.css`, `git show <BASE>:css/themes.css`, worktree `css/style.css`·`css/themes.css`(읽기), `git diff --no-renames --unified=0 <BASE> -- index.html`, `-- js/main.js`(Git 읽기만).
-- `runGuard(input) = [...checkCss(...), ...checkMarkupPatch(html, 'index.html'), ...checkMarkupPatch(js, 'js/main.js')]`. 실제 저장소 검사는 이후 모든 step의 전체 testCommand에서 위반 0을 요구한다.
+- `collectGuardInput({ git, fs })`: `git show <BASE>:css/style.css`, `git show <BASE>:css/themes.css`, worktree `css/style.css`·`css/themes.css`(읽기), `git diff --no-renames --unified=0 <BASE> -- index.html`, `-- js/main.js`.
+- `runGuard(input) = [...checkCss(...), ...checkMarkupPatch(html, 'index.html'), ...checkMarkupPatch(js, 'js/main.js')]`. 이후 모든 step의 전체 testCommand에서 위반 0을 요구한다.
 
 ## 17. fresh runner preflight (대표 exact 승인 후, runner 시작 전, 하네스 수행 — source 구현 아님)
 
@@ -780,5 +798,5 @@ step 14 markup·통합(`tests/helpers/design-guard.js`):
 2. backup: `/Users/hoon/.hermes/company/development/product-management/HOO-81-evidence/preflight-<UTC 타임스탬프>/`에 같은 상대 경로로 `cp -p` 복사하고, 원본·복사본 sha256 manifest(`manifest.sha256`, 28줄)를 기록한다.
 3. 원본과 복사본 sha256이 모두 같을 때만 `rm --` 뒤에 28개 경로를 명시적으로 나열해 제거한다. `git clean`, `git reset`, `git restore`, `git checkout`, glob·와일드카드·디렉터리 삭제는 쓰지 않는다.
 4. 검증: 28개 경로가 모두 없음(lstat ENOENT), backup 28개가 manifest sha256과 일치, HEAD가 plan commit과 같음, `git status --porcelain=v1 --untracked-files=all`에 §11.5 하네스 런타임 면제 밖 항목 없음, `tests/.tmp`에 `start-snapshot-*` 파일 없음.
-5. 위 목록 밖의 `start-snapshot-*` 파일이 발견되면 제거하지 않고 중단해 대표 지시를 받는다. 두 untracked 파일 내용은 승인된 구현이 아니며 step 15가 새로 작성한다.
+5. 위 목록 밖의 `start-snapshot-*` 파일이 발견되면 제거하지 않고 중단해 대표 지시를 받는다. 두 untracked 파일 내용은 승인된 구현이 아니며 step 17이 새로 작성한다.
 6. Harness 2.0.1 migration·Chromium 선행 HOO-100은 완료 상태다.

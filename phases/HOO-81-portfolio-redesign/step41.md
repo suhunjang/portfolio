@@ -1,18 +1,18 @@
-# Step 41 — focus-trap-modal
+# Step 41 — section-layout
 
-- 목적: `trapFocus` 구현과 모달 연결.
+- 목적: 섹션 padding(64/80/96px), card gap 24px, Career·그리드 반응형, 비색 타이포 위계.
 - 예상 17분 / 선행 0~40 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.2(step 41)
-- tracked 허용(exact): `js/main.js`(`trapFocus`와 모달 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
+- read-first: 설계 §6, §9, §16(DESIGN_HASH_CHECK 후 `DesktopExplore.dc.html`·`Mobile.dc.html`·`Foundations.dc.html` 읽기 전용); fixture tokens
+- tracked 허용(exact): `css/style.css`(섹션 padding, Career, 그리드 gap·열, 섹션 제목·`.subsection-title` 비색 타이포만), `tests/specs/layout.spec.js`
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 코드
+- 금지: §15.7, `index.html`, `js/*`, 색·서체 asset, BASE 밖 font-weight
 
 ## 작업 (TDD)
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step41`
-2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 경계 순환, 이탈 없음, 세 닫기 경로 복귀, 두 트리거 영역, 반복 후 Tab 한 칸.
-3. main.js.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step41` → `python3 -I tests/scripts/design-intake-check.py`
+2. `layout.spec.js`(6 project, tokens는 fixture): 가로 스크롤 없음; `#career`~`#contact` padding-top·bottom = tokens.sectionPaddingPx[viewport]; `#heroFeatured`·`#projectGrid`·`#strengthsGrid` row-gap·column-gap 24px; projectGrid·strengthsGrid 3/2/1열; Career 375 세로·768/1280 가로(top 차 < 24px); 375 highlights 보임; `.subsection-title` font-weight ≤ h2·font-size < h2.
+3. style.css.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step41.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- layout.spec.js css-parse.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step41.json --allow css/style.css,tests/specs/layout.spec.js` → exit 0

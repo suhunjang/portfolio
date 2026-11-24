@@ -11,7 +11,7 @@
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step11`
 2. AC 실행 → 통과면 no-op, 실패면 spec만 수정.
-3. 계약: after.z 있음/없음 × FIFO/symlink 4가지를 `runCheck`·C로(exit 1, after.z 불변·미생성); CLI `tests/.tmp` 외부 링크 `unsafe path: symlink:tests/.tmp`; 실제 저장소 after.z FIFO `non-regular:`; identity 7개 변형 `start snapshot identity mismatch: {field}`, after.z 미생성, status·tests 밖 sha256 불변.
+3. 계약: step 9 합성 준비; 기존 after.z 있음/없음 × 기록 대상 FIFO `tests/specs/p.fifo`/symlink `link-x → <outside>/secret.txt` 4가지에서 `runCheck({ startFile, allow: [그 경로] })`와 C 모두 exit 1·stderr에 `non-regular:tests/specs/p.fifo` 또는 `symlink:link-x`, after.z open 없음, 있음이면 bytes·mtime 불변, 없음이면 미생성; CLI(cwd dir) `tests/.tmp → <outside>/tmpdir` → `unsafe path: symlink:tests/.tmp`, 외부 불변; 실제 저장소 after.z FIFO → `non-regular:…-after.z`; identity 7개 변형(`projectRoot`=`/tmp/other`, `head`=40자 0, `base`=40자 f, `harness.sourceCommit`, `harness.manifestHash`, `harness.distributionVersion`=`9.9.9`, `harness.lockSha256`=64자 0) 각각 `start snapshot identity mismatch: {field}`, after.z 미생성, status·tests 밖 sha256 불변.
 
 ## AC (한 셸에서 순서대로, 모두 exit 0)
 

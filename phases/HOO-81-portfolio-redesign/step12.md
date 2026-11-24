@@ -12,7 +12,7 @@
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step12`
 2. fixture: 설계 §16.1 fenced block과 파싱 결과 deep-equal(끝 개행 1개).
 3. `design-intake-check.py`: 설계 §16.1 계약(`--fixture` 선택 인자, 읽기만, 메시지 형식 고정).
-4. `design-intake.spec.js`(node 전용, desktop-dark만, 외부 경로는 읽지 않음): fixture = 설계 블록(설계 문서는 읽기만); `files` 9개 소문자 64hex; `adopted`·`excluded`·tokens 값; 합성 — `tests/.tmp/design-intake-<pid>/`에 가짜 bundle 9개·summary·fixture 사본 → `--fixture` 실행: 정상 OK, 바이트 변경 `hash mismatch:`, 파일 추가 `files mismatch`, symlink `unsafe:`, summary 줄 변경 `summary mismatch:`, 사본 bytes 불변; 삭제.
+4. `design-intake.spec.js`(node 전용, desktop-dark만, 외부 경로는 읽지 않음): fixture = 설계 블록(설계 문서는 읽기만); `files` 9개 소문자 64hex; `adopted`·`excluded`·tokens 값; 합성 — `tests/.tmp/design-intake-<pid>/`에 가짜 bundle 9개·summary·그에 맞춘 fixture 사본 → `python3 -I tests/scripts/design-intake-check.py --fixture <사본>`: 정상 `design-intake: OK`, 한 파일 바이트 변경 `design-intake: hash mismatch:{name}`, 파일 추가 `design-intake: files mismatch`, 파일을 symlink로 `design-intake: unsafe:{path}`, summary 줄 변경 `design-intake: summary mismatch:{name}`, 사본 bytes 불변; 삭제.
 
 ## AC (한 셸에서 순서대로, 모두 exit 0)
 

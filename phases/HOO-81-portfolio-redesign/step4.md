@@ -11,7 +11,7 @@
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step4`
 2. AC 실행 → 통과면 no-op, 실패면 계약 안에서 수정.
-3. 계약: `scanProject`, `hashPath`, `takeCurrent`; `synthetic-repo.js`(`makeSyntheticRepo`, `designBlock`, `runPython`, `runNode`, `runHarness`). spec: `hashPath` 4유형·링크 follow 없음; `scanProject` root symlink·SKIP·정렬; `takeCurrent` start key 경로 위반 → fs 0; 합성 수집·rename(`R ` 두 경로); runtime 내부 링크 비보고; 실제 저장소 parity 일치; cleanup.
+3. 계약: `scanProject`, `hashPath`, `takeCurrent(start | null, { git, fs, root })`; `synthetic-repo.js`: `makeSyntheticRepo() → { dir, outside, git(args), cleanup() }`(init/add/commit만), `designBlock(marker)`, `runPython(args, { cwd, input })`, `runNode(args, { cwd })`(timeout 10초), `runHarness(body, { cwd, toplevel, argv, status? })`. spec: `hashPath` file sha256·missing null·dir `non-regular:`·symlink `symlink:`, 링크 follow 호출 없음; `scanProject` root symlink → readdir 없음, SKIP 미진입·엔트리 symlink 보고·정렬; `takeCurrent` start `files`에 `../outside.txt` → `bad start snapshot: paths`·fs 0; 합성(`.gitignore`·`tracked.txt`·`tests/specs/a.spec.js` commit 후 수정·ignore·runtime 파일) `unsafe` `[]`·files 정확; rename(`fs.renameSync` + `add -A`, `R ` 두 경로, a null); `tests/node_modules/.bin/x` 링크 비보고; 실제 저장소 `parity-<pid>`와 `takeCurrent(null)` 일치; cleanup.
 
 ## AC (모두 exit 0)
 
