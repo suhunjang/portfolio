@@ -1,8 +1,8 @@
-# Step 34 — axe-plan-executable
+# Step 34 — axe-remediation-plan-schema
 
-- 목적: blocked·text-change·빈 fixFiles 그룹에서 중단하는 실행 가능성 검사.
-- 예상 15분 / 선행 0~33 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §7.2, §8.3(step 34, 재계획 조건), §8.6(FIXTURE_OK·FIXTURE_THEMES), §16.3
+- 목적: §8.6 plan schema 검증(`validateRemediationPlan`, PlanTarget `{key, target}`).
+- 예상 19분 / 선행 0~33 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.3(step 34), §8.5, §8.6(전체, 특히 테스트 fixture FIXTURE_OK·FIXTURE_THEMES)
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
 - runtime: R0(독립 디렉터리)
 - 금지: §15.7, 이전 helper 동작, 실제 fixtures
@@ -10,8 +10,11 @@
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step34`
-2. `validateRemediationExecutable(plan, baseline)`, CLI `--check-executable`.
-3. spec(desktop-dark, step 33의 FIXTURE_OK·FIXTURE_THEMES 상수 재사용): `{ groups: [] }` → `[]`; FIXTURE_OK + §8.6 정상 예 → `[]`; FIXTURE_THEMES + blocked true themes 그룹 → 정확히 `["blocked-group:career-kicker-contrast"]`; text-change fix 하나뿐인 합성 baseline + 그 그룹(blocked, fixFiles `[]`) → `blocked-group:{id}`·`text-change:{id}:{key}:{target}`·`empty-fixfiles:{id}`; 정상+blocked 혼합 → blocked 관련만; 입력 불변; CLI 빈 0·가능만 0·blocked 1(첫 줄 `Harness 재계획 필요: 실행 불가 remediation 그룹`)·plan 없음·baseline JSON 오류 1.
+2. `GROUP_ID_RE`, `loadPlan`, `validateRemediationPlan`(§8.6 규칙·오류 형식 그대로), CLI `--check-plan [--coverage] [--require-empty] [--plan] [--baseline]`.
+3. spec(desktop-dark). spec 안 상수로 §8.6의 FIXTURE_OK와 FIXTURE_THEMES를 정확히 정의하고, 먼저 두 상수 모두 `validateBaseline` → `[]`임을 확인한다.
+   - FIXTURE_OK 기준(정상 plan 검증 전용): §8.6 정상 예 → `validateRemediationPlan(plan, FIXTURE_OK, { coverage: true })` 정확히 `[]`(unknown-target 없음); 오류 예 2종 정확한 메시지(`groups[0].targets[0]: not-object`, `groups[0]: reason-required`); id 통과 `color-token-1`·`a`·`x2`, 거부 `Group-1`·`a--b`·`-a`·`a-`·`a_b`·빈 문자열(`bad-id`); 같은 id 두 그룹 → `plan: duplicate-id {id}`; id 역순 → `plan: groups unsorted`; PlanTarget 여분 필드 → `fields missing=[] extra=[x]`; baseline에 없는 target → `unknown-target`; 같은 PlanTarget 두 번 → `targets duplicate`; 역순 → `targets unsorted`; 두 그룹에 같은 PlanTarget → `plan: target-in-multiple-groups {key}|{target}`; fixFiles `["css/style.css"]` → `fixFiles-mismatch`; `bad-difficulty`; `bad-estMinutes`(0·21·1.5); `bad-blocked`; `blocked: false`·`reason: "x"` → `reason-must-be-empty`; `{ groups: [] }` + coverage → `plan: uncovered page:desktop-dark:aria-allowed-attr|aria-allowed-attr::#heroFeatured::대표 프로젝트`; requireEmpty 빈 통과·그룹 1개 `groups: expected empty, got 1`
+   - FIXTURE_THEMES 기준(`css/themes.css` blocked 검증 전용): §8.6 themes 예(blocked false) → 정확히 `["groups[0]: blocked-required"]`; 같은 plan에 `blocked: true`, `reason: "color change excluded (HOO-81 §16.3)"` → `[]`
+   - CLI: FIXTURE_OK·정상 plan 파일 → 0; 오류 plan → 1; FIXTURE_THEMES·blocked false plan → 1; `--require-empty` 빈 0·그룹 1개 1; plan 없음·JSON 오류 1
 
 ## AC
 

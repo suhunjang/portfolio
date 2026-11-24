@@ -1,25 +1,23 @@
-# Step 45 — state-sequence
+# Step 45 — component-hit-open
 
-- 목적: 상태 순서 측정 helper `measureStateSequence`(대상마다 새 page, finally `mouse.up()`·`page.close()`)와 격리·실패 경로 테스트. 사이트 파일은 바꾸지 않는다.
-- 예상 17분 / 선행 0~44 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3(모달·`modal-open`·CTA), §16.2(step 45 상태 순서 측정 helper·격리 회귀); `tests/helpers/component-state.js`(import만)
-- tracked 허용(exact): `tests/helpers/state-sequence.js`(신규), `tests/specs/state-sequence.spec.js`(신규)
+- 목적: 대상 한정 애니메이션 대기·측정 helper 신설, 44px hit target(6 project), mobile menu open(`mobile-dark`), modal open(6 project) 측정과 hit target CSS.
+- 예상 19분 / 선행 0~44 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §3(무한 장식 애니메이션), §16.2(component state 측정 helper·대상·step 45 절차), §16.4(DESIGN_HASH_CHECK 후 `Components.dc.html`·`MobileMenu.dc.html` 읽기 전용); fixture tokens
+- tracked 허용(exact): `css/style.css`(§16.2 대상의 min-width·min-height·padding·line-height·display 등 비색 hit target 규칙만), `tests/helpers/component-state.js`(신규), `tests/specs/component-hit.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 사이트 파일, `component-state.js`·기존 spec 수정, 여러 대상에 한 page 재사용, BASE fixture·generator(step 46 몫)
+- 금지: §15.7, `index.html`, `js/*`, 색 선언(기존 규칙에 추가 포함), 기존 색 규칙 순서 변경, hover·active·clamp 규칙(step 48·49), 무한 장식 애니메이션 제거·변경, 문서 전체 `document.getAnimations()` 대기, 기존 spec 수정
 
 ## 작업 (TDD)
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step45`
-2. `state-sequence.spec.js`(`desktop-dark`·`desktop-light`만, 나머지 `test.skip`; 테스트 `context`와 url `/` 사용) 먼저 실패 확인:
-   - 반환 형태: `.hero-cta .btn` nth 0 → `{ default, hover, active }` 각각 정확히 `color, backgroundColor, borderColor, outlineColor, transform, opacity` 6필드
-   - page 수: 호출마다 `context.on('page')` 이벤트 정확히 1회, 호출 전후 `context.pages().length` 동일
-   - 격리 (a): `#projectGrid .project-card[data-project="0"]` 순서 측정 직후 `[data-project="1"]` 순서 측정이 완료되고, 두 번째 호출의 `beforeMeasure`에서 `#projectModal`이 hidden·body에 `modal-open` 없음
-   - 격리 (b): `.hero-cta .btn` nth 0 순서 측정 직후 다음 대상 호출의 `beforeMeasure`에서 `location.hash === ''`·`scrollY === 0`
-   - 실패 경로 (c): 존재하지 않는 selector → reject, 호출 전후 `context.pages().length` 동일
-   - 실패 경로 (d): `beforeMeasure`가 throw → 같은 오류로 reject, `context.pages().length` 동일
-   - 실패 경로 (e): active 측정 직전에 실패하도록 `beforeMeasure`에서 대상의 `pointerdown` 리스너로 요소를 제거해 `measureState`가 실패하게 한 경우 → reject, `context.pages().length` 동일(finally에서 `mouse.up()`과 `page.close()` 수행)
-3. `state-sequence.js`: 설계 §16.2 고정 절차 그대로 — 대상마다 `context.newPage()` → `goto(url)` → `document.fonts.ready` → `beforeMeasure(page)` → `scrollIntoViewIfNeeded()` → `waitForFiniteAnimations` → `mouse.move(0, 0)` 후 default → `locator.hover()` 후 hover → `mouse.down()` 직후 active → finally에서 down이 실행됐으면 `mouse.up()`, 그다음 항상 `page.close()`. 상태 값은 `measureState` 결과의 6필드.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step45` → `python3 -I tests/scripts/design-intake-check.py`
+2. `component-state.js`: 설계 §16.2 `waitForFiniteAnimations(page, selectors, { timeoutMs = 5000 })`(대상·subtree의 `getAnimations({ subtree: true })` 중 `iterations !== Infinity`이고 `playState`가 `running`·`pending`인 것만 `finished` 대기, 취소 reject는 완료로 처리, 초과 시 `Error('animation-timeout:{selector}')`)와 `measureState(page, selector, { nth = 0 })`(먼저 대기 후 `{ color, backgroundColor, borderColor, outlineColor, transform, opacity, box }`).
+3. `component-hit.spec.js` 먼저 실패 확인(상태 측정은 `measureState`만 사용)
+   - helper 회귀: (a) 실제 사이트 desktop-dark에서 `.caret`(있으면)과 `.scroll-hint span`에 `iterations === Infinity`이고 `playState === 'running'`인 애니메이션이 있음을 확인한 상태로 `waitForFiniteAnimations(page, ['#hero', '.scroll-hint'], { timeoutMs: 5000 })`가 resolve되고 `measureState(page, '.hero-cta .btn')`가 값을 반환; (b) `setContent` 합성에서 300ms 유한 transition을 시작한 요소 → helper 반환 시 그 animation `playState === 'finished'`; (c) 10초 유한 animation + `timeoutMs: 200` → 정확히 `animation-timeout:{selector}`; (d) 무한 animation만 있는 요소 → 즉시 resolve
+   - hit target(6 project): `.nav-link`(그 project에서 기본 상태로 보이는 것만), `#menuToggle`(보이면), `#themeToggle`, `.hero-cta .btn` 각각, `.featured-card` 3개, `#projectGrid .project-card` 13개, `#contactActions a`(있으면), `.scroll-hint`(보이면)의 bbox width·height ≥ tokens.hitTargetMinPx
+   - menu open(`mobile-dark`만, 다른 project는 `test.skip`): 설계 §16.2 step 45 menu open 절차 그대로
+   - modal open(6 project): 설계 §16.2 step 45 modal open 절차 그대로
+4. style.css(guard 통과).
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- state-sequence.spec.js component-hit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step45.json --allow tests/helpers/state-sequence.js,tests/specs/state-sequence.spec.js --require-absent tests/helpers/state-sequence.js,tests/specs/state-sequence.spec.js` → exit 0
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- component-hit.spec.js css-parse.spec.js color-vocab.spec.js design-guard-color-pairs.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step45.json --allow css/style.css,tests/helpers/component-state.js,tests/specs/component-hit.spec.js --require-absent tests/helpers/component-state.js,tests/specs/component-hit.spec.js` → exit 0

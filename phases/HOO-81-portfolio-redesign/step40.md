@@ -1,18 +1,18 @@
-# Step 40 — hero-first-screen
+# Step 40 — featured-projects
 
-- 목적: 히어로 DOM 순서·tagline과 첫 화면 AC(지표 item 4개 개별). 2열은 step 41.
-- 예상 20분 / 선행 0~39 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3, §5, §9, §16(DESIGN_HASH_CHECK 후 `DesktopTop.dc.html`·`Mobile.dc.html` 읽기 전용); main.js `#heroStats` 렌더
-- tracked 허용(exact): `index.html`(section#hero 내부만: 직계 자식 8개 순서·tagline·`#heroFeatured` 위치), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄), `css/style.css`(hero 1열 간격·STATS·featured 반응형·`.hero-tagline` 비색 타이포만), `tests/specs/hero.spec.js`
+- 목적: 대표 프로젝트 3개 카드와 모달 연결(색은 기존 `.project-card` 색 규칙의 featured 대응 선택자 추가로만).
+- 예상 19분 / 선행 0~39 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §5, §7, §8.3, §16(DESIGN_HASH_CHECK 후 `DesktopTop.dc.html`·`Components.dc.html` 읽기 전용), §16.4
+- tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤 `#heroFeatured` 마크업만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, 위임만), `css/style.css`(`.featured-*` 비색 배치 규칙과 기존 `.project-card` 색 규칙(`:hover`·`:active` 포함) 선택자 목록에 featured 대응 선택자 추가만), `tests/specs/featured.spec.js`
 - runtime: R0
-- 금지: §15.7, `js/data.js`, 새 색·BASE 밖 font-weight·font-family 이동, 문구 축소·변경, 렌더 로직, 섹션·nav
+- 금지: §15.7, 새 색 선언(기존 규칙에 색 선언·같은 prop 다른 값 추가·색 선언 순서 변경 포함), 기존 색 규칙 순서 변경, hero 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
 
 ## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step40` → `python3 -I tests/scripts/design-intake-check.py`
-2. `hero.spec.js`(6 project) 먼저 실패 확인: 상수 `STAT_ITEM`·`STAT_VALUE`·`STAT_LABEL`; `.hero-inner` 직계 자식 §5 순서; `#heroTagline` 텍스트 = `PROFILE.tagline`; CTA·eyebrow·typed·`#heroFeatured` role·aria-label 유지; STATS 375 2×2·768/1280 4×1, featured 1/2/3열; 첫 화면(desktop-dark/light) `expectInFirstScreen` = §5 assertion 전부, 대상 `#heroName`·`#heroTagline`·`#heroStats`·`.featured-title` 3개·지표 item 4개 × (item, VALUE, LABEL) 및 텍스트 일치.
-3. 구현.
+2. `featured.spec.js`(6 project) 먼저 실패 확인: 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트 일치, span block, background-image none; 카드 click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목 일치, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`가 grid 카드만 사용; `.featured-card` 색 3속성이 `#projectGrid .project-card`와 같음.
+3. 구현(`esc()` 이스케이프, 그리드 직후 호출). axe 새 target은 색 변경 없이 허용 파일 안에서 해결, 식별 손실이면 중단·재계획.
 
 ## AC
 
-- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- hero.spec.js css-parse.spec.js color-vocab.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step40.json --allow index.html,js/main.js,css/style.css,tests/specs/hero.spec.js` → exit 0
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- featured.spec.js css-parse.spec.js color-vocab.spec.js design-guard-color-pairs.spec.js design-guard-color-rules.spec.js design-guard-color.spec.js design-guard-css.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step40.json --allow index.html,js/data.js,js/main.js,css/style.css,tests/specs/featured.spec.js` → exit 0

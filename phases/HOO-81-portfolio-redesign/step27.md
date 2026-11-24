@@ -1,18 +1,18 @@
-# Step 27 — axe-prepare-page
+# Step 27 — axe-canonical
 
-- 목적: 준비 helper 공통 오류 계약과 page 준비.
-- 예상 15분 / 선행 0~26 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3(reveal), §8.4(step 27)
-- tracked 허용(exact): `tests/helpers/axe-prepare.js`(신규: `PREPARE_PREFIX`, `prepareError`, `withPrepareCode`, `preparePage`만), `tests/specs/axe-prepare-page.spec.js`(신규)
+- 목적: axe canonical target 식별 helper.
+- 예상 19분 / 선행 0~26 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.1, §8.3(step 27)
+- tracked 허용(exact): `tests/helpers/axe.js`(신규), `tests/specs/axe-helper.spec.js`(신규)
 - runtime: R0
 - 금지: §15.7
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step27`
-2. 설계 §8.4 step 27 계약.
-3. spec(desktop-dark, desktop-light, mobile-dark): 실제 사이트 `revealChecked` > 0·모두 `.in`·반환 후 scrollY 0·scrollSteps ≥ 1; `.in`이 안 붙는 `.reveal` 1개 + `timeoutMs: 500` → `prepareForAxe: reveal-hidden:1`·code 일치; `prepareError('x')` message·code; `withPrepareCode('fonts-not-ready', reject boom)` message·cause; `withPrepareCode('a', reject prepareError('b'))` 코드 b; data-theme·reduced-motion 불변.
+2. `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe`.
+3. spec(desktop-dark, setContent + 실제 axe): section#career subtree 이동·h3→span·01→04에도 key 같음; h3만 section 밖 이동하면 다름; `[data-project=5]` 안 div→p 같음; 텍스트 다르면 다름; `project:5`≠`featured:5`; alias 적용 시 같음.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-page.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step27.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
