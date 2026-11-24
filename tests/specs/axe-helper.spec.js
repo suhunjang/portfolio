@@ -918,3 +918,292 @@ test.describe('step 34 axe-baseline-projection', () => {
     expect(broken.stdout).toBe('');
   });
 });
+
+// step 35 — axe-remediation-plan-schema (§6.2 step 35·§6.5)
+import { GROUP_ID_RE, loadPlan, requiredBlockReason, validateRemediationPlan } from '../helpers/axe.js';
+
+const S35_KEY_OK = 'page:desktop-dark:aria-allowed-attr';
+const S35_KEY_CC = 'page:desktop-dark:color-contrast';
+const S35_KEY_TS = 'page:desktop-dark:target-size';
+const R_COLOR = 'color change excluded (HOO-81 §16.3)';
+const R_TEXT = 'text change excluded';
+const R_BOTH = `${R_TEXT}; ${R_COLOR}`;
+const pt = (key, target) => ({ key, target });
+const group = (over) => ({
+  id: 'g',
+  targets: [],
+  fixFiles: [],
+  difficulty: 'low',
+  estMinutes: 6,
+  blocked: false,
+  reason: '',
+  ...over,
+});
+const PLAN_OK = {
+  groups: [group({ id: 'hero-featured-aria', targets: [pt(S35_KEY_OK, T_HERO)], fixFiles: ['index.html'] })],
+};
+const planOkWith = (fn) => {
+  const p = clone(PLAN_OK);
+  fn(p.groups[0], p);
+  return p;
+};
+const themesPlan = (blocked, reason) => ({
+  groups: [
+    group({
+      id: 'career-kicker-contrast',
+      targets: [pt(S35_KEY_CC, T_CAREER)],
+      fixFiles: ['css/themes.css'],
+      estMinutes: 5,
+      blocked,
+      reason,
+    }),
+  ],
+});
+const rulePlainPlan = (blocked, reason) => ({
+  groups: [group({ id: 'theme-toggle-size', targets: [pt(S35_KEY_TS, T_TOGGLE)], fixFiles: ['css/style.css'], blocked, reason })],
+});
+const ruleColorPlan = (blocked, reason) => ({
+  groups: [
+    group({
+      id: 'career-kicker-rule',
+      targets: [pt(S35_KEY_CC, T_CAREER)],
+      fixFiles: ['css/style.css'],
+      estMinutes: 5,
+      blocked,
+      reason,
+    }),
+  ],
+});
+const mixedPlan = (blocked, reason) => ({
+  groups: [
+    group({
+      id: 'kicker-mixed',
+      targets: [pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_PROJECTS)],
+      fixFiles: ['css/style.css'],
+      blocked,
+      reason,
+    }),
+  ],
+});
+
+let s35Seq = 0;
+function s35Dir() {
+  s35Seq += 1;
+  const rel = `tests/.tmp/axe-helper-s35-${process.pid}-${s35Seq}`;
+  fs.mkdirSync(path.join(S32_REPO, rel), { recursive: true });
+  return rel;
+}
+
+test.describe('step 35 axe-remediation-plan-schema', () => {
+  let before;
+  const made = [];
+  const dir = () => {
+    const d = s35Dir();
+    made.push(d);
+    return d;
+  };
+
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'desktop-dark 전용');
+    before = s32State();
+  });
+
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.project.name !== 'desktop-dark') return;
+    for (const d of made.splice(0)) fs.rmSync(path.join(S32_REPO, d), { recursive: true, force: true });
+    expect(s32State()).toEqual(before);
+  });
+
+  test('fixture 상수는 모두 validateBaseline → []', () => {
+    for (const b of [FIXTURE_OK, FIXTURE_THEMES, FIXTURE_RULE_PLAIN, FIXTURE_RULE_COLOR, FIXTURE_MIXED, FIXTURE_COLOR_PLAIN]) {
+      expect(validateBaseline(b)).toEqual([]);
+    }
+  });
+
+  test('requiredBlockReason: 조각·순서·무시·입력 불변', () => {
+    expect(requiredBlockReason([pt(S35_KEY_OK, T_HERO)], FIXTURE_OK)).toBe('');
+    expect(requiredBlockReason([pt(S35_KEY_CC, T_CAREER)], FIXTURE_THEMES)).toBe(R_COLOR);
+    expect(requiredBlockReason([pt(S35_KEY_TS, T_TOGGLE)], FIXTURE_RULE_PLAIN)).toBe('');
+    expect(requiredBlockReason([pt(S35_KEY_CC, T_CAREER)], FIXTURE_RULE_COLOR)).toBe(R_COLOR);
+    expect(requiredBlockReason([pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_PROJECTS)], FIXTURE_MIXED)).toBe(R_BOTH);
+    // 입력 순서가 달라도 조각 순서는 text → color
+    expect(requiredBlockReason([pt(S35_KEY_CC, T_PROJECTS), pt(S35_KEY_CC, T_CAREER)], FIXTURE_MIXED)).toBe(R_BOTH);
+    expect(requiredBlockReason([pt(S35_KEY_CC, T_PROJECTS)], FIXTURE_MIXED)).toBe(R_TEXT);
+    expect(requiredBlockReason([pt(S35_KEY_CC, T_CAREER)], FIXTURE_MIXED)).toBe(R_COLOR);
+    expect(requiredBlockReason([pt(S35_KEY_TS, T_TOGGLE)], FIXTURE_COLOR_PLAIN)).toBe('');
+    expect(requiredBlockReason([], FIXTURE_MIXED)).toBe('');
+    // baseline에 없는 target 무시
+    expect(requiredBlockReason([pt(S35_KEY_CC, 'color-contrast::#about::About')], FIXTURE_MIXED)).toBe('');
+    expect(requiredBlockReason([pt(S35_KEY_OK, T_HERO)], FIXTURE_THEMES)).toBe('');
+    expect(requiredBlockReason([pt(S35_KEY_OK, T_HERO), pt(S35_KEY_CC, T_CAREER)], FIXTURE_THEMES)).toBe(R_COLOR);
+    // 입력 불변
+    const gts = [pt(S35_KEY_CC, T_PROJECTS), pt(S35_KEY_CC, T_CAREER)];
+    const gSnap = clone(gts);
+    const bSnap = clone(FIXTURE_MIXED);
+    requiredBlockReason(gts, FIXTURE_MIXED);
+    expect(gts).toEqual(gSnap);
+    expect(FIXTURE_MIXED).toEqual(bSnap);
+  });
+
+  test('FIXTURE_OK: 정상·오류 예·id·중복·정렬·PlanTarget·필드 값 오류', () => {
+    const v = (plan, opts) => validateRemediationPlan(plan, FIXTURE_OK, opts);
+    const planSnap = clone(PLAN_OK);
+    const baseSnap = clone(FIXTURE_OK);
+    expect(v(PLAN_OK)).toEqual([]);
+    expect(v(PLAN_OK, { coverage: true })).toEqual([]);
+    expect(PLAN_OK).toEqual(planSnap);
+    expect(FIXTURE_OK).toEqual(baseSnap);
+    // §6.5 오류 예 2종
+    expect(v(planOkWith((g) => (g.targets[0] = T_HERO)))).toEqual(['groups[0].targets[0]: not-object']);
+    expect(v(planOkWith((g) => (g.blocked = true)))).toEqual(['groups[0]: reason-required']);
+
+    // GROUP_ID_RE·id
+    expect(GROUP_ID_RE.source).toBe('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+    for (const id of ['color-token-1', 'a', 'x2']) {
+      expect(GROUP_ID_RE.test(id), id).toBe(true);
+      expect(v(planOkWith((g) => (g.id = id))), id).toEqual([]);
+    }
+    for (const id of ['Group-1', 'a--b', '-a', 'a-', 'a_b', '']) {
+      expect(GROUP_ID_RE.test(id), id).toBe(false);
+      expect(v(planOkWith((g) => (g.id = id))), id).toEqual(['groups[0]: bad-id']);
+    }
+
+    // plan 수준: 중복 id·정렬(두 번째 그룹은 targets 빈 배열)
+    const g0 = PLAN_OK.groups[0];
+    const twoGroups = (ids) => ({ groups: ids.map((id, i) => ({ ...clone(g0), id, targets: i === 0 ? clone(g0.targets) : [] })) });
+    expect(v(twoGroups(['a', 'a']))).toEqual(['groups[1]: targets empty', 'plan: duplicate-id a']);
+    expect(v(twoGroups(['b', 'a']))).toEqual(['groups[1]: targets empty', 'plan: groups unsorted']);
+
+    // PlanTarget 여분·누락 필드
+    expect(v(planOkWith((g) => (g.targets[0].x = 1)))).toEqual(['groups[0].targets[0]: fields missing=[] extra=[x]']);
+    expect(v(planOkWith((g) => delete g.targets[0].target))).toEqual([
+      'groups[0].targets[0]: fields missing=[target] extra=[]',
+    ]);
+    // unknown-target
+    expect(v(planOkWith((g) => (g.targets[0].target = 'aria-allowed-attr::#nope::x')))).toEqual([
+      'groups[0].targets[0]: unknown-target',
+    ]);
+    expect(v(planOkWith((g) => (g.targets[0].key = 'page:desktop-light:aria-allowed-attr')))).toEqual([
+      'groups[0].targets[0]: unknown-target',
+    ]);
+    // 그룹 내 중복·정렬
+    expect(v(planOkWith((g) => g.targets.push(clone(g.targets[0]))))).toEqual(['groups[0]: targets duplicate']);
+    const unsorted = mixedPlan(true, R_BOTH);
+    unsorted.groups[0].targets.reverse();
+    expect(validateRemediationPlan(unsorted, FIXTURE_MIXED)).toEqual(['groups[0]: targets unsorted']);
+    // 두 그룹 중복
+    const multi = { groups: [clone(g0), { ...clone(g0), id: 'hero-featured-aria-2' }] };
+    expect(v(multi)).toEqual([`plan: target-in-multiple-groups ${S35_KEY_OK}|${T_HERO}`]);
+
+    // 필드 값 오류
+    expect(v(planOkWith((g) => (g.fixFiles = ['css/style.css'])))).toEqual(['groups[0]: fixFiles-mismatch']);
+    expect(v(planOkWith((g) => (g.fixFiles = [])))).toEqual(['groups[0]: fixFiles-mismatch']);
+    expect(v(planOkWith((g) => (g.difficulty = 'easy')))).toEqual(['groups[0]: bad-difficulty']);
+    for (const m of [0, 21, 1.5, '6']) {
+      expect(v(planOkWith((g) => (g.estMinutes = m))), String(m)).toEqual(['groups[0]: bad-estMinutes']);
+    }
+    for (const m of [1, 20]) expect(v(planOkWith((g) => (g.estMinutes = m))), String(m)).toEqual([]);
+    expect(v(planOkWith((g) => (g.blocked = 'false')))).toEqual(['groups[0]: bad-blocked']);
+    expect(v(planOkWith((g) => (g.reason = 'x')))).toEqual(['groups[0]: reason-must-be-empty']);
+    expect(v(planOkWith((g) => (g.targets = [])))).toEqual(['groups[0]: targets empty']);
+    expect(v(planOkWith((g) => (g.note = 'x')))).toEqual(['groups[0]: fields missing=[] extra=[note]']);
+    expect(v({ groups: [null] })).toEqual(['groups[0]: not-object']);
+
+    // plan 형태
+    expect(v(null)).toEqual(['plan: not-object']);
+    expect(v([])).toEqual(['plan: not-object']);
+    expect(v({ groups: [], x: 1 })).toEqual(['plan: fields missing=[] extra=[x]']);
+    expect(v({})).toEqual(['plan: fields missing=[groups] extra=[]']);
+    expect(v({ groups: {} })).toEqual(['plan: groups not-array']);
+
+    // coverage·requireEmpty
+    expect(v({ groups: [] })).toEqual([]);
+    expect(v({ groups: [] }, { coverage: true })).toEqual([
+      'plan: uncovered page:desktop-dark:aria-allowed-attr|aria-allowed-attr::#heroFeatured::대표 프로젝트',
+    ]);
+    expect(v({ groups: [] }, { requireEmpty: true })).toEqual([]);
+    expect(v(PLAN_OK, { requireEmpty: true })).toEqual(['groups: expected empty, got 1']);
+    expect(PLAN_OK).toEqual(planSnap);
+  });
+
+  test('FIXTURE_THEMES·RULE_PLAIN·RULE_COLOR·MIXED: blocked·reason', () => {
+    const v = validateRemediationPlan;
+    expect(v(themesPlan(false, ''), FIXTURE_THEMES)).toEqual(['groups[0]: blocked-required']);
+    expect(v(themesPlan(true, R_COLOR), FIXTURE_THEMES)).toEqual([]);
+    expect(v(themesPlan(true, R_COLOR), FIXTURE_THEMES, { coverage: true })).toEqual([]);
+    expect(v(themesPlan(true, 'x'), FIXTURE_THEMES)).toEqual(['groups[0]: reason-mismatch']);
+    expect(v(themesPlan(true, ''), FIXTURE_THEMES)).toEqual(['groups[0]: reason-required']);
+
+    expect(v(rulePlainPlan(false, ''), FIXTURE_RULE_PLAIN)).toEqual([]);
+    expect(v(rulePlainPlan(true, 'manual hold'), FIXTURE_RULE_PLAIN)).toEqual([]);
+    expect(v(rulePlainPlan(true, ''), FIXTURE_RULE_PLAIN)).toEqual(['groups[0]: reason-required']);
+
+    expect(v(ruleColorPlan(false, ''), FIXTURE_RULE_COLOR)).toEqual(['groups[0]: blocked-required']);
+    expect(v(ruleColorPlan(true, R_COLOR), FIXTURE_RULE_COLOR)).toEqual([]);
+
+    expect(v(mixedPlan(true, R_BOTH), FIXTURE_MIXED)).toEqual([]);
+    expect(v(mixedPlan(true, R_BOTH), FIXTURE_MIXED, { coverage: true })).toEqual([]);
+    expect(v(mixedPlan(true, R_COLOR), FIXTURE_MIXED)).toEqual(['groups[0]: reason-mismatch']);
+    expect(v(mixedPlan(false, ''), FIXTURE_MIXED)).toEqual(['groups[0]: blocked-required']);
+
+    // FIXTURE_COLOR_PLAIN: 두 그룹, target-size 그룹은 blocked 불필요
+    const cp = { groups: [...ruleColorPlan(true, R_COLOR).groups, ...rulePlainPlan(false, '').groups] };
+    expect(v(cp, FIXTURE_COLOR_PLAIN, { coverage: true })).toEqual([]);
+    expect(v(rulePlainPlan(false, ''), FIXTURE_COLOR_PLAIN, { coverage: true })).toEqual([
+      `plan: uncovered ${S35_KEY_CC}|${T_CAREER}`,
+    ]);
+  });
+
+  test('loadPlan·CLI --check-plan', async () => {
+    const d = dir();
+    const write = (name, data) => {
+      const rel = `${d}/${name}`;
+      fs.writeFileSync(path.join(S32_REPO, rel), typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+      return rel;
+    };
+    const run = (plan, baseline, extra = []) => s32Cli(['--check-plan', '--plan', plan, '--baseline', baseline, ...extra]);
+
+    expect(loadPlan(write('lp.json', PLAN_OK))).toEqual(PLAN_OK);
+    expect(() => loadPlan(`${d}/nope.json`)).toThrow();
+    expect(() => loadPlan(write('lp-broken.json', '{'))).toThrow();
+
+    const ok = await run(write('ok.json', PLAN_OK), write('b-ok.json', FIXTURE_OK));
+    expect(ok.code).toBe(0);
+    expect(ok.stdout).toBe('check-plan: OK\n');
+    expect(ok.stderr).toBe('');
+    expect((await run(`${d}/ok.json`, `${d}/b-ok.json`, ['--coverage'])).code).toBe(0);
+
+    const bad = await run(write('bad.json', planOkWith((g) => (g.blocked = true))), `${d}/b-ok.json`);
+    expect(bad.code).toBe(1);
+    expect(bad.stderr).toBe('groups[0]: reason-required\n');
+    expect(bad.stdout).toBe('');
+
+    const themes = await run(write('themes.json', themesPlan(false, '')), write('b-themes.json', FIXTURE_THEMES));
+    expect(themes.code).toBe(1);
+    expect(themes.stderr).toBe('groups[0]: blocked-required\n');
+
+    const rc = await run(write('rc.json', ruleColorPlan(false, '')), write('b-rc.json', FIXTURE_RULE_COLOR));
+    expect(rc.code).toBe(1);
+    expect(rc.stderr).toBe('groups[0]: blocked-required\n');
+
+    const rp = await run(write('rp.json', rulePlainPlan(false, '')), write('b-rp.json', FIXTURE_RULE_PLAIN));
+    expect(rp.code).toBe(0);
+    expect(rp.stdout).toBe('check-plan: OK\n');
+
+    const empty = await run(write('empty.json', { groups: [] }), `${d}/b-ok.json`, ['--require-empty']);
+    expect(empty.code).toBe(0);
+    const notEmpty = await run(`${d}/ok.json`, `${d}/b-ok.json`, ['--require-empty']);
+    expect(notEmpty.code).toBe(1);
+    expect(notEmpty.stderr).toBe('groups: expected empty, got 1\n');
+    const uncovered = await run(`${d}/empty.json`, `${d}/b-ok.json`, ['--coverage']);
+    expect(uncovered.code).toBe(1);
+    expect(uncovered.stderr).toBe(`plan: uncovered ${S35_KEY_OK}|${T_HERO}\n`);
+
+    const missing = await run(`${d}/nope.json`, `${d}/b-ok.json`);
+    expect(missing.code).toBe(1);
+    expect(missing.stdout).toBe('');
+    const broken = await run(write('broken.json', '{"groups": ['), `${d}/b-ok.json`);
+    expect(broken.code).toBe(1);
+    expect(broken.stdout).toBe('');
+  });
+});

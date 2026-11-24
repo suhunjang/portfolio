@@ -607,23 +607,239 @@ function baselineMatchLines(r) {
   ];
 }
 
+// step 35 — remediation plan schema (§6.2 step 35·§6.5)
+// GROUP_ID_RE · loadPlan · requiredBlockReason · validateRemediationPlan · CLI `--check-plan`
+export const GROUP_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const PLAN_FIELDS = ['groups'];
+const GROUP_FIELDS = ['id', 'targets', 'fixFiles', 'difficulty', 'estMinutes', 'blocked', 'reason'];
+const PLAN_TARGET_FIELDS = ['key', 'target'];
+const DIFFICULTIES = ['low', 'medium', 'high'];
+const REASON_TEXT = 'text change excluded';
+const REASON_COLOR = 'color change excluded (HOO-81 §16.3)';
+
+const ptId = (key, target) => `${key}|${target}`;
+
+// baseline → Map(`${key}|${target}` → fix). 형식이 맞지 않는 entry·fix는 건너뛴다(검증은 validateBaseline 담당).
+function baselineFixIndex(baseline) {
+  const map = new Map();
+  if (!Array.isArray(baseline)) return map;
+  for (const e of baseline) {
+    if (!isPlainObject(e) || typeof e.key !== 'string' || !Array.isArray(e.fixes)) continue;
+    for (const fix of e.fixes) {
+      if (!isPlainObject(fix) || typeof fix.target !== 'string') continue;
+      const id = ptId(e.key, fix.target);
+      if (!map.has(id)) map.set(id, fix);
+    }
+  }
+  return map;
+}
+
+// JSON으로 읽기만(없음·깨짐 throw). 스키마 검증은 validateRemediationPlan 담당.
+export function loadPlan(planPath = PLAN_PATH) {
+  let text;
+  try {
+    text = fs.readFileSync(repoAbs(planPath), 'utf8');
+  } catch (e) {
+    throw new Error(`loadPlan: missing: ${planPath}`, { cause: e });
+  }
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error(`loadPlan: invalid json: ${planPath}`, { cause: e });
+  }
+}
+
+// 그룹 targets의 baseline fix에서 필수 block reason 계산(§6.5). 순수·입력 불변. baseline에 없는 target 무시.
+export function requiredBlockReason(groupTargets, baseline) {
+  const index = baselineFixIndex(baseline);
+  let text = false;
+  let color = false;
+  for (const t of Array.isArray(groupTargets) ? groupTargets : []) {
+    if (!isPlainObject(t) || typeof t.key !== 'string' || typeof t.target !== 'string') continue;
+    const fix = index.get(ptId(t.key, t.target));
+    if (!fix) continue;
+    if (fix.fixKind === 'text-change') text = true;
+    if (fix.requiresColorChange === true) color = true;
+  }
+  const parts = [];
+  if (text) parts.push(REASON_TEXT);
+  if (color) parts.push(REASON_COLOR);
+  return parts.join('; ');
+}
+
+const cmpPlanTarget = (a, b) => byCodeUnit(a.key, b.key) || byCodeUnit(a.target, b.target);
+
+// §6.5 plan 검증 → 오류 문자열 배열(발견 순). 필수 reason은 requiredBlockReason으로만 계산. 입력 불변.
+export function validateRemediationPlan(plan, baseline, { coverage = false, requireEmpty = false } = {}) {
+  if (!isPlainObject(plan)) return ['plan: not-object'];
+  const pfp = fieldsProblem(plan, PLAN_FIELDS);
+  if (pfp) return [`plan: ${pfp}`];
+  if (!Array.isArray(plan.groups)) return ['plan: groups not-array'];
+  const index = baselineFixIndex(baseline);
+  const errors = [];
+  const ids = [];
+  const owner = new Map(); // PlanTarget id → 처음 나온 그룹 index
+  const multi = [];
+  plan.groups.forEach((g, i) => {
+    const at = `groups[${i}]`;
+    if (!isPlainObject(g)) {
+      errors.push(`${at}: not-object`);
+      return;
+    }
+    const gfp = fieldsProblem(g, GROUP_FIELDS);
+    if (gfp) {
+      errors.push(`${at}: ${gfp}`);
+      return;
+    }
+    if (typeof g.id === 'string') ids.push(g.id);
+    if (typeof g.id !== 'string' || !GROUP_ID_RE.test(g.id)) errors.push(`${at}: bad-id`);
+
+    let targetError = false;
+    const valid = [];
+    if (!Array.isArray(g.targets) || g.targets.length === 0) {
+      errors.push(`${at}: targets empty`);
+      targetError = true;
+    } else {
+      g.targets.forEach((t, j) => {
+        const tat = `${at}.targets[${j}]`;
+        if (!isPlainObject(t)) {
+          errors.push(`${tat}: not-object`);
+          targetError = true;
+          return;
+        }
+        const tfp = fieldsProblem(t, PLAN_TARGET_FIELDS);
+        if (tfp) {
+          errors.push(`${tat}: ${tfp}`);
+          targetError = true;
+          return;
+        }
+        if (typeof t.key !== 'string' || typeof t.target !== 'string' || !index.has(ptId(t.key, t.target))) {
+          errors.push(`${tat}: unknown-target`);
+          targetError = true;
+          return;
+        }
+        valid.push(t);
+      });
+      const seenInGroup = new Set();
+      let dup = false;
+      for (const t of valid) {
+        const id = ptId(t.key, t.target);
+        if (seenInGroup.has(id)) dup = true;
+        seenInGroup.add(id);
+      }
+      if (dup) errors.push(`${at}: targets duplicate`);
+      for (let k = 1; k < valid.length; k++) {
+        if (cmpPlanTarget(valid[k - 1], valid[k]) > 0) {
+          errors.push(`${at}: targets unsorted`);
+          break;
+        }
+      }
+      for (const id of seenInGroup) {
+        if (!owner.has(id)) owner.set(id, i);
+        else if (owner.get(id) !== i && !multi.includes(id)) multi.push(id);
+      }
+    }
+    if (!targetError) {
+      const union = new Set();
+      for (const t of valid) {
+        const files = index.get(ptId(t.key, t.target)).fixFiles;
+        if (Array.isArray(files)) for (const f of files) union.add(f);
+      }
+      if (!sameArray(g.fixFiles, [...union].sort(byCodeUnit))) errors.push(`${at}: fixFiles-mismatch`);
+    }
+    if (!DIFFICULTIES.includes(g.difficulty)) errors.push(`${at}: bad-difficulty`);
+    if (!Number.isInteger(g.estMinutes) || g.estMinutes < 1 || g.estMinutes > 20) errors.push(`${at}: bad-estMinutes`);
+    if (typeof g.blocked !== 'boolean') {
+      errors.push(`${at}: bad-blocked`);
+      return;
+    }
+    const required = requiredBlockReason(g.targets, baseline);
+    const reason = g.reason;
+    if (required !== '') {
+      if (g.blocked !== true) errors.push(`${at}: blocked-required`);
+      else if (typeof reason !== 'string' || reason === '') errors.push(`${at}: reason-required`);
+      else if (reason !== required) errors.push(`${at}: reason-mismatch`);
+    } else if (g.blocked) {
+      if (typeof reason !== 'string' || reason === '') errors.push(`${at}: reason-required`);
+    } else if (reason !== '') {
+      errors.push(`${at}: reason-must-be-empty`);
+    }
+  });
+
+  const seenIds = new Set();
+  const reportedIds = new Set();
+  for (const id of ids) {
+    if (seenIds.has(id) && !reportedIds.has(id)) {
+      errors.push(`plan: duplicate-id ${id}`);
+      reportedIds.add(id);
+    }
+    seenIds.add(id);
+  }
+  for (let k = 1; k < ids.length; k++) {
+    if (byCodeUnit(ids[k - 1], ids[k]) > 0) {
+      errors.push('plan: groups unsorted');
+      break;
+    }
+  }
+  for (const id of multi) errors.push(`plan: target-in-multiple-groups ${id}`);
+  if (coverage && Array.isArray(baseline)) {
+    for (const e of baseline) {
+      if (!isPlainObject(e) || typeof e.key !== 'string' || !Array.isArray(e.targets)) continue;
+      for (const t of e.targets) {
+        const id = ptId(e.key, t);
+        if (!owner.has(id)) errors.push(`plan: uncovered ${id}`);
+      }
+    }
+  }
+  if (requireEmpty && plan.groups.length !== 0) errors.push(`groups: expected empty, got ${plan.groups.length}`);
+  return errors;
+}
+
 function parseCliArgs(argv) {
-  const opts = { cmd: null, dir: undefined, out: undefined, baseline: undefined, collected: undefined };
+  const opts = {
+    cmd: null,
+    dir: undefined,
+    out: undefined,
+    baseline: undefined,
+    collected: undefined,
+    plan: undefined,
+    coverage: false,
+    requireEmpty: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--reset' || a === '--merge' || a === '--assert-empty' || a === '--check-baseline-match') {
+    if (
+      a === '--reset' ||
+      a === '--merge' ||
+      a === '--assert-empty' ||
+      a === '--check-baseline-match' ||
+      a === '--check-plan'
+    ) {
       if (opts.cmd) throw new Error(`axe.js: duplicate command ${a}`);
       opts.cmd = a.slice(2);
-    } else if (a === '--dir' || a === '--out' || a === '--baseline' || a === '--collected') {
+    } else if (a === '--dir' || a === '--out' || a === '--baseline' || a === '--collected' || a === '--plan') {
       const v = argv[++i];
       if (v === undefined || v.startsWith('--')) throw new Error(`axe.js: ${a} requires a value`);
       opts[a.slice(2)] = v;
+    } else if (a === '--coverage') {
+      opts.coverage = true;
+    } else if (a === '--require-empty') {
+      opts.requireEmpty = true;
     } else {
       throw new Error(`axe.js: unknown argument ${a}`);
     }
   }
   if (!opts.cmd) {
-    throw new Error('axe.js: command required (--reset | --merge | --assert-empty | --check-baseline-match)');
+    throw new Error('axe.js: command required (--reset | --merge | --assert-empty | --check-baseline-match | --check-plan)');
+  }
+  if (opts.cmd === 'check-plan') {
+    if (opts.dir !== undefined || opts.out !== undefined || opts.collected !== undefined) {
+      throw new Error('axe.js: --check-plan takes only --coverage, --require-empty, --plan and --baseline');
+    }
+    return opts;
+  }
+  if (opts.plan !== undefined || opts.coverage || opts.requireEmpty) {
+    throw new Error('axe.js: --plan, --coverage and --require-empty only with --check-plan');
   }
   if (opts.cmd === 'check-baseline-match') {
     if (opts.dir !== undefined || opts.out !== undefined) {
@@ -653,6 +869,17 @@ export function runCli(argv) {
       const file = opts.baseline ?? BASELINE_PATH;
       assertEmptyFile(file);
       process.stdout.write(`axe assert-empty: OK (${file})\n`);
+      return 0;
+    }
+    if (opts.cmd === 'check-plan') {
+      const plan = loadPlan(opts.plan ?? PLAN_PATH);
+      const baseline = loadBaseline(opts.baseline ?? BASELINE_PATH);
+      const errors = validateRemediationPlan(plan, baseline, { coverage: opts.coverage, requireEmpty: opts.requireEmpty });
+      if (errors.length) {
+        for (const line of errors) process.stderr.write(`${line}\n`);
+        return 1;
+      }
+      process.stdout.write('check-plan: OK\n');
       return 0;
     }
     if (opts.cmd === 'check-baseline-match') {
