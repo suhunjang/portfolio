@@ -158,7 +158,10 @@
     {
       "step": 17,
       "name": "axe-classify-merge",
-      "status": "pending"
+      "status": "blocked",
+      "started_at": "2026-11-25T01:08:48+0900",
+      "blocked_reason": "resume step17 §R7 작업3에 따라 중단, 원 §6.2 remediation 재계획 필요: pairs.json 25 pair 중 color-contrast 12 pair(61 occurrence)가 모두 css-rule·requiresColorChange=true라서 requiredBlockReason='color change excluded (HOO-81 §16.3)'이다. 따라서 coverage가 완전한 plan에는 blocked 그룹이 반드시 생기고, AC의 AXE --check-executable(blocked-group)을 통과할 수 없다. 메모리 검증 결과: pairs 결정 그대로 만든 baseline은 validateBaseline []·compareCollectedBaseline ok. plan(color-contrast 61 target blocked / nested-interactive 78 target js/main.js blocked=false)은 validateRemediationPlan(coverage) []이지만 validateRemediationExecutable ['blocked-group:color-contrast']. pairs와 다른 requiresColorChange나 manual block은 금지라서 허용 범위 안에서는 해결할 수 없다. RSNAP 17(step117)만 생성했고 tracked 파일(axe-baseline.json·axe-remediation-plan.json)은 쓰지 않았다.",
+      "blocked_at": "2026-11-25T01:09:56+0900"
     },
     {
       "step": 18,
