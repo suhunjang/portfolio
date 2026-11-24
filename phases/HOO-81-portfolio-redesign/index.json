@@ -46,7 +46,10 @@
     {
       "step": 3,
       "name": "scope-snapshot-loader",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:28:54+0900",
+      "completed_at": "2026-11-24T19:29:55+0900",
+      "summary": "reverify step3: no-op — SNAP 3 created→reused, scope-snapshot-loader+parse+paths specs 19 passed (desktop-dark), FULL 81 passed, CGATE 3 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 4,
