@@ -166,7 +166,10 @@
     {
       "step": 18,
       "name": "font-preservation",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:49:40+0900",
+      "completed_at": "2026-11-24T19:51:04+0900",
+      "summary": "step18: added tests/helpers/design-guard-font.js (matchesBaseRule: same file·chain, base selectors ⊆ current, extras only featuredCounterpart; checkFontDecls over atRule-null Rules: (1) BASE order font-family/font decl with no matching current Rule having same prop·value -> 'font-decl-missing:{chain}|{selectors}|{prop}', (2) current order/decl order font decl with no matching BASE Rule having same prop·value -> 'font-asset:{current selectors}'; dedup, no sorting, inputs unmutated) and tests/specs/design-guard-font.spec.js (4 passed desktop-dark: matchesBaseRule cases, allowed [], exact diagnostics, immutability); RED confirmed (module missing), SNAP 18 created, T font+color+rules+pairs+color-vocab+css-parse 53 passed, FULL 137 passed, GATE 18 scope-snapshot: OK"
     },
     {
       "step": 19,
