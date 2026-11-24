@@ -102,7 +102,10 @@
     {
       "step": 10,
       "name": "axe-classify-occ-batch-9",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-25T00:05:47+0900",
+      "completed_at": "2026-11-25T00:23:08+0900",
+      "summary": "RSNAP 10(step110) · OCC_RUN 9(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 9 occurrence 10개 axe 재현 — 전부 nested-interactive(mobile-light project:1~7,10,11,12 project-card role=button tabindex=0 안 button.project-more(project:2는 a 링크도 포함) → js-render·false), pair 불일치 없음; occ-batch-9.json·server-9.json 기록. OCC_CHECK 9 'occ-check 9: OK 10' · FULL 429 passed(앞선 3회는 scope-snapshot-parity-artifacts tests/.tmp race 2건·modal-regression page.goto timeout 1건으로 매번 다른 1건 flake, 단독 재실행 통과) · VS OK · RGATE 10 '' OK"
     },
     {
       "step": 11,
