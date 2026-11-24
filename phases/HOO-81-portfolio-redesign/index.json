@@ -30,7 +30,10 @@
     {
       "step": 1,
       "name": "scope-snapshot-paths",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:26:55+0900",
+      "completed_at": "2026-11-24T19:27:57+0900",
+      "summary": "reverify step1: no-op — SNAP 1 created→reused, scope-snapshot-paths.spec.js 7 passed (desktop-dark), FULL 81 passed, CGATE 1 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 2,
