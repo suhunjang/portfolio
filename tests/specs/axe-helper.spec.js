@@ -1543,3 +1543,305 @@ test.describe('step 37 axe-current-checks', () => {
     });
   });
 });
+
+// step 38 — axe regression·prune (설계 §6.2 step 38·§6.5 prune): checkCollectedRegression · prunePlan ·
+// CLI --check-regression / --prune-plan
+import { checkCollectedRegression, prunePlan } from '../helpers/axe.js';
+
+const T_ZETA = 'color-contrast::#zeta::Z';
+const T_NEW = 'color-contrast::#about::## — About';
+// 기본 prune용 baseline: OK(aria) + 3-target color-contrast(css-rule·static-markup·js-render, 색 변경 없음) + RULE_PLAIN
+const S38_BASELINE = [
+  FIXTURE_OK[0],
+  {
+    key: S35_KEY_CC,
+    scenario: 'page',
+    project: 'desktop-dark',
+    ruleId: 'color-contrast',
+    impact: 'serious',
+    targets: [T_CAREER, T_PROJECTS, T_ZETA],
+    selectors: ['#career .section-kicker', '#projects .section-kicker', '#zeta'],
+    fixes: [
+      { target: T_CAREER, fixKind: 'css-rule', fixFiles: ['css/style.css'], requiresColorChange: false },
+      { target: T_PROJECTS, fixKind: 'static-markup', fixFiles: ['index.html'], requiresColorChange: false },
+      { target: T_ZETA, fixKind: 'js-render', fixFiles: ['js/main.js'], requiresColorChange: false },
+    ],
+    fixFiles: ['css/style.css', 'index.html', 'js/main.js'],
+  },
+  FIXTURE_RULE_PLAIN[0],
+];
+const S38_PLAN = {
+  groups: [
+    group({ id: 'hero', targets: [pt(S35_KEY_OK, T_HERO)], fixFiles: ['index.html'] }),
+    group({
+      id: 'kicker',
+      targets: [pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_PROJECTS), pt(S35_KEY_CC, T_ZETA)],
+      fixFiles: ['css/style.css', 'index.html', 'js/main.js'],
+      difficulty: 'medium',
+      estMinutes: 12,
+    }),
+    group({ id: 'toggle', targets: [pt(S35_KEY_TS, T_TOGGLE)], fixFiles: ['css/style.css'], difficulty: 'high', estMinutes: 3 }),
+  ],
+};
+const S38_GROUP_KEYS = ['id', 'targets', 'fixFiles', 'difficulty', 'estMinutes', 'blocked', 'reason'];
+// COLOR_PLAIN 한 그룹(color-contrast + target-size)
+const s38ColorPlainGroup = (reason) => ({
+  groups: [
+    group({
+      id: 'kicker-toggle',
+      targets: [pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_TS, T_TOGGLE)],
+      fixFiles: ['css/style.css'],
+      blocked: true,
+      reason,
+    }),
+  ],
+});
+// prune 결과 검증: 입력 유효, validateRemediationPlan(결과, baseline) → [], 필드 추가 없음, 입력 불변, 결정적
+function s38Prune(plan, collected, baseline) {
+  expect(validateRemediationPlan(plan, baseline)).toEqual([]);
+  const ps = clone(plan);
+  const cs = clone(collected);
+  const bs = clone(baseline);
+  const r = prunePlan(plan, collected, baseline);
+  expect(plan).toEqual(ps);
+  expect(collected).toEqual(cs);
+  expect(baseline).toEqual(bs);
+  expect(prunePlan(plan, collected, baseline)).toEqual(r);
+  expect(Object.keys(r)).toEqual(['groups']);
+  for (const g of r.groups) {
+    expect(Object.keys(g)).toEqual(S38_GROUP_KEYS);
+    for (const t of g.targets) expect(Object.keys(t)).toEqual(['key', 'target']);
+  }
+  expect(validateRemediationPlan(r, baseline)).toEqual([]);
+  return r;
+}
+
+let s38Seq = 0;
+function s38Dir() {
+  s38Seq += 1;
+  const rel = `tests/.tmp/axe-helper-s38-${process.pid}-${s38Seq}`;
+  fs.mkdirSync(path.join(S32_REPO, rel), { recursive: true });
+  return rel;
+}
+
+test.describe('step 38 axe-regression-prune', () => {
+  let before;
+  const made = [];
+  const dir = () => {
+    const d = s38Dir();
+    made.push(d);
+    return d;
+  };
+
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'desktop-dark 전용');
+    before = s32State();
+  });
+
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.project.name !== 'desktop-dark') return;
+    for (const d of made.splice(0)) fs.rmSync(path.join(S32_REPO, d), { recursive: true, force: true });
+    expect(s32State()).toEqual(before);
+  });
+
+  test('checkCollectedRegression: 같음·새 key·새 target·key 불일치·사라짐', () => {
+    for (const b of [FIXTURE_OK, FIXTURE_THEMES, FIXTURE_RULE_PLAIN, FIXTURE_RULE_COLOR, FIXTURE_MIXED, FIXTURE_COLOR_PLAIN]) {
+      expect(validateBaseline(b)).toEqual([]);
+    }
+    const same = FIXTURE_MIXED.map((e) => projectEntry(e));
+    expect(checkCollectedRegression(same, FIXTURE_MIXED)).toEqual([]);
+    // 사라짐(일부 target·전체) → []
+    expect(checkCollectedRegression([cEntry(S35_KEY_CC, [T_PROJECTS])], FIXTURE_MIXED)).toEqual([]);
+    expect(checkCollectedRegression([], FIXTURE_MIXED)).toEqual([]);
+    // 새 key
+    expect(checkCollectedRegression([...same, cEntry(S35_KEY_TS, [T_TOGGLE])], FIXTURE_MIXED)).toEqual([
+      `new-key:${S35_KEY_TS}`,
+    ]);
+    // 새 target(정렬)
+    expect(checkCollectedRegression([cEntry(S35_KEY_CC, [T_ZETA, T_CAREER, T_NEW])], FIXTURE_MIXED)).toEqual([
+      `new-target:${S35_KEY_CC}:${T_NEW}`,
+      `new-target:${S35_KEY_CC}:${T_ZETA}`,
+    ]);
+    // key 불일치(필드와 key가 다름·형식 오류 key)
+    const mismatch = { ...cEntry(S35_KEY_CC, [T_CAREER]), ruleId: 'target-size' };
+    expect(checkCollectedRegression([mismatch], FIXTURE_MIXED)).toEqual([`bad-key:${S35_KEY_CC}`]);
+    const badKey = { ...cEntry(S35_KEY_CC, [T_CAREER]), key: 'x' };
+    expect(checkCollectedRegression([badKey], FIXTURE_MIXED)).toEqual(['bad-key:x']);
+    // 혼합 → 고유·정렬
+    const mixed = [cEntry(S35_KEY_TS, [T_TOGGLE]), cEntry(S35_KEY_CC, [T_NEW, T_NEW]), badKey];
+    expect(checkCollectedRegression(mixed, FIXTURE_MIXED)).toEqual([
+      'bad-key:x',
+      `new-key:${S35_KEY_TS}`,
+      `new-target:${S35_KEY_CC}:${T_NEW}`,
+    ]);
+    expect(() => checkCollectedRegression({}, FIXTURE_MIXED)).toThrow(new Error('invalid collected'));
+    expect(() => checkCollectedRegression([{ key: S35_KEY_CC }], FIXTURE_MIXED)).toThrow(new Error('invalid collected'));
+    // 입력 불변
+    const ms = clone(mixed);
+    const bs = clone(FIXTURE_MIXED);
+    checkCollectedRegression(mixed, FIXTURE_MIXED);
+    expect(mixed).toEqual(ms);
+    expect(FIXTURE_MIXED).toEqual(bs);
+  });
+
+  test('prunePlan 기본: 제거·순서 유지·fixFiles 재계산·빈 그룹 삭제·필드 유지', () => {
+    expect(validateBaseline(S38_BASELINE)).toEqual([]);
+    expect(validateRemediationPlan(S38_PLAN, S38_BASELINE, { coverage: true })).toEqual([]);
+    // 전부 남음 → 그대로
+    const all = S38_BASELINE.map((e) => projectEntry(e));
+    expect(s38Prune(S38_PLAN, all, S38_BASELINE)).toEqual(S38_PLAN);
+    // hero 전부 사라짐, kicker의 #projects 사라짐
+    const collected = [cEntry(S35_KEY_CC, [T_ZETA, T_CAREER]), cEntry(S35_KEY_TS, [T_TOGGLE])];
+    const r = s38Prune(S38_PLAN, collected, S38_BASELINE);
+    expect(r).toEqual({
+      groups: [
+        group({
+          id: 'kicker',
+          targets: [pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_ZETA)],
+          fixFiles: ['css/style.css', 'js/main.js'],
+          difficulty: 'medium',
+          estMinutes: 12,
+        }),
+        group({ id: 'toggle', targets: [pt(S35_KEY_TS, T_TOGGLE)], fixFiles: ['css/style.css'], difficulty: 'high', estMinutes: 3 }),
+      ],
+    });
+    // 첫 두 그룹만 남음 → 그룹 순서 유지
+    const r2 = s38Prune(S38_PLAN, [cEntry(S35_KEY_OK, [T_HERO]), cEntry(S35_KEY_CC, [T_PROJECTS])], S38_BASELINE);
+    expect(r2.groups.map((g) => g.id)).toEqual(['hero', 'kicker']);
+    expect(r2.groups[1]).toEqual(
+      group({ id: 'kicker', targets: [pt(S35_KEY_CC, T_PROJECTS)], fixFiles: ['index.html'], difficulty: 'medium', estMinutes: 12 }),
+    );
+    // 전부 사라짐 → 빈 groups
+    expect(s38Prune(S38_PLAN, [], S38_BASELINE)).toEqual({ groups: [] });
+    // 결과를 고쳐도 입력은 불변(참조 공유 없음)
+    const r3 = prunePlan(S38_PLAN, all, S38_BASELINE);
+    const ps = clone(S38_PLAN);
+    r3.groups[0].targets.push(pt('x', 'y'));
+    r3.groups[1].fixFiles.push('z');
+    r3.groups[1].targets[0].key = 'changed';
+    expect(S38_PLAN).toEqual(ps);
+    expect(() => prunePlan(S38_PLAN, {}, S38_BASELINE)).toThrow(new Error('invalid collected'));
+  });
+
+  test('prunePlan blocked·reason 재계산: MIXED·파생 blocker 소멸·manual 보존·false 유지', () => {
+    // FIXTURE_MIXED kicker-mixed
+    const mixed = mixedPlan(true, R_BOTH);
+    const a = s38Prune(mixed, [cEntry(S35_KEY_CC, [T_CAREER])], FIXTURE_MIXED);
+    expect(a.groups).toEqual([
+      group({ id: 'kicker-mixed', targets: [pt(S35_KEY_CC, T_CAREER)], fixFiles: ['css/style.css'], blocked: true, reason: R_COLOR }),
+    ]);
+    const b = s38Prune(mixed, [cEntry(S35_KEY_CC, [T_PROJECTS])], FIXTURE_MIXED);
+    expect(b.groups).toEqual([
+      group({ id: 'kicker-mixed', targets: [pt(S35_KEY_CC, T_PROJECTS)], fixFiles: [], blocked: true, reason: R_TEXT }),
+    ]);
+    // 파생 blocker 소멸: COLOR_PLAIN 한 그룹에서 color-contrast 제거
+    const cp = s38ColorPlainGroup(R_COLOR);
+    const c = s38Prune(cp, [cEntry(S35_KEY_TS, [T_TOGGLE])], FIXTURE_COLOR_PLAIN);
+    expect(c.groups).toEqual([
+      group({ id: 'kicker-toggle', targets: [pt(S35_KEY_TS, T_TOGGLE)], fixFiles: ['css/style.css'], blocked: false, reason: '' }),
+    ]);
+    // 두 target 유지 → 그대로
+    const cAll = FIXTURE_COLOR_PLAIN.map((e) => projectEntry(e));
+    expect(s38Prune(cp, cAll, FIXTURE_COLOR_PLAIN)).toEqual(cp);
+    // COLOR_PLAIN에는 manual 그룹을 만들 수 없음(필수 reason과 혼합 → validator 거부)
+    expect(validateRemediationPlan(s38ColorPlainGroup('manual hold'), FIXTURE_COLOR_PLAIN)).toEqual(['groups[0]: reason-mismatch']);
+    expect(validateRemediationPlan(s38ColorPlainGroup(`${R_COLOR}; manual hold`), FIXTURE_COLOR_PLAIN)).toEqual([
+      'groups[0]: reason-mismatch',
+    ]);
+    // manual-only: RULE_PLAIN blocked true·manual hold, target 유지 → 그대로
+    const manual = rulePlainPlan(true, 'manual hold');
+    const toggleOnly = [cEntry(S35_KEY_TS, [T_TOGGLE])];
+    expect(s38Prune(manual, toggleOnly, FIXTURE_RULE_PLAIN)).toEqual(manual);
+    expect(s38Prune(manual, [], FIXTURE_RULE_PLAIN)).toEqual({ groups: [] });
+    // 기존 false 유지
+    const plain = rulePlainPlan(false, '');
+    expect(s38Prune(plain, toggleOnly, FIXTURE_RULE_PLAIN)).toEqual(plain);
+  });
+
+  test('CLI --check-regression·--prune-plan: 실패 시 불변, 통과 시 prune 결과 기록', async () => {
+    const d = dir();
+    const write = (name, data) => {
+      const rel = `${d}/${name}`;
+      fs.writeFileSync(path.join(S32_REPO, rel), typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+      return rel;
+    };
+    const base = write('baseline.json', S38_BASELINE);
+    const planRel = write('plan.json', S38_PLAN);
+    const planAbs = path.join(S32_REPO, planRel);
+    const cNew = write('c-new.json', [cEntry(S35_KEY_CC, [T_CAREER, T_NEW])]);
+    // 회귀 없음 + 사라진 target 1개(#projects)
+    const cGone = write(
+      'c-gone.json',
+      S38_BASELINE.map((e) => projectEntry(e)).map((e) => (e.key === S35_KEY_CC ? { ...e, targets: [T_CAREER, T_ZETA] } : e)),
+    );
+    const bBroken = write('b-broken.json', '[{');
+    const missing = `${d}/nope.json`;
+    const stamp = () => ({
+      sha: createHash('sha256').update(fs.readFileSync(planAbs)).digest('hex'),
+      mtime: fs.statSync(planAbs).mtimeMs,
+    });
+    const s0 = stamp();
+
+    // --check-regression
+    expect(await s32Cli(['--check-regression', '--collected', cGone, '--baseline', base])).toEqual({
+      code: 0,
+      stdout: 'check-regression: OK\n',
+      stderr: '',
+    });
+    expect(await s32Cli(['--check-regression', '--collected', cNew, '--baseline', base])).toEqual({
+      code: 1,
+      stdout: '',
+      stderr: `new-target:${S35_KEY_CC}:${T_NEW}\n`,
+    });
+    expect((await s32Cli(['--check-regression', '--collected', missing, '--baseline', base])).code).toBe(1);
+    expect((await s32Cli(['--check-regression', '--collected', cGone, '--baseline', bBroken])).code).toBe(1);
+    expect((await s32Cli(['--check-regression', '--collected', cGone, '--baseline', base, '--plan', planRel])).code).toBe(1);
+
+    // --prune-plan 실패 → exit 1·불변
+    const prune = (collected, baseline) =>
+      s32Cli(['--prune-plan', '--collected', collected, '--plan', planRel, '--baseline', baseline]);
+    expect(await prune(cNew, base)).toEqual({ code: 1, stdout: '', stderr: `new-target:${S35_KEY_CC}:${T_NEW}\n` });
+    expect(stamp()).toEqual(s0);
+    const fMissing = await prune(missing, base);
+    expect(fMissing.code).toBe(1);
+    expect(fMissing.stdout).toBe('');
+    expect(stamp()).toEqual(s0);
+    const fBroken = await prune(cGone, bBroken);
+    expect(fBroken.code).toBe(1);
+    expect(fBroken.stdout).toBe('');
+    expect(stamp()).toEqual(s0);
+
+    // sh -c '<check-regression> && <prune-plan>' 회귀 실패 → 불변
+    const chain = (collected) =>
+      new Promise((resolve) => {
+        const cmd =
+          `"${process.execPath}" "${S32_AXE}" --check-regression --collected "${collected}" --baseline "${base}"` +
+          ` && "${process.execPath}" "${S32_AXE}" --prune-plan --collected "${collected}" --plan "${planRel}" --baseline "${base}"`;
+        execFile('/bin/sh', ['-c', cmd], { cwd: S32_REPO }, (err, stdout, stderr) => {
+          resolve({ code: err ? (typeof err.code === 'number' ? err.code : 1) : 0, stdout, stderr });
+        });
+      });
+    expect(await chain(cNew)).toEqual({ code: 1, stdout: '', stderr: `new-target:${S35_KEY_CC}:${T_NEW}\n` });
+    expect(stamp()).toEqual(s0);
+
+    // 회귀 없음 + 사라진 target 1개 → exit 0·제거·재계산 반영
+    const ok = await chain(cGone);
+    expect(ok).toEqual({ code: 0, stdout: `check-regression: OK\nprune-plan: OK (${planRel})\n`, stderr: '' });
+    const expected = {
+      groups: [
+        S38_PLAN.groups[0],
+        group({
+          id: 'kicker',
+          targets: [pt(S35_KEY_CC, T_CAREER), pt(S35_KEY_CC, T_ZETA)],
+          fixFiles: ['css/style.css', 'js/main.js'],
+          difficulty: 'medium',
+          estMinutes: 12,
+        }),
+        S38_PLAN.groups[2],
+      ],
+    };
+    expect(prunePlan(S38_PLAN, loadBaseline(cGone), S38_BASELINE)).toEqual(expected);
+    expect(fs.readFileSync(planAbs, 'utf8')).toBe(JSON.stringify(expected, null, 2) + '\n');
+    expect(stamp().sha).not.toBe(s0.sha);
+  });
+});

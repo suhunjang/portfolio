@@ -870,6 +870,86 @@ export function countCollectedTargets(collected) {
   return collectedTargets(collected).length;
 }
 
+// §6.2 step 38: collected(MergedEntry 배열) 회귀 검사. key가 makeEntryKey(scenario, project, ruleId)와 다르거나
+// 만들 수 없으면 `bad-key:{key}`, baseline에 없는 key → `new-key:{key}`, key의 새 target → `new-target:{key}:{target}`.
+// 사라진 key·target 허용. 고유·코드 유닛 정렬. 순수·입력 불변.
+export function checkCollectedRegression(collected, baseline) {
+  collectedTargets(collected); // 형식 검사(Error('invalid collected'))
+  const byKey = new Map();
+  for (const e of Array.isArray(baseline) ? baseline : []) {
+    if (isPlainObject(e) && typeof e.key === 'string') byKey.set(e.key, e);
+  }
+  const out = new Set();
+  for (const e of collected) {
+    let expected = null;
+    try {
+      expected = makeEntryKey({ scenario: e.scenario, project: e.project, ruleId: e.ruleId });
+    } catch {
+      expected = null;
+    }
+    if (expected !== e.key) {
+      out.add(`bad-key:${e.key}`);
+      continue;
+    }
+    const entry = byKey.get(e.key);
+    if (!entry) {
+      out.add(`new-key:${e.key}`);
+      continue;
+    }
+    const known = new Set(Array.isArray(entry.targets) ? entry.targets : []);
+    for (const t of e.targets) if (!known.has(t)) out.add(`new-target:${e.key}:${t}`);
+  }
+  return [...out].sort(byCodeUnit);
+}
+
+// §6.5 prune: (1) collected에 없는 PlanTarget 제거(순서 유지) (2) 빈 그룹 삭제(순서 유지) (3) fixFiles 재계산·
+// R' = requiredBlockReason(남은 targets) (4) R' ≠ "" → blocked true·reason R' (5) R' = "" → manual block
+// (prune 전 blocked true·reason 비어 있지 않음·prune 전 requiredBlockReason과 다름)만 유지, 아니면 false·""
+// (6) id·difficulty·estMinutes 유지, 필드 추가 없음. 순수·입력 불변·결정적.
+export function prunePlan(plan, collected, baseline) {
+  const present = new Set(collectedTargets(collected).map((t) => ptId(t.key, t.target)));
+  if (!isPlainObject(plan) || !Array.isArray(plan.groups)) throw new Error('invalid plan');
+  const index = baselineFixIndex(baseline);
+  const groups = [];
+  for (const g of plan.groups) {
+    if (!isPlainObject(g) || !Array.isArray(g.targets)) throw new Error('invalid plan');
+    const targets = g.targets
+      .filter((t) => isPlainObject(t) && present.has(ptId(t.key, t.target)))
+      .map((t) => ({ key: t.key, target: t.target }));
+    if (targets.length === 0) continue;
+    const files = [];
+    for (const t of targets) {
+      const fix = index.get(ptId(t.key, t.target));
+      if (fix && Array.isArray(fix.fixFiles)) files.push(...fix.fixFiles);
+    }
+    const required = requiredBlockReason(targets, baseline);
+    let blocked = false;
+    let reason = '';
+    if (required !== '') {
+      blocked = true;
+      reason = required;
+    } else if (
+      g.blocked === true &&
+      typeof g.reason === 'string' &&
+      g.reason !== '' &&
+      g.reason !== requiredBlockReason(g.targets, baseline)
+    ) {
+      blocked = true;
+      reason = g.reason;
+    }
+    groups.push({
+      id: g.id,
+      targets,
+      fixFiles: sortedUniqueStrings(files),
+      difficulty: g.difficulty,
+      estMinutes: g.estMinutes,
+      blocked,
+      reason,
+    });
+  }
+  return { groups };
+}
+
 function parseCliArgs(argv) {
   const opts = {
     cmd: null,
@@ -898,7 +978,9 @@ function parseCliArgs(argv) {
       a === '--assert-empty' ||
       a === '--check-baseline-match' ||
       a === '--check-plan' ||
-      a === '--check-executable'
+      a === '--check-executable' ||
+      a === '--check-regression' ||
+      a === '--prune-plan'
     ) {
       if (opts.cmd) throw new Error(`axe.js: duplicate command ${a}`);
       opts.cmd = a.slice(2);
@@ -928,6 +1010,19 @@ function parseCliArgs(argv) {
       (!planAllowed && opts.plan !== undefined)
     ) {
       throw new Error(`axe.js: --${opts.cmd} takes only --collected${planAllowed ? ' and --plan' : ''}`);
+    }
+    return opts;
+  }
+  if (opts.cmd === 'check-regression' || opts.cmd === 'prune-plan') {
+    const planAllowed = opts.cmd === 'prune-plan';
+    if (
+      opts.dir !== undefined ||
+      opts.out !== undefined ||
+      opts.coverage ||
+      opts.requireEmpty ||
+      (!planAllowed && opts.plan !== undefined)
+    ) {
+      throw new Error(`axe.js: --${opts.cmd} takes only --collected${planAllowed ? ', --plan' : ''} and --baseline`);
     }
     return opts;
   }
@@ -996,6 +1091,35 @@ export function runCli(argv) {
         return 1;
       }
       process.stdout.write('check-executable: OK\n');
+      return 0;
+    }
+    if (opts.cmd === 'check-regression' || opts.cmd === 'prune-plan') {
+      const collected = loadBaseline(opts.collected ?? CURRENT_COLLECTED_PATH);
+      const baseline = loadBaseline(opts.baseline ?? BASELINE_PATH);
+      const planPath = opts.plan ?? PLAN_PATH;
+      const plan = opts.cmd === 'prune-plan' ? loadPlan(planPath) : null;
+      const regressions = checkCollectedRegression(collected, baseline);
+      if (regressions.length) {
+        for (const line of regressions) process.stderr.write(`${line}\n`);
+        return 1;
+      }
+      if (opts.cmd === 'check-regression') {
+        process.stdout.write('check-regression: OK\n');
+        return 0;
+      }
+      const inputErrors = validateRemediationPlan(plan, baseline);
+      if (inputErrors.length) {
+        for (const line of inputErrors) process.stderr.write(`${line}\n`);
+        return 1;
+      }
+      const pruned = prunePlan(plan, collected, baseline);
+      const prunedErrors = validateRemediationPlan(pruned, baseline);
+      if (prunedErrors.length) {
+        for (const line of prunedErrors) process.stderr.write(`${line}\n`);
+        return 1;
+      }
+      fs.writeFileSync(repoAbs(planPath), JSON.stringify(pruned, null, 2) + '\n');
+      process.stdout.write(`prune-plan: OK (${planPath})\n`);
       return 0;
     }
     if (opts.cmd === 'check-group-done' || opts.cmd === 'check-coverage' || opts.cmd === 'assert-no-violations') {
