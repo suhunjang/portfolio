@@ -5,7 +5,7 @@
 - read-first: 설계 §11.6, §11.7(projectRoot, 경로 유형, 실행 전제, S, C, 블록 추출, exec harness, 비교 도구 step 1, 테스트 격리), §12
 - tracked 허용(exact): `tests/scripts/scope-snapshot.mjs`(step 1 API), `tests/specs/scope-snapshot-paths.spec.js`
 - runtime: R0(합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`, `<pid>-link`, `<pid>-file`)
-- 금지: §15.7, 이후 step API 변경, S·C 본문 변경, dirfd/openat·경쟁 주입 테스트
+- 금지: §15.7, 이후 step API 변경, S·C 본문 변경, `HARNESS_IDENTITY` 값 변경, dirfd/openat·경쟁 주입 테스트
 
 ## 작업
 

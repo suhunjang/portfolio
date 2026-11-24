@@ -1,22 +1,26 @@
 # Step 0 — tests-env-bootstrap (재검증)
 
-- 목적: 시작 snapshot을 먼저 남기고 tests 실행 환경을 갖춘다. HEAD에 기존 구현이 있으므로 설계 §11.6 재검증 모드.
-- 예상 18분 / 선행 없음(§17 preflight 완료 전제) / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
-- read-first: 설계 §3, §11.1~§11.4, §11.6, §11.7, §17
-- tracked 허용(exact): `tests/scripts/with-env.sh`, `tests/scripts/start-snapshot.py`, `tests/package.json`, `tests/package-lock.json`, `tests/.gitignore`, `tests/playwright.config.js`, `tests/specs/bootstrap.spec.js`
+- 목적: 시작 snapshot을 먼저 남기고 tests 실행 환경을 갖추며, 최초 전체 테스트 전에 S(`start-snapshot.py`)와 `scope-snapshot.mjs`의 Harness identity 3값을 2.0.1 확정값으로 동기화한다. HEAD에 기존 구현이 있으므로 설계 §11.6 재검증 모드.
+- 예상 19분 / 선행 없음(§17 preflight 완료 전제) / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
+- read-first: 설계 §3, §11.1~§11.4, §11.6, §11.7(S 블록 `HARNESS`, 비교 도구 step 1 상수 `HARNESS_IDENTITY`), §17
+- tracked 허용(exact): `tests/scripts/with-env.sh`, `tests/scripts/start-snapshot.py`, `tests/package.json`, `tests/package-lock.json`, `tests/.gitignore`, `tests/playwright.config.js`, `tests/specs/bootstrap.spec.js`, `tests/scripts/scope-snapshot.mjs`(`HARNESS_IDENTITY`의 sourceCommit·manifestHash·distributionVersion 3값 줄만)
 - runtime: R0 + `tests/node_modules/**`
-- 금지: §15.7, 설계 문서와 S·C 본문 변경, 비runtime symlink·FIFO
+- 금지: §15.7, 설계 문서와 S·C 본문 변경, `scope-snapshot.mjs`의 identity 3값 외 변경(키 이름·구조·함수·다른 상수 불변), 비runtime symlink·FIFO
 
 ## 작업
 
 1. 시작 snapshot: 어떤 파일보다 먼저 `python3 -I - step0 <<'PY'` + 설계 §11.7 S 코드 블록 본문(그대로) + `PY`. `created`/`reused`가 아니면 중단·보고(§17이 끝나지 않아 2.0.0 snapshot이 남아 있으면 identity mismatch로 멈춘다).
-2. 재검증 모드 판정: 7개 파일이 모두 `git ls-files`에 있으면 재검증 모드(`step0 start clean` 생략). 없으면 최초 구축: `python3 -I -c "import json,sys; s=json.load(open('tests/.tmp/start-snapshot-step0.json')); bad=sorted(p for p in set(s['files'])|set(s['xy']) if p=='package.json' or (p.startswith('tests/') and not p.startswith('tests/.tmp/'))); sys.exit('preexisting: '+','.join(bad)) if bad else print('step0 start clean')"`가 `step0 start clean`이어야 한다.
-3. 알려진 불일치: 커밋된 `tests/scripts/start-snapshot.py`는 2.0.0 identity와 decode 변환 없는 `parse_status`를 담고 있다. 이 파일 전체를 설계 §11.7 S 블록(설계 블록 추출 규칙)과 바이트 그대로 같게 저장한다. 설계 블록을 고치지 않는다. 그 밖 파일은 AC가 실패할 때만 고친다.
+2. 재검증 모드 판정: 원래 7개 파일(`with-env.sh`, `start-snapshot.py`, `package.json`, `package-lock.json`, `.gitignore`, `playwright.config.js`, `bootstrap.spec.js`)이 모두 `git ls-files`에 있으면 재검증 모드(`step0 start clean` 생략). 없으면 최초 구축: `python3 -I -c "import json,sys; s=json.load(open('tests/.tmp/start-snapshot-step0.json')); bad=sorted(p for p in set(s['files'])|set(s['xy']) if p=='package.json' or (p.startswith('tests/') and not p.startswith('tests/.tmp/'))); sys.exit('preexisting: '+','.join(bad)) if bad else print('step0 start clean')"`가 `step0 start clean`이어야 한다.
+3. 알려진 불일치 동기화(어떤 테스트 실행보다 먼저):
+   - (a) `tests/scripts/start-snapshot.py` 전체를 설계 §11.7 S 블록(설계 블록 추출 규칙)과 바이트 그대로 같게 저장한다(2.0.0 identity·decode 변환 없는 `parse_status` 교체). 설계 블록을 고치지 않는다.
+   - (b) `tests/scripts/scope-snapshot.mjs`의 `HARNESS_IDENTITY` 3값을 S 블록 `HARNESS`와 같은 값(sourceCommit `e7a03919a460f975149f7c55343ca4b34d3d2352`, manifestHash `b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372`, distributionVersion `2.0.1`)으로 바꾼다. 그 밖 줄은 바꾸지 않는다.
+   - 그 밖 허용 파일은 AC가 실패할 때만 고친다.
 4. 계약: `with-env.sh` = §11.2; `.gitignore` = §11.1 7줄; `package.json` = `private`, `type: module`, devDependencies 2개, scripts `test`·`browsers:install`(이후 step이 추가한 script 유지); 설치 `sh tests/scripts/with-env.sh npm --prefix tests install`; `playwright.config.js` = §11.4.
-5. `bootstrap.spec.js` 계약(node 전용, desktop-dark만, timeout 10초, 실제 저장소에는 parity 파일·retry probe만 쓰고 삭제): config `workers === 1`·`fullyParallel === false`·6 project; `.gitignore` 7줄; `with-env.sh` 첫 두 줄·`PLAYWRIGHT_BROWSERS_PATH`; `start-snapshot.py` bytes = 설계 S 블록; 최초 `parity-<A>` `created`·키·`tests/playwright.config.js` sha256·null 경로 부재·SKIP 없음; probe 후 `reused`·sha256·mtime 불변; identity 변형 6종(`stepId`, `head`, `base`, `projectRoot`, `harness.manifestHash`, `harness.lockSha256`) 거부; schemaVersion 변형(`2`·`true`·`1.0`·`1e0` → `bad start snapshot: schemaVersion`, 최상위 중복 3종 → `invalid json`, 최상위 `1.0` + `harness` 안 `"schemaVersion": 1` → `schemaVersion`, `files` 값 `NaN` → `invalid json`); 잘못된 id `step`·`../x`·`Step1` 거부·파일 없음.
-6. 로그: `reverify step0: fixed tests/scripts/start-snapshot.py`(+ 추가 수정 파일).
+5. `bootstrap.spec.js` 계약(node 전용, desktop-dark만, timeout 10초, 실제 저장소에는 parity 파일·retry probe만 쓰고 삭제): config `workers === 1`·`fullyParallel === false`·6 project; `.gitignore` 7줄; `with-env.sh` 첫 두 줄·`PLAYWRIGHT_BROWSERS_PATH`; `start-snapshot.py` bytes = 설계 S 블록; `scope-snapshot.mjs`의 `HARNESS_IDENTITY` 3값이 S 블록 `HARNESS`와 deep-equal; 최초 `parity-<A>` `created`·키·`tests/playwright.config.js` sha256·null 경로 부재·SKIP 없음; probe 후 `reused`·sha256·mtime 불변; identity 변형 6종(`stepId`, `head`, `base`, `projectRoot`, `harness.manifestHash`, `harness.lockSha256`) 거부; schemaVersion 변형(`2`·`true`·`1.0`·`1e0` → `bad start snapshot: schemaVersion`, 최상위 중복 3종 → `invalid json`, 최상위 `1.0` + `harness` 안 `"schemaVersion": 1` → `schemaVersion`, `files` 값 `NaN` → `invalid json`); 잘못된 id `step`·`../x`·`Step1` 거부·파일 없음.
+6. 로그: `reverify step0: fixed tests/scripts/start-snapshot.py,tests/scripts/scope-snapshot.mjs`(+ 추가 수정 파일).
 
 ## AC (한 셸에서 순서대로, 모두 exit 0)
 
-1. `sh tests/scripts/with-env.sh npm --prefix tests install && sh tests/scripts/with-env.sh npm --prefix tests test -- bootstrap.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step0` (마지막은 `reused`)
-2. 범위 gate: `python3 -I - step0 'tests/scripts/with-env.sh,tests/scripts/start-snapshot.py,tests/package.json,tests/package-lock.json,tests/.gitignore,tests/playwright.config.js,tests/specs/bootstrap.spec.js' '' <<'PY'` + 설계 §11.7 C 코드 블록 본문(그대로) + `PY` (최초 구축 모드면 세 번째 인자는 두 번째와 같은 목록)
+1. identity diff 제한(시작 HEAD 대비, 3값 줄만·추가 줄 3개 이하): `git diff --no-renames --unified=0 HEAD -- tests/scripts/scope-snapshot.mjs | python3 -I -c "import re,sys; L=[l for l in sys.stdin.read().splitlines() if l.startswith(('+','-')) and not l.startswith(('+++','---'))]; bad=[l for l in L if not re.search('sourceCommit|manifestHash|distributionVersion', l)]; sys.exit('identity-diff: '+repr(bad)) if bad or sum(l[0]=='+' for l in L)>3 else print('identity-diff: OK')"`
+2. `sh tests/scripts/with-env.sh npm --prefix tests install && sh tests/scripts/with-env.sh npm --prefix tests test -- bootstrap.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test -- scope-snapshot-identity.spec.js scope-snapshot-cli.spec.js scope-snapshot-parity-core.spec.js scope-snapshot-parity-paths.spec.js scope-snapshot-parity-artifacts.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && python3 -I tests/scripts/start-snapshot.py step0` (마지막은 `reused`)
+3. 범위 gate: `python3 -I - step0 'tests/scripts/with-env.sh,tests/scripts/start-snapshot.py,tests/package.json,tests/package-lock.json,tests/.gitignore,tests/playwright.config.js,tests/specs/bootstrap.spec.js,tests/scripts/scope-snapshot.mjs' '' <<'PY'` + 설계 §11.7 C 코드 블록 본문(그대로) + `PY` (최초 구축 모드면 세 번째 인자는 `scope-snapshot.mjs`를 뺀 원래 7개 목록)
