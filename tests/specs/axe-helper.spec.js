@@ -718,3 +718,203 @@ test.describe('step 33 axe-baseline-regression', () => {
     }
   });
 });
+
+// step 34 — axe baseline projection (설계 §6.2 step 34): PROJECTION_FIELDS · projectEntry ·
+// compareCollectedBaseline · CLI --check-baseline-match
+import { PROJECTION_FIELDS, projectEntry, compareCollectedBaseline } from '../helpers/axe.js';
+
+const S34_KEY_A = 'page:desktop-dark:aria-allowed-attr';
+const S34_KEY_B = 'page:desktop-dark:color-contrast';
+const T_EXTRA = 'color-contrast::#about::About';
+// 같은 entry 2개 기준 baseline(§6.4 strict fix 포함) = FIXTURE_OK ∪ FIXTURE_RULE_COLOR(css-rule → rcc true/false 모두 유효).
+const S34_BASELINE = [...FIXTURE_OK, ...FIXTURE_RULE_COLOR];
+const s34Collected = (b = S34_BASELINE) => b.map((e) => projectEntry(e));
+const S34_EMPTY = { ok: true, missingEntries: [], extraEntries: [], missingTargets: [], extraTargets: [], fieldMismatches: [] };
+const s34Result = (over) => ({ ...S34_EMPTY, ok: false, ...over });
+
+let s34Seq = 0;
+function s34Dir() {
+  s34Seq += 1;
+  const rel = `tests/.tmp/axe-helper-s34-${process.pid}-${s34Seq}`;
+  fs.mkdirSync(path.join(S32_REPO, rel), { recursive: true });
+  return rel;
+}
+
+test.describe('step 34 axe-baseline-projection', () => {
+  let before;
+  const made = [];
+  const dir = () => {
+    const d = s34Dir();
+    made.push(d);
+    return d;
+  };
+
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'desktop-dark 전용');
+    before = s32State();
+  });
+
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.project.name !== 'desktop-dark') return;
+    for (const d of made.splice(0)) fs.rmSync(path.join(S32_REPO, d), { recursive: true, force: true });
+    expect(s32State()).toEqual(before);
+  });
+
+  test('PROJECTION_FIELDS·projectEntry: 정확히 7필드, fixes·fixFiles·requiresColorChange 없음', () => {
+    expect(PROJECTION_FIELDS).toEqual(['key', 'scenario', 'project', 'ruleId', 'impact', 'targets', 'selectors']);
+    expect(validateBaseline(S34_BASELINE)).toEqual([]);
+    const snapshot = clone(S34_BASELINE);
+    const p = projectEntry(S34_BASELINE[1]);
+    expect(Object.keys(p)).toEqual(PROJECTION_FIELDS);
+    expect(p).not.toHaveProperty('fixes');
+    expect(p).not.toHaveProperty('fixFiles');
+    expect(p).not.toHaveProperty('requiresColorChange');
+    expect(JSON.stringify(p)).not.toContain('requiresColorChange');
+    expect(p).toEqual({
+      key: S34_KEY_B,
+      scenario: 'page',
+      project: 'desktop-dark',
+      ruleId: 'color-contrast',
+      impact: 'serious',
+      targets: [T_CAREER],
+      selectors: ['#career .section-kicker'],
+    });
+    expect(S34_BASELINE).toEqual(snapshot);
+    // targets·selectors 정렬·중복 제거, 입력 불변
+    const messy = { ...p, targets: [T_PROJECTS, T_CAREER, T_PROJECTS], selectors: ['b', 'a', 'b'] };
+    const messySnap = clone(messy);
+    expect(projectEntry(messy)).toEqual({ ...p, targets: [T_CAREER, T_PROJECTS], selectors: ['a', 'b'] });
+    expect(messy).toEqual(messySnap);
+    // 누락·key 불일치 throw
+    for (const f of PROJECTION_FIELDS) {
+      const e = clone(p);
+      delete e[f];
+      expect(() => projectEntry(e), f).toThrow();
+    }
+    expect(() => projectEntry({ ...p, key: 'page:desktop-light:color-contrast' })).toThrow();
+    expect(() => projectEntry(null)).toThrow();
+  });
+
+  test('compareCollectedBaseline: 같음 ok·다섯 []; requiresColorChange true↔false만 바꿔도 동일', () => {
+    const collected = s34Collected();
+    const cSnap = clone(collected);
+    const bSnap = clone(S34_BASELINE);
+    expect(compareCollectedBaseline(collected, S34_BASELINE)).toEqual(S34_EMPTY);
+    expect(collected).toEqual(cSnap);
+    expect(S34_BASELINE).toEqual(bSnap);
+    const flipped = clone(S34_BASELINE);
+    expect(flipped[1].fixes[0].requiresColorChange).toBe(true);
+    flipped[1].fixes[0].requiresColorChange = false;
+    expect(validateBaseline(flipped)).toEqual([]);
+    expect(compareCollectedBaseline(collected, flipped)).toEqual(S34_EMPTY);
+    expect(compareCollectedBaseline(collected, S34_BASELINE)).toEqual(compareCollectedBaseline(collected, flipped));
+  });
+
+  test('compareCollectedBaseline 불일치 5종·중복 throw', () => {
+    const collected = s34Collected();
+    // collected에만 entry
+    expect(compareCollectedBaseline(collected, S34_BASELINE.slice(1))).toEqual(s34Result({ missingEntries: [S34_KEY_A] }));
+    // baseline에만 entry
+    expect(compareCollectedBaseline(collected.slice(1), S34_BASELINE)).toEqual(s34Result({ extraEntries: [S34_KEY_A] }));
+    // collected target 추가
+    const cMore = clone(collected);
+    cMore[1].targets.push(T_EXTRA);
+    expect(compareCollectedBaseline(cMore, S34_BASELINE)).toEqual(
+      s34Result({ missingTargets: [{ key: S34_KEY_B, target: T_EXTRA }] }),
+    );
+    // baseline target 추가
+    const bMore = clone(S34_BASELINE);
+    bMore[1].targets.push(T_EXTRA);
+    expect(compareCollectedBaseline(collected, bMore)).toEqual(
+      s34Result({ extraTargets: [{ key: S34_KEY_B, target: T_EXTRA }] }),
+    );
+    // impact 다름
+    const cImpact = clone(collected);
+    cImpact[0].impact = 'critical';
+    expect(compareCollectedBaseline(cImpact, S34_BASELINE)).toEqual(
+      s34Result({ fieldMismatches: [{ key: S34_KEY_A, field: 'impact' }] }),
+    );
+    // selectors 다름
+    const cSel = clone(collected);
+    cSel[1].selectors = ['#career'];
+    expect(compareCollectedBaseline(cSel, S34_BASELINE)).toEqual(
+      s34Result({ fieldMismatches: [{ key: S34_KEY_B, field: 'selectors' }] }),
+    );
+    // key 중복 throw
+    expect(() => compareCollectedBaseline([...collected, collected[0]], S34_BASELINE)).toThrow();
+    expect(() => compareCollectedBaseline(collected, [...S34_BASELINE, S34_BASELINE[1]])).toThrow();
+  });
+
+  test('CLI --check-baseline-match: 일치 0, 5종 불일치 1·정확한 줄, 파일 없음·JSON 오류 1', async () => {
+    const d = dir();
+    const write = (f, data) => {
+      const rel = `${d}/${f}`;
+      fs.writeFileSync(path.join(S32_REPO, rel), typeof data === 'string' ? data : JSON.stringify(data, null, 2) + '\n');
+      return rel;
+    };
+    const base = write('baseline.json', S34_BASELINE);
+    const run = (collected, baseline = base) =>
+      s32Cli(['--check-baseline-match', '--collected', collected, '--baseline', baseline]);
+
+    const ok = await run(write('ok.json', s34Collected()));
+    expect(ok.code).toBe(0);
+    expect(ok.stdout).toBe('baseline-match: OK\n');
+    expect(ok.stderr).toBe('');
+
+    const flippedBase = clone(S34_BASELINE);
+    flippedBase[1].fixes[0].requiresColorChange = false;
+    const flippedRun = await run(write('ok2.json', s34Collected()), write('flipped.json', flippedBase));
+    expect(flippedRun.code).toBe(0);
+    expect(flippedRun.stdout).toBe('baseline-match: OK\n');
+
+    const collected = s34Collected();
+    const cMore = clone(collected);
+    cMore[1].targets.push(T_EXTRA);
+    const bMore = clone(S34_BASELINE);
+    bMore[1].targets.push(T_EXTRA);
+    const cImpact = clone(collected);
+    cImpact[0].impact = 'critical';
+    const cSel = clone(collected);
+    cSel[1].selectors = ['#career'];
+    const cases = [
+      ['missing-entry', collected, S34_BASELINE.slice(1), `missing-entry:${S34_KEY_A}\n`],
+      ['extra-entry', collected.slice(1), S34_BASELINE, `extra-entry:${S34_KEY_A}\n`],
+      ['missing-target', cMore, S34_BASELINE, `missing-target:${S34_KEY_B}|${T_EXTRA}\n`],
+      ['extra-target', collected, bMore, `extra-target:${S34_KEY_B}|${T_EXTRA}\n`],
+      ['field-mismatch-impact', cImpact, S34_BASELINE, `field-mismatch:${S34_KEY_A}|impact\n`],
+      ['field-mismatch-selectors', cSel, S34_BASELINE, `field-mismatch:${S34_KEY_B}|selectors\n`],
+    ];
+    for (const [name, c, b, line] of cases) {
+      const r = await run(write(`${name}-c.json`, c), write(`${name}-b.json`, b));
+      expect(r.code, name).toBe(1);
+      expect(r.stderr, name).toBe(line);
+      expect(r.stdout, name).toBe('');
+    }
+
+    // 여러 종류가 섞이면 missing-entry → extra-entry → missing-target → extra-target → field-mismatch 순서
+    const mixC = [
+      { ...collected[0], key: 'page:mobile-dark:aria-allowed-attr', project: 'mobile-dark' },
+      { ...collected[1], targets: [T_EXTRA], selectors: ['#x'] },
+    ];
+    const mix = await run(write('mix-c.json', mixC), base);
+    expect(mix.code).toBe(1);
+    expect(mix.stderr).toBe(
+      [
+        'missing-entry:page:mobile-dark:aria-allowed-attr',
+        `extra-entry:${S34_KEY_A}`,
+        `missing-target:${S34_KEY_B}|${T_EXTRA}`,
+        `extra-target:${S34_KEY_B}|${T_CAREER}`,
+        `field-mismatch:${S34_KEY_B}|selectors`,
+        '',
+      ].join('\n'),
+    );
+
+    // collected 없음·baseline JSON 오류 → 1
+    const missing = await run(`${d}/nope.json`);
+    expect(missing.code).toBe(1);
+    expect(missing.stdout).toBe('');
+    const broken = await run(write('c3.json', s34Collected()), write('broken.json', '[{'));
+    expect(broken.code).toBe(1);
+    expect(broken.stdout).toBe('');
+  });
+});

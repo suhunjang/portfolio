@@ -521,14 +521,100 @@ export function assertEmptyFile(file = BASELINE_PATH) {
   if (data.length !== 0) throw new Error(`assertEmptyFile: expected [], got ${data.length} entries: ${file}`);
 }
 
+// step 34 — baseline projection (§6.2 step 34). fixes·fixFiles·fix의 requiresColorChange는
+// projection과 collected 비교에서 명시적으로 제외한다.
+export const PROJECTION_FIELDS = Object.freeze(['key', 'scenario', 'project', 'ruleId', 'impact', 'targets', 'selectors']);
+const COMPARED_FIELDS = ['scenario', 'project', 'ruleId', 'impact', 'selectors'];
+
+// entry(collected MergedEntry 또는 baseline entry) → PROJECTION_FIELDS 7필드만. targets·selectors 정렬·중복 제거.
+// 필드 누락·key 불일치 throw. 입력 불변.
+export function projectEntry(entry) {
+  if (!isPlainObject(entry)) throw new Error('projectEntry: not-object');
+  const missing = PROJECTION_FIELDS.filter((f) => !Object.prototype.hasOwnProperty.call(entry, f));
+  if (missing.length) throw new Error(`projectEntry: missing=[${missing.join(',')}]`);
+  for (const f of ['targets', 'selectors']) {
+    if (!Array.isArray(entry[f]) || entry[f].some((x) => typeof x !== 'string')) {
+      throw new Error(`projectEntry: ${f} not-string-array: ${entry.key}`);
+    }
+  }
+  const want = makeEntryKey({ scenario: entry.scenario, project: entry.project, ruleId: entry.ruleId });
+  if (entry.key !== want) throw new Error(`projectEntry: key-mismatch: ${entry.key} != ${want}`);
+  return {
+    key: entry.key,
+    scenario: entry.scenario,
+    project: entry.project,
+    ruleId: entry.ruleId,
+    impact: entry.impact,
+    targets: sortedUniqueStrings(entry.targets),
+    selectors: sortedUniqueStrings(entry.selectors),
+  };
+}
+
+function projectByKey(list, label) {
+  if (!Array.isArray(list)) throw new Error(`compareCollectedBaseline: ${label} not-array`);
+  const map = new Map();
+  for (const e of list) {
+    const p = projectEntry(e);
+    if (map.has(p.key)) throw new Error(`compareCollectedBaseline: ${label} duplicate-key ${p.key}`);
+    map.set(p.key, p);
+  }
+  return map;
+}
+
+const byKeyThen = (second) => (a, b) => byCodeUnit(a.key, b.key) || byCodeUnit(a[second], b[second]);
+
+// collected vs baseline projection 비교. 입력 불변, 모든 배열 정렬. ok = 다섯 배열 빔.
+export function compareCollectedBaseline(collected, baseline) {
+  const c = projectByKey(collected, 'collected');
+  const b = projectByKey(baseline, 'baseline');
+  const missingEntries = [];
+  const extraEntries = [];
+  const missingTargets = [];
+  const extraTargets = [];
+  const fieldMismatches = [];
+  for (const [key, ce] of c) {
+    const be = b.get(key);
+    if (!be) {
+      missingEntries.push(key);
+      continue;
+    }
+    const bt = new Set(be.targets);
+    const ct = new Set(ce.targets);
+    for (const t of ce.targets) if (!bt.has(t)) missingTargets.push({ key, target: t });
+    for (const t of be.targets) if (!ct.has(t)) extraTargets.push({ key, target: t });
+    for (const field of COMPARED_FIELDS) {
+      if (JSON.stringify(ce[field]) !== JSON.stringify(be[field])) fieldMismatches.push({ key, field });
+    }
+  }
+  for (const key of b.keys()) if (!c.has(key)) extraEntries.push(key);
+  missingEntries.sort(byCodeUnit);
+  extraEntries.sort(byCodeUnit);
+  missingTargets.sort(byKeyThen('target'));
+  extraTargets.sort(byKeyThen('target'));
+  fieldMismatches.sort(byKeyThen('field'));
+  const ok = [missingEntries, extraEntries, missingTargets, extraTargets, fieldMismatches].every((x) => x.length === 0);
+  return { ok, missingEntries, extraEntries, missingTargets, extraTargets, fieldMismatches };
+}
+
+// 비교 결과 → stderr 줄(missing-entry → extra-entry → missing-target → extra-target → field-mismatch).
+function baselineMatchLines(r) {
+  return [
+    ...r.missingEntries.map((k) => `missing-entry:${k}`),
+    ...r.extraEntries.map((k) => `extra-entry:${k}`),
+    ...r.missingTargets.map((x) => `missing-target:${x.key}|${x.target}`),
+    ...r.extraTargets.map((x) => `extra-target:${x.key}|${x.target}`),
+    ...r.fieldMismatches.map((x) => `field-mismatch:${x.key}|${x.field}`),
+  ];
+}
+
 function parseCliArgs(argv) {
-  const opts = { cmd: null, dir: undefined, out: undefined, baseline: undefined };
+  const opts = { cmd: null, dir: undefined, out: undefined, baseline: undefined, collected: undefined };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--reset' || a === '--merge' || a === '--assert-empty') {
+    if (a === '--reset' || a === '--merge' || a === '--assert-empty' || a === '--check-baseline-match') {
       if (opts.cmd) throw new Error(`axe.js: duplicate command ${a}`);
       opts.cmd = a.slice(2);
-    } else if (a === '--dir' || a === '--out' || a === '--baseline') {
+    } else if (a === '--dir' || a === '--out' || a === '--baseline' || a === '--collected') {
       const v = argv[++i];
       if (v === undefined || v.startsWith('--')) throw new Error(`axe.js: ${a} requires a value`);
       opts[a.slice(2)] = v;
@@ -536,7 +622,16 @@ function parseCliArgs(argv) {
       throw new Error(`axe.js: unknown argument ${a}`);
     }
   }
-  if (!opts.cmd) throw new Error('axe.js: command required (--reset | --merge | --assert-empty)');
+  if (!opts.cmd) {
+    throw new Error('axe.js: command required (--reset | --merge | --assert-empty | --check-baseline-match)');
+  }
+  if (opts.cmd === 'check-baseline-match') {
+    if (opts.dir !== undefined || opts.out !== undefined) {
+      throw new Error('axe.js: --check-baseline-match takes only --collected and --baseline');
+    }
+    return opts;
+  }
+  if (opts.collected !== undefined) throw new Error('axe.js: --collected only with --check-baseline-match');
   if (opts.cmd === 'reset' && opts.out !== undefined) throw new Error('axe.js: --out only with --merge');
   if (opts.cmd !== 'assert-empty' && opts.baseline !== undefined) throw new Error('axe.js: --baseline only with --assert-empty');
   if (opts.cmd === 'assert-empty' && (opts.dir !== undefined || opts.out !== undefined)) {
@@ -558,6 +653,17 @@ export function runCli(argv) {
       const file = opts.baseline ?? BASELINE_PATH;
       assertEmptyFile(file);
       process.stdout.write(`axe assert-empty: OK (${file})\n`);
+      return 0;
+    }
+    if (opts.cmd === 'check-baseline-match') {
+      const collected = loadBaseline(opts.collected ?? COLLECTED_PATH);
+      const baseline = loadBaseline(opts.baseline ?? BASELINE_PATH);
+      const r = compareCollectedBaseline(collected, baseline);
+      if (!r.ok) {
+        for (const line of baselineMatchLines(r)) process.stderr.write(`${line}\n`);
+        return 1;
+      }
+      process.stdout.write('baseline-match: OK\n');
       return 0;
     }
     const out = opts.out ?? DEFAULT_MERGE_OUT;
