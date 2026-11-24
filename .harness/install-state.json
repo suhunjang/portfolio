@@ -1,6 +1,6 @@
 {
   "distributionName": "discord-claude-harness",
-  "distributionVersion": "2.0.0",
+  "distributionVersion": "2.0.1",
   "files": {
     ".claude/commands/harness.md": {
       "hash": "c8c9ebdb7833980136c777070f4ad730a35f4588f315c8302fff879b3aefbb54",
@@ -39,7 +39,7 @@
       "status": "adopted"
     },
     ".harness/harness.lock.json": {
-      "hash": "457ddfd8763dc5988b643ad6ead8961e21247cd239e15843fde523fab290bb2d",
+      "hash": "c9a996bf931c9d0d9f92c65b5e6017c5aa2fa304281d9b95d26836c238bf7dbe",
       "ownership": "config"
     },
     ".harness/policy.json": {
@@ -69,17 +69,11 @@
       "status": "created"
     }
   },
-  "manifestHash": "287201c44d766b0441470953005450b40f300de2718b246eeb44fd0e3c2f900a",
-  "migration": {
-    "fromDistributionVersion": "1.0.0",
-    "fromManifestHash": "03049192615fc0cb03e348f0fe0ee24acd0b0c515cbc6e80c1fd0226a05cd80b",
-    "fromSourceCommit": "002edcd97da4bd55d412409c15cbb3659a72b233",
-    "fromStateSha": "0301b58d403a39125c99b7f817f8314e5eda303749c2502ca93fa481b8700781",
-    "transaction": "20261123T143910292356Z-370e674a"
-  },
+  "manifestHash": "b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372",
+  "migration": null,
   "profile": "ui",
   "schemaVersion": 2,
-  "sourceCommit": "cb179f99acbb9ad32c5dcebab01ff19df7c3f4ae",
-  "stateHash": "9446ea5f36aa2c44a8e5337fbab7832fa75986083cd0121d6a3f5b0c4f0d7cdd",
-  "updatedAt": "2026-11-23T14:39:10.292529+00:00"
+  "sourceCommit": "e7a03919a460f975149f7c55343ca4b34d3d2352",
+  "stateHash": "f2c68f71a75928395a707499a5740acc5b71e91c224cae6c34a75885fb02b890",
+  "updatedAt": "2026-11-24T01:10:54.900959+00:00"
 }
