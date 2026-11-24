@@ -103,7 +103,10 @@
     {
       "step": 10,
       "name": "scope-snapshot-parity-paths",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T09:04:24+0900",
+      "completed_at": "2026-11-24T09:06:12+0900",
+      "summary": "step10 시작 snapshot(created→reused), scope-snapshot-parity-paths.spec.js(desktop-dark 전용, 코드 추가 없음) 작성: 변형마다 새 합성 저장소(.gitignore 'tests/.tmp/'·lock·tracked.txt·a.spec.js commit, BASE verify 대체 git 래퍼로 parity-1 snapshot, runtime 비노출 확인, 외부 secret.txt 고유 sentinel)에서 정상 identity 유지한 채 files에 (vi-A) ../<pid>-outside/secret.txt·(vi-B) 외부 절대 경로 key(null) 추가, after.z 고정 bytes; C exec harness(exit 'bad start snapshot: paths: tests/.tmp/start-snapshot-parity-1.json', lstat/open/walk 대상에 외부 경로 없음, os.open snapshot 1회, toplevel 외 git 0)·C subprocess exit 1 동일 stderr, runCheck(기록 fs 외부 경로 접근 0, computeIdentity·takeCurrent·writeAfterZ 미호출, git 호출 0) code 1, CLI subprocess exit 1 동일 stderr, snapshot·after.z·secret sha256·mtime 불변, 출력에 sentinel 없음, finally cleanup. 테스트만 추가라 처음부터 통과(RED 없음). AC1(spec 2 passed·전체 73 passed·S reused·CLI scope-snapshot: OK)·AC2(inline C scope-snapshot: OK, sandbox가 heredoc 임시파일을 막아 설계 블록 본문을 stdin 파이프로 전달) 통과"
     },
     {
       "step": 11,
