@@ -2,7 +2,7 @@
 
 - 목적: 합성 저장소 준비, runtime 비노출 assertion, inline C와 `runCheck`의 정상·변경 parity 사례 (i)~(v)를 실행 검증한다. 코드 추가 없이 신규 spec 하나만. 종료 gate는 아직 S reused + inline C이다(CLI 종료 gate 전환은 step 12).
 - 예상 19분(snapshot·단독·전체 테스트·범위 gate·디버깅 포함) / 선행 0~8 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
-- read-first: 설계 §11.6, §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, 실행 순서, C, 비교 도구 step 7·8·9~11, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`
+- read-first: 설계 §11.6, §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, 실행 전제, 실행 순서, C, 비교 도구 step 7·8·9~11, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`
 - tracked 허용(exact): `tests/specs/scope-snapshot-parity-core.spec.js`(신규, 정확히 이 파일 하나)
 - runtime: R0(합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`, `<pid>-outside/`)
 - 금지: §15.7, `scope-snapshot.mjs`·`start-snapshot.py`·helper·다른 spec 수정, 실제 저장소 비runtime 경로에 symlink·FIFO 생성, 합성 저장소에서 init/add/commit 외 Git 변경, 권한 변경

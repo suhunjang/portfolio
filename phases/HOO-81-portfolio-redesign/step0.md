@@ -2,7 +2,7 @@
 
 - 목적: 시작 snapshot을 먼저 남기고 tests 실행 환경(래퍼, snapshot 스크립트, package, gitignore, 직렬 Playwright 설정, 설치)을 만든다.
 - 예상 18분 / 선행 없음 / 공통 절차 설계 §15 (래퍼는 작성 뒤부터) / 종료 gate: S reused + inline C
-- read-first: 설계 §3, §11.1~§11.4, §11.6, §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, 실행 순서, schema, 재시도 계약, S, C, 설계 블록 추출 규칙, 테스트 격리)
+- read-first: 설계 §3, §11.1~§11.4, §11.6, §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, 실행 전제, 실행 순서, schema, 재시도 계약, S, C, 설계 블록 추출 규칙, 테스트 격리)
 - tracked 허용(exact): `tests/scripts/with-env.sh`, `tests/scripts/start-snapshot.py`, `tests/package.json`, `tests/package-lock.json`, `tests/.gitignore`, `tests/playwright.config.js`, `tests/specs/bootstrap.spec.js`
 - runtime: R0 + `tests/node_modules/**`
 - 금지: §15.7, `tests/scripts/scope-snapshot.mjs`(step 1~8), S·C 본문 변경, 실제 저장소의 비runtime 경로에 symlink·FIFO 생성

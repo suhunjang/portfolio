@@ -2,7 +2,7 @@
 
 - 목적: projectRoot·경로 유형 검사를 포함한 현재 status+hash 상태 수집과 합성 저장소 helper를 만들고, 합성 저장소 수집·rename과 실제 저장소 Python S parity를 증명한다.
 - 예상 19분 / 선행 0~3 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
-- read-first: 설계 §11.1, §11.4(직렬화), §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, S, 비교 도구 step 4, 설계 블록 추출 규칙, S·C exec harness, 테스트 격리), §12(합성 저장소 예외)
+- read-first: 설계 §11.1, §11.4(직렬화), §11.7(규칙, 저장소 상대 경로 계약, projectRoot 유형, 경로 유형 계약, 실행 전제, S, 비교 도구 step 4, 설계 블록 추출 규칙, S·C exec harness, 테스트 격리), §12(합성 저장소 예외)
 - tracked 허용(exact): `tests/scripts/scope-snapshot.mjs`(추가만), `tests/helpers/synthetic-repo.js`(신규), `tests/specs/scope-snapshot-state.spec.js`(신규)
 - runtime: R0(합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`, `<pid>-outside/` 포함)
 - 금지: §15.7, step 1~3 함수 동작, identity·판정·CLI(step 7·8), 실제 저장소의 비runtime 경로에 symlink·FIFO 생성, 합성 저장소에서 init/add/commit 외 Git 변경(`git mv` 포함), 권한 변경

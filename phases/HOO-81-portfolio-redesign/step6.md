@@ -1,8 +1,8 @@
 # Step 6 — scope-snapshot-special-files
 
-- 목적: 고정 S·C와 JS loader가 snapshot·기록 대상·after.z의 특수 파일(FIFO·디렉터리)과 조상 symlink(`tests/.tmp` 외부 디렉터리 링크 포함)를 open/read/write 전에 거부하고, 실패 시 기존 bytes와 산출물이 바뀌지 않음을 실행 검증한다. 코드 추가 없이 테스트만.
+- 목적: 고정 S·C와 JS loader가 snapshot·기록 대상·after.z의 특수 파일(FIFO·디렉터리)과 조상 symlink(`tests/.tmp` 외부 디렉터리 링크 포함)를 실행 시점 검사로 open/read/write 전에 거부하고, 실패 시 기존 bytes와 산출물이 바뀌지 않음을 실행 검증한다. 코드 추가 없이 테스트만.
 - 예상 19분 / 선행 0~5 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
-- read-first: 설계 §11.7(경로 유형 계약, 실행 순서, S, C, 비교 도구 step 1~4, 설계 블록 추출 규칙, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`
+- read-first: 설계 §11.7(경로 유형 계약, 실행 전제, 실행 순서, S, C, 비교 도구 step 1~4, 설계 블록 추출 규칙, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`
 - tracked 허용(exact): `tests/specs/scope-snapshot-special.spec.js`(신규)
 - runtime: R0(합성 저장소, `<pid>-outside/`, 실제 저장소 `tests/.tmp/start-snapshot-parity-{숫자}.json` 위치의 FIFO·디렉터리)
 - 금지: §15.7, `scope-snapshot.mjs`·`start-snapshot.py`·helper 수정, 실제 저장소 비runtime 경로에 symlink·FIFO 생성, 권한 변경
@@ -10,7 +10,7 @@
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step6`
-2. `scope-snapshot-special.spec.js` (node 전용, desktop-dark만, 모든 S·C subprocess timeout 10초 — timeout은 실패로 판정, 각 사례 전후로 대상 디렉터리의 파일 목록·각 regular 파일 sha256·mtime·FIFO/디렉터리 유형을 기록해 비교). FIFO는 `os.mkfifo`(python3 -I -c) 또는 `mkfifo`로 만든다.
+2. `scope-snapshot-special.spec.js` (node 전용, desktop-dark만, 모든 S·C subprocess timeout 10초 — timeout은 실패로 판정, 각 사례 전후로 대상 디렉터리의 파일 목록·각 regular 파일 sha256·mtime·FIFO/디렉터리 유형을 기록해 비교). FIFO는 `os.mkfifo`(python3 -I -c) 또는 `mkfifo`로 만든다. 모든 거부 대상 상태는 실행 전에 만들어 두고 실행 중에는 바꾸지 않는다.
    - S 합성(cwd `dir`, BASE 없음 → 유형 검사 실패가 BASE 오류보다 먼저 나와야 함)
      - (a) snapshot FIFO: `tests/.tmp/start-snapshot-parity-1.json`이 FIFO → exit ≠ 0, stderr `unsafe path:`에 `non-regular:tests/.tmp/start-snapshot-parity-1.json`, 멈추지 않음, FIFO 유지, 새 파일 없음
      - (b) snapshot 디렉터리: 같은 경로가 디렉터리(안에 파일 1개) → `non-regular:…`, 디렉터리 내용 불변

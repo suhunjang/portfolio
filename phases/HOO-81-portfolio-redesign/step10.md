@@ -2,7 +2,7 @@
 
 - 목적: 저장소 상대 경로 계약 위반 parity 사례 (vi)(상대 경로 탈출·절대 경로)에서 inline C와 `runCheck`·CLI가 모두 외부 파일 open 없이 exit 1이고 기존 snapshot·after.z가 불변임을 실행 검증한다. 코드 추가 없이 신규 spec 하나만. 종료 gate는 S reused + inline C.
 - 예상 17분(snapshot·단독·전체 테스트·범위 gate·디버깅 포함) / 선행 0~9 / 공통 절차 설계 §15 / 종료 gate: S reused + inline C
-- read-first: 설계 §11.7(저장소 상대 경로 계약, 실행 순서, C, S·C exec harness, 비교 도구 step 3·8·9~11, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`, `tests/specs/scope-snapshot-parity-core.spec.js`(읽기만, 준비 절차 참고)
+- read-first: 설계 §11.7(저장소 상대 경로 계약, 실행 전제, 실행 순서, C, S·C exec harness, 비교 도구 step 3·8·9~11, 테스트 격리), §12(합성 저장소 예외); `tests/helpers/synthetic-repo.js`, `tests/specs/scope-snapshot-parity-core.spec.js`(읽기만, 준비 절차 참고)
 - tracked 허용(exact): `tests/specs/scope-snapshot-parity-paths.spec.js`(신규, 정확히 이 파일 하나)
 - runtime: R0(합성 저장소 `tests/.tmp/synthetic-repos/<pid>/`, `<pid>-outside/`)
 - 금지: §15.7, `scope-snapshot.mjs`·`start-snapshot.py`·helper·다른 spec 수정, 실제 저장소 비runtime 경로에 symlink·FIFO 생성, 합성 저장소에서 init/add/commit 외 Git 변경, 권한 변경
