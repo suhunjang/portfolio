@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
-    "browsers:install": "playwright install chromium"
+    "browsers:install": "playwright install chromium",
+    "verify-scope": "node scripts/verify-scope.mjs",
+    "verify-scope:selftest": "node scripts/verify-scope.mjs --self-test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
