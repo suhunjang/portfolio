@@ -1,15 +1,14 @@
-# Resume Step 13 — component-hover-active (원 step 49)
+# Resume Step 13 — axe-classify-occ-batch-12
 
-- 목적: 원 §11.2 step 49 비색 hover·active와 상태별 BASE 색 보존.
-- 16분 / 선행 0~12 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 13`
-- 허용(exact): `css/style.css`(`.hero-cta .btn`·`.featured-card`·`#projectGrid .project-card`의 `:hover`·`:active`에서 transform·opacity·transition만), `tests/specs/component-hover.spec.js`(신규)
-- runtime: R0
-- 추가 금지: `index.html`, `js/*`, 색 선언·순서, hit·clamp, focus-visible, helper·generator·fixture·기존 spec, `measureStateSequence` 밖 측정, page 단위 테마 주입
+- 목적: §R5 batch 12(정렬 occurrence 133~139) 분류.
+- 15분(2 + 7 + 6) / 선행 0~12 / 공통 §R1 / gate `RGATE 13`
+- 허용(exact): 없음
+- runtime: R0 + `tests/.tmp/axe-classify/occ-batch-12.json`(이 파일만)
+- 추가 금지: 다른 batch·pairs 파일 수정·작성, 조사 스크립트 파일 저장, baseline·plan 작성, 사이트·helper·spec·collected 수정
 
 ## 작업
-1. `RSNAP 13` → `DI`(`Components.dc.html` 읽기만).
-2. RED spec(`desktop-dark`·`desktop-light`, §THEME `test`의 `context`·url `/`, `measureStateSequence`만): `hero-cta-btn-{i}`·`grid-card-0`·`grid-card-1` 상태별 색 3속성 = fixture[project 테마]; 첫 `.featured-card` = `grid-card-1`; hover·active 각각 transform 또는 opacity ≠ default; outline-color = default.
-3. style.css(guard 통과).
+1. `RSNAP 13`
+2. step 2와 같은 절차로 occurrence 133~139 → `occ-batch-12.json`.
 
 ## AC
-- `DI && W node tests/scripts/make-state-colors.mjs --check && T component-hover.spec.js state-sequence.spec.js state-colors.spec.js component-hit.spec.js GS && FULL && VS && RGATE 13 css/style.css,tests/specs/component-hover.spec.js tests/specs/component-hover.spec.js`
+- `OCC_CHECK 12 && FULL && VS && RGATE 13 ''`(첫 명령 stdout `occ-check 12: OK 7`)

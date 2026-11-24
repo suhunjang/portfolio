@@ -1,15 +1,15 @@
-# Resume Step 17 — print-pdf (원 step 53)
+# Resume Step 17 — hero-first-screen (원 step 42)
 
-- 목적: 원 §7 인쇄(clamp 해제)·PDF.
-- 17분 / 선행 0~16 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 17`
-- 허용(exact): `css/style.css`(`@media print`만, 색 선언 없음), `tests/specs/print.spec.js`
+- 목적: 원 §3 hero DOM 순서·tagline·첫 화면 AC(2열은 resume 18).
+- 20분 / 선행 0~16 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 17`
+- 허용(exact): `index.html`(section#hero 내부: 직계 8개 순서·tagline·`#heroFeatured` 위치), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄), `css/style.css`(hero 1열 간격·STATS·featured 반응형·`.hero-tagline` 비색 타이포만), `tests/specs/hero.spec.js`
 - runtime: R0
-- 추가 금지: `index.html`, `js/*`, 색 규칙 순서, PDF 파서 의존성
+- 추가 금지: `js/data.js`, 원 §11.3, 문구 변경, 렌더 로직, 섹션·nav
 
 ## 작업
-1. `RSNAP 17`
-2. RED spec(desktop-dark/light): `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length` 자체 검증(`/Pages`만 0, `/Page` 1, `/Type/Page` 1); A: 본문·featured visible·opacity 1, reveal 비어 있지 않음, 인터랙션·modal 숨김, lightbox 없음/none, print에서 `.featured-blurb`·카드 blurb clamp `none`/`unset`, PDF > 10240·count ≥ 1; B: screen lightbox visible → print에서 lightbox·modal none, PDF 동일.
-3. `@media print`.
+1. `RSNAP 17` → `DI`(`DesktopTop.dc.html`·`Mobile.dc.html` 읽기만).
+2. RED spec(6 project): 상수 `STAT_ITEM`·`STAT_VALUE`·`STAT_LABEL`; 직계 자식 원 §3 순서; `#heroTagline` = `PROFILE.tagline`; CTA·eyebrow·typed·`#heroFeatured` role·label 유지; STATS 375 2×2·768/1280 4×1, featured 1/2/3열; desktop-dark/light `expectInFirstScreen` = 원 §3 첫 화면 AC 전부.
+3. 구현.
 
 ## AC
-- `T print.spec.js GS && FULL && VS && RGATE 17 css/style.css,tests/specs/print.spec.js`
+- `DI && T hero.spec.js GS && FULL && VS && RGATE 17 index.html,js/main.js,css/style.css,tests/specs/hero.spec.js`

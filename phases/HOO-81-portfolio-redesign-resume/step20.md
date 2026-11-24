@@ -1,15 +1,15 @@
-# Resume Step 20 — axe-finalize (원 step 56)
+# Resume Step 20 — section-layout (원 step 45)
 
-- 목적: 위반 0 전제 확인 후 baseline `[]` 확정.
-- 16분 / 선행 0~19 / 공통 원 §9 + §R1 / gate `RGATE 20`
-- 허용(exact): `tests/fixtures/axe-baseline.json`(`[]`로만)
+- 목적: 원 §7 섹션 padding·card gap·Career·그리드·비색 타이포 위계.
+- 17분 / 선행 0~19 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 20`
+- 허용(exact): `css/style.css`(섹션 padding, Career, 그리드 gap·열, 섹션 제목·`.subsection-title` 비색 타이포만), `tests/specs/layout.spec.js`
 - runtime: R0
-- 추가 금지: 사이트 파일, helper·spec·다른 fixture
+- 추가 금지: `index.html`, `js/*`, 원 §11.3
 
 ## 작업
-1. `RSNAP 20`
-2. 전제(실패 시 baseline 불변 중단): `COLLECT_CHAIN --out tests/.tmp/axe-current.json && REGRESSION_GATE && AXE --check-plan --require-empty && AXE --assert-no-violations --collected tests/.tmp/axe-current.json`
-3. baseline `[]` 후 일반 axe 전체. 실패 시 보고·재계획.
+1. `RSNAP 20` → `DI`(`DesktopExplore.dc.html`·`Mobile.dc.html`·`Foundations.dc.html` 읽기만).
+2. RED spec(6 project, tokens): 가로 스크롤 없음; `#career`~`#contact` padding-top·bottom = tokens.sectionPaddingPx[viewport]; 세 grid row·column-gap 24px; projectGrid·strengthsGrid 3/2/1열; Career 375 세로·768/1280 가로(top 차 < 24); 375 highlights 보임; `.subsection-title` weight ≤ h2·size < h2.
+3. style.css.
 
 ## AC
-- 작업 2 exit 0, 이어 `AXE --assert-empty && FULL && VS && RGATE 20 tests/fixtures/axe-baseline.json`
+- `DI && T layout.spec.js GS && FULL && VS && RGATE 20 css/style.css,tests/specs/layout.spec.js`

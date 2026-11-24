@@ -1,15 +1,14 @@
-# Resume Step 6 — hero-first-screen (원 step 42)
+# Resume Step 6 — axe-classify-occ-batch-5
 
-- 목적: 원 §3 hero DOM 순서·tagline·첫 화면 AC(2열은 resume 7).
-- 20분 / 선행 0~5 / 공통 원 §9 + §R1·§R2 no-op / gate `RGATE 6`
-- 허용(exact): `index.html`(section#hero 내부: 직계 8개 순서·tagline·`#heroFeatured` 위치), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄), `css/style.css`(hero 1열 간격·STATS·featured 반응형·`.hero-tagline` 비색 타이포만), `tests/specs/hero.spec.js`
-- runtime: R0
-- 추가 금지: `js/data.js`, 원 §11.3, 문구 변경, 렌더 로직, 섹션·nav
+- 목적: §R5 batch 5(정렬 occurrence 49~60) 분류.
+- 20분(2 + 12 + 6) / 선행 0~5 / 공통 §R1 / gate `RGATE 6`
+- 허용(exact): 없음
+- runtime: R0 + `tests/.tmp/axe-classify/occ-batch-5.json`(이 파일만)
+- 추가 금지: 다른 batch·pairs 파일 수정·작성, 조사 스크립트 파일 저장, baseline·plan 작성, 사이트·helper·spec·collected 수정
 
 ## 작업
-1. `RSNAP 6` → `DI`(`DesktopTop.dc.html`·`Mobile.dc.html` 읽기만).
-2. RED spec(6 project): 상수 `STAT_ITEM`·`STAT_VALUE`·`STAT_LABEL`; 직계 자식 원 §3 순서; `#heroTagline` = `PROFILE.tagline`; CTA·eyebrow·typed·`#heroFeatured` role·label 유지; STATS 375 2×2·768/1280 4×1, featured 1/2/3열; desktop-dark/light `expectInFirstScreen` = 원 §3 첫 화면 AC 전부.
-3. 구현.
+1. `RSNAP 6`
+2. step 2와 같은 절차로 occurrence 49~60 → `occ-batch-5.json`.
 
 ## AC
-- `DI && T hero.spec.js GS && FULL && VS && RGATE 6 index.html,js/main.js,css/style.css,tests/specs/hero.spec.js`
+- `OCC_CHECK 5 && FULL && VS && RGATE 6 ''`(첫 명령 stdout `occ-check 5: OK 12`)
