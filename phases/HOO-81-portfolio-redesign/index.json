@@ -95,7 +95,10 @@
     {
       "step": 9,
       "name": "scope-snapshot-parity-core",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T09:02:19+0900",
+      "completed_at": "2026-11-24T09:04:24+0900",
+      "summary": "step9 시작 snapshot(created→reused), scope-snapshot-parity-core.spec.js(desktop-dark 전용, 코드 추가 없음) 작성: 사례마다 새 합성 저장소에서 루트 .gitignore 정확히 'tests/.tmp/\\n'(HEAD:.gitignore 확인)·identity 3값 lock·tracked.txt·tests/specs/a.spec.js 초기 commit, BASE verify만 대체하는 git 래퍼로 computeIdentity·takeCurrent 기반 parity-1 snapshot 생성, snapshot 생성 직후·C/runCheck after.z 생성 직후마다 parseStatusZ로 snapshot·after.z가 path·origPath에 없음 assert, 사례 전후 저장소(.git·tests/.tmp 제외)·outside inventory(유형·sha256·mtime) 불변, finally cleanup; C(designBlock stdin, cwd dir)와 runCheck parity (i) OK code 0 (ii) outside-tests:tracked.txt (iii) tests-changed:tests/specs/x.spec.js (iv) snapshot-not-first:tracked.txt (v) 시작 xy ' M'·현재 'M '·sha 동일 확인 후 status-changed:tracked.txt — code·위반 줄·after.z 내용 일치. 테스트만 추가라 처음부터 통과(RED 없음). AC1(spec 5 passed·전체 71 passed·S reused·CLI scope-snapshot: OK)·AC2(inline C scope-snapshot: OK, sandbox가 heredoc 임시파일을 막아 설계 블록 본문을 stdin 파이프로 전달) 통과"
     },
     {
       "step": 10,
