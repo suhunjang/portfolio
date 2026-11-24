@@ -1,18 +1,18 @@
-# Step 38 — print-pdf
+# Step 38 — section-layout
 
-- 목적: 인쇄 스타일과 PDF 검증.
-- 예상 16분 / 선행 0~37 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §10; `@media print`, `ensureLightbox`
-- tracked 허용(exact): `css/style.css`(`@media print` 블록만), `tests/specs/print.spec.js`
+- 목적: 섹션 padding(64/80/96px), card gap 24px, Career·그리드 반응형, 타이포 위계(비색).
+- 예상 17분 / 선행 0~37 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §6, §9, §16.2~§16.4(DESIGN_HASH_CHECK 후 `DesktopExplore.dc.html`·`Mobile.dc.html`·`Foundations.dc.html` 읽기 전용); fixture tokens
+- tracked 허용(exact): `css/style.css`(섹션 padding, Career, 그리드 gap·열, `.subsection-title`·섹션 제목 타이포만), `tests/specs/layout.spec.js`
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, `css/themes.css`, PDF 파서 의존성
+- 금지: §15.7, `index.html`, `js/*`, `css/themes.css`, 색·서체 asset, BASE에 없는 font-weight
 
 ## 작업 (TDD)
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step38`
-2. `print.spec.js`(desktop-dark/light): `pdfPageCount(buf) = (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length` 자체 검증(`/Pages`만 0, `/Page` 1, `/Type/Page` 1); A: 본문·featured visible·opacity 1, reveal 비어 있지 않음, 인터랙션·modal 숨김, lightbox 없음 또는 none, PDF > 10240바이트·count ≥ 1; B: screen에서 lightbox visible 확인 → print에서 lightbox·modal none, 본문 A와 같음, PDF 조건 동일.
-3. `@media print`: reveal 보이기, featured 포함, overlay·인터랙션 숨김, modal-open 잠금 해제, 기존 숨김 유지.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step38` → `python3 -I tests/scripts/design-intake-check.py`
+2. `layout.spec.js`(6 project, tokens는 fixture): 가로 스크롤 없음; `#career`~`#contact` padding-top·bottom = tokens.sectionPaddingPx[viewport]; `#heroFeatured`·`#projectGrid`·`#strengthsGrid` row-gap·column-gap = 24px; projectGrid·strengthsGrid 3/2/1열; Career 375 세로·768/1280 가로(top 차 < 24px); 375 highlights 보임; `.subsection-title` font-weight ≤ h2, font-size < h2.
+3. style.css(색 선언 없음).
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- print.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step38.json --allow css/style.css,tests/specs/print.spec.js` → exit 0
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- layout.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step38.json --allow css/style.css,tests/specs/layout.spec.js` → exit 0

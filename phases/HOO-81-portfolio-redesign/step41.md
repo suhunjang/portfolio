@@ -1,19 +1,18 @@
-# Step 41 — axe-finalize
+# Step 41 — focus-trap-lightbox
 
-- 목적: 위반 0 전제 확인 후 baseline을 `[]`로 확정.
-- 예상 16분 / 선행 0~40 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(REGRESSION_GATE, step 41)
-- tracked 허용(exact): `tests/fixtures/axe-baseline.json`(`[]`로 바꾸는 것만)
+- 목적: lightbox trap 연결, 기존 Tab 리스너 제거, focus-visible(기존 토큰만).
+- 예상 17분 / 선행 0~40 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.2(step 41), §16.4(`:focus-visible` outline 예외); `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 리스너, `:focus-visible`
+- tracked 허용(exact): `js/main.js`(lightbox trap 연결과 기존 Tab 리스너 제거만), `css/style.css`(`:focus-visible`만, BASE 정의 토큰만), `tests/specs/focus-lightbox.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 사이트 파일, helper·spec·다른 fixture
+- 금지: §15.7, `index.html`, `js/data.js`, `css/themes.css`, 새 색, trapFocus 시그니처·모달 연결, focus-modal.spec
 
-## 작업
+## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step41`
-2. 전제(실패 시 baseline 불변으로 중단): `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --require-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-no-violations --collected tests/.tmp/axe-current.json`
-3. baseline을 `[]`로 바꾸고 일반 axe 전체 실행. 실패하면 되돌리지 않고 보고·재계획.
+2. spec(desktop-dark/light) 먼저 실패 확인: lightbox 안 순환; Esc 1회 lightbox 닫힘·`.shot-zoom` 복귀·모달 순환; Esc 2회 모달 닫힘·트리거 복귀; 3회 반복 후 Tab 한 칸; 키보드 도달한 `.featured-card`, `.project-card`, 모달 닫기, `.shot-zoom`의 outline-style ≠ none.
+3. main.js·style.css.
 
 ## AC
 
-- 작업 2 전제가 exit 0
-- `sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-empty && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step41.json --allow tests/fixtures/axe-baseline.json` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step41.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → exit 0

@@ -1,18 +1,22 @@
-# Step 36 — focus-trap-modal
+# Step 36 — hero-two-column
 
-- 목적: `trapFocus` 구현과 모달 연결.
+- 목적: desktop(≥1024px) 2열 좌측 정렬 hero와 mobile·tablet 1열 전환(설계 §16.2, CSS만).
 - 예상 17분 / 선행 0~35 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.2(step 36); `openProjectModal`, `closeProjectModal`, `lastFocused`, 모달 포커스 요소, lightbox 코드 위치(수정 금지)
-- tracked 허용(exact): `js/main.js`(`trapFocus` 추가와 모달 열기·닫기 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
+- read-first: 설계 §5, §9, §16.1~§16.4(DESIGN_HASH_CHECK 후 `Main.dc.html` hero 행·`DesktopTop.dc.html`·`Mobile.dc.html` 읽기 전용); `tests/fixtures/claude-design-intake.json` tokens
+- tracked 허용(exact): `css/style.css`(`.hero`·`.hero-inner`와 그 직계 자식의 grid·정렬·간격 규칙만), `tests/specs/hero-layout.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 관련 코드
+- 금지: §15.7, `index.html`, `js/*`, `css/themes.css`, DOM 순서 변경, 색·서체 asset 변경, hero `min-height`·scroll-hint 위치 등 허용 목록 밖 bundle 제안
 
 ## 작업 (TDD)
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step36`
-2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 마지막→Tab→첫, 첫→Shift+Tab→마지막, 모달 밖으로 나가지 않음; button·backdrop·esc 닫기 후 트리거 복귀; `#heroFeatured`·`#projectGrid` 트리거 양쪽; 연속 2회 열고 닫아도 Tab 한 칸만 이동.
-3. main.js: §8.2 계약 그대로, 열 때 push(trigger)·닫을 때 release.
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step36` → `python3 -I tests/scripts/design-intake-check.py`
+2. `hero-layout.spec.js`(6 project, tokens는 fixture에서 읽음) 먼저 실패 확인
+   - 1280: `.hero-inner` computed `display: grid`, `grid-template-areas`가 tokens.heroAreas 6행과 같음(공백 정규화), column-gap 48px; `#heroName` 오른쪽 끝 ≤ `#heroSummary` 왼쪽 끝; `.hero-cta` 왼쪽이 `#heroSummary` 왼쪽과 ±1px; `#heroStats`·`#heroFeatured` 폭 ≥ `.hero-inner` content 폭 × 0.95; `#heroName`·`#heroSummary` computed `text-align`이 `left` 또는 `start`
+   - 375·768: 8개 직계 자식의 left가 `.hero-inner` content-box left와 ±1px, top이 DOM 순서대로 증가, `text-align` `left`/`start`
+   - DOM 순서 불변(직계 자식 순서 = §5), 가로 스크롤 없음
+   - 첫 화면 AC(hero.spec.js)는 전체 실행에서 계속 통과
+3. style.css: ≥1024px 미디어 쿼리에서 tokens 값 그대로 grid 정의, 그 외 1열.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step36.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- hero-layout.spec.js hero.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step36.json --allow css/style.css,tests/specs/hero-layout.spec.js --require-absent tests/specs/hero-layout.spec.js` → exit 0

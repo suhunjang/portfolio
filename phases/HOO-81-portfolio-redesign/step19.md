@@ -1,18 +1,18 @@
-# Step 19 — axe-canonical
+# Step 19 — modal-regression
 
-- 목적: axe canonical target 식별 helper.
-- 예상 19분 / 선행 0~18 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.1, §8.3(canonical, 안정성 범위, step 19)
-- tracked 허용(exact): `tests/helpers/axe.js`(신규), `tests/specs/axe-helper.spec.js`(신규)
+- 목적: modal.js helper와 모달·lightbox 회귀(BASE 사이트에서 통과).
+- 예상 18분 / 선행 0~18 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §3, §5, §7.4, §11.4
+- tracked 허용(exact): `tests/helpers/modal.js`(신규), `tests/specs/modal-regression.spec.js`(신규)
 - runtime: R0
 - 금지: §15.7
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step19`
-2. `axe.js`: `ALIASES`, `canonicalTargetInPage`, `canonicalFromDescriptor`, `runAxe`.
-3. `axe-helper.spec.js`(desktop-dark, setContent + 실제 axe): section#career subtree 이동·h3→span·01→04에도 key 같음; h3만 section 밖 이동하면 다름; `[data-project=5]` 안 div→p 같음; 텍스트 다르면 다름; `project:5`≠`featured:5`; alias 적용 시 같음.
+2. `modal.js`: 설계 §7.4 계약 그대로.
+3. `modal-regression.spec.js`(6 project): click·Enter로 열기, 제목 일치, `modal-open`; button·backdrop·esc 닫기 후 트리거 포커스 복귀·`modal-open` 해제; desktop lightbox: `findProjectWithShots` 반환·탐색 후 닫힘·그 카드 `.shot-zoom`으로 열림; Esc 1회 lightbox만, 2회 모달.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step19.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- modal-regression.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step19.json --allow tests/helpers/modal.js,tests/specs/modal-regression.spec.js` → exit 0

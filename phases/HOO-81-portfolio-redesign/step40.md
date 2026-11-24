@@ -1,17 +1,18 @@
-# Step 40 — axe-remediation-recheck
+# Step 40 — focus-trap-modal
 
-- 목적: remediation 후 gate 재실행, plan 비었음과 현재 위반 0 확인.
-- 예상 18분 / 선행 0~39 + 재계획 `axe-remediation-*` 전부 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(REGRESSION_GATE, step 27, step 40), `step39.md`
-- tracked 허용(exact): `tests/fixtures/axe-remediation-plan.json`(`--prune-plan` 결과로만)
+- 목적: `trapFocus` 구현과 모달 연결.
+- 예상 17분 / 선행 0~39 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §8.2(step 40); `openProjectModal`, `closeProjectModal`, `lastFocused`, lightbox 코드 위치(수정 금지)
+- tracked 허용(exact): `js/main.js`(`trapFocus` 추가와 모달 열기·닫기 trap 연결만), `tests/specs/focus-modal.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, 사이트 파일, baseline·collected·helper·spec, plan 임의 비우기
+- 금지: §15.7, `index.html`, `js/data.js`, `css/*`, lightbox 코드
 
-## 작업
+## 작업 (TDD)
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step40`
-2. step 39 체인 + `--check-plan --require-empty` + `--assert-no-violations`(baseline 잔존 허점 차단). 하나라도 실패하면 남은 그룹·target 보고 후 재계획.
+2. spec(desktop-dark/light, mobile-dark) 먼저 실패 확인: 경계 순환, 밖으로 나가지 않음, 세 닫기 경로 후 트리거 복귀, `#heroFeatured`·`#projectGrid` 트리거 양쪽, 연속 2회 후에도 Tab 한 칸.
+3. main.js: §8.2 계약.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge --out tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-regression --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --prune-plan --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-coverage --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-executable && sh tests/scripts/with-env.sh node tests/helpers/axe.js --check-plan --require-empty && sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-no-violations --collected tests/.tmp/axe-current.json && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step40.json --allow tests/fixtures/axe-remediation-plan.json` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step40.json --allow js/main.js,tests/specs/focus-modal.spec.js` → exit 0

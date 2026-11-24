@@ -1,18 +1,18 @@
-# Step 24 — axe-baseline-regression
+# Step 24 — axe-prepare-lightbox
 
-- 목적: baseline 스키마·회귀 판정·분류 대기 baseline 계약.
+- 목적: lightbox 준비와 결합 진입점 `prepareForAxe`.
 - 예상 19분 / 선행 0~23 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(entry key, step 24, 실행 모드)
-- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 19·23 동작, 실제 fixtures
+- read-first: 설계 §3(lightbox), §7.4, §8.4(step 24, 합성 fixture)
+- tracked 허용(exact): `tests/helpers/axe-prepare.js`(추가만: `prepareLightbox`, `prepareOverlay`, `prepareForAxe`), `tests/specs/axe-prepare-lightbox.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, step 22·23 함수 동작
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step24`
-2. 설계 §8.3 step 24 계약 구현(`resolveBaselineMode`는 환경변수를 읽지 않는다).
-3. spec(desktop-dark, 경로는 모두 독립 디렉터리): validateBaseline 통과(혼합 color-contrast, js-render, static-markup, text-change `[]`); 거부 — key 불일치·중복·targets 중복·미정렬, kind별 파일 오대응 5종, 비-text-change 빈 배열, js-render 여분 파일, 합집합 불일치, fix 누락, targets 밖 target, 알 수 없는 kind; checkRegression 새 key/target 오류·사라짐 허용·`page:desktop-dark`에만 있는 target이 `page:desktop-light`에 나오면 new-key/new-target·입력 불변; resolveBaselineMode — baseline 있음 → `check`, baseline 없음+collected 있음+plan 없음 → `pending`, baseline 없음+collected 없음 → throw, baseline 없음+collected 있음+plan 있음 → throw, `process.env.AXE_ALLOW_MISSING_BASELINE='1'`을 설정해도 collected 없으면 throw; loadBaseline 없음·잘못된 JSON·`{}` throw; CLI `--assert-empty` `[]` 0, `[{}]`·`{}`·잘못된 JSON·없음 1.
+2. 설계 §8.4 step 24 계약 구현.
+3. spec(desktop-dark/light): page → `body`·null, modal → `#projectModal`, lightbox → `.lightbox`·img 로딩·포커스 내부; shots 없는 index → `lightbox-not-open`; 이미지 abort → `content-not-loaded:img`; `unknown-scenario` 2종; no-shots fixture → null·opens/closes 2·`no-shots-project`; shots fixture → 1·대표 click 0; 깨진 img·0×0 svg.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step24.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-lightbox.spec.js axe-prepare-modal.spec.js axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step24.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-lightbox.spec.js` → exit 0

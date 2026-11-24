@@ -1,18 +1,18 @@
-# Step 37 — focus-trap-lightbox
+# Step 37 — section-structure
 
-- 목적: lightbox trap 연결, 기존 Tab 리스너 제거, focus-visible.
-- 예상 17분 / 선행 0~36 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.2(step 37); step 36 `trapFocus`, `ensureLightbox`, 기존 lightbox Tab 리스너, `.shot-zoom`, `:focus-visible`
-- tracked 허용(exact): `js/main.js`(lightbox 열기·닫기 trap 연결과 기존 Tab 리스너 제거만), `css/style.css`(`:focus-visible`만), `tests/specs/focus-lightbox.spec.js`(신규)
+- 목적: FINAL 섹션 순서·nav·kicker·heading 재구성(§6).
+- 예상 19분 / 선행 0~36 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §5, §6, §7, §8.3, §11.4, §12(step 37 예외), §16(DESIGN_HASH_CHECK 후 `DesktopExplore.dc.html` 읽기 전용); content-exceptions final
+- tracked 허용(exact): `index.html`(hero 밖 섹션 subtree 이동·kicker·Stack &amp; Contact 분리·nav 순서·scroll-hint 위치; 속성 변경은 설계 §12의 (a)·(b)만), `js/main.js`(스크롤스파이 배열과 skill-group h4만), `tests/specs/structure.spec.js`
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/data.js`, `css/themes.css`, trapFocus 시그니처와 모달 연결, focus-modal.spec
+- 금지: §15.7, `css/*`, `js/data.js`, hero 내부, 표에 없는 문구, (a)·(b) 밖 속성 변경, 새 섹션·이미지·아이콘
 
 ## 작업 (TDD)
 
-1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step37`
-2. spec(desktop-dark/light) 먼저 실패 확인: grid 카드 모달 → `.shot-zoom` lightbox에서 Tab/Shift+Tab이 lightbox 안에서만 순환; Esc 1회 lightbox 닫힘·`.shot-zoom` 복귀·이후 모달 경계 순환; Esc 2회 모달 닫힘·트리거 복귀; lightbox 3회 열고 닫은 뒤에도 Tab 한 칸; 키보드로 도달한 `.featured-card`, `.project-card`, 모달 닫기 버튼, `.shot-zoom`의 outline-style ≠ none.
-3. main.js: 열 때 push(`.shot-zoom`)·닫을 때 release, 기존 리스너 제거. style.css: outline 유지·보강(토큰만).
+1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step37` → `python3 -I tests/scripts/design-intake-check.py`
+2. `structure.spec.js`(6 project): 섹션·nav·kicker·h2가 §6과 일치, section `class` 정확히 §6 표, subsection h3 1개, skillsGrid는 about 안·h4, contact, `.scroll-hint` `href === '#career'`, heading 계층, `#heroFeatured` 유지, PROJECTS 카드 13개 순서 불변, desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#about"]'); await link.click(); await expect(link).toHaveClass(/active/);`.
+3. index.html·main.js 변경. axe canonical 점검(식별 손실이면 중단·재계획).
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- focus-lightbox.spec.js focus-modal.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step37.json --allow js/main.js,css/style.css,tests/specs/focus-lightbox.spec.js` → exit 0
+- `python3 -I tests/scripts/design-intake-check.py && sh tests/scripts/with-env.sh npm --prefix tests test -- structure.spec.js design-guard.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step37.json --allow index.html,js/main.js,tests/specs/structure.spec.js` → exit 0, content-static.spec에서 final 성립

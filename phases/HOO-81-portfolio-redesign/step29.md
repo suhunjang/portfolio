@@ -1,17 +1,17 @@
-# Step 29 — axe-regression-prune
+# Step 29 — axe-plan-executable
 
-- 목적: plan 수정 전 회귀 gate와 plan 정리 도구.
-- 예상 19분 / 선행 0~28 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(entry key, step 29, REGRESSION_GATE, gate/recheck)
+- 목적: blocked(색 변경 제외 포함)·text-change·빈 fixFiles 그룹에서 중단하는 실행 가능성 검사.
+- 예상 15분 / 선행 0~28 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §7.2, §8.3(step 29, 색 변경 제외, 재계획 조건), §16.3
 - tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(독립 디렉터리 사본만, 실제 plan 파일에 쓰지 않음)
-- 금지: §15.7, step 19·23~28 동작, 실제 fixtures
+- runtime: R0(독립 디렉터리)
+- 금지: §15.7, 이전 helper 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step29`
 2. 설계 §8.3 step 29 계약 구현.
-3. spec(desktop-dark): checkCollectedRegression 같음 `[]`, 새 key `new-key:`, 새 target `new-target:`, key 불일치 `bad-key:`, 사라짐 `[]`; prunePlan 사라진 target 제거·빈 그룹 삭제·fixFiles 부분집합·id 유지·plan 밖 target 추가 없음·blocked 불변·입력 불변; CLI check-regression 0/1(new-target, baseline 없음, collected 없음); prune-plan 전 sha256·mtime 기록 → new-target이면 exit 1·불변, collected 없음·baseline JSON 오류 exit 1·불변, `sh -c 'node axe.js --check-regression ... && node axe.js --prune-plan ...'` 회귀 실패 시 exit 1·불변, 회귀 없음+사라진 target 1개 exit 0·target 제거·`validateRemediationPlan`(coverage false) 통과.
+3. spec(desktop-dark): `{ groups: [] }` → `[]`; 실행 가능 → `[]`; blocked css-rule → `blocked-group`; reason `color change excluded (HOO-81 §16.3)`인 blocked css-token 그룹 → `blocked-group`; text-change → 3종 모두; 혼합 → blocked만; 입력 불변; CLI 빈 0, 가능 0, blocked 1(첫 줄 고정), fixFiles `[]` 1, 파일 오류 1.
 
 ## AC
 
