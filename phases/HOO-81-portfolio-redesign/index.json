@@ -206,7 +206,10 @@
     {
       "step": 23,
       "name": "scope-content",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:59:57+0900",
+      "completed_at": "2026-11-24T20:03:05+0900",
+      "summary": "step23: extended tests/scripts/verify-scope.mjs (diff arg constants and collectInput unchanged) with checkGitignore (exact 7 §8.1 lines, only one trailing newline normalized), checkSpaceGrotesk, checkDataJsDiff(patch,{requireExactly3}) (hunk-parsed: deleted:N, added-non-featured:N for lines other than trimmed 'featured: true,', featured-count:N if >3 or !=3 when required; name-only output = 0 lines), read-only collectContentInput (git show HEAD:index.html, :index.html, :tests/.gitignore + worktree fs) / collectScopeInput, evaluateContent(input,{final}) (data-js 4 intervals, final = baseHead/baseIndex/baseWorktree exactly 3, indexWorktree featured-only <=3; Space+Grotesk head/index/worktree; gitignore index/worktree), evaluateScope = paths+content; CLI default 'verify-scope: OK', --final 'verify-scope: OK (final)'; self-test covers synthesized patches (final 0), title 'x', name-only shortfall, data.js deleted/non-featured/4 lines/stage-then-revert, final violations (BASE->HEAD 0, BASE->index 2, index->worktree non-featured), Space Grotesk staged removal then revert, gitignore added/dup/blank/order/comment/CRLF/missing/index-only, no-trailing-newline pass; RED confirmed, SNAP 23 created, selftest OK, VS OK, FULL 175 passed, GATE 23 scope-snapshot: OK"
     },
     {
       "step": 24,
