@@ -1207,3 +1207,154 @@ test.describe('step 35 axe-remediation-plan-schema', () => {
     expect(broken.stdout).toBe('');
   });
 });
+
+// step 36 — axe-plan-executable (§6.2 step 36)
+import { validateRemediationExecutable } from '../helpers/axe.js';
+
+const S36_HEAD = 'Harness 재계획 필요: 실행 불가 remediation 그룹';
+// text-change 하나뿐인 baseline(requiresColorChange false, fixFiles [])
+const FIXTURE_TEXT_ONLY = [
+  {
+    key: S35_KEY_CC,
+    scenario: 'page',
+    project: 'desktop-dark',
+    ruleId: 'color-contrast',
+    impact: 'serious',
+    targets: [T_PROJECTS],
+    selectors: ['#projects .section-kicker'],
+    fixes: [{ target: T_PROJECTS, fixKind: 'text-change', fixFiles: [], requiresColorChange: false }],
+    fixFiles: [],
+  },
+];
+const textOnlyPlan = () => ({
+  groups: [
+    group({ id: 'projects-kicker-text', targets: [pt(S35_KEY_CC, T_PROJECTS)], fixFiles: [], blocked: true, reason: R_TEXT }),
+  ],
+});
+const colorPlainPlan = () => ({ groups: [...ruleColorPlan(true, R_COLOR).groups, ...rulePlainPlan(false, '').groups] });
+
+let s36Seq = 0;
+function s36Dir() {
+  s36Seq += 1;
+  const rel = `tests/.tmp/axe-helper-s36-${process.pid}-${s36Seq}`;
+  fs.mkdirSync(path.join(S32_REPO, rel), { recursive: true });
+  return rel;
+}
+
+test.describe('step 36 axe-plan-executable', () => {
+  let before;
+  const made = [];
+  const dir = () => {
+    const d = s36Dir();
+    made.push(d);
+    return d;
+  };
+  // 전제: 모든 입력은 먼저 validateRemediationPlan → []
+  const exec = (plan, baseline) => {
+    expect(validateBaseline(baseline)).toEqual([]);
+    expect(validateRemediationPlan(plan, baseline)).toEqual([]);
+    return validateRemediationExecutable(plan, baseline);
+  };
+
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'desktop-dark 전용');
+    before = s32State();
+  });
+
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.project.name !== 'desktop-dark') return;
+    for (const d of made.splice(0)) fs.rmSync(path.join(S32_REPO, d), { recursive: true, force: true });
+    expect(s32State()).toEqual(before);
+  });
+
+  test('실행 가능 → [], blocked 그룹만 거부, 입력 불변', () => {
+    expect(exec({ groups: [] }, FIXTURE_OK)).toEqual([]);
+    expect(exec(PLAN_OK, FIXTURE_OK)).toEqual([]);
+    expect(exec(rulePlainPlan(false, ''), FIXTURE_RULE_PLAIN)).toEqual([]);
+
+    expect(exec(themesPlan(true, R_COLOR), FIXTURE_THEMES)).toEqual(['blocked-group:career-kicker-contrast']);
+    expect(exec(ruleColorPlan(true, R_COLOR), FIXTURE_RULE_COLOR)).toEqual(['blocked-group:career-kicker-rule']);
+    expect(exec(rulePlainPlan(true, 'manual hold'), FIXTURE_RULE_PLAIN)).toEqual(['blocked-group:theme-toggle-size']);
+
+    expect(exec(textOnlyPlan(), FIXTURE_TEXT_ONLY)).toEqual([
+      'blocked-group:projects-kicker-text',
+      `text-change:projects-kicker-text:${S35_KEY_CC}:${T_PROJECTS}`,
+      'empty-fixfiles:projects-kicker-text',
+    ]);
+
+    // 혼합: 한 그룹 안의 color+text → blocked·text-change만(fixFiles 있음)
+    expect(exec(mixedPlan(true, R_BOTH), FIXTURE_MIXED)).toEqual([
+      'blocked-group:kicker-mixed',
+      `text-change:kicker-mixed:${S35_KEY_CC}:${T_PROJECTS}`,
+    ]);
+    // 혼합: 실행 가능 그룹 + blocked 그룹 → blocked 그룹 관련만
+    expect(exec(colorPlainPlan(), FIXTURE_COLOR_PLAIN)).toEqual(['blocked-group:career-kicker-rule']);
+
+    const inputs = [
+      [textOnlyPlan(), FIXTURE_TEXT_ONLY],
+      [mixedPlan(true, R_BOTH), FIXTURE_MIXED],
+      [colorPlainPlan(), FIXTURE_COLOR_PLAIN],
+    ];
+    for (const [plan, baseline] of inputs) {
+      const ps = clone(plan);
+      const bs = clone(baseline);
+      validateRemediationExecutable(plan, baseline);
+      expect(plan).toEqual(ps);
+      expect(baseline).toEqual(bs);
+    }
+  });
+
+  test('CLI --check-executable·--check-plan 체인', async () => {
+    const d = dir();
+    const write = (name, data) => {
+      const rel = `${d}/${name}`;
+      fs.writeFileSync(path.join(S32_REPO, rel), typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+      return rel;
+    };
+    const run = (plan, baseline) => s32Cli(['--check-executable', '--plan', plan, '--baseline', baseline]);
+
+    const bOk = write('b-ok.json', FIXTURE_OK);
+    const empty = await run(write('empty.json', { groups: [] }), bOk);
+    expect(empty).toEqual({ code: 0, stdout: 'check-executable: OK\n', stderr: '' });
+    const ok = await run(write('ok.json', PLAN_OK), bOk);
+    expect(ok).toEqual({ code: 0, stdout: 'check-executable: OK\n', stderr: '' });
+
+    const bThemes = write('b-themes.json', FIXTURE_THEMES);
+    const themes = await run(write('themes.json', themesPlan(true, R_COLOR)), bThemes);
+    expect(themes.code).toBe(1);
+    expect(themes.stdout).toBe('');
+    expect(themes.stderr).toBe(`${S36_HEAD}\nblocked-group:career-kicker-contrast\n`);
+
+    const text = await run(write('text.json', textOnlyPlan()), write('b-text.json', FIXTURE_TEXT_ONLY));
+    expect(text.code).toBe(1);
+    expect(text.stderr.split('\n')[0]).toBe(S36_HEAD);
+    expect(text.stderr).toBe(
+      `${S36_HEAD}\nblocked-group:projects-kicker-text\ntext-change:projects-kicker-text:${S35_KEY_CC}:${T_PROJECTS}\nempty-fixfiles:projects-kicker-text\n`,
+    );
+
+    const missing = await run(`${d}/nope.json`, bOk);
+    expect(missing.code).toBe(1);
+    expect(missing.stdout).toBe('');
+    const brokenBaseline = await run(`${d}/ok.json`, write('b-broken.json', '[{'));
+    expect(brokenBaseline.code).toBe(1);
+    expect(brokenBaseline.stdout).toBe('');
+
+    // 잘못 분류(RULE_COLOR + blocked false): --check-plan이 먼저 exit 1 → 체인은 executable 전에 멈춤
+    const rcPlan = write('rc.json', ruleColorPlan(false, ''));
+    const bRc = write('b-rc.json', FIXTURE_RULE_COLOR);
+    const plan = await s32Cli(['--check-plan', '--plan', rcPlan, '--baseline', bRc]);
+    expect(plan.code).toBe(1);
+    expect(plan.stderr).toBe('groups[0]: blocked-required\n');
+    const chain = await new Promise((resolve) => {
+      const cmd =
+        `"${process.execPath}" "${S32_AXE}" --check-plan --plan "${rcPlan}" --baseline "${bRc}"` +
+        ` && echo EXEC-REACHED && "${process.execPath}" "${S32_AXE}" --check-executable --plan "${rcPlan}" --baseline "${bRc}"`;
+      execFile('/bin/sh', ['-c', cmd], { cwd: S32_REPO }, (err, stdout, stderr) => {
+        resolve({ code: err ? (typeof err.code === 'number' ? err.code : 1) : 0, stdout, stderr });
+      });
+    });
+    expect(chain.code).toBe(1);
+    expect(chain.stdout).toBe('');
+    expect(chain.stderr).toBe('groups[0]: blocked-required\n');
+  });
+});

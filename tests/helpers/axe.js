@@ -795,6 +795,28 @@ export function validateRemediationPlan(plan, baseline, { coverage = false, requ
   return errors;
 }
 
+// §6.2 step 36: 실행 가능성 검사(전제: 같은 입력이 validateRemediationPlan → []). blocked 그룹만 거부.
+// 그룹 순서대로 blocked-group:{id} → 그 그룹 text-change target마다 text-change:{id}:{key}:{target}
+// → fixFiles 비면 empty-fixfiles:{id}. requiresColorChange 재판정 없음(step 35 몫). 순수·입력 불변.
+export const EXECUTABLE_HEADER = 'Harness 재계획 필요: 실행 불가 remediation 그룹';
+
+export function validateRemediationExecutable(plan, baseline) {
+  const errors = [];
+  const index = baselineFixIndex(baseline);
+  const groups = isPlainObject(plan) && Array.isArray(plan.groups) ? plan.groups : [];
+  for (const g of groups) {
+    if (!isPlainObject(g) || g.blocked !== true) continue;
+    errors.push(`blocked-group:${g.id}`);
+    for (const t of Array.isArray(g.targets) ? g.targets : []) {
+      if (!isPlainObject(t)) continue;
+      const fix = index.get(ptId(t.key, t.target));
+      if (fix && fix.fixKind === 'text-change') errors.push(`text-change:${g.id}:${t.key}:${t.target}`);
+    }
+    if (!Array.isArray(g.fixFiles) || g.fixFiles.length === 0) errors.push(`empty-fixfiles:${g.id}`);
+  }
+  return errors;
+}
+
 function parseCliArgs(argv) {
   const opts = {
     cmd: null,
@@ -813,7 +835,8 @@ function parseCliArgs(argv) {
       a === '--merge' ||
       a === '--assert-empty' ||
       a === '--check-baseline-match' ||
-      a === '--check-plan'
+      a === '--check-plan' ||
+      a === '--check-executable'
     ) {
       if (opts.cmd) throw new Error(`axe.js: duplicate command ${a}`);
       opts.cmd = a.slice(2);
@@ -830,7 +853,13 @@ function parseCliArgs(argv) {
     }
   }
   if (!opts.cmd) {
-    throw new Error('axe.js: command required (--reset | --merge | --assert-empty | --check-baseline-match | --check-plan)');
+    throw new Error('axe.js: command required (--reset | --merge | --assert-empty | --check-baseline-match | --check-plan | --check-executable)');
+  }
+  if (opts.cmd === 'check-executable') {
+    if (opts.dir !== undefined || opts.out !== undefined || opts.collected !== undefined || opts.coverage || opts.requireEmpty) {
+      throw new Error('axe.js: --check-executable takes only --plan and --baseline');
+    }
+    return opts;
   }
   if (opts.cmd === 'check-plan') {
     if (opts.dir !== undefined || opts.out !== undefined || opts.collected !== undefined) {
@@ -880,6 +909,17 @@ export function runCli(argv) {
         return 1;
       }
       process.stdout.write('check-plan: OK\n');
+      return 0;
+    }
+    if (opts.cmd === 'check-executable') {
+      const plan = loadPlan(opts.plan ?? PLAN_PATH);
+      const baseline = loadBaseline(opts.baseline ?? BASELINE_PATH);
+      const errors = validateRemediationExecutable(plan, baseline);
+      if (errors.length) {
+        for (const line of [EXECUTABLE_HEADER, ...errors]) process.stderr.write(`${line}\n`);
+        return 1;
+      }
+      process.stdout.write('check-executable: OK\n');
       return 0;
     }
     if (opts.cmd === 'check-baseline-match') {
