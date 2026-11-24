@@ -62,7 +62,10 @@
     {
       "step": 5,
       "name": "scope-snapshot-symlink",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:30:52+0900",
+      "completed_at": "2026-11-24T19:31:51+0900",
+      "summary": "reverify step5: no-op — SNAP 5 created→reused, scope-snapshot-symlink.spec.js 5 passed (desktop-dark), FULL 81 passed, CGATE 5 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 6,
