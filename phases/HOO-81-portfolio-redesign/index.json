@@ -342,7 +342,10 @@
     {
       "step": 40,
       "name": "axe-classify",
-      "status": "pending"
+      "status": "blocked",
+      "started_at": "2026-11-24T21:43:54+0900",
+      "blocked_reason": "step40 재계획 필요: 산정 초과 — tests/fixtures/axe-collected.json = 12 entries / 139 targets (color-contrast 6 entries 61 targets, nested-interactive 6 entries 78 targets; page 시나리오만, distinct ruleId|canonical target 25). 산정 = 묶음별 2분 + target×1분 + 6분 >= 2 + 139 + 6 = 147분 > 20분 (§6.2 단계 40 규칙). 규칙대로 axe-baseline.json·axe-remediation-plan.json을 쓰지 않음. SNAP 40 created, 파일 변경 없음. 하네스가 분류를 20분 이하 단위(예: ruleId×scenario/project 묶음 또는 canonical target 25개 기준 분할)로 재계획해야 함.",
+      "blocked_at": "2026-11-24T21:44:26+0900"
     },
     {
       "step": 41,
