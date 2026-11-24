@@ -1,19 +1,18 @@
-# Step 35 — axe-collect
+# Step 35 — axe-current-checks
 
-- 목적: axe.spec.js 10개 시나리오와 최초 수집. 종료 시 `pending`.
+- 목적: 현재 수집 결과 판정(PlanTarget 단위 group done·coverage, 위반 0).
 - 예상 17분 / 선행 0~34 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.1, §8.3, §8.4
-- tracked 허용(exact): `tests/specs/axe.spec.js`(신규), `tests/fixtures/axe-collected.json`
-- runtime: R0(실제 COLLECT_DIR)
-- 금지: §15.7, helper, baseline·plan 생성
+- read-first: 설계 §8.3(step 35), §8.6
+- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
+- runtime: R0(독립 디렉터리)
+- 금지: §15.7, 이전 helper 동작, 실제 fixtures
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step35`
-2. `axe.spec.js`: 10개 시나리오, `prepareForAxe` → `runAxe({ include })`; 수집 모드 `writeCollected(scenario, testInfo.project.name, violations)`만; 일반 모드 `resolveBaselineMode()`, `check`면 checkRegression·validateBaseline(desktop-dark 1회)·plan 있으면 validateRemediationPlan(coverage false), `pending`이면 준비까지만 하고 `test.skip(true, 'axe classification pending (step 36)')`.
-3. COLLECT_CHAIN(기본 out) 후 entry 수·target 수·ruleId 분포 로그, 모든 key = makeEntryKey.
-4. 기본 testCommand `pending` 경로 확인.
+2. 설계 §8.3 step 35 계약(remaining·uncovered는 정렬된 `{key, target}` 배열, 비배열 collected `Error('invalid collected')`, 없는 id `Error('unknown group id: {id}')`).
+3. spec(desktop-dark): checkGroupDone 사라짐 done·`lightbox:desktop-dark:*`에만 남음 remaining 1(정확한 PlanTarget)·다른 그룹 잔여 무영향·unknown·형식 오류 id·`{}` collected throw; coverage 전부 포함 ok·plan 밖 1개 uncovered·빈 groups+잔여·입력 불변; countCollectedTargets `[]` 0·2+1 → 3·같은 target 두 entry → 2; CLI group-done·coverage·assert-no-violations 각 0/1/없음 1; baseline과 수집에 같은 target이 남으면 checkRegression `[]`이어도 `--assert-no-violations` 1.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --reset && AXE_COLLECT=1 sh tests/scripts/with-env.sh npm --prefix tests test -- axe.spec.js && sh tests/scripts/with-env.sh node tests/helpers/axe.js --merge && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step35.json --allow tests/specs/axe.spec.js,tests/fixtures/axe-collected.json` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step35.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0

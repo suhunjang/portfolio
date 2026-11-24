@@ -1,18 +1,18 @@
-# Step 25 — axe-prepare-page
+# Step 25 — ui-regression
 
-- 목적: 준비 helper 공통 오류 계약과 page 준비.
-- 예상 15분 / 선행 0~24 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §3(reveal), §8.4(step 25)
-- tracked 허용(exact): `tests/helpers/axe-prepare.js`(신규: `PREPARE_PREFIX`, `prepareError`, `withPrepareCode`, `preparePage`만), `tests/specs/axe-prepare-page.spec.js`(신규)
+- 목적: 테마·최초 방문·메뉴·scrollspy·typing·reduced-motion 회귀.
+- 예상 17분 / 선행 0~24 / 공통 절차 설계 §15 / 종료 gate: CLI
+- read-first: 설계 §3, §6, §7.4, §11.4
+- tracked 허용(exact): `tests/specs/ui-regression.spec.js`, `tests/specs/first-visit.spec.js`
 - runtime: R0
 - 금지: §15.7
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step25`
-2. 설계 §8.4 step 25 계약.
-3. spec(desktop-dark, desktop-light, mobile-dark): 실제 사이트 `revealChecked` > 0·모두 `.in`·반환 후 scrollY 0·scrollSteps ≥ 1; `.in`이 안 붙는 `.reveal` 1개 + `timeoutMs: 500` → `prepareForAxe: reveal-hidden:1`·code 일치; `prepareError('x')` message·code; `withPrepareCode('fonts-not-ready', reject boom)` message·cause; `withPrepareCode('a', reject prepareError('b'))` 코드 b; data-theme·reduced-motion 불변.
+2. `ui-regression.spec.js`(6 project): 테마 토글 `data-theme`·`THEME_KEY` 변경 후 새로고침 유지; mobile 메뉴 `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 정확히 `const link = page.locator('.nav-link[href="#projects"]'); await link.click(); await expect(link).toHaveClass(/active/);`; typing 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`.
+3. `first-visit.spec.js`: fixture 없이 desktop-dark, colorScheme light·dark 각각 시스템 따름.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step25.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-page.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- ui-regression.spec.js first-visit.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step25.json --allow tests/specs/ui-regression.spec.js,tests/specs/first-visit.spec.js` → exit 0

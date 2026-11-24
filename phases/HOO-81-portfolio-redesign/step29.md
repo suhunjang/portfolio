@@ -1,26 +1,18 @@
-# Step 29 — axe-baseline-regression
+# Step 29 — axe-prepare-lightbox
 
-- 목적: §8.5 baseline schema 검증(`validateBaseline`), 회귀 판정, 분류 대기 계약.
+- 목적: lightbox 준비와 `prepareForAxe`.
 - 예상 19분 / 선행 0~28 / 공통 절차 설계 §15 / 종료 gate: CLI
-- read-first: 설계 §8.3(step 29, 실행 모드), §8.5(전체)
-- tracked 허용(exact): `tests/helpers/axe.js`(추가만), `tests/specs/axe-helper.spec.js`(추가만)
-- runtime: R0(독립 디렉터리)
-- 금지: §15.7, step 24·28 동작, 실제 fixtures
+- read-first: 설계 §3(lightbox), §7.4, §8.4(step 29, 합성 fixture)
+- tracked 허용(exact): `tests/helpers/axe-prepare.js`(추가만: `prepareLightbox`, `prepareOverlay`, `prepareForAxe`), `tests/specs/axe-prepare-lightbox.spec.js`(신규)
+- runtime: R0
+- 금지: §15.7, step 27·28 함수 동작
 
 ## 작업
 
 1. 시작 snapshot: `python3 -I tests/scripts/start-snapshot.py step29`
-2. 설계 §8.3 step 29 계약. `validateBaseline`은 §8.5 규칙·오류 형식 그대로.
-3. spec(desktop-dark):
-   - 통과: §8.5 정상 예 → `[]`; `[]` → `[]`; text-change fix(`fixFiles: []`)만 있는 entry와 entry `fixFiles: []` → `[]`
-   - §8.5 오류 예 A → 정확히 `["baseline[0]: fields missing=[] extra=[note]"]`
-   - §8.5 오류 예 B(fixKind만 `css-rule`, fix·entry fixFiles 유지) → 정확히 `["baseline[0].fixes[0]: fixFiles-mismatch"]`
-   - §8.5 오류 예 C(fix 정상, entry `fixFiles`만 `["css/style.css"]`) → 정확히 `["baseline[0]: fixFiles union-mismatch"]`
-   - 그 밖 각각 한 항목: `baseline: not-array`(`{}`), `baseline[0]: not-object`, `fields missing=[impact] extra=[]`, `bad-scenario`, `bad-project`, `bad-ruleId`(`a:b`), `key-mismatch`, `bad-impact`(`minor`), `targets empty`, `targets duplicate`, `targets unsorted`, `selectors unsorted`, `fixes count`, `fixes[0]: target-mismatch`, `fixes[0]: bad-fixKind`, `baseline: duplicate-key {key}`, `baseline: unsorted`
-   - checkRegression: 새 key → `new-key:{key}`, 기존 key의 새 target → `new-target:{key}:{target}`, 사라짐 허용, `page:desktop-dark`에만 있는 target이 `page:desktop-light`에 나오면 new-key, 입력 불변
-   - resolveBaselineMode: baseline 있음 `check`; baseline 없음+collected 있음+plan 없음 `pending`; baseline 없음+collected 없음 throw; baseline 없음+collected+plan throw; `process.env.AXE_ALLOW_MISSING_BASELINE='1'`이어도 collected 없으면 throw
-   - loadBaseline 없음·잘못된 JSON·`{}` throw; CLI `--assert-empty` `[]` 0, `[{}]`·`{}`·잘못된 JSON·없음 1
+2. 설계 §8.4 step 29 계약.
+3. spec(desktop-dark/light): page → `body`·null, modal → `#projectModal`, lightbox → `.lightbox`·img 로딩·포커스 내부; shots 없는 grid index → `lightbox-not-open`; `page.route`로 이미지 abort → `content-not-loaded:img`; `scenario: 'x'`·`prepareOverlay({ scenario: 'page' })` → `unknown-scenario`; no-shots fixture(grid 0·1 shots 없음 + 대표 버튼 0) → `findProjectWithShots` null·`__opens === 2`·`__closes === 2`·대표 click 0·lightbox `no-shots-project`; shots fixture(1에만 `.shot-zoom` + 대표 버튼 1) → 1·opens/closes 2·대표 0; `.modal-section` 안 깨진 img → `content-not-loaded:img`, 0×0 svg → `content-not-loaded:svg`.
 
 ## AC
 
-- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-helper.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step29.json --allow tests/helpers/axe.js,tests/specs/axe-helper.spec.js` → exit 0
+- `sh tests/scripts/with-env.sh npm --prefix tests test -- axe-prepare-lightbox.spec.js axe-prepare-modal.spec.js axe-prepare-page.spec.js && sh tests/scripts/with-env.sh npm --prefix tests test && sh tests/scripts/with-env.sh npm --prefix tests run verify-scope && sh tests/scripts/with-env.sh node tests/scripts/scope-snapshot.mjs --check tests/.tmp/start-snapshot-step29.json --allow tests/helpers/axe-prepare.js,tests/specs/axe-prepare-lightbox.spec.js` → exit 0
