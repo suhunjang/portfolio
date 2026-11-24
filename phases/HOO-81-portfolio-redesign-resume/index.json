@@ -94,7 +94,10 @@
     {
       "step": 9,
       "name": "axe-classify-occ-batch-8",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T23:55:39+0900",
+      "completed_at": "2026-11-25T00:05:47+0900",
+      "summary": "RSNAP 9(step109) · OCC_RUN 8(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 8 occurrence 10개 axe 재현 — color-contrast 8(mobile-light #about .about-meta dt Focus/Location/Role --text-faint #8a8a93 on #ffffff 3.42:1, #heroStats .stat-label 3개·#footerName·footer .footer-note --text-faint #8a8a93 on #fafafa 3.27:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 2(mobile-dark project:9, mobile-light project:0 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-8.json·server-8.json 기록. OCC_CHECK 8 'occ-check 8: OK 10' · FULL 429 passed(1차는 modal-regression page.goto timeout 1건 flake, 재실행 통과) · VS OK · RGATE 9 '' OK"
     },
     {
       "step": 10,
