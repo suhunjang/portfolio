@@ -78,7 +78,10 @@
     {
       "step": 7,
       "name": "axe-classify-occ-batch-6",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T23:33:11+0900",
+      "completed_at": "2026-11-24T23:48:03+0900",
+      "summary": "RSNAP 7(step107) · OCC_RUN 6(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 6 occurrence 10개 axe 재현 — color-contrast 8(mobile-dark #aboutAvatar·#brandMark·#hero .btn-primary #fff on --accent #7ea8d8 2.47:1, #heroStats .stat-label 3개·#footerName·footer .footer-note --text-faint #71717a on #0d0f12 3.97:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 2(project:0,10 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-6.json·server-6.json 기록. OCC_CHECK 6 'occ-check 6: OK 10' · FULL 429 passed(앞선 2회는 modal-regression page.goto timeout과 scope-snapshot-parity-artifacts tests/.tmp inventory race로 서로 다른 1건 flake, 재실행 통과) · VS OK · RGATE 7 '' OK"
     },
     {
       "step": 8,
