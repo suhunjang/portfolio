@@ -118,7 +118,10 @@
     {
       "step": 12,
       "name": "axe-classify-occ-batch-11",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-25T00:30:09+0900",
+      "completed_at": "2026-11-25T00:36:27+0900",
+      "summary": "RSNAP 12(step112) · OCC_RUN 11(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 11 occurrence 10개 axe 재현 — color-contrast 4(tablet-dark #heroStats .stat-label 3개·footer span.footer-note(.footer-inner 상속) --text-faint #71717a on #0d0f12 3.97:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 6(tablet-dark project:0,1,2,10,11,12 project-card role=button tabindex=0 안 button.project-more(project:2는 a 링크도 포함) → js-render·false), pair 불일치 없음; occ-batch-11.json·server-11.json 기록. OCC_CHECK 11 'occ-check 11: OK 10' · FULL 429 passed · VS OK · RGATE 12 '' OK"
     },
     {
       "step": 13,
