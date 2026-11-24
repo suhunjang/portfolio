@@ -87,7 +87,10 @@
     {
       "step": 8,
       "name": "scope-snapshot-cli",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T08:58:59+0900",
+      "completed_at": "2026-11-24T09:02:19+0900",
+      "summary": "step8 시작 snapshot(created→reused), scope-snapshot.mjs에 step8 API(writeAfterZ: checkPath(after, missing|file) 실패면 open 없이 UnsafePathError → O_WRONLY|O_CREAT|O_TRUNC|O_NOFOLLOW|O_NONBLOCK 0o644 open → fstat regular 확인 → 쓰기; runCheck({startFile,allow,requireAbsent},{git,fs,root,deps}): checkRoot→loadStartSnapshot→computeIdentity+checkIdentity('start snapshot identity mismatch: {field}')→takeCurrent(unsafe면 snapshot-not-first·정렬 unsafe로 code 1, writeAfterZ 없음)→writeAfterZ(git status 원문, 실패 code 1)→evaluateGate(위반 code 1 / 'scope-snapshot: OK' code 0), deps는 테스트용 단계 대체; CLI --check <json> --allow <list> [--require-absent <list>], 인자 오류 stderr usage exit 2) 추가(step1~7 함수 불변)와 scope-snapshot-cli.spec.js(desktop-dark 전용: writeAfterZ 가짜 fs flags·fstat 후 쓰기·leaf symlink/FIFO/dir·조상 tests/.tmp symlink·root symlink 거부 open 없음·fstat 경쟁 거부; runCheck spy (0)~(5) 단계 순서·stderr·쓰기 0; 실제 저장소 parity-<pid> CLI exit 0·after.z regular, 없는 snapshot unsafe path: missing:, schemaVersion 1.0 사본 bad start snapshot: schemaVersion, 인자 누락·알 수 없는 인자 exit 2 usage, snapshot sha256 불변·finally 삭제) 작성. RED(export 없음) 확인 후 GREEN, AC1(2개 spec 18 passed·전체 66 passed·S reused·CLI scope-snapshot: OK)·AC2(inline C scope-snapshot: OK, sandbox가 heredoc 임시파일을 막아 같은 설계 블록 본문을 stdin 파이프로 전달) 통과"
     },
     {
       "step": 9,
