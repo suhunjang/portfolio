@@ -54,7 +54,10 @@
     {
       "step": 4,
       "name": "scope-snapshot-state",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:29:55+0900",
+      "completed_at": "2026-11-24T19:30:52+0900",
+      "summary": "reverify step4: no-op — SNAP 4 created→reused, scope-snapshot-state+loader specs 13 passed (desktop-dark), FULL 81 passed, CGATE 4 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 5,
