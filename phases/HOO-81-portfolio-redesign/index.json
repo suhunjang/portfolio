@@ -230,7 +230,10 @@
     {
       "step": 26,
       "name": "modal-regression",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:09:20+0900",
+      "completed_at": "2026-11-24T20:19:57+0900",
+      "summary": "step26: added tests/helpers/modal.js (GRID_CARD '#projectGrid .project-card'; gridCard(page,N) exact data-project locator; openFirstProjectByClick/openFirstProjectByEnter (focus+Enter) waiting #projectModal visible; closeVia button '#projectModal .modal-close[data-modal-close]' / backdrop click position {x:5,y:5} / esc, unknown -> throw; expectFocused toBeFocused; modalTitle '#projectModal #modalTitle'; findProjectWithShots = first grid card (DOM order) whose PROJECTS[N].detail.shots non-empty else null) and tests/specs/modal-regression.spec.js (6 projects: helper selectors, click & Enter open x button/backdrop/esc close -> title = baseline title, modal-open set/cleared, close-button focus on open, trigger card focus restored, closeVia throw; desktop-only lightbox: findProjectWithShots, open/close modal leaves no lightbox, .shot-zoom opens lightbox with src + close focus, Esc 1 closes lightbox only (modal-open kept, zoom refocused), Esc 2 closes modal + card focus); RED confirmed (module missing), SNAP 26 created, T modal-regression 50 passed/4 skipped (repeat-each 4: 200 passed), FULL 291 passed, VS OK, GATE 26 scope-snapshot: OK"
     },
     {
       "step": 27,
