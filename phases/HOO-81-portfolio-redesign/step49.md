@@ -4,11 +4,11 @@
 - 16분 / 선행 0~48 / 공통 §9 / gate GATE
 - 허용(exact): `css/style.css`(`.hero-cta .btn`·`.featured-card`·`#projectGrid .project-card`의 `:hover`·`:active`에서 transform·opacity·transition만), `tests/specs/component-hover.spec.js`(신규)
 - runtime: R0
-- 추가 금지: `index.html`, `js/*`, 색 선언·순서, hit·clamp, focus-visible, helper·generator·fixture·기존 spec, `measureStateSequence` 밖 측정
+- 추가 금지: `index.html`, `js/*`, 색 선언·순서, hit·clamp, focus-visible, helper·generator·fixture·기존 spec, `measureStateSequence` 밖 측정, page 단위 테마 주입
 
 ## 작업
 1. `SNAP 49` → `DI`(`Components.dc.html` 읽기만).
-2. RED spec(`desktop-dark`·`desktop-light`, 테스트 `context`·url `/`, `measureStateSequence`만): `hero-cta-btn-{i}`·`grid-card-0`·`grid-card-1` 상태별 색 3속성 = fixture; 첫 `.featured-card` = `grid-card-1`; hover·active 각각 transform 또는 opacity ≠ default; outline-color = default.
+2. RED spec(`desktop-dark`·`desktop-light`, §THEME `test`의 `context`(테마 상속)·url `/`, `measureStateSequence`만): `hero-cta-btn-{i}`·`grid-card-0`·`grid-card-1` 상태별 색 3속성 = fixture[project 테마]; 첫 `.featured-card` = `grid-card-1`; hover·active 각각 transform 또는 opacity ≠ default; outline-color = default.
 3. style.css(guard 통과).
 
 ## AC

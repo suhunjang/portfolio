@@ -8,7 +8,7 @@
 
 ## 작업
 1. `SNAP 57` → `DI`
-2. spec: 화면마다 `prepareForAxe` 후 촬영, 6 project page, desktop 대표 모달 3·lightbox·print, 모달 SVG text font-family Space Grotesk. 먼저 단독 통과.
+2. spec(§THEME `test`): 화면마다 `prepareForAxe` 후 촬영, 6 project page, desktop 대표 모달 3·lightbox·print, 모달 SVG text font-family Space Grotesk. 먼저 단독 통과.
 3. AC 후 요약(§11.2 반영 목록, guard 통과, step 0~11 재검증 로그). exact-commit 리뷰·push·PR은 하네스(§FLOW).
 
 ## AC

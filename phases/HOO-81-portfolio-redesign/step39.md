@@ -8,7 +8,7 @@
 
 ## 작업
 1. `SNAP 39`
-2. spec: `prepareForAxe` → `runAxe({ include })`; 수집 모드 `writeCollected(scenario, testInfo.project.name, violations)`만; 일반 모드 §6.2(pending이면 준비까지 후 `test.skip(true, 'axe classification pending (step 40)')`).
+2. spec(§THEME `test`): `prepareForAxe` → `runAxe({ include })`; 수집 모드 `writeCollected(scenario, testInfo.project.name, violations)`만; 일반 모드 §6.2(pending이면 준비까지 후 `test.skip(true, 'axe classification pending (step 40)')`).
 3. COLLECT_CHAIN 후 entry·target 수·ruleId 분포 로그, key = makeEntryKey 확인. `FULL` pending 경로 확인.
 
 ## AC

@@ -7,7 +7,7 @@
 
 ## 작업
 1. `SNAP 27`
-2. ui-regression(6 project): 토글 `data-theme`·`THEME_KEY` 새로고침 유지; mobile `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 §4 정확한 문법(projects); typing 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`. first-visit: fixture 없이 desktop-dark, colorScheme light·dark 따름.
+2. ui-regression(6 project, §THEME `test`): 토글 `data-theme`·`THEME_KEY` 새로고침 유지; mobile `#navLinks.open`·`aria-expanded="true"`, 링크 클릭 후 닫힘; desktop 스크롤스파이 §4 정확한 문법(projects); typing 변화; `reducedMotion: 'reduce'`에서 `#typed` = `roles[0]`, `.reveal` 즉시 `.in`. first-visit: `installProjectTheme` 없는 별도 context, desktop-dark, colorScheme light·dark 따름.
 
 ## AC
 - `T ui-regression.spec.js first-visit.spec.js && FULL && VS && GATE 27 tests/specs/ui-regression.spec.js,tests/specs/first-visit.spec.js`
