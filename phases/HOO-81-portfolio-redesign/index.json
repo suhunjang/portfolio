@@ -174,7 +174,10 @@
     {
       "step": 19,
       "name": "design-guard-css",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:51:04+0900",
+      "completed_at": "2026-11-24T19:52:57+0900",
+      "summary": "step19: added tests/helpers/design-guard-css.js (checkTypeAndAssets = checkFontDecls results first, then current order/decl order: @import without same file·chain·prelude in BASE -> asset:@import; @font-face without same file·chain·decls -> font-asset:@font-face (+asset:@font-face if url()); font-weight not in BASE style.css values -> font-weight:{v}; new url() decl -> asset:{selectors}; new content not none/''/\"\"/normal -> content:{selectors}; unknown-token for varRefs of non-custom decls not in KNOWN = union of custom property names in BASE+current style/themes; global dedup, no sorting, inputs unmutated; checkCss = parse style/themes then [...checkColors, ...checkTypeAndAssets] + themes-changed) and tests/specs/design-guard-css.spec.js (4 passed desktop-dark: allowed [], exact diagnostics, checkCss, immutability); RED confirmed (module missing), SNAP 19 created, T css+font+color+rules+pairs+color-vocab+css-parse 57 passed, FULL 141 passed, GATE 19 scope-snapshot: OK"
     },
     {
       "step": 20,
