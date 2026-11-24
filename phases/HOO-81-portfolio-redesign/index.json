@@ -190,7 +190,10 @@
     {
       "step": 21,
       "name": "tests-browser-smoke",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:55:01+0900",
+      "completed_at": "2026-11-24T19:57:00+0900",
+      "summary": "step21: browsers:install (chromium-1255 into tests/.pw-browsers); added tests/helpers/theme.js (§THEME installProjectTheme: strict /-(dark|light)$/ project suffix else throw, THEME_KEY regex-extracted from js/main.js, exactly one context.addInitScript with null-only localStorage setItem; test = base.extend context fixture installing theme before navigation; collectConsoleErrors immediate pageerror/console.error listeners excluding Google Fonts domains, finish() after networkidle -> {pageErrors, consoleErrors}) and tests/specs/smoke.spec.js (6 projects: (a) default page data-theme=suffix + #heroName visible, (b) context.newPage inherits, (c) seeded opposite theme not overwritten, installProjectTheme throw/1-call spy, console [] + async throw -> 1 pageError); RED confirmed (module missing), SNAP 21 created, T smoke 30 passed, FULL 175 passed, GATE 21 scope-snapshot: OK"
     },
     {
       "step": 22,
