@@ -5,7 +5,7 @@
 - read-first: 설계 §3, §16.2(component state 대상·측정 시점·step 44 절차), §16.4(DESIGN_HASH_CHECK 후 `Components.dc.html`·`MobileMenu.dc.html` 읽기 전용); fixture tokens
 - tracked 허용(exact): `css/style.css`(§16.2 대상의 min-width·min-height·padding·line-height·display 등 비색 hit target 규칙만), `tests/specs/component-hit.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, 색 선언, hover·active·clamp 규칙(step 45·46), 기존 spec 수정
+- 금지: §15.7, `index.html`, `js/*`, 색 선언(기존 규칙에 추가 포함), hover·active·clamp 규칙(step 45·46), 기존 spec 수정
 
 ## 작업 (TDD)
 

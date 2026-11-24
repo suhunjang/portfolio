@@ -5,7 +5,7 @@
 - read-first: 설계 §3, §5, §9, §16(DESIGN_HASH_CHECK 후 `DesktopTop.dc.html`·`Mobile.dc.html` 읽기 전용); main.js `#heroStats` 렌더
 - tracked 허용(exact): `index.html`(section#hero 내부만: 직계 자식 8개 순서·tagline·`#heroFeatured` 위치), `js/main.js`(정확히 `setText('heroTagline', PROFILE.tagline);` 1줄), `css/style.css`(hero 1열 간격·STATS·featured 반응형·`.hero-tagline` 비색 타이포만), `tests/specs/hero.spec.js`
 - runtime: R0
-- 금지: §15.7, `js/data.js`, 새 색·BASE 밖 font-weight, 문구 축소·변경, 렌더 로직, 섹션·nav
+- 금지: §15.7, `js/data.js`, 새 색·BASE 밖 font-weight·font-family 이동, 문구 축소·변경, 렌더 로직, 섹션·nav
 
 ## 작업 (TDD)
 

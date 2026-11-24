@@ -5,7 +5,7 @@
 - read-first: 설계 §16.2(step 45 hover·active), §16.4(DESIGN_HASH_CHECK 후 `Components.dc.html` 읽기 전용)
 - tracked 허용(exact): `css/style.css`(`.hero-cta .btn`·`.featured-card`·`#projectGrid .project-card`의 `:hover`·`:active` 규칙에서 transform·opacity·transition만), `tests/specs/component-hover.spec.js`(신규)
 - runtime: R0
-- 금지: §15.7, `index.html`, `js/*`, 색 선언, hit target·clamp 규칙, focus-visible, 기존 spec 수정
+- 금지: §15.7, `index.html`, `js/*`, 색 선언(기존 규칙에 추가 포함), hit target·clamp 규칙, focus-visible, 기존 spec 수정
 
 ## 작업 (TDD)
 

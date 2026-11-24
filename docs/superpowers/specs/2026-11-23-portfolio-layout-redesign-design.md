@@ -5,7 +5,7 @@
 - 선행 시각 설계: `docs/superpowers/specs/2026-07-29-quiet-executive-redesign-design.md` (적용 완료, 계속 유효)
 - 합의: Q1 Discord 1574196542901059632, Q2 1574197289084387379, Q3~Q5 1574197696334405756 (추천안 일괄 확정)
 - 범위 변경: 대표 결정 `scope-change-claude-design-v27`·`scope-change-claude-design-v28-compact` — Claude Design 패턴(레이아웃·컴포넌트·간격·타이포 위계만)을 구현 기준으로 추가. 이전 Harness 2.0.1 계획·리뷰·승인은 재사용하지 않는다.
-- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`: 규칙 구조 CSS guard, baseline(§8.5)·plan(§8.6) schema, component state 측정, `css/themes.css` 제외, §17 preflight 28개 경로. 33차 `review-resume-d032b938c536-v30`: 색 custom property 의존 그래프, CSS guard step 분할, step 6·8·32 완전 기술, baseline 오류 예 교정, component state 3분할. 34차 `review-resume-16ea71f32fac-v31`: 고정 S·C `parse_status`의 UTF-8 decode 실패 → `ValueError('bad status record')` 변환(설계 소유자 확정), step 6 합성 저장소 lock·조상 준비, 색 guard 3분할(step 14~16), step 0~53 재번호. 35차 `review-resume-6a5d82a7db93-v32`(record `6a5d82a7db9327845ac1b1a429b2113f20fff779984eecc4fc27f7eba059c7b7`, major 2건): step 15 `checkColorRules`의 규칙 4·5에서 custom property 정의 제외(정의 검사는 step 16 `checkColorTokens` 전담) 및 회귀 사례 추가, step 33·34 plan 검증 fixture를 §8.6 정상 예와 정확히 대응하는 `aria-allowed-attr` baseline(FIXTURE_OK)과 themes blocked 전용 `color-contrast` baseline(FIXTURE_THEMES)으로 분리(§8.6).
+- 리뷰 반영 이력: 1~30차(Astra `1432c5274b33` ~ `review-resume-h201-b86b75bb881e-v26`)는 이 문서에 반영되어 있다(세부는 Git 이력). 31차 범위 변경. 32차 `review-resume-c57f750bfd7a-v29`: 규칙 구조 CSS guard, baseline(§8.5)·plan(§8.6) schema, component state 측정, `css/themes.css` 제외, §17 preflight 28개 경로. 33차 `review-resume-d032b938c536-v30`: 색 custom property 의존 그래프, CSS guard step 분할, step 6·8·32 완전 기술, baseline 오류 예 교정, component state 3분할. 34차 `review-resume-16ea71f32fac-v31`: 고정 S·C `parse_status`의 UTF-8 decode 실패 → `ValueError('bad status record')` 변환(설계 소유자 확정), step 6 합성 저장소 lock·조상 준비, 색 guard 3분할(step 14~16), step 0~53 재번호. 35차 `review-resume-6a5d82a7db93-v32`(record `6a5d82a7db9327845ac1b1a429b2113f20fff779984eecc4fc27f7eba059c7b7`, major 2건): step 15 `checkColorRules`의 규칙에서 custom property 정의 제외(정의 검사는 step 16 `checkColorTokens` 전담) 및 회귀 사례 추가, step 33·34 plan 검증 fixture를 §8.6 정상 예와 정확히 대응하는 `aria-allowed-attr` baseline(FIXTURE_OK)과 themes blocked 전용 `color-contrast` baseline(FIXTURE_THEMES)으로 분리(§8.6). 36차 `review-resume-9c1f912760e7-v33`(record `9c1f912760e7aba49329496be4ce22a53612f3498c7796f636a018bd1ec817b0`, major 2·minor 1): step 14 `COLOR_PROPS`에 방향·논리 border 색 longhand 등 동등한 색 적용 속성 포함, step 15 짝지어진 기존 규칙에 새로 추가된 색 선언 거부(규칙 4), step 17 BASE `font-family`·`font` 선언의 file·chain·selectors·값 단위 양방향 보존(`font-decl-missing`), step 41 5:7 열 폭 허용 오차와 1023/1024px 전환 검증(§16.2).
 - Harness 실행 identity (중앙 release, `.harness/harness.lock.json`을 직접 읽어 확인): sourceCommit `e7a03919a460f975149f7c55343ca4b34d3d2352`, manifestHash `b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372`, distributionVersion 2.0.1
 - 진행 순서: materialize → 새 plan commit → Astra `gpt-6-astra` 계획 리뷰 CLEAN → 대표 exact 승인(§17 경로 목록 포함) → §17 preflight → fresh runner(step 0~53) → 전체 테스트 → exact-commit Astra 리뷰 CLEAN → feature push → OPEN PR. merge·deploy·main 직접 변경 없음.
 
@@ -201,7 +201,7 @@ helper (`tests/helpers/axe.js`):
 | 섹션 padding-top·bottom(career~contact) | 64px | 80px | 96px |
 | card gap(`#heroFeatured`, `#projectGrid`, `#strengthsGrid` row·column) | 24px | 24px | 24px |
 
-가로 스크롤 없음. hero 2열 전환 기준은 viewport 너비 1024px 이상.
+가로 스크롤 없음. hero 2열 전환 기준은 viewport 너비 1024px 이상(1023px 1열, 1024px 2열).
 
 ## 10. 인쇄와 PDF
 
@@ -656,10 +656,10 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 | 11 | scope-snapshot-parity-artifacts (재검증) | 19 | S reused + C |
 | 12 | claude-design-intake | 15 | CLI (첫 CLI gate) |
 | 13 | css-parser | 17 | CLI |
-| 14 | color-vocab-graph | 16 | CLI |
-| 15 | design-guard-color-rules | 17 | CLI |
+| 14 | color-vocab-graph | 17 | CLI |
+| 15 | design-guard-color-rules | 18 | CLI |
 | 16 | design-guard-color-tokens | 17 | CLI |
-| 17 | design-guard-type-asset | 15 | CLI |
+| 17 | design-guard-type-asset | 18 | CLI |
 | 18 | design-guard-integration | 15 | CLI |
 | 19 | tests-browser-smoke | 15 | CLI |
 | 20 | scope-paths | 19 | CLI |
@@ -683,7 +683,7 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 | 38 | axe-classify | ≤20 (초과 시 재계획) | CLI |
 | 39 | featured-projects | 19 | CLI |
 | 40 | hero-first-screen | 20 | CLI |
-| 41 | hero-two-column | 17 | CLI |
+| 41 | hero-two-column | 19 | CLI |
 | 42 | section-structure | 19 | CLI |
 | 43 | section-layout | 17 | CLI |
 | 44 | component-hit-open | 18 | CLI |
@@ -762,7 +762,8 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
 ### 16.2 허용 패턴 (구현 기준)
 
 - Explore surface: PROJECTS 13개 전체를 기존 순서로 card grid, card → modal 탐색 유지.
-- hero(step 40·41): `.hero-inner` 직계 자식 8개. viewport ≥ 1024px에서 `display: grid`, `grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)`, column-gap 48px, `grid-template-areas: "eyebrow summary" "name summary" "tagline summary" "role cta" "stats stats" "featured featured"`(DOM 순서 불변), 좌측 정렬. 1024px 미만 1열.
+- hero(step 40·41): `.hero-inner` 직계 자식 8개. viewport ≥ 1024px(`@media (min-width: 1024px)`)에서 `display: grid`, `grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)`, column-gap 48px, `grid-template-areas: "eyebrow summary" "name summary" "tagline summary" "role cta" "stats stats" "featured featured"`(DOM 순서 불변), 좌측 정렬. 1024px 미만 1열.
+- hero 열 폭 계약(step 41): `.hero-inner`의 computed `grid-template-columns`가 px 값 두 개 a(왼쪽)·b(오른쪽)이고, content 폭 W = `clientWidth` − 좌우 padding일 때 |a − (W − 48) × 5/12| ≤ 1, |b − (W − 48) × 7/12| ≤ 1, |a + 48 + b − W| ≤ 1(px). viewport 1023px에서는 computed `grid-template-columns`가 px 값 한 개 이하(또는 `display`가 grid 아님)이고 직계 자식 8개 left = content-box left ±1px·top이 DOM 순서대로 증가, 1024px에서는 위 2열 계약 전체가 성립한다.
 - 섹션 padding·card gap: §9 표.
 - component state(step 44~46): 대상 `.nav-link`, `#menuToggle`, `#themeToggle`, `.hero-cta .btn`, `.featured-card`, `#projectGrid .project-card`, `#projectModal .modal-close`, `#contactActions a`, `.scroll-hint`(보일 때). 측정 시점: 상태 진입 후 `document.getAnimations().length === 0`이 될 때까지 `expect.poll`한 뒤 `getComputedStyle`·`boundingBox`. 색 3속성 = color·background-color·border-color.
   - step 44 hit target(6 project): 그 project에서 기본 상태로 보이는 대상의 bbox width·height ≥ 44px.
@@ -771,11 +772,11 @@ S·C exec harness(테스트 전용): `python3 -I -c '<harness>'`가 본문을 �
   - step 45 hover·active(`desktop-dark`·`desktop-light`): `.hero-cta .btn`(각각), `.featured-card`(첫 번째), `#projectGrid .project-card[data-project="0"]`에 대해 default 측정 → `hover()` 후 측정 → `mouse.down()` 상태 측정 → `mouse.up()`; hover와 active 각각에서 `transform` 또는 `opacity`가 default와 다르고 색 3속성과 outline-color는 default와 같다.
   - step 46 line clamp: `.featured-blurb`와 `#projectGrid` 카드 blurb에 screen `-webkit-line-clamp: 3`(DOM 텍스트 전문 유지, 모달·print는 전문). strength 장식 stripe: BASE `.strength-card::before` 규칙은 제거 가능(선택).
 - focus-visible은 기존 outline(step 48).
-- typography hierarchy: font-size·line-height·letter-spacing·margin 위계만. font-weight는 BASE `css/style.css`에 쓰인 값(400·500·600·700)만.
+- typography hierarchy: font-size·line-height·letter-spacing·margin 위계만. font-weight는 BASE `css/style.css`에 쓰인 값(400·500·600·700)만. BASE의 `font-family`·`font` 선언은 위치(file·chain·selectors)와 값을 그대로 유지한다.
 
 ### 16.3 제외(절대 반영 금지)
 
-새 색상 값, 기존 색상의 역할·적용 위치 변경(특히 button/logo dark text `#0d0f12`, muted grey 재배정), 색 custom property의 추가·재정의·삭제·별칭 변경, named color·`currentColor`를 통한 색 역할 변경, 서체 family/weight asset 변경, 새 문구·수치·통계·섹션·이미지·아이콘, 프로젝트 순서·정보구조 변경, mockup placeholder 실콘텐츠화, `css/themes.css` 변경. bundle의 hero `min-height`·card thumb 비율 등 허용 목록 밖 제안도 반영하지 않는다.
+새 색상 값, 기존 색상의 역할·적용 위치 변경(특히 button/logo dark text `#0d0f12`, muted grey 재배정), 기존 규칙에 새 색 적용 선언 추가, 색 custom property의 추가·재정의·삭제·별칭 변경, named color·`currentColor`를 통한 색 역할 변경, 서체 family/weight asset 변경과 BASE `font-family`·`font` 선언의 삭제·이동·값 변경, 새 문구·수치·통계·섹션·이미지·아이콘, 프로젝트 순서·정보구조 변경, mockup placeholder 실콘텐츠화, `css/themes.css` 변경. bundle의 hero `min-height`·card thumb 비율 등 허용 목록 밖 제안도 반영하지 않는다.
 
 ### 16.4 design guard (step 13~18)
 
@@ -785,10 +786,11 @@ step 13 parser(`tests/helpers/css-parse.js`, 순수):
 - `splitSelectors(text)`, `normalizeValue(value)` export.
 
 step 14 색 어휘·의존 그래프(`tests/helpers/color-vocab.js`, 순수, step 13 import):
-- `NAMED_COLORS`: CSS Color 4 named color 148개 + `transparent`. `COLOR_PROPS`: `color, background, background-color, background-image, border, border-top, border-right, border-bottom, border-left, border-color, outline, outline-color, fill, stroke, box-shadow, text-shadow, text-decoration-color, caret-color, accent-color, column-rule-color`(`border*` 값이 `0`·`none`이면 비색). `COLOR_LITERAL_RE`: `#[0-9a-fA-F]{3,8}\b`, `rgb(`, `rgba(`, `hsl(`, `hsla(`, `hwb(`, `lab(`, `lch(`, `oklab(`, `oklch(`, `color-mix(`.
+- `NAMED_COLORS`: CSS Color 4 named color 148개 + `transparent`. `COLOR_LITERAL_RE`: `#[0-9a-fA-F]{3,8}\b`, `rgb(`, `rgba(`, `hsl(`, `hsla(`, `hwb(`, `lab(`, `lch(`, `oklab(`, `oklch(`, `color-mix(`.
+- `COLOR_PROPS`(색을 적용하는 속성 전부): `color, background, background-color, background-image, border, border-top, border-right, border-bottom, border-left, border-color, border-top-color, border-right-color, border-bottom-color, border-left-color, border-block, border-block-start, border-block-end, border-block-color, border-block-start-color, border-block-end-color, border-inline, border-inline-start, border-inline-end, border-inline-color, border-inline-start-color, border-inline-end-color, outline, outline-color, column-rule, column-rule-color, text-decoration, text-decoration-color, text-emphasis, text-emphasis-color, -webkit-text-fill-color, -webkit-text-stroke, -webkit-text-stroke-color, fill, stroke, stop-color, flood-color, lighting-color, box-shadow, text-shadow, caret-color, accent-color, scrollbar-color`. 예외: shorthand(`border`, `border-top|right|bottom|left`, `-color`로 끝나지 않는 `border-block*`·`border-inline*`, `outline`, `column-rule`, `text-decoration`, `text-emphasis`, `-webkit-text-stroke`)의 값이 `0` 또는 `none`이면 비색.
 - `valueIdentifiers(value)`: 문자열·`url()` 내용·`var()` 인자 이름을 제외한 식별자 목록. `varRefs(value)`: `var(--x)`·중첩 fallback의 `--x` 이름 목록.
 - `isColorLiteralValue(value)`: 색 리터럴, `NAMED_COLORS` 식별자(대소문자 무시), `currentColor` 중 하나라도 있으면 true.
-- `isColorDecl([prop, value])`: prop ∈ COLOR_PROPS(border 예외 반영). custom property(`--x`) 선언은 항상 false.
+- `isColorDecl([prop, value])`: prop ∈ COLOR_PROPS(위 예외 반영). custom property(`--x`) 선언은 항상 false.
 - `customPropertyDefs(rules) → Array<{ file, chain, selectors, name, value }>`.
 - `colorTokenSet(rules) → Set<string>`: 정의를 노드, `varRefs` 참조를 간선으로 둔다. 시작 집합 = `isColorLiteralValue(value)`인 정의 이름 ∪ 색 선언이 `var()`로 참조하는 이름. 별칭 간선을 양방향(참조하는 쪽·참조되는 쪽)으로 따라가는 고정점이 color token 집합이다.
 - `isColorValue(value, colorTokens)`: `isColorLiteralValue(value)` 또는 `varRefs(value)` 중 colorTokens에 있는 이름이 있음.
@@ -796,12 +798,13 @@ step 14 색 어휘·의존 그래프(`tests/helpers/color-vocab.js`, 순수, ste
 step 15 색 규칙 대응(`tests/helpers/design-guard-color-rules.js`, 순수, step 13·14 import). 이 step의 모든 규칙은 custom property(`--x`) 선언을 검사하지 않는다(정의의 추가·변경·삭제는 step 16 `checkColorTokens` 전담):
 - `featuredCounterpart(selector)`: `.project-card`를 포함한 선택자의 모든 `.project-card`를 `.featured-card`로 바꾼 문자열(없으면 null).
 - `pairColorRules(baseRules, currentRules) → Array<{ base, current|null }>`: BASE 색 Rule(custom property가 아닌 색 선언이 있는 Rule)마다 같은 file·chain에서 selectors ⊇ base.selectors인 현재 Rule을 찾는다. 같은 file·chain·selectors의 BASE Rule이 여러 개면 현재 후보를 등장 순서로 1:1 짝짓는다.
-- `checkColorRules({ baseRules, currentRules, colorTokens }) → string[]`:
+- `checkColorRules({ baseRules, currentRules, colorTokens }) → string[]`(발견 순서, 같은 문자열은 한 번만):
   1. 짝이 없는 BASE 색 Rule: selectors가 모두 `.strength-card::before`이면 허용, 아니면 `color-rule-missing:{chain}|{selectors}`(chain은 ` > `로, selectors는 `, `로 연결; 대상 교체·미디어 조건 변경·삭제 포함).
   2. 짝의 추가 선택자가 base selectors의 featured 대응 선택자가 아니면 `selector-extended:{현재 selectors}`.
-  3. 짝의 색 선언 집합(custom property 제외, prop·정규화 value)이 base와 다르면 `color-decl-changed:{base selectors}`.
-  4. 짝지어지지 않은 현재 Rule의 custom property가 아닌 선언 중 색 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 `isColorLiteralValue`가 거짓이고 `varRefs`가 모두 colorTokens에 있음.
-  5. custom property가 아닌 비색 선언 값에 `currentColor`·named color가 새로 나타나면(같은 file·chain·selectors·선언이 BASE에 없으면) `color-decl-new:{selectors}`.
+  3. 짝의 BASE 색 선언(custom property 제외, prop·정규화 value) 중 하나라도 현재 짝에 그대로 없으면(값 변경·삭제) `color-decl-changed:{base selectors}`.
+  4. 짝에 새로 추가된 선언 — custom property가 아니고, (prop, 정규화 value)가 BASE 짝 Rule의 선언에 없으며, prop이 BASE 짝의 색 선언 prop 집합에 없는 선언 — 중 `isColorDecl`이 참이거나 `isColorValue(value, colorTokens)`가 참(색 리터럴·named color·`currentColor`·color token 참조)인 선언 → `color-decl-new:{base selectors}`. 비색 선언 추가는 허용.
+  5. 짝지어지지 않은 현재 Rule의 custom property가 아닌 선언 중 색 선언 또는 `isColorValue`가 참인 선언 → `color-decl-new:{selectors}`. 예외: selectors가 모두 `:focus-visible`을 포함하고 선언이 `outline`·`outline-offset`뿐이며 `isColorLiteralValue`가 거짓이고 `varRefs`가 모두 colorTokens에 있음.
+  6. custom property가 아닌 비색 선언 값에 `currentColor`·named color가 새로 나타나면(같은 file·chain·selectors·선언이 BASE에 없으면) `color-decl-new:{selectors}`.
 
 step 16 token 보존·통합(`tests/helpers/design-guard-color.js`, 순수, step 13~15 import):
 - `checkColorTokens({ baseRules, currentRules, colorTokens }) → string[]`(custom property 정의만 검사):
@@ -811,7 +814,9 @@ step 16 token 보존·통합(`tests/helpers/design-guard-color.js`, 순수, step
 - `checkColors({ baseRules, currentRules }) = [...checkColorRules(...), ...checkColorTokens(...)]`(colorTokens = `colorTokenSet(baseRules)`).
 
 step 17 서체·asset·token(`tests/helpers/design-guard-css.js`, 순수, step 13~16 import):
-- `checkTypeAndAssets({ baseRules, currentRules }) → string[]`: BASE에 같은 file·chain·selectors·선언으로 없는 `font-family`·`font` 선언과 `@font-face`·`@import` → `font-asset:{selectors|atRule}`; `font-weight` 값이 BASE style.css 값 집합 밖 → `font-weight:{value}`; 새 `url(` → `asset:{selectors|atRule}`; 새 `content` 값이 `none`·`''`·`""`·`normal` 밖 → `content:{selectors}`; `var(--x)`의 x가 BASE 두 파일과 현재의 비색 custom property 정의 어디에도 없으면 → `unknown-token:--x`.
+- `checkTypeAndAssets({ baseRules, currentRules }) → string[]`. 결과 순서: (1) 보존 위반 전부(BASE 등장 순) → (2) 신규 위반(현재 등장 순), 같은 문자열은 한 번만.
+  1. 보존(BASE → 현재): BASE의 `font-family`·`font` 선언(file·chain·selectors·prop·정규화 value)마다, 현재에 같은 file·같은 chain이고 selectors가 BASE selectors와 같거나 추가분이 featured 대응 선택자뿐인 Rule 안에 같은 prop·정규화 value 선언이 없으면 `font-decl-missing:{chain}|{selectors}|{prop}`(chain은 ` > `, selectors는 `, `로 연결). 삭제·선택자 이동·미디어 조건 이동·값 변경 모두 해당.
+  2. 신규(현재 → BASE): BASE에 같은 file·chain·selectors·선언으로 없는 `font-family`·`font` 선언과 `@font-face`·`@import` → `font-asset:{selectors|atRule}`; `font-weight` 값이 BASE style.css 값 집합 밖 → `font-weight:{value}`; 새 `url(` → `asset:{selectors|atRule}`; 새 `content` 값이 `none`·`''`·`""`·`normal` 밖 → `content:{selectors}`; `var(--x)`의 x가 BASE 두 파일과 현재의 비색 custom property 정의 어디에도 없으면 → `unknown-token:--x`.
 - `checkCss({ baseCss, currentCss, baseThemes, currentThemes }) → string[]` = 네 텍스트를 parse해 `[...checkColors(...), ...checkTypeAndAssets(...)]`, 그리고 `currentThemes !== baseThemes`면 `themes-changed`.
 
 step 18 markup·통합(`tests/helpers/design-guard.js`):

@@ -5,7 +5,7 @@
 - read-first: 설계 §5, §7, §8.3, §16(DESIGN_HASH_CHECK 후 `DesktopTop.dc.html`·`Components.dc.html` 읽기 전용), §16.4
 - tracked 허용(exact): `index.html`(`#heroStats` 바로 뒤 `#heroFeatured` 마크업만), `js/data.js`(`featured: true,` 3줄만), `js/main.js`(`renderFeaturedProjects`, `openProjectModal` 시그니처, 위임만), `css/style.css`(`.featured-*` 비색 배치 규칙과 기존 `.project-card` 색 규칙 선택자 목록에 featured 대응 선택자 추가만), `tests/specs/featured.spec.js`
 - runtime: R0
-- 금지: §15.7, 새 색 선언, hero 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
+- 금지: §15.7, 새 색 선언(기존 규칙에 색 선언 추가 포함), hero 순서·tagline·섹션·nav, 기존 tests, 새 target 자동 편입
 
 ## 작업 (TDD)
 
