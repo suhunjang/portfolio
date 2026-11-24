@@ -38,7 +38,10 @@
     {
       "step": 2,
       "name": "scope-snapshot-parse",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T19:27:57+0900",
+      "completed_at": "2026-11-24T19:28:54+0900",
+      "summary": "reverify step2: no-op — SNAP 2 created→reused, scope-snapshot-parse+paths specs 13 passed (desktop-dark), FULL 81 passed, CGATE 2 scope-snapshot: OK; allowed files unchanged"
     },
     {
       "step": 3,
