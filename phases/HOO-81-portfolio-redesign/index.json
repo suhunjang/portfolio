@@ -222,7 +222,10 @@
     {
       "step": 25,
       "name": "content-static-baseline",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-24T20:05:54+0900",
+      "completed_at": "2026-11-24T20:09:19+0900",
+      "summary": "step25: added tests/fixtures/content-exceptions.json (kickers.base/final, titles.base/final, featured.indexes [1,5,7], subsectionTitleFinal '기술 스택'), tests/helpers/content.js extractStatic (append only: norm'd StaticContent title/metaDescription/navLabels(sorted)/heroEyebrow/ctaLabels/kickers/sectionTitles/sectionSubs/aboutParagraphs(.about-text p:not([id]))/aboutPoints/aboutMetaTerms/contactHeading/contactText/footerNote/footerTop), tests/specs/content-static.spec.js (4 tests x 6 projects: exceptions shape, baseline-index.html setContent javaScriptEnabled:false extraction values, synthetic base/final pass + final requires exactly one h3.subsection-title 기술 스택 + mixed/one-char diffs rejected per key + synthetic final HTML extraction passes, live index.html (JS off) = BASE under §5 exceptions); RED confirmed (extractStatic export missing), SNAP 25 created, T content-static 24 passed, FULL 241 passed, VS OK, GATE 25 scope-snapshot: OK"
     },
     {
       "step": 26,
