@@ -1,12 +1,12 @@
-# Step 25: final-fixture-transition
+# Step 25: state-color-remediation-expectation
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Fixture transition only. Step15 initially creates remediation plan; only this step may empty it after verified zero, and only this step empties baseline. `prepare` verifies regular files, evidence SHA, complete scenarios, zero counts and original 139 mapping, then atomically writes baseline `[]` and plan `{"groups":[]}`; any failure leaves both byte-identical. Specs cover tampering and rollback. No browser/screenshots.
+Post-remediation expectation update at step25. Lane generation runs write/check/write/check and asserts deterministic write bytes. Fan-in acceptance is distinct and check-first: capture submitted fixture bytes, run `--check` before any write, then write/check/write/check and require submitted bytes equal both regenerated snapshots. Immutable `tests/fixtures/component-state-colors.base.json` plus fresh git archive is BASE; working fixture is never BASE. Tampered submitted output therefore blocks instead of being healed.
 
 ## Exact write boundary
-final-prepare: tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json, tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
+state-color-remediation: tests/fixtures/component-state-colors.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

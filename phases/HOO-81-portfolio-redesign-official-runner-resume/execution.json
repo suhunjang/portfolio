@@ -405,17 +405,16 @@
       ]
     },
     {
-      "waveId": "state-color-base-fixture-wave",
+      "waveId": "state-color-base-measurement-wave",
       "step": 9,
       "baseSelector": "completedStep:8",
       "emptyAllowed": false,
       "lanes": [
         {
-          "laneId": "state-color-base-fixture",
+          "laneId": "state-color-base-measurement",
           "files": [
             "tests/scripts/make-state-colors.mjs",
-            "tests/fixtures/component-state-colors.base.json",
-            "tests/fixtures/component-state-colors.json",
+            "tests/fixtures/component-state-colors.candidate.json",
             "tests/specs/state-colors.spec.js"
           ],
           "requiredCommands": [
@@ -423,14 +422,12 @@
               "node",
               "tests/scripts/make-state-colors.mjs",
               "--mode",
-              "base-expectation",
+              "base-measurement",
               "--base-ref",
               "5a34759acf16e7beb96c415101c152d6e786c4b3",
-              "--write",
-              "--base-fixture",
-              "tests/fixtures/component-state-colors.base.json",
-              "--fixture",
-              "tests/fixtures/component-state-colors.json",
+              "--measure-write",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
               "--server-root",
               ".",
               "--port",
@@ -440,14 +437,12 @@
               "node",
               "tests/scripts/make-state-colors.mjs",
               "--mode",
-              "base-expectation",
+              "base-measurement",
               "--base-ref",
               "5a34759acf16e7beb96c415101c152d6e786c4b3",
-              "--check",
-              "--base-fixture",
-              "tests/fixtures/component-state-colors.base.json",
-              "--fixture",
-              "tests/fixtures/component-state-colors.json",
+              "--measure-check",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
               "--server-root",
               ".",
               "--port",
@@ -475,9 +470,78 @@
       ]
     },
     {
-      "waveId": "hover-wave",
+      "waveId": "state-color-base-transaction-wave",
       "step": 10,
       "baseSelector": "completedStep:9",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-base-transaction",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/fixtures/component-state-colors.base.json",
+            "tests/fixtures/component-state-colors.json",
+            "tests/specs/state-colors.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "base-fixture-transaction",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
+              "--publish",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--fixture",
+              "tests/fixtures/component-state-colors.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "base-fixture-transaction",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
+              "--check",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--fixture",
+              "tests/fixtures/component-state-colors.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "hover-wave",
+      "step": 11,
+      "baseSelector": "completedStep:10",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -514,8 +578,8 @@
     },
     {
       "waveId": "clamp-wave",
-      "step": 11,
-      "baseSelector": "completedStep:10",
+      "step": 12,
+      "baseSelector": "completedStep:11",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -552,8 +616,8 @@
     },
     {
       "waveId": "focus-modal-wave",
-      "step": 12,
-      "baseSelector": "completedStep:11",
+      "step": 13,
+      "baseSelector": "completedStep:12",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -589,8 +653,8 @@
     },
     {
       "waveId": "focus-lightbox-wave",
-      "step": 13,
-      "baseSelector": "completedStep:12",
+      "step": 14,
+      "baseSelector": "completedStep:13",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -627,8 +691,8 @@
     },
     {
       "waveId": "print-wave",
-      "step": 14,
-      "baseSelector": "completedStep:13",
+      "step": 15,
+      "baseSelector": "completedStep:14",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -664,8 +728,8 @@
     },
     {
       "waveId": "a11y-occurrence-wave",
-      "step": 15,
-      "baseSelector": "completedStep:14",
+      "step": 16,
+      "baseSelector": "completedStep:15",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -724,9 +788,58 @@
       ]
     },
     {
+      "waveId": "a11y-contrast-base-wave",
+      "step": 17,
+      "baseSelector": "completedStep:16",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-contrast-base",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-base.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "collect-contrast-base",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--css",
+              "css/style.css",
+              "--out",
+              "tests/fixtures/axe-contrast-base.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
       "waveId": "a11y-color-derive-wave",
-      "step": 16,
-      "baseSelector": "completedStep:15",
+      "step": 18,
+      "baseSelector": "completedStep:17",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -743,8 +856,8 @@
               "derive-color-changes",
               "--occurrences",
               "tests/fixtures/axe-remediation-occurrences.json",
-              "--base-fixture",
-              "tests/fixtures/component-state-colors.base.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
               "--css",
               "css/style.css",
               "--evidence",
@@ -758,7 +871,9 @@
               "--contrast-algorithm",
               "wcag2-relative-luminance",
               "--min-ratio",
-              "4.5"
+              "4.5",
+              "--token-choice",
+              "minimum-srgb-distance-sum-then-code-unit-token"
             ]
           ],
           "focusedTests": [
@@ -782,8 +897,8 @@
     },
     {
       "waveId": "state-color-remediation-contract-wave",
-      "step": 17,
-      "baseSelector": "completedStep:16",
+      "step": 19,
+      "baseSelector": "completedStep:18",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -834,8 +949,8 @@
     },
     {
       "waveId": "a11y-lifecycle-wave",
-      "step": 18,
-      "baseSelector": "completedStep:17",
+      "step": 20,
+      "baseSelector": "completedStep:19",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -871,8 +986,8 @@
     },
     {
       "waveId": "a11y-live-scan-wave",
-      "step": 19,
-      "baseSelector": "completedStep:18",
+      "step": 21,
+      "baseSelector": "completedStep:20",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -908,8 +1023,8 @@
     },
     {
       "waveId": "a11y-observation-contract-wave",
-      "step": 20,
-      "baseSelector": "completedStep:19",
+      "step": 22,
+      "baseSelector": "completedStep:21",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -948,8 +1063,8 @@
     },
     {
       "waveId": "a11y-color-guard-wave",
-      "step": 21,
-      "baseSelector": "completedStep:20",
+      "step": 23,
+      "baseSelector": "completedStep:22",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1005,8 +1120,8 @@
     },
     {
       "waveId": "a11y-wave",
-      "step": 22,
-      "baseSelector": "completedStep:21",
+      "step": 24,
+      "baseSelector": "completedStep:23",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1103,8 +1218,8 @@
     },
     {
       "waveId": "state-color-remediation-wave",
-      "step": 23,
-      "baseSelector": "completedStep:22",
+      "step": 25,
+      "baseSelector": "completedStep:24",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1142,8 +1257,8 @@
     },
     {
       "waveId": "zero-observation-wave",
-      "step": 24,
-      "baseSelector": "completedStep:23",
+      "step": 26,
+      "baseSelector": "completedStep:25",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1196,8 +1311,8 @@
     },
     {
       "waveId": "final-prepare-wave",
-      "step": 25,
-      "baseSelector": "completedStep:24",
+      "step": 27,
+      "baseSelector": "completedStep:26",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1248,8 +1363,8 @@
     },
     {
       "waveId": "final-verify-wave",
-      "step": 26,
-      "baseSelector": "completedStep:25",
+      "step": 28,
+      "baseSelector": "completedStep:27",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1285,8 +1400,8 @@
     },
     {
       "waveId": "final-screenshot-wave",
-      "step": 27,
-      "baseSelector": "completedStep:26",
+      "step": 29,
+      "baseSelector": "completedStep:28",
       "emptyAllowed": false,
       "lanes": [
         {

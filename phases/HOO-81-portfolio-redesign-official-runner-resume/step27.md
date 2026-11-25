@@ -1,12 +1,12 @@
-# Step 27: final-screenshots
+# Step 27: final-fixture-transition
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Screenshot contract only. `screenshots.spec.js` imports the resolver and uses only its returned directory. Worker/fan-in output is ephemeral under official TMPDIR; coordinator step28 alone writes persistent `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots/HOO-81-screenshots` via explicit environment argv. No descriptor/control access is allowed. Required page/menu/modal PNG names and dimensions remain exact. Worker verification preserves HEAD/tracked diff and permits only its owned spec diff; final-contract clean enforcement is only with explicit --require-clean. The steps8/9/17 temp BASE trees are separately removed in finally.
+Fixture transition only. Step16 initially creates remediation plan; only this step may empty it after verified zero, and only this step empties baseline. `prepare` verifies regular files, evidence SHA, complete scenarios, zero counts and original 139 mapping, then atomically writes baseline `[]` and plan `{"groups":[]}`; any failure leaves both byte-identical. Specs cover tampering and rollback. No browser/screenshots.
 
 ## Exact write boundary
-final-screenshot: tests/specs/screenshots.spec.js
+final-prepare: tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json, tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

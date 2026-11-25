@@ -1,13 +1,12 @@
-# Step 10: component-hover-active
+# Step 10: state-color-base-transaction
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-- Reference-only: `phases/HOO-81-portfolio-redesign-resume/step26.md`, SHA-256 `2d0b13219c2142c37995e87b8faf5f27f5d6f1bd83849d7ef50acc15bd0a8fca`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
-Current contract: desktop-dark/light only. For `.hero-cta .btn`, first `.featured-card` and project cards 0/1, default/hover/active colors equal fixture. Existing button hover remains primary opacity .88 or ghost background/border change; add no color values. Card hover uses transform translateY(-2px), active translateY(0), both opacity 1, transition transform 0.2s var(--ease); outlineColor equals default. Input is Playwright hover and mouse.down/up via measureStateSequence. component-hover.spec.js asserts exact transform/opacity differences and fixture colors.
+BASE fixture transaction only. Read immutable `tests/fixtures/component-state-colors.candidate.json` and atomically publish byte-identical canonical bytes to `tests/fixtures/component-state-colors.base.json` and `tests/fixtures/component-state-colors.json` as one rollback-safe transaction; `--check` is read-only and requires candidate/base/working byte equality. Inject failure after each temporary write and rename and prove both destination bytes roll back exactly. The BASE fixture becomes permanently immutable after this step; only `tests/fixtures/component-state-colors.json` changes later at the dedicated post-remediation writer. No browser, measurement, CSS or candidate generation. <=12 minutes.
 
 ## Exact write boundary
-hover: css/style.css, tests/specs/component-hover.spec.js
+state-color-base-transaction: tests/scripts/make-state-colors.mjs, tests/fixtures/component-state-colors.base.json, tests/fixtures/component-state-colors.json, tests/specs/state-colors.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

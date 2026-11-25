@@ -40,7 +40,9 @@
     "tests/fixtures/axe-remediation-evidence.json",
     "tests/fixtures/axe-zero-observation.json",
     "tests/fixtures/component-state-colors.base.json",
-    "tests/fixtures/axe-remediation-occurrences.json"
+    "tests/fixtures/axe-remediation-occurrences.json",
+    "tests/fixtures/axe-contrast-base.json",
+    "tests/fixtures/component-state-colors.candidate.json"
   ],
   "testCommand": [
     "sh",
@@ -355,7 +357,7 @@
     },
     {
       "step": 9,
-      "name": "state-color-base-fixture",
+      "name": "state-color-base-measurement",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
@@ -366,14 +368,12 @@
           "node",
           "tests/scripts/make-state-colors.mjs",
           "--mode",
-          "base-expectation",
+          "base-measurement",
           "--base-ref",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
-          "--write",
-          "--base-fixture",
-          "tests/fixtures/component-state-colors.base.json",
-          "--fixture",
-          "tests/fixtures/component-state-colors.json",
+          "--measure-write",
+          "--candidate",
+          "tests/fixtures/component-state-colors.candidate.json",
           "--server-root",
           ".",
           "--port",
@@ -383,14 +383,12 @@
           "node",
           "tests/scripts/make-state-colors.mjs",
           "--mode",
-          "base-expectation",
+          "base-measurement",
           "--base-ref",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
-          "--check",
-          "--base-fixture",
-          "tests/fixtures/component-state-colors.base.json",
-          "--fixture",
-          "tests/fixtures/component-state-colors.json",
+          "--measure-check",
+          "--candidate",
+          "tests/fixtures/component-state-colors.candidate.json",
           "--server-root",
           ".",
           "--port",
@@ -413,15 +411,76 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "state-color-base-fixture-wave"
+      "wave": "state-color-base-measurement-wave"
     },
     {
       "step": 10,
+      "name": "state-color-base-transaction",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        9
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "base-fixture-transaction",
+          "--candidate",
+          "tests/fixtures/component-state-colors.candidate.json",
+          "--publish",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "base-fixture-transaction",
+          "--candidate",
+          "tests/fixtures/component-state-colors.candidate.json",
+          "--check",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-base-transaction-wave"
+    },
+    {
+      "step": 11,
       "name": "component-hover-active",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        9
+        10
       ],
       "acceptanceCommands": [
         [
@@ -444,12 +503,12 @@
       "wave": "hover-wave"
     },
     {
-      "step": 11,
+      "step": 12,
       "name": "component-clamp-stripe",
       "estimatedMinutes": 15,
       "timeoutMinutes": 30,
       "dependsOn": [
-        10
+        11
       ],
       "acceptanceCommands": [
         [
@@ -472,12 +531,12 @@
       "wave": "clamp-wave"
     },
     {
-      "step": 12,
+      "step": 13,
       "name": "focus-modal",
       "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
-        11
+        12
       ],
       "acceptanceCommands": [
         [
@@ -499,12 +558,12 @@
       "wave": "focus-modal-wave"
     },
     {
-      "step": 13,
+      "step": 14,
       "name": "focus-lightbox",
       "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
-        12
+        13
       ],
       "acceptanceCommands": [
         [
@@ -526,12 +585,12 @@
       "wave": "focus-lightbox-wave"
     },
     {
-      "step": 14,
+      "step": 15,
       "name": "print-pdf",
       "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
-        13
+        14
       ],
       "acceptanceCommands": [
         [
@@ -553,12 +612,12 @@
       "wave": "print-wave"
     },
     {
-      "step": 15,
+      "step": 16,
       "name": "a11y-occurrence-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        14
+        15
       ],
       "acceptanceCommands": [
         [
@@ -606,12 +665,54 @@
       "wave": "a11y-occurrence-wave"
     },
     {
-      "step": 16,
+      "step": 17,
+      "name": "a11y-contrast-base",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        16
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "collect-contrast-base",
+          "--occurrences",
+          "tests/fixtures/axe-remediation-occurrences.json",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--css",
+          "css/style.css",
+          "--out",
+          "tests/fixtures/axe-contrast-base.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-contrast-base-wave"
+    },
+    {
+      "step": 18,
       "name": "a11y-color-derivation",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        15
+        17
       ],
       "acceptanceCommands": [
         [
@@ -620,8 +721,8 @@
           "derive-color-changes",
           "--occurrences",
           "tests/fixtures/axe-remediation-occurrences.json",
-          "--base-fixture",
-          "tests/fixtures/component-state-colors.base.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
           "--css",
           "css/style.css",
           "--evidence",
@@ -635,7 +736,9 @@
           "--contrast-algorithm",
           "wcag2-relative-luminance",
           "--min-ratio",
-          "4.5"
+          "4.5",
+          "--token-choice",
+          "minimum-srgb-distance-sum-then-code-unit-token"
         ],
         [
           "env",
@@ -656,12 +759,12 @@
       "wave": "a11y-color-derive-wave"
     },
     {
-      "step": 17,
+      "step": 19,
       "name": "state-color-remediation-contract",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        16
+        18
       ],
       "acceptanceCommands": [
         [
@@ -702,12 +805,12 @@
       "wave": "state-color-remediation-contract-wave"
     },
     {
-      "step": 18,
+      "step": 20,
       "name": "a11y-server-lifecycle-contract",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
-        17
+        19
       ],
       "acceptanceCommands": [
         [
@@ -729,12 +832,12 @@
       "wave": "a11y-lifecycle-wave"
     },
     {
-      "step": 19,
+      "step": 21,
       "name": "a11y-live-scan-contract",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        18
+        20
       ],
       "acceptanceCommands": [
         [
@@ -756,12 +859,12 @@
       "wave": "a11y-live-scan-wave"
     },
     {
-      "step": 20,
+      "step": 22,
       "name": "a11y-observation-contract",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        19
+        21
       ],
       "acceptanceCommands": [
         [
@@ -790,12 +893,12 @@
       "wave": "a11y-observation-contract-wave"
     },
     {
-      "step": 21,
+      "step": 23,
       "name": "a11y-color-guard-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        20
+        22
       ],
       "acceptanceCommands": [
         [
@@ -844,12 +947,12 @@
       "wave": "a11y-color-guard-wave"
     },
     {
-      "step": 22,
+      "step": 24,
       "name": "a11y-remediation-wave",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        21
+        23
       ],
       "acceptanceCommands": [
         [
@@ -876,12 +979,12 @@
       "wave": "a11y-wave"
     },
     {
-      "step": 23,
+      "step": 25,
       "name": "state-color-remediation-expectation",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        22
+        24
       ],
       "acceptanceCommands": [
         [
@@ -910,12 +1013,12 @@
       "wave": "state-color-remediation-wave"
     },
     {
-      "step": 24,
+      "step": 26,
       "name": "canonical-zero-observation",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
-        23
+        25
       ],
       "acceptanceCommands": [
         [
@@ -938,12 +1041,12 @@
       "wave": "zero-observation-wave"
     },
     {
-      "step": 25,
+      "step": 27,
       "name": "final-fixture-transition",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        24
+        26
       ],
       "acceptanceCommands": [
         [
@@ -965,12 +1068,12 @@
       "wave": "final-prepare-wave"
     },
     {
-      "step": 26,
+      "step": 28,
       "name": "final-contract-verification",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        25
+        27
       ],
       "acceptanceCommands": [
         [
@@ -992,12 +1095,12 @@
       "wave": "final-verify-wave"
     },
     {
-      "step": 27,
+      "step": 29,
       "name": "final-screenshots",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        26
+        28
       ],
       "acceptanceCommands": [
         [
@@ -1020,31 +1123,31 @@
       "wave": "final-screenshot-wave"
     },
     {
-      "step": 28,
+      "step": 30,
       "name": "canonical-tested-head",
       "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
-        27
+        29
       ],
       "acceptanceCommands": [
         [
           "python3",
           "-I",
           "-c",
-          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"env\", \"PW_PORT=4175\", \"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--server-root\", \".\", \"--forbid-existing-server\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:mobile-dark:null,page:mobile-light:null,page:tablet-dark:null,page:tablet-light:null,page:desktop-dark:null,page:desktop-light:null,modal:desktop-dark:0,modal:desktop-light:0,lightbox:desktop-dark:0,lightbox:desktop-light:0\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"HOO103_SCREENSHOT_OUTPUT_ROOT=/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head\nassert subprocess.check_output(['git','status','--porcelain'],text=True)==''\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
+          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); screenshot_root='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots'; os.makedirs(screenshot_root,mode=0o700,exist_ok=True); st=os.lstat(screenshot_root); assert not os.path.islink(screenshot_root) and os.path.isdir(screenshot_root) and os.path.realpath(screenshot_root)==os.path.abspath(screenshot_root) and os.access(screenshot_root,os.W_OK|os.X_OK)\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"env\", \"PW_PORT=4175\", \"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--server-root\", \".\", \"--forbid-existing-server\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:mobile-dark:null,page:mobile-light:null,page:tablet-dark:null,page:tablet-light:null,page:desktop-dark:null,page:desktop-light:null,modal:desktop-dark:0,modal:desktop-light:0,lightbox:desktop-dark:0,lightbox:desktop-light:0\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"HOO103_SCREENSHOT_OUTPUT_ROOT=/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head\nassert subprocess.check_output(['git','status','--porcelain'],text=True)==''\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
         ]
       ],
       "executor": "sequential",
       "status": "pending"
     },
     {
-      "step": 29,
+      "step": 31,
       "name": "exact-commit-astra-review",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        28
+        30
       ],
       "acceptanceCommands": [
         [
@@ -1058,12 +1161,12 @@
       "status": "pending"
     },
     {
-      "step": 30,
+      "step": 32,
       "name": "publish-open-pr",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        29
+        31
       ],
       "acceptanceCommands": [
         [
@@ -1077,12 +1180,12 @@
       "status": "pending"
     },
     {
-      "step": 31,
+      "step": 33,
       "name": "published-sha-identity",
       "estimatedMinutes": 5,
       "timeoutMinutes": 30,
       "dependsOn": [
-        30
+        32
       ],
       "acceptanceCommands": [
         [
