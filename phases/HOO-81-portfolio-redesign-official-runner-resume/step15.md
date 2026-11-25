@@ -1,12 +1,12 @@
-# Step 15: final-artifact-preparation
+# Step 15: a11y-remediation-wave
 
 ## Current authoritative contract
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-Worker lane prepares final artifacts from the tracked canonical `tests/fixtures/axe-zero-observation.json` created only by step14 fan-in acceptance. It verifies complete scenario/zero counts and observation SHA before setting baseline [] and plan groups[]. Preserve `tests/fixtures/axe-remediation-evidence.json` with original 139 mapping. Validate generated diff and UI specs, but do not require clean before official fan-in commit.
+Two fresh remediation lanes. Each lane requires its owned rule=0 and reads the non-owned rule's approved residual count from immutable evidence; it remains count/identity-equal. Color changes only css/style.css at evidence-listed declarations and passes approved delta guard; nested changes only js/main.js project-card render/event anchors. Preserve keyboard/internal-link/modal/focus. No observation artifact in these lanes.
 
 ## Exact write boundary
-final-artifacts: tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json, tests/specs/screenshots.spec.js, tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
+a11y-color: css/style.css; a11y-nested: js/main.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

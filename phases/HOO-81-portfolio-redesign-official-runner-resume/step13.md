@@ -1,12 +1,12 @@
-# Step 13: integration-a11y-contract
+# Step 13: a11y-evidence-contract
 
 ## Current authoritative contract
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-Canonical integration. Use tracked `tests/fixtures/axe-pairs-inherited.json` and collected fixture. Preserve original mapping in `tests/fixtures/axe-remediation-evidence.json` permanently; remediation plan is mutable completion state. Evidence schema binds 25/139, 12 color/61, 13 nested/78, scenarios, canonical targets, CSS token/role or JS render/event anchors, allowed files, and pre/post status. Reject new rules, missing/duplicate occurrences, empty scenario set, index.html/css/themes.css need. Compute state-color approved remediation delta from evidence, never observed output.
+Evidence-only contract. Use tracked `tests/fixtures/axe-pairs-inherited.json` and collected fixture. Preserve original mapping in `tests/fixtures/axe-remediation-evidence.json` permanently; remediation plan is mutable completion state. Evidence schema is exactly `schemaVersion`, `original`, `scenarios`, `occurrences`, `colorChanges`; original binds 25/139, 12 color/61, 13 nested/78 and both input hashes. Each occurrence has exactly ruleId, scenario, project, target, canonicalTarget, anchor, allowedFile, preStatus, postStatus. Require one unique record per inherited occurrence, nonempty unique scenarios, css/style.css only for contrast, js/main.js only for nested, preStatus present, postStatus pending. Reject new rules, missing/duplicate occurrences, or index.html/css/themes.css need. Plan groups use exact occurrence IDs with full coverage. No remediation or guard implementation here.
 
 ## Exact write boundary
-a11y-contract: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/helpers/design-guard-color-rules.js, tests/specs/design-guard-color-rules.spec.js, tests/fixtures/axe-remediation-plan.json, tests/fixtures/axe-remediation-evidence.json, tests/fixtures/component-state-colors.json
+a11y-evidence: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/fixtures/axe-remediation-plan.json, tests/fixtures/axe-remediation-evidence.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

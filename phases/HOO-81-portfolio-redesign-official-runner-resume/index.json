@@ -8,10 +8,6 @@
     "css/style.css",
     "js/main.js",
     "js/data.js",
-    "tests/scripts/verify-scope.mjs",
-    "tests/specs/verify-scope-resume.spec.js",
-    "tests/playwright.config.js",
-    "tests/specs/smoke.spec.js",
     "tests/scripts/continuation-preflight.mjs",
     "tests/specs/continuation-preflight.spec.js",
     "tests/scripts/verify-a11y-remediation.mjs",
@@ -86,6 +82,19 @@
           "HOO-81-portfolio-redesign-official-runner-resume",
           "--base-head",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--document",
+          "CLAUDE.md:b63e8c71bea72313c7ae312c6c5582e6fd1ccc98b122d2f4ade46f09e65cb8aa",
+          "--document",
+          "docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md:eb229f57acb23bd9a24d990d3c510ec3fb824fc24051909bb02665408cd54e49",
+          "--document",
+          "docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md:351a18f1b6ca30f46606ab25ff310329eeecd8cd4db138d7848a86d414b3ffe1",
+          "--lock",
+          ".harness/harness.lock.json:d7df38b1d032e1c7ef6c535f5257b69a42143ce323baf80cfc9bddee8be62aa3",
+          "--lock",
+          ".harness/install-state.json:a022500410b8a145121b6693f4315dfd90ae9a06f2082621a623ad5a39ec5e7f",
+          "--lock",
+          ".harness/policy.json:ad59822299dee5f9aeaca8dba8ee6232e788b9e66af09c70b1ec4b9ba838aaa0",
+          "--require-plan-execution-binding",
           "--pairs-source",
           "/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json",
           "--pairs-output",
@@ -297,7 +306,9 @@
           "tests/scripts/make-state-colors.mjs",
           "--check",
           "--mode",
-          "base-expectation"
+          "base-expectation",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3"
         ],
         [
           "env",
@@ -457,21 +468,13 @@
     },
     {
       "step": 13,
-      "name": "integration-a11y-contract",
-      "estimatedMinutes": 19,
+      "name": "a11y-evidence-contract",
+      "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
         12
       ],
       "acceptanceCommands": [
-        [
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "test"
-        ],
         [
           "node",
           "tests/scripts/verify-a11y-remediation.mjs",
@@ -499,11 +502,48 @@
           "--reject-new-rules"
         ],
         [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-evidence-wave"
+    },
+    {
+      "step": 14,
+      "name": "a11y-color-guard-contract",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        13
+      ],
+      "acceptanceCommands": [
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
+        ],
+        [
           "node",
           "tests/scripts/make-state-colors.mjs",
           "--check",
           "--mode",
           "approved-remediation-delta",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
           "--remediation",
           "tests/fixtures/axe-remediation-evidence.json"
         ],
@@ -519,20 +559,20 @@
           "playwright",
           "test",
           "specs/design-guard-color-rules.spec.js",
-          "specs/verify-a11y-remediation.spec.js"
+          "specs/state-colors.spec.js"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "integration-a11y-wave"
+      "wave": "a11y-color-guard-wave"
     },
     {
-      "step": 14,
+      "step": 15,
       "name": "a11y-remediation-wave",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        13
+        14
       ],
       "acceptanceCommands": [
         [
@@ -557,43 +597,43 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "a11y-wave",
-      "checks": {
-        "mutation": {
-          "command": [
-            "node",
-            "tests/scripts/verify-a11y-remediation.mjs",
-            "verify-full",
-            "--evidence",
-            "tests/fixtures/axe-remediation-evidence.json",
-            "--expect-color",
-            "0",
-            "--expect-nested",
-            "0",
-            "--scenarios",
-            "page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light",
-            "--require-nonempty-scenario-set",
-            "--write-observation",
-            "tests/fixtures/axe-zero-observation.json"
-          ],
-          "targetPaths": [
-            "tests/fixtures/axe-zero-observation.json"
-          ],
-          "forbiddenPaths": [
-            "index.html",
-            "css/themes.css"
-          ],
-          "requireChanged": true
-        }
-      }
+      "wave": "a11y-wave"
     },
     {
-      "step": 15,
+      "step": 16,
+      "name": "canonical-zero-observation",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        15
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-observation",
+          "--observation",
+          "tests/fixtures/axe-zero-observation.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--expect-color",
+          "0",
+          "--expect-nested",
+          "0",
+          "--require-complete-scenarios"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "zero-observation-wave"
+    },
+    {
+      "step": 17,
       "name": "final-artifact-preparation",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        14
+        16
       ],
       "acceptanceCommands": [
         [
@@ -613,81 +653,12 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "final-artifact-wave",
-      "checks": {
-        "mutation": {
-          "command": [
-            "node",
-            "tests/scripts/verify-final-contract.mjs",
-            "prepare",
-            "--base",
-            "5a34759acf16e7beb96c415101c152d6e786c4b3",
-            "--zero-observation",
-            "tests/fixtures/axe-zero-observation.json",
-            "--evidence",
-            "tests/fixtures/axe-remediation-evidence.json",
-            "--baseline",
-            "tests/fixtures/axe-baseline.json",
-            "--plan",
-            "tests/fixtures/axe-remediation-plan.json",
-            "--preserve-evidence",
-            "tests/fixtures/axe-remediation-evidence.json"
-          ],
-          "targetPaths": [
-            "tests/fixtures/axe-baseline.json",
-            "tests/fixtures/axe-remediation-plan.json"
-          ],
-          "forbiddenPaths": [
-            "tests/fixtures/axe-remediation-evidence.json",
-            "index.html",
-            "css/themes.css"
-          ],
-          "requireChanged": true
-        }
-      }
-    },
-    {
-      "step": 16,
-      "name": "canonical-tested-head",
-      "estimatedMinutes": 20,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        15
-      ],
-      "acceptanceCommands": [
-        [
-          "python3",
-          "-I",
-          "-c",
-          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
-        ]
-      ],
-      "executor": "sequential",
-      "status": "pending"
-    },
-    {
-      "step": 17,
-      "name": "exact-commit-astra-review",
-      "estimatedMinutes": 12,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        16
-      ],
-      "acceptanceCommands": [
-        [
-          "python3",
-          "-I",
-          "-c",
-          "import hashlib,json,os,subprocess,tempfile,time\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); assert tested['head']==head,tested\ncmd=['/Volumes/P9/hoonlabs-data/dev-harness/bin/harness','--project-root','.','cross-review','diff','5a34759acf16e7beb96c415101c152d6e786c4b3']; r=subprocess.run(cmd,text=True,capture_output=True,env={**os.environ,'HARNESS_REVIEW_BACKEND':'codex','HARNESS_REVIEW_MODEL':'gpt-6-astra'}); assert r.returncode==0,(r.stdout,r.stderr); assert r.stdout.strip()=='CLEAN',r.stdout\ndiff=subprocess.check_output(['git','diff','--binary','5a34759acf16e7beb96c415101c152d6e786c4b3..'+head],text=False)\nout={'kind':'HOO-103-exact-commit-review','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'model':'gpt-6-astra','verdict':'CLEAN','scope':'git diff 5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'diffSha256':hashlib.sha256(diff).hexdigest(),'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest(),'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
-        ]
-      ],
-      "executor": "sequential",
-      "status": "pending"
+      "wave": "final-artifact-wave"
     },
     {
       "step": 18,
-      "name": "publish-open-pr",
-      "estimatedMinutes": 8,
+      "name": "canonical-tested-head",
+      "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
         17
@@ -697,7 +668,7 @@
           "python3",
           "-I",
           "-c",
-          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status; assert tested['head']==reviewed['head']==head; assert reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'\nlocal=subprocess.check_output(['git','rev-parse',branch],text=True).strip(); assert local==head,(local,head)\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nr=subprocess.run(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],capture_output=True,text=True)\nif r.returncode!=0:\n if 'no pull requests found' not in (r.stderr+r.stdout).lower(): raise RuntimeError(r.stderr+r.stdout)\n subprocess.run(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Official Harness evidence is recorded in HOO-103.'],check=True)\npr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; assert pr['state']=='OPEN' and pr['baseRefName']=='main' and remote==pr['headRefOid']==head,(remote,pr,head); print(json.dumps(pr))\n"
+          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head\nassert subprocess.check_output(['git','status','--porcelain'],text=True)==''\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
         ]
       ],
       "executor": "sequential",
@@ -705,8 +676,8 @@
     },
     {
       "step": 19,
-      "name": "published-sha-identity",
-      "estimatedMinutes": 5,
+      "name": "exact-commit-astra-review",
+      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         18
@@ -716,7 +687,45 @@
           "python3",
           "-I",
           "-c",
-          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; pr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; assert reviewed['verdict']=='CLEAN'; assert tested['head']==reviewed['head']==head==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['baseRefName']=='main'; print(json.dumps({'testedSha':tested['head'],'reviewedSha':reviewed['head'],'localSha':head,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
+          "import hashlib,json,os,subprocess,tempfile,time\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); assert subprocess.check_output(['git','status','--porcelain'],text=True)==''; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['head']==head and tested['reviewRange']=='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,tested\ncmd=['/Volumes/P9/hoonlabs-data/dev-harness/bin/harness','--project-root','.','cross-review','diff','5a34759acf16e7beb96c415101c152d6e786c4b3']; r=subprocess.run(cmd,text=True,capture_output=True,env={**os.environ,'HARNESS_REVIEW_BACKEND':'codex','HARNESS_REVIEW_MODEL':'gpt-6-astra'}); assert r.returncode==0,(r.stdout,r.stderr); assert r.stdout.strip()=='CLEAN',r.stdout\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head; assert subprocess.check_output(['git','status','--porcelain'],text=True)==''\ndiff=subprocess.check_output(['git','diff','--binary','5a34759acf16e7beb96c415101c152d6e786c4b3..'+head],text=False)\nout={'kind':'HOO-103-exact-commit-review','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'model':'gpt-6-astra','verdict':'CLEAN','scope':'git diff 5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'diffSha256':hashlib.sha256(diff).hexdigest(),'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest(),'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 20,
+      "name": "publish-open-pr",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        19
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['head']==head and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['head']==head and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'\nlocal=subprocess.check_output(['git','rev-parse',branch],text=True).strip(); assert local==head,(local,head)\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nq=subprocess.run(['gh','pr','list','--head',branch,'--base','main','--state','open','--json','url,state,headRefOid,baseRefName'],capture_output=True,text=True); q.check_returncode(); prs=json.loads(q.stdout)\nif not prs:\n subprocess.run(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Official Harness evidence is recorded in HOO-103.'],check=True)\nelif len(prs)!=1: raise RuntimeError('multiple OPEN PRs for exact head/base')\npr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; assert pr['state']=='OPEN' and pr['baseRefName']=='main' and remote==pr['headRefOid']==head,(remote,pr,head); print(json.dumps(pr))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 21,
+      "name": "published-sha-identity",
+      "estimatedMinutes": 5,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        20
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; pr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'; assert tested['head']==reviewed['head']==head==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['baseRefName']=='main'; print(json.dumps({'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','diffSha256':diff,'testedSha':tested['head'],'reviewedSha':reviewed['head'],'localSha':head,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
         ]
       ],
       "executor": "sequential",

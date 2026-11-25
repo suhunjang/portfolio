@@ -5,8 +5,8 @@ Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three feat
 
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step19.md`, SHA-256 `981460e2332b76990088b99ae1a17e7a2c0237c0a6392344cd8b3e8edeff66af`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
 ### Current carried-forward requirements from historical boundary 19 (authoritative, not a command)
-2. `DI`(`DesktopTop.dc.html`·`Mobile.dc.html` 읽기만). RED spec(6 project): 상수 `STAT_ITEM`·`STAT_VALUE`·`STAT_LABEL`; 직계 자식 원 §3 순서; `#heroTagline` = `PROFILE.tagline`; CTA·eyebrow·typed·`#heroFeatured` role·label 유지; STATS 375 2×2·768/1280 4×1, featured 1/2/3열; desktop-dark/light `expectInFirstScreen` = 원 §3 첫 화면 AC 전부.
-Current contract: #hero/.hero-inner/.hero-summary/.hero-cta/.hero-stats only; preserve text and IA. No-op forbidden; focused spec required.
+
+Current contract: `.hero-inner` direct children are exactly eyebrow, `#heroName`, `#heroTagline`, `#typed`, `#heroSummary`, `.hero-cta`, `#heroStats`, `#heroFeatured` in that order; tagline equals `PROFILE.tagline`. `#heroStats` is 2x2 at 375 and 4x1 at 768/1280; featured is 1/2/3 columns at 375/768/1280. At 1280x800 after `document.fonts.ready` and scrollY=0, `#heroName`, `#heroTagline`, all 4 STATS item/value/label pairs, and all 3 featured titles have positive boxes fully inside the viewport, visible ancestors, opacity 1, and STATS text/order exactly matches `STATS[0..3]`. Preserve text and IA. No-op forbidden.
 
 ## Exact write boundary
 hero: index.html, js/main.js, css/style.css, tests/specs/hero.spec.js

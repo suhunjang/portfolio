@@ -23,6 +23,19 @@
               "HOO-81-portfolio-redesign-official-runner-resume",
               "--base-head",
               "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--document",
+              "CLAUDE.md:b63e8c71bea72313c7ae312c6c5582e6fd1ccc98b122d2f4ade46f09e65cb8aa",
+              "--document",
+              "docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md:eb229f57acb23bd9a24d990d3c510ec3fb824fc24051909bb02665408cd54e49",
+              "--document",
+              "docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md:351a18f1b6ca30f46606ab25ff310329eeecd8cd4db138d7848a86d414b3ffe1",
+              "--lock",
+              ".harness/harness.lock.json:d7df38b1d032e1c7ef6c535f5257b69a42143ce323baf80cfc9bddee8be62aa3",
+              "--lock",
+              ".harness/install-state.json:a022500410b8a145121b6693f4315dfd90ae9a06f2082621a623ad5a39ec5e7f",
+              "--lock",
+              ".harness/policy.json:ad59822299dee5f9aeaca8dba8ee6232e788b9e66af09c70b1ec4b9ba838aaa0",
+              "--require-plan-execution-binding",
               "--pairs-source",
               "/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json",
               "--pairs-output",
@@ -546,21 +559,18 @@
       ]
     },
     {
-      "waveId": "integration-a11y-wave",
+      "waveId": "a11y-evidence-wave",
       "step": 13,
       "baseSelector": "completedStep:12",
       "emptyAllowed": false,
       "lanes": [
         {
-          "laneId": "a11y-contract",
+          "laneId": "a11y-evidence",
           "files": [
             "tests/scripts/verify-a11y-remediation.mjs",
             "tests/specs/verify-a11y-remediation.spec.js",
-            "tests/helpers/design-guard-color-rules.js",
-            "tests/specs/design-guard-color-rules.spec.js",
             "tests/fixtures/axe-remediation-plan.json",
-            "tests/fixtures/axe-remediation-evidence.json",
-            "tests/fixtures/component-state-colors.json"
+            "tests/fixtures/axe-remediation-evidence.json"
           ],
           "requiredCommands": [
             [
@@ -602,8 +612,46 @@
               "exec",
               "playwright",
               "test",
-              "specs/verify-a11y-remediation.spec.js",
-              "specs/design-guard-color-rules.spec.js"
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-color-guard-wave",
+      "step": 14,
+      "baseSelector": "completedStep:13",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-color-guard",
+          "files": [
+            "tests/helpers/design-guard-color-rules.js",
+            "tests/specs/design-guard-color-rules.spec.js",
+            "tests/fixtures/component-state-colors.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/design-guard-color-rules.spec.js",
+              "specs/state-colors.spec.js"
             ]
           ],
           "maxAttempts": 2
@@ -612,15 +660,14 @@
     },
     {
       "waveId": "a11y-wave",
-      "step": 14,
-      "baseSelector": "completedStep:13",
+      "step": 15,
+      "baseSelector": "completedStep:14",
       "emptyAllowed": false,
       "lanes": [
         {
           "laneId": "a11y-color",
           "files": [
-            "css/style.css",
-            "tests/fixtures/axe-zero-observation.json"
+            "css/style.css"
           ],
           "requiredCommands": [
             [
@@ -701,9 +748,58 @@
       ]
     },
     {
+      "waveId": "zero-observation-wave",
+      "step": 16,
+      "baseSelector": "completedStep:15",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "zero-observation",
+          "files": [
+            "tests/fixtures/axe-zero-observation.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "verify-full",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expect-color",
+              "0",
+              "--expect-nested",
+              "0",
+              "--scenarios",
+              "page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light",
+              "--require-nonempty-scenario-set",
+              "--write-observation",
+              "tests/fixtures/axe-zero-observation.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "verify-observation",
+              "--observation",
+              "tests/fixtures/axe-zero-observation.json",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expect-color",
+              "0",
+              "--expect-nested",
+              "0",
+              "--require-complete-scenarios"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
       "waveId": "final-artifact-wave",
-      "step": 15,
-      "baseSelector": "completedStep:14",
+      "step": 17,
+      "baseSelector": "completedStep:16",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -718,7 +814,20 @@
           "requiredCommands": [
             [
               "node",
-              "tests/scripts/verify-scope.mjs"
+              "tests/scripts/verify-final-contract.mjs",
+              "prepare",
+              "--base",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--zero-observation",
+              "tests/fixtures/axe-zero-observation.json",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--baseline",
+              "tests/fixtures/axe-baseline.json",
+              "--plan",
+              "tests/fixtures/axe-remediation-plan.json",
+              "--preserve-evidence",
+              "tests/fixtures/axe-remediation-evidence.json"
             ]
           ],
           "focusedTests": [

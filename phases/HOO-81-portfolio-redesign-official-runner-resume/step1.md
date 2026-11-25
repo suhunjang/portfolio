@@ -5,7 +5,6 @@ Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three feat
 
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step18.md`, SHA-256 `2257f62944d6ec4ca95c96f8144a3c4463c2b1ee7030f759f7ae7d896b116cc9`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
 ### Current carried-forward requirements from historical boundary 18 (authoritative, not a command)
-2. `DI`(이후 `DesktopTop.dc.html`·`Components.dc.html` 읽기만). RED spec(6 project): 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트, span block, background-image none; click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`는 grid만; `.featured-card` 색 3속성 = `#projectGrid .project-card`.
 3. 구현(`esc()`, 그리드 직후). axe 새 target은 색 변경 없이 해결, 식별 손실이면 중단·재계획.
 Current contract: existing records 1,5,7 only; #heroFeatured immediately after #heroStats; renderFeaturedProjects() delegates to unchanged openProjectModal(idx); featured buttons contain no nested interactive; click/Enter/modal close restores trigger focus. No-op forbidden; focused spec must be added.
 
