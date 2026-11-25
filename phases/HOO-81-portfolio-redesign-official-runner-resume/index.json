@@ -645,6 +645,14 @@
           "tests/fixtures/axe-remediation-occurrences.json",
           "--css",
           "css/style.css",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR",
           "--map",
           "tests/fixtures/axe-contrast-change-units.json",
           "--expect-color",
@@ -687,6 +695,12 @@
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
           "--css",
           "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4189",
+          "--temp-root-env",
+          "TMPDIR",
           "--measurements",
           "tests/fixtures/axe-contrast-measurements.json",
           "--expect-color",
@@ -725,6 +739,8 @@
           "verify-contrast-base",
           "--occurrences",
           "tests/fixtures/axe-remediation-occurrences.json",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
           "--measurements",
           "tests/fixtures/axe-contrast-measurements.json",
           "--css",
@@ -1262,7 +1278,7 @@
           "python3",
           "-I",
           "-c",
-          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['head']==head and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['head']==head and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'\nlocal=subprocess.check_output(['git','rev-parse',branch],text=True).strip(); assert local==head,(local,head)\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nq=subprocess.run(['gh','pr','list','--head',branch,'--base','main','--state','open','--json','url,state,headRefOid,baseRefName'],capture_output=True,text=True); q.check_returncode(); prs=json.loads(q.stdout)\nif not prs:\n subprocess.run(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Official Harness evidence is recorded in HOO-103.'],check=True)\nelif len(prs)!=1: raise RuntimeError('multiple OPEN PRs for exact head/base')\npr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; assert pr['state']=='OPEN' and pr['baseRefName']=='main' and remote==pr['headRefOid']==head,(remote,pr,head); print(json.dumps(pr))\n"
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['head']==head and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['head']==head and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'\nlocal=subprocess.check_output(['git','rev-parse',branch],text=True).strip(); assert local==head,(local,head)\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nq=subprocess.run(['gh','pr','list','--head',branch,'--base','main','--state','open','--json','number,url,state,headRefName,headRefOid,baseRefName'],capture_output=True,text=True); q.check_returncode(); prs=json.loads(q.stdout)\nif not prs:\n pr_id=subprocess.check_output(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Official Harness evidence is recorded in HOO-103.'],text=True).strip()\nelif len(prs)!=1: raise RuntimeError('multiple OPEN PRs for exact head/base')\nelse: pr_id=str(prs[0]['number'])\npr=json.loads(subprocess.check_output(['gh','pr','view',pr_id,'--json','number,url,state,headRefName,headRefOid,baseRefName'],text=True)); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; assert pr['state']=='OPEN' and pr['headRefName']==branch and pr['baseRefName']=='main' and remote==pr['headRefOid']==head,(remote,pr,head); print(json.dumps(pr))\n"
         ]
       ],
       "executor": "sequential",
@@ -1281,7 +1297,7 @@
           "python3",
           "-I",
           "-c",
-          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); local_branch=subprocess.check_output(['git','rev-parse','refs/heads/'+branch],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; pr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'; assert tested['head']==reviewed['head']==head==local_branch==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['baseRefName']=='main'; print(json.dumps({'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','diffSha256':diff,'testedSha':tested['head'],'reviewedSha':reviewed['head'],'headSha':head,'localBranchSha':local_branch,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); local_branch=subprocess.check_output(['git','rev-parse','refs/heads/'+branch],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; prs=json.loads(subprocess.check_output(['gh','pr','list','--head',branch,'--base','main','--state','open','--json','number,url,state,headRefName,headRefOid,baseRefName'],text=True)); assert len(prs)==1,prs; pr_id=str(prs[0]['number']); pr=json.loads(subprocess.check_output(['gh','pr','view',pr_id,'--json','number,url,state,headRefName,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'; assert tested['head']==reviewed['head']==head==local_branch==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['headRefName']==branch and pr['baseRefName']=='main'; print(json.dumps({'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','diffSha256':diff,'testedSha':tested['head'],'reviewedSha':reviewed['head'],'headSha':head,'localBranchSha':local_branch,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'prNumber':pr['number'],'pr':pr['url']}))\n"
         ]
       ],
       "executor": "sequential",
