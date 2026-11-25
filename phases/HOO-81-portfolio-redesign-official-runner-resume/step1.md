@@ -6,10 +6,10 @@ Always-on preparation: before each worker acts, read CLAUDE.md and both pinned d
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step18.md`, SHA-256 `2257f62944d6ec4ca95c96f8144a3c4463c2b1ee7030f759f7ae7d896b116cc9`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
 ### Current carried-forward requirements from historical boundary 18 (authoritative, not a command)
 3. 구현(`esc()`, 그리드 직후). axe 새 target은 색 변경 없이 해결, 식별 손실이면 중단·재계획.
-Current contract: existing records 1,5,7 only; #heroFeatured immediately after #heroStats; renderFeaturedProjects() delegates to unchanged openProjectModal(idx); featured buttons contain no nested interactive; click/Enter/modal close restores trigger focus. No-op forbidden; focused spec must be added.
+Current contract: existing records 1,5,7 only; in js/data.js add exactly one `featured: true,` line to each of PROJECTS indices 1,5,7 and change no other data line/field/order; final verify-scope must observe exactly these three added lines. #heroFeatured immediately after #heroStats; renderFeaturedProjects() delegates to unchanged openProjectModal(idx); featured buttons contain no nested interactive; click/Enter/modal close restores trigger focus. No-op forbidden; focused spec must be added.
 
 ## Exact write boundary
-featured: index.html, js/main.js, css/style.css, tests/specs/featured.spec.js
+featured: index.html, js/data.js, js/main.js, css/style.css, tests/specs/featured.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

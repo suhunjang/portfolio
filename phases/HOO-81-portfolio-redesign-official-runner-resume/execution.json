@@ -82,6 +82,7 @@
           "laneId": "featured",
           "files": [
             "index.html",
+            "js/data.js",
             "js/main.js",
             "css/style.css",
             "tests/specs/featured.spec.js"
