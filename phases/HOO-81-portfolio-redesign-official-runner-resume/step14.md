@@ -1,12 +1,12 @@
-# Step 14: a11y-color-guard-contract
+# Step 14: a11y-live-verifier-contract
 
 ## Current authoritative contract
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-Color-guard/delta contract only. Keep base fixture byte-identical. Implement design guard and validate step7 approved delta with `--validate`; do not compare future fixture/current DOM. Every colorChanges entry maps to its occurrence ID, existing css/style.css declaration/token/role and exact theme/state; duplicate, unknown, new-literal or theme-file entries fail. FULL and focused positive/negative tests run. Do not edit css/style.css, js/main.js, evidence, plan, or component-state-colors fixture.
+Live verifier CLI contract only, using frozen evidence from step13. Implement verify-lane, verify-full, verify-observation and self-test-live. Each live invocation binds server root to its current worktree realpath, requires its PW_PORT to be free, starts its own server/browser, refuses an existing server even if responsive, and kills only its recorded child PID/process group in finally. verify-lane expands evidence scenarios, requires owned=0 and exact non-owned IDs, writes nothing and prints JSON. verify-full requires both zero, supports exactly one of write-observation or observation-stdout, rejects new rules and writes only the declared observation. verify-observation is browser-free read-only schema/hash/count/scenario validation. Setup/browser error exit2, validation exit1, success0. Tests cover ports 4175/4176 isolation, occupied-port refusal, cross-worktree root mismatch, child-only cleanup, new rule, missing scenario, duplicate ID and no-write behavior.
 
 ## Exact write boundary
-a11y-color-guard: tests/helpers/design-guard-color-rules.js, tests/specs/design-guard-color-rules.spec.js
+a11y-verifier: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

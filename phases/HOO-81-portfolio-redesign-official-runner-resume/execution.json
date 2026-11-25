@@ -620,9 +620,49 @@
       ]
     },
     {
-      "waveId": "a11y-color-guard-wave",
+      "waveId": "a11y-verifier-wave",
       "step": 14,
       "baseSelector": "completedStep:13",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-verifier",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "self-test-live",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-color-guard-wave",
+      "step": 15,
+      "baseSelector": "completedStep:14",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -659,8 +699,8 @@
     },
     {
       "waveId": "a11y-wave",
-      "step": 15,
-      "baseSelector": "completedStep:14",
+      "step": 16,
+      "baseSelector": "completedStep:15",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -670,6 +710,8 @@
           ],
           "requiredCommands": [
             [
+              "env",
+              "PW_PORT=4175",
               "node",
               "tests/scripts/verify-a11y-remediation.mjs",
               "verify-lane",
@@ -681,7 +723,10 @@
               "0",
               "--expect-other-from-evidence",
               "--scenarios",
-              "all"
+              "all",
+              "--server-root",
+              ".",
+              "--forbid-existing-server"
             ]
           ],
           "focusedTests": [
@@ -708,6 +753,8 @@
           ],
           "requiredCommands": [
             [
+              "env",
+              "PW_PORT=4176",
               "node",
               "tests/scripts/verify-a11y-remediation.mjs",
               "verify-lane",
@@ -719,7 +766,10 @@
               "0",
               "--expect-other-from-evidence",
               "--scenarios",
-              "all"
+              "all",
+              "--server-root",
+              ".",
+              "--forbid-existing-server"
             ]
           ],
           "focusedTests": [
@@ -747,8 +797,8 @@
     },
     {
       "waveId": "state-color-remediation-wave",
-      "step": 16,
-      "baseSelector": "completedStep:15",
+      "step": 17,
+      "baseSelector": "completedStep:16",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -791,8 +841,8 @@
     },
     {
       "waveId": "zero-observation-wave",
-      "step": 17,
-      "baseSelector": "completedStep:16",
+      "step": 18,
+      "baseSelector": "completedStep:17",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -840,8 +890,8 @@
     },
     {
       "waveId": "final-artifact-wave",
-      "step": 18,
-      "baseSelector": "completedStep:17",
+      "step": 19,
+      "baseSelector": "completedStep:18",
       "emptyAllowed": false,
       "lanes": [
         {

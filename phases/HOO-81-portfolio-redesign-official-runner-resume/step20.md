@@ -1,9 +1,9 @@
-# Step 20: exact-commit-astra-review
+# Step 20: canonical-tested-head
 
 ## Current authoritative contract
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-Coordinator-only. Read tested.json and require its HEAD=current clean HEAD and implementationBase=`5a34759acf16e7beb96c415101c152d6e786c4b3`. Run GPT-6 Astra over the complete implementation range `git diff 5a34759acf16e7beb96c415101c152d6e786c4b3..HEAD`; accept stdout exactly CLEAN. Atomically write `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json` with base/head, diff SHA-256, model, exact scope, CLEAN verdict and output hashes. Findings or ambiguous output block.
+Coordinator-only after runner commits step19 fan-in. At clean HEAD, rerun FULL, fixed-scenario fresh zero read-only, screenshots/final contract and --require-clean. Capture HEAD/status before and after and refuse evidence on change. Atomically write external `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json` with implementation base `5a34759acf16e7beb96c415101c152d6e786c4b3`, tested HEAD, `5a34759acf16e7beb96c415101c152d6e786c4b3..HEAD` and command hashes.
 
 ## Exact write boundary
 No repository writes; external release-gate evidence/actions only.
