@@ -788,13 +788,62 @@
       ]
     },
     {
-      "waveId": "a11y-contrast-base-wave",
+      "waveId": "a11y-contrast-measurement-wave",
       "step": 17,
       "baseSelector": "completedStep:16",
       "emptyAllowed": false,
       "lanes": [
         {
-          "laneId": "a11y-contrast-base",
+          "laneId": "a11y-contrast-measurement",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-measurements.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "collect-contrast-measurements",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--css",
+              "css/style.css",
+              "--out",
+              "tests/fixtures/axe-contrast-measurements.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-contrast-validation-wave",
+      "step": 18,
+      "baseSelector": "completedStep:17",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-contrast-validation",
           "files": [
             "tests/scripts/verify-a11y-remediation.mjs",
             "tests/specs/verify-a11y-remediation.spec.js",
@@ -804,11 +853,11 @@
             [
               "node",
               "tests/scripts/verify-a11y-remediation.mjs",
-              "collect-contrast-base",
+              "validate-contrast-base",
               "--occurrences",
               "tests/fixtures/axe-remediation-occurrences.json",
-              "--base-ref",
-              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--measurements",
+              "tests/fixtures/axe-contrast-measurements.json",
               "--css",
               "css/style.css",
               "--out",
@@ -838,8 +887,8 @@
     },
     {
       "waveId": "a11y-color-derive-wave",
-      "step": 18,
-      "baseSelector": "completedStep:17",
+      "step": 19,
+      "baseSelector": "completedStep:18",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -897,12 +946,84 @@
     },
     {
       "waveId": "state-color-remediation-contract-wave",
-      "step": 19,
-      "baseSelector": "completedStep:18",
+      "step": 20,
+      "baseSelector": "completedStep:19",
       "emptyAllowed": false,
       "lanes": [
         {
           "laneId": "state-color-remediation-contract",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/specs/state-colors.spec.js",
+            "tests/fixtures/component-state-colors.remediation-expected.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "approved-remediation-expectation",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--derive",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "approved-remediation-expectation",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--validate",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-remediation-apply-wave",
+      "step": 21,
+      "baseSelector": "completedStep:20",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation-apply",
           "files": [
             "tests/scripts/make-state-colors.mjs",
             "tests/specs/state-colors.spec.js"
@@ -912,16 +1033,12 @@
               "node",
               "tests/scripts/make-state-colors.mjs",
               "--mode",
-              "approved-remediation-delta",
-              "--base-ref",
-              "5a34759acf16e7beb96c415101c152d6e786c4b3",
-              "--remediation",
-              "tests/fixtures/axe-remediation-evidence.json",
-              "--validate",
+              "approved-remediation-apply",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--self-test-atomic-live",
               "--base-fixture",
               "tests/fixtures/component-state-colors.base.json",
-              "--fixture",
-              "tests/fixtures/component-state-colors.json",
               "--server-root",
               ".",
               "--port",
@@ -949,8 +1066,8 @@
     },
     {
       "waveId": "a11y-lifecycle-wave",
-      "step": 20,
-      "baseSelector": "completedStep:19",
+      "step": 22,
+      "baseSelector": "completedStep:21",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -986,8 +1103,8 @@
     },
     {
       "waveId": "a11y-live-scan-wave",
-      "step": 21,
-      "baseSelector": "completedStep:20",
+      "step": 23,
+      "baseSelector": "completedStep:22",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1023,8 +1140,8 @@
     },
     {
       "waveId": "a11y-observation-contract-wave",
-      "step": 22,
-      "baseSelector": "completedStep:21",
+      "step": 24,
+      "baseSelector": "completedStep:23",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1063,8 +1180,8 @@
     },
     {
       "waveId": "a11y-color-guard-wave",
-      "step": 23,
-      "baseSelector": "completedStep:22",
+      "step": 25,
+      "baseSelector": "completedStep:24",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1082,16 +1199,16 @@
               "node",
               "tests/scripts/make-state-colors.mjs",
               "--mode",
-              "approved-remediation-delta",
+              "approved-remediation-expectation",
               "--base-ref",
               "5a34759acf16e7beb96c415101c152d6e786c4b3",
               "--remediation",
               "tests/fixtures/axe-remediation-evidence.json",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
               "--validate",
               "--base-fixture",
               "tests/fixtures/component-state-colors.base.json",
-              "--fixture",
-              "tests/fixtures/component-state-colors.json",
               "--server-root",
               ".",
               "--port",
@@ -1120,8 +1237,8 @@
     },
     {
       "waveId": "a11y-wave",
-      "step": 24,
-      "baseSelector": "completedStep:23",
+      "step": 26,
+      "baseSelector": "completedStep:25",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1218,8 +1335,8 @@
     },
     {
       "waveId": "state-color-remediation-wave",
-      "step": 25,
-      "baseSelector": "completedStep:24",
+      "step": 27,
+      "baseSelector": "completedStep:26",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1232,7 +1349,7 @@
               "python3",
               "-I",
               "-c",
-              "from pathlib import Path\nimport subprocess\np=Path('tests/fixtures/component-state-colors.json')\ncmds=[[\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-delta\", \"--base-ref\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--remediation\", \"tests/fixtures/axe-remediation-evidence.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-delta\", \"--base-ref\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--remediation\", \"tests/fixtures/axe-remediation-evidence.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-delta\", \"--base-ref\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--remediation\", \"tests/fixtures/axe-remediation-evidence.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-delta\", \"--base-ref\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--remediation\", \"tests/fixtures/axe-remediation-evidence.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"]]\nsnap=[]\nfor i,cmd in enumerate(cmds):\n subprocess.run(cmd,check=True)\n if i in (0,2): snap.append(p.read_bytes())\nassert len(snap)==2 and snap[0]==snap[1], 'approved-remediation-delta write is not byte-idempotent'\n"
+              "from pathlib import Path\nimport subprocess\np=Path('tests/fixtures/component-state-colors.json')\ncmds=[[\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"]]\nsnap=[]\nfor i,cmd in enumerate(cmds):\n subprocess.run(cmd,check=True)\n if i in (0,2): snap.append(p.read_bytes())\nassert len(snap)==2 and snap[0]==snap[1], 'approved-remediation-delta write is not byte-idempotent'\n"
             ]
           ],
           "focusedTests": [
@@ -1257,8 +1374,8 @@
     },
     {
       "waveId": "zero-observation-wave",
-      "step": 26,
-      "baseSelector": "completedStep:25",
+      "step": 28,
+      "baseSelector": "completedStep:27",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1311,8 +1428,8 @@
     },
     {
       "waveId": "final-prepare-wave",
-      "step": 27,
-      "baseSelector": "completedStep:26",
+      "step": 29,
+      "baseSelector": "completedStep:28",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1363,8 +1480,8 @@
     },
     {
       "waveId": "final-verify-wave",
-      "step": 28,
-      "baseSelector": "completedStep:27",
+      "step": 30,
+      "baseSelector": "completedStep:29",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1400,8 +1517,8 @@
     },
     {
       "waveId": "final-screenshot-wave",
-      "step": 29,
-      "baseSelector": "completedStep:28",
+      "step": 31,
+      "baseSelector": "completedStep:30",
       "emptyAllowed": false,
       "lanes": [
         {

@@ -1,12 +1,12 @@
-# Step 26: canonical-zero-observation
+# Step 26: a11y-remediation-wave
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Single-owner observation lane at step26. Run the actual step21 shared expansion, require both rules zero, and produce `tests/fixtures/axe-zero-observation.json` using exactly the step22 schema. Acceptance invokes verify-observation with the complete scenario requirement, proving this consumer uses the same ordered expansion. No css/js/baseline/plan writes.
+Two fresh remediation lanes. Workers run only own lane commands on ports 4175/4176. Detached staging runs step26 acceptance once before commit publication. Each lane requires owned rule=0 and exact non-owned residual identity from evidence. Color changes only css/style.css; nested changes only js/main.js. Preserve keyboard/internal-link/modal/focus. No observation artifact.
 
 ## Exact write boundary
-zero-observation: tests/fixtures/axe-zero-observation.json
+a11y-color: css/style.css; a11y-nested: js/main.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

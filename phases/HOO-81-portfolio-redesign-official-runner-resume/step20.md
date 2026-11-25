@@ -1,12 +1,12 @@
-# Step 20: a11y-server-lifecycle-contract
+# Step 20: state-color-remediation-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Server/browser lifecycle only. Implement reusable owned-child lifecycle in verify-a11y-remediation: bind root to current worktree realpath, require PW_PORT free, refuse any listener, start one child process group and browser, and kill only recorded child/group in finally. Specs independently exercise ports 4175/4176, cross-worktree mismatch, occupied port, setup failure and child-only cleanup. No scan/observation semantics yet.
+Remediation expectation derivation only. Strict mode `approved-remediation-expectation` accepts exactly base-ref, remediation, expected-fixture, base-fixture, server-root, port and one of derive/validate. `--derive` validates evidence change-unit decisions, immutable BASE identity, token/state/conflict/path links and deterministically writes canonical `tests/fixtures/component-state-colors.remediation-expected.json`; it never writes the working fixture or checks live DOM. `--validate` is read-only and must be the first fan-in AC, rejecting a bad submitted expected fixture before any generation. Reconstruct BASE via step8 lifecycle and require `tests/fixtures/component-state-colors.base.json` equality. Lane runs derive then validate; fan-in runs validate only. Specs cover conflict, missing state/unit, token/path mismatch, immutable BASE drift, canonical determinism and failure preservation. <=16 minutes.
 
 ## Exact write boundary
-a11y-lifecycle: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js
+state-color-remediation-contract: tests/scripts/make-state-colors.mjs, tests/specs/state-colors.spec.js, tests/fixtures/component-state-colors.remediation-expected.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

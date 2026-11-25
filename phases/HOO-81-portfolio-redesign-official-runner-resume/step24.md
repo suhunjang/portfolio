@@ -1,12 +1,12 @@
-# Step 24: a11y-remediation-wave
+# Step 24: a11y-observation-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Two fresh remediation lanes. Workers run only own lane commands on ports 4175/4176. Detached staging runs step24 acceptance once before commit publication. Each lane requires owned rule=0 and exact non-owned residual identity from evidence. Color changes only css/style.css; nested changes only js/main.js. Preserve keyboard/internal-link/modal/focus. No observation artifact.
+Observation validation atop completed steps22-23. Implement browser-free read-only verify-observation plus self-test-live and prove this now-existing observation consumer calls the exact step23 expandScenarios helper. Observation has exactly schemaVersion, evidenceSha256, scenarios, collectionPayload, collectionOutputSha256; results are in exact helper order with sorted unique IDs. Canonical payload uses recursive code-unit-sorted object keys, preserved arrays, compact UTF-8 JSON and SHA-256. Validate evidence SHA, complete scenarios, counts, IDs and payload hash; payload/SHA tamper and duplicate/missing/reordered scenarios fail. Do not test future step28/32 consumers here. No mutation.
 
 ## Exact write boundary
-a11y-color: css/style.css; a11y-nested: js/main.js
+a11y-observation-contract: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

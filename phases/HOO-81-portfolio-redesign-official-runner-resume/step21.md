@@ -1,12 +1,12 @@
-# Step 21: a11y-live-scan-contract
+# Step 21: state-color-remediation-apply-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Live scan only atop step20 lifecycle. Implement exact `expandScenarios` and use it now only in verify-lane and verify-full; do not require future step22/26/30 consumers before they exist. Ordered expansion is page mobile-dark/light, tablet-dark/light, desktop-dark/light with projectIndex null; modal desktop-dark/light projectIndex 0 from grid card 0; lightbox desktop-dark/light projectIndex 0 from that modal's first shot. Every scenario runs preparePage before overlay preparation. This step's specs prove exact input/output order and that current verify-lane/verify-full share the helper; omission, duplication, reordering or another index fails. verify-lane requires owned=0 and exact non-owned IDs, writes nothing and prints deterministic JSON. verify-full requires both zero, rejects new rules and supports exactly one output mode. No observation validator yet.
+Remediation apply/check implementation only, consuming validated `tests/fixtures/component-state-colors.remediation-expected.json` from step20. Strict `approved-remediation-apply` implements atomic `--write`, read-only `--check`, and `--self-test-atomic-live`. This step's lane and fan-in run only self-test against process-owned temporary fixture/server data: inject each temp-write/rename/live-DOM/setup failure, prove prior bytes preserved and unrelated files/processes untouched, and prove check detects fixture or live mismatch. It does not mutate tracked `tests/fixtures/component-state-colors.json` yet. Actual tracked write/check runs only at the dedicated post-remediation expectation step after product remediation. <=14 minutes.
 
 ## Exact write boundary
-a11y-live-scan: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js
+state-color-remediation-apply: tests/scripts/make-state-colors.mjs, tests/specs/state-colors.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
