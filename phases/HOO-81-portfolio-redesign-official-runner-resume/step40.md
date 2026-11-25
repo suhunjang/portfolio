@@ -1,12 +1,12 @@
-# Step 40: final-contract-verification
+# Step 40: final-transition-manifest-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Read-only final browser contract on the detached Step40 candidate. Run menu/modal assertions with `--candidate-diff-only --no-clean-tree-check`; do not require a clean git status because Step40's own submitted script/spec diff is intentionally uncommitted. `--require-clean` is forbidden in worker/fan-in and is reserved for coordinator Step42 after Step41 fan-in commit publication. Resolver takes explicit HOO103_SCREENSHOT_OUTPUT_ROOT or TMPDIR, requires absolute existing non-symlink writable root, and returns its HOO-81-screenshots child. Menu mobile-dark means viewport 375x812 dark theme: button opens visible nav and aria-expanded=true; Escape hides nav, sets false and restores button focus. For projects 1,5,7,0,2,12 at desktop-dark 1280x800, each trigger opens the matching visible dialog/title/full content, focus starts inside, Tab and Shift+Tab wrap, and close button, backdrop, and Escape each close and restore that exact trigger. CLI project list order is exact; omission/extra/wrong identity/focus fails.
+Transition-manifest implementation only. Implement and self-test prepare-transition-manifest/verify-transition-manifest against process-owned temporary fixture data; prove exact input-hash/original-139/schema/tamper behavior and read-only verification. Do not write tracked `tests/fixtures/final-transition-ready.json`, mutate baseline/plan, implement the transaction, or run browser/menu/modal checks. <=8 minutes.
 
 ## Exact write boundary
-final-verify: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
+final-transition-manifest-contract: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

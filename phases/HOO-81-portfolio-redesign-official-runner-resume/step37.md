@@ -1,12 +1,12 @@
-# Step 37: state-color-remediation-expectation
+# Step 37: a11y-remediation-wave
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Post-remediation expectation update at step37. Consume both desktop-dark and desktop-light theme branches from the exact step30 schema; write/check must validate full 2×5×3×3 coverage without collapsing themes. Lane generation runs write/check/write/check and asserts deterministic write bytes. Fan-in acceptance is distinct and check-first: capture submitted fixture bytes, run `--check` before any write, then write/check/write/check and require submitted bytes equal both regenerated snapshots. Immutable `tests/fixtures/component-state-colors.base.json` plus fresh git archive is BASE; working fixture is never BASE. Tampered submitted output therefore blocks instead of being healed.
+Two fresh remediation lanes. Workers run only own lane commands on ports 4175/4176. Detached staging runs step36 acceptance once before commit publication. Each lane requires owned rule=0 and exact non-owned residual identity from evidence. Color changes only css/style.css; nested changes only js/main.js. Preserve keyboard/internal-link/modal/focus. No observation artifact.
 
 ## Exact write boundary
-state-color-remediation: tests/fixtures/component-state-colors.json
+a11y-color: css/style.css; a11y-nested: js/main.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

@@ -1,12 +1,12 @@
-# Step 34: a11y-observation-contract
+# Step 34: a11y-live-scan-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Observation validation atop completed steps32-33. Implement browser-free read-only verify-observation plus self-test-live and prove this now-existing observation consumer calls the exact step33 expandScenarios helper. Observation has exactly schemaVersion, evidenceSha256, scenarios, collectionPayload, collectionOutputSha256; results are in exact helper order with sorted unique IDs. Canonical payload uses recursive code-unit-sorted object keys, preserved arrays, compact UTF-8 JSON and SHA-256. Validate evidence SHA, complete scenarios, counts, IDs and payload hash; payload/SHA tamper and duplicate/missing/reordered scenarios fail. Do not test future step38/42 consumers here. No mutation.
+Live scan only atop Step33 lifecycle. Implement exact `expandScenarios` and use it now only in verify-lane and verify-full; do not require future Step35/39/45 consumers before they exist. Ordered expansion is page mobile-dark/light, tablet-dark/light, desktop-dark/light with projectIndex null; modal desktop-dark/light projectIndex 0 from grid card 0; lightbox desktop-dark/light projectIndex 0 from that modal's first shot. Every scenario runs preparePage before overlay preparation. This step's specs prove exact input/output order and that current verify-lane/verify-full share the helper; omission, duplication, reordering or another index fails. verify-lane requires owned=0 and exact non-owned IDs, writes nothing and prints deterministic JSON. verify-full requires both zero, rejects new rules and supports exactly one output mode. No observation validator yet.
 
 ## Exact write boundary
-a11y-observation-contract: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js
+a11y-live-scan: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

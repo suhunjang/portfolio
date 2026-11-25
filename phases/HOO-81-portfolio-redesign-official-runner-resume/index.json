@@ -591,7 +591,7 @@
     {
       "step": 16,
       "name": "a11y-occurrence-contract",
-      "estimatedMinutes": 14,
+      "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
         15
@@ -603,6 +603,10 @@
           "verify-occurrences",
           "--pairs",
           "tests/fixtures/axe-pairs-inherited.json",
+          "--collected",
+          "tests/fixtures/axe-collected.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
           "--plan",
           "tests/fixtures/axe-remediation-plan.json",
           "--occurrences",
@@ -615,6 +619,14 @@
           "61",
           "--expect-nested",
           "78"
+        ],
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
         ],
         [
           "env",
@@ -703,11 +715,51 @@
     },
     {
       "step": 19,
-      "name": "a11y-scope-role-extractor-contract",
+      "name": "a11y-declaration-winner-contract",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
         18
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-declaration-resolver",
+          "--css",
+          "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-declaration-winner-wave"
+    },
+    {
+      "step": 20,
+      "name": "a11y-scope-role-extractor-contract",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        19
       ],
       "acceptanceCommands": [
         [
@@ -742,12 +794,12 @@
       "wave": "a11y-scope-role-extractor-wave"
     },
     {
-      "step": 20,
+      "step": 21,
       "name": "a11y-current-declaration-resolution",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        19
+        20
       ],
       "acceptanceCommands": [
         [
@@ -788,12 +840,12 @@
       "wave": "a11y-current-declaration-wave"
     },
     {
-      "step": 21,
+      "step": 22,
       "name": "a11y-change-unit-mapping",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        20
+        21
       ],
       "acceptanceCommands": [
         [
@@ -832,12 +884,12 @@
       "wave": "a11y-change-unit-map-wave"
     },
     {
-      "step": 22,
+      "step": 23,
       "name": "a11y-contrast-base-target-observation",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        21
+        22
       ],
       "acceptanceCommands": [
         [
@@ -878,12 +930,12 @@
       "wave": "a11y-contrast-target-wave"
     },
     {
-      "step": 23,
+      "step": 24,
       "name": "a11y-contrast-candidate-eligibility",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        22
+        23
       ],
       "acceptanceCommands": [
         [
@@ -926,12 +978,12 @@
       "wave": "a11y-contrast-eligibility-wave"
     },
     {
-      "step": 24,
+      "step": 25,
       "name": "a11y-contrast-measurement",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        23
+        24
       ],
       "acceptanceCommands": [
         [
@@ -976,12 +1028,12 @@
       "wave": "a11y-contrast-measurement-wave"
     },
     {
-      "step": 25,
+      "step": 26,
       "name": "a11y-contrast-validation",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        24
+        25
       ],
       "acceptanceCommands": [
         [
@@ -1020,12 +1072,12 @@
       "wave": "a11y-contrast-validation-wave"
     },
     {
-      "step": 26,
+      "step": 27,
       "name": "a11y-coupled-contrast-guard",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
-        25
+        26
       ],
       "acceptanceCommands": [
         [
@@ -1058,12 +1110,12 @@
       "wave": "a11y-coupled-contrast-guard-wave"
     },
     {
-      "step": 27,
+      "step": 28,
       "name": "a11y-color-derivation",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        26
+        27
       ],
       "acceptanceCommands": [
         [
@@ -1110,12 +1162,12 @@
       "wave": "a11y-color-derive-wave"
     },
     {
-      "step": 28,
+      "step": 29,
       "name": "state-color-remediation-winning-source-map",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        27
+        28
       ],
       "acceptanceCommands": [
         [
@@ -1160,12 +1212,12 @@
       "wave": "state-color-winning-source-wave"
     },
     {
-      "step": 29,
+      "step": 30,
       "name": "state-color-remediation-influence-analysis",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        28
+        29
       ],
       "acceptanceCommands": [
         [
@@ -1206,12 +1258,12 @@
       "wave": "state-color-remediation-influence-wave"
     },
     {
-      "step": 30,
+      "step": 31,
       "name": "state-color-remediation-contract",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        29
+        30
       ],
       "acceptanceCommands": [
         [
@@ -1258,12 +1310,12 @@
       "wave": "state-color-remediation-contract-wave"
     },
     {
-      "step": 31,
+      "step": 32,
       "name": "state-color-remediation-apply-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        30
+        31
       ],
       "acceptanceCommands": [
         [
@@ -1300,36 +1352,9 @@
       "wave": "state-color-remediation-apply-wave"
     },
     {
-      "step": 32,
+      "step": 33,
       "name": "a11y-server-lifecycle-contract",
       "estimatedMinutes": 10,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        31
-      ],
-      "acceptanceCommands": [
-        [
-          "env",
-          "PW_PORT=4175",
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "exec",
-          "playwright",
-          "test",
-          "specs/verify-a11y-remediation.spec.js"
-        ]
-      ],
-      "executor": "parallel",
-      "status": "pending",
-      "wave": "a11y-lifecycle-wave"
-    },
-    {
-      "step": 33,
-      "name": "a11y-live-scan-contract",
-      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         32
@@ -1351,15 +1376,42 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "a11y-live-scan-wave"
+      "wave": "a11y-lifecycle-wave"
     },
     {
       "step": 34,
-      "name": "a11y-observation-contract",
+      "name": "a11y-live-scan-contract",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         33
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-live-scan-wave"
+    },
+    {
+      "step": 35,
+      "name": "a11y-observation-contract",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        34
       ],
       "acceptanceCommands": [
         [
@@ -1388,12 +1440,12 @@
       "wave": "a11y-observation-contract-wave"
     },
     {
-      "step": 35,
+      "step": 36,
       "name": "a11y-color-guard-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        34
+        35
       ],
       "acceptanceCommands": [
         [
@@ -1449,12 +1501,12 @@
       "wave": "a11y-color-guard-wave"
     },
     {
-      "step": 36,
+      "step": 37,
       "name": "a11y-remediation-wave",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        35
+        36
       ],
       "acceptanceCommands": [
         [
@@ -1481,12 +1533,12 @@
       "wave": "a11y-wave"
     },
     {
-      "step": 37,
+      "step": 38,
       "name": "state-color-remediation-expectation",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        36
+        37
       ],
       "acceptanceCommands": [
         [
@@ -1515,12 +1567,12 @@
       "wave": "state-color-remediation-wave"
     },
     {
-      "step": 38,
+      "step": 39,
       "name": "canonical-zero-observation",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
-        37
+        38
       ],
       "acceptanceCommands": [
         [
@@ -1543,12 +1595,88 @@
       "wave": "zero-observation-wave"
     },
     {
-      "step": 39,
+      "step": 40,
+      "name": "final-transition-manifest-contract",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        39
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "self-test-transition-manifest",
+          "--expect-original-occurrences",
+          "139",
+          "--no-browser"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-transition-manifest-wave"
+    },
+    {
+      "step": 41,
+      "name": "final-transition-transaction-contract",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        40
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "self-test-transition-transaction",
+          "--manifest",
+          "tests/fixtures/final-transition-ready.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--inject-each-post-validation-failure",
+          "--require-original-bytes-restored",
+          "--no-browser"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-transition-transaction-wave"
+    },
+    {
+      "step": 42,
       "name": "final-fixture-transition",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        38
+        41
       ],
       "acceptanceCommands": [
         [
@@ -1570,59 +1698,55 @@
           "--manifest",
           "tests/fixtures/final-transition-ready.json",
           "--read-only"
-        ],
-        [
-          "node",
-          "tests/scripts/verify-final-contract.mjs",
-          "self-test-transition-transaction",
-          "--manifest",
-          "tests/fixtures/final-transition-ready.json",
-          "--baseline",
-          "tests/fixtures/axe-baseline.json",
-          "--plan",
-          "tests/fixtures/axe-remediation-plan.json",
-          "--inject-each-post-validation-failure",
-          "--require-original-bytes-restored",
-          "--no-browser"
-        ],
-        [
-          "node",
-          "tests/scripts/verify-final-contract.mjs",
-          "commit-fixture-transition",
-          "--base",
-          "5a34759acf16e7beb96c415101c152d6e786c4b3",
-          "--zero-observation",
-          "tests/fixtures/axe-zero-observation.json",
-          "--evidence",
-          "tests/fixtures/axe-remediation-evidence.json",
-          "--baseline",
-          "tests/fixtures/axe-baseline.json",
-          "--plan",
-          "tests/fixtures/axe-remediation-plan.json",
-          "--manifest",
-          "tests/fixtures/final-transition-ready.json",
-          "--expect-original-occurrences",
-          "139",
-          "--baseline-empty",
-          "--plan-empty",
-          "--evidence-preserved",
-          "--candidate-diff-only",
-          "--allowed-mutations",
-          "tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json",
-          "--transactional"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "final-prepare-wave"
+      "wave": "final-prepare-wave",
+      "checks": {
+        "mutation": {
+          "command": [
+            "node",
+            "tests/scripts/verify-final-contract.mjs",
+            "commit-fixture-transition",
+            "--base",
+            "5a34759acf16e7beb96c415101c152d6e786c4b3",
+            "--zero-observation",
+            "tests/fixtures/axe-zero-observation.json",
+            "--evidence",
+            "tests/fixtures/axe-remediation-evidence.json",
+            "--baseline",
+            "tests/fixtures/axe-baseline.json",
+            "--plan",
+            "tests/fixtures/axe-remediation-plan.json",
+            "--manifest",
+            "tests/fixtures/final-transition-ready.json",
+            "--expect-original-occurrences",
+            "139",
+            "--baseline-empty",
+            "--plan-empty",
+            "--evidence-preserved",
+            "--candidate-diff-only",
+            "--allowed-mutations",
+            "tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json",
+            "--transactional"
+          ],
+          "targetPaths": [
+            "tests/fixtures/axe-baseline.json",
+            "tests/fixtures/axe-remediation-plan.json"
+          ],
+          "forbiddenPaths": [],
+          "requireChanged": true
+        }
+      }
     },
     {
-      "step": 40,
+      "step": 43,
       "name": "final-contract-verification",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        39
+        42
       ],
       "acceptanceCommands": [
         [
@@ -1665,12 +1789,12 @@
       "wave": "final-verify-wave"
     },
     {
-      "step": 41,
+      "step": 44,
       "name": "final-screenshots",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        40
+        43
       ],
       "acceptanceCommands": [
         [
@@ -1693,12 +1817,12 @@
       "wave": "final-screenshot-wave"
     },
     {
-      "step": 42,
+      "step": 45,
       "name": "canonical-tested-head",
       "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
-        41
+        44
       ],
       "acceptanceCommands": [
         [
@@ -1712,12 +1836,12 @@
       "status": "pending"
     },
     {
-      "step": 43,
+      "step": 46,
       "name": "exact-commit-astra-review",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        42
+        45
       ],
       "acceptanceCommands": [
         [
@@ -1731,12 +1855,12 @@
       "status": "pending"
     },
     {
-      "step": 44,
+      "step": 47,
       "name": "publish-open-pr",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        43
+        46
       ],
       "acceptanceCommands": [
         [
@@ -1750,12 +1874,12 @@
       "status": "pending"
     },
     {
-      "step": 45,
+      "step": 48,
       "name": "published-sha-identity",
       "estimatedMinutes": 5,
       "timeoutMinutes": 30,
       "dependsOn": [
-        44
+        47
       ],
       "acceptanceCommands": [
         [

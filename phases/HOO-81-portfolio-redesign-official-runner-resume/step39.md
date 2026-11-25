@@ -1,12 +1,12 @@
-# Step 39: final-fixture-transition
+# Step 39: canonical-zero-observation
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Transactional fixture transition only. Step16 initially creates remediation plan. Worker lane is read-only for baseline/plan and writes only canonical `tests/fixtures/final-transition-ready.json` after validating original 139 occurrences and exact input hashes. Detached fan-in runs `verify-transition-manifest`, then `self-test-transition-transaction` solely on process-owned temporary copies with injected failure at every post-validation/rename/fsync point, requiring both original bytes restored. Its final and last AC is one `commit-fixture-transition --transactional` process: open and hash both originals, revalidate manifest/original139/evidence/zero observation, create same-directory staged baseline `[]` and plan `{"groups":[]}`, run baseline-empty/plan-empty/evidence-preserved/candidate-diff-only/allowed-mutations verification against the staged paths, fsync both, then commit both with rollback backups. Any validation, first/second rename, directory fsync or cleanup failure restores and fsyncs both exact original bytes before nonzero exit. No separate command runs after commit. Browser/menu/modal/clean-tree checks are forbidden. Official mutation targetPaths are exactly baseline and plan; worker ownership remains verifier script/spec/manifest only. <=12 minutes.
+Single-owner observation lane at Step39. Run the actual Step34 shared expansion, require both rules zero, and produce `tests/fixtures/axe-zero-observation.json` using exactly the Step35 schema. Acceptance invokes verify-observation with the complete scenario requirement, proving this consumer uses the same ordered expansion. No css/js/baseline/plan writes.
 
 ## Exact write boundary
-final-prepare: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js, tests/fixtures/final-transition-ready.json
+zero-observation: tests/fixtures/axe-zero-observation.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
