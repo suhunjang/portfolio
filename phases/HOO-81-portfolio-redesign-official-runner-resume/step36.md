@@ -1,12 +1,12 @@
-# Step 36: final-fixture-transition
+# Step 36: a11y-remediation-wave
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Fixture transition only. Step16 initially creates remediation plan. Worker lane never mutates baseline/plan: `prepare-transition-manifest` read-only validates regular original inputs, evidence SHA, complete zero scenarios and original 139 mapping, then writes only canonical `tests/fixtures/final-transition-ready.json` containing exact input hashes and expected empty-output hashes. Fan-in first validates that manifest and the still-nonempty submitted baseline/plan read-only, then runs exact `verify-transition`; any mismatch exits before mutation. Only then fan-in runs `prepare`, which revalidates the same hashes and atomically writes baseline `[]` and plan `{"groups":[]}`; browser-free `verify-fixture-transition` then checks empty fixtures, preserved evidence and only runner-approved candidate diff plus baseline/plan mutation targetPaths. Browser menu/modal verification and `--require-clean` are forbidden here and run only at Step37 after fan-in commit publication. The official acceptance mutation record must name only baseline and plan so Harness folds these two checked bytes into the accepted candidate. Any failure preserves both original bytes. Specs cover already-empty input, hash/occurrence mismatch, manifest tamper, mutation targetPaths, and rollback. No browser/screenshots.
+Two fresh remediation lanes. Workers run only own lane commands on ports 4175/4176. Detached staging runs step36 acceptance once before commit publication. Each lane requires owned rule=0 and exact non-owned residual identity from evidence. Color changes only css/style.css; nested changes only js/main.js. Preserve keyboard/internal-link/modal/focus. No observation artifact.
 
 ## Exact write boundary
-final-prepare: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js, tests/fixtures/final-transition-ready.json
+a11y-color: css/style.css; a11y-nested: js/main.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
