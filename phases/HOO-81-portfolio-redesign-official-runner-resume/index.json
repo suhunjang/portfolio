@@ -12,6 +12,12 @@
     "tests/specs/verify-scope-resume.spec.js",
     "tests/playwright.config.js",
     "tests/specs/smoke.spec.js",
+    "tests/scripts/continuation-preflight.mjs",
+    "tests/specs/continuation-preflight.spec.js",
+    "tests/scripts/verify-a11y-remediation.mjs",
+    "tests/specs/verify-a11y-remediation.spec.js",
+    "tests/scripts/verify-final-contract.mjs",
+    "tests/specs/final-contract.spec.js",
     "tests/specs/featured.spec.js",
     "tests/specs/hero.spec.js",
     "tests/specs/hero-layout.spec.js",
@@ -66,19 +72,21 @@
     {
       "step": 0,
       "name": "inherit-preflight",
-      "estimatedMinutes": 15,
+      "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [],
       "acceptanceCommands": [
         [
-          "/Volumes/P9/hoonlabs-data/dev-harness/bin/harness",
-          "--project-root",
-          ".",
-          "check"
-        ],
-        [
           "node",
-          "tests/scripts/verify-scope.mjs"
+          "tests/scripts/continuation-preflight.mjs",
+          "--task",
+          "HOO-81-portfolio-redesign-official-runner-resume",
+          "--base-head",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--pairs-sha",
+          "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+          "--collected-sha",
+          "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c"
         ],
         [
           "env",
@@ -91,11 +99,13 @@
           "exec",
           "playwright",
           "test",
+          "specs/continuation-preflight.spec.js",
           "specs/smoke.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "preflight-wave"
     },
     {
       "step": 1,
@@ -120,8 +130,9 @@
           "specs/featured.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "featured-wave"
     },
     {
       "step": 2,
@@ -146,13 +157,14 @@
           "specs/hero.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "hero-wave"
     },
     {
       "step": 3,
-      "name": "wave-a-layout-structure-state",
-      "estimatedMinutes": 13,
+      "name": "hero-and-structure-wave",
+      "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
         2
@@ -170,17 +182,16 @@
           "playwright",
           "test",
           "specs/hero-layout.spec.js",
-          "specs/structure.spec.js",
-          "specs/state-sequence.spec.js"
+          "specs/structure.spec.js"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "wave-a"
+      "wave": "hero-structure-wave"
     },
     {
       "step": 4,
-      "name": "wave-b-layout-focus-state",
+      "name": "section-layout",
       "estimatedMinutes": 13,
       "timeoutMinutes": 30,
       "dependsOn": [
@@ -198,14 +209,12 @@
           "exec",
           "playwright",
           "test",
-          "specs/layout.spec.js",
-          "specs/focus-modal.spec.js",
-          "specs/state-colors.spec.js"
+          "specs/layout.spec.js"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "wave-b"
+      "wave": "section-layout-wave"
     },
     {
       "step": 5,
@@ -230,13 +239,14 @@
           "specs/component-hit.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "component-hit-wave"
     },
     {
       "step": 6,
-      "name": "hover-and-clamp",
-      "estimatedMinutes": 19,
+      "name": "state-sequence",
+      "estimatedMinutes": 13,
       "timeoutMinutes": 30,
       "dependsOn": [
         5
@@ -253,22 +263,27 @@
           "exec",
           "playwright",
           "test",
-          "specs/component-hover.spec.js",
-          "specs/component-clamp.spec.js"
+          "specs/state-sequence.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-sequence-wave"
     },
     {
       "step": 7,
-      "name": "focus-lightbox",
-      "estimatedMinutes": 11,
+      "name": "state-color-contract",
+      "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
         6
       ],
       "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--check"
+        ],
         [
           "env",
           "PW_PORT=4175",
@@ -280,16 +295,18 @@
           "exec",
           "playwright",
           "test",
-          "specs/focus-lightbox.spec.js"
+          "specs/state-colors.spec.js",
+          "specs/state-sequence.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-wave"
     },
     {
       "step": 8,
-      "name": "print-pdf",
-      "estimatedMinutes": 11,
+      "name": "hover-and-clamp",
+      "estimatedMinutes": 19,
       "timeoutMinutes": 30,
       "dependsOn": [
         7
@@ -306,33 +323,24 @@
           "exec",
           "playwright",
           "test",
-          "specs/print.spec.js"
+          "specs/component-hover.spec.js",
+          "specs/component-clamp.spec.js",
+          "specs/state-colors.spec.js"
         ]
       ],
-      "executor": "sequential",
-      "status": "pending"
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "hover-clamp-wave"
     },
     {
       "step": 9,
-      "name": "integration-a11y-collect",
-      "estimatedMinutes": 18,
+      "name": "focus-modal",
+      "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
         8
       ],
       "acceptanceCommands": [
-        [
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "test"
-        ],
-        [
-          "node",
-          "tests/scripts/verify-scope.mjs"
-        ],
         [
           "env",
           "PW_PORT=4175",
@@ -344,59 +352,17 @@
           "exec",
           "playwright",
           "test",
-          "specs/featured.spec.js",
-          "specs/hero.spec.js",
-          "specs/hero-layout.spec.js",
-          "specs/structure.spec.js",
-          "specs/layout.spec.js",
-          "specs/component-hit.spec.js",
-          "specs/state-sequence.spec.js",
-          "specs/state-colors.spec.js",
-          "specs/component-hover.spec.js",
-          "specs/component-clamp.spec.js",
-          "specs/focus-modal.spec.js",
-          "specs/focus-lightbox.spec.js",
-          "specs/print.spec.js"
+          "specs/focus-modal.spec.js"
         ]
       ],
-      "executor": "sequential",
+      "executor": "parallel",
       "status": "pending",
-      "batch": {
-        "items": [
-          "pair-001",
-          "pair-002",
-          "pair-003",
-          "pair-004",
-          "pair-005",
-          "pair-006",
-          "pair-007",
-          "pair-008",
-          "pair-009",
-          "pair-010",
-          "pair-011",
-          "pair-012",
-          "pair-013",
-          "pair-014",
-          "pair-015",
-          "pair-016",
-          "pair-017",
-          "pair-018",
-          "pair-019",
-          "pair-020",
-          "pair-021",
-          "pair-022",
-          "pair-023",
-          "pair-024",
-          "pair-025"
-        ],
-        "maxItemsPerStep": 25,
-        "inputArtifactSha": "439ff4e306bec12163155310955f70510cf2ff402fc04dedce57832bc66debb9"
-      }
+      "wave": "focus-modal-wave"
     },
     {
       "step": 10,
-      "name": "a11y-remediation-wave",
-      "estimatedMinutes": 15,
+      "name": "focus-lightbox",
+      "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
         9
@@ -413,24 +379,47 @@
           "exec",
           "playwright",
           "test",
-          "specs/modal-regression.spec.js",
-          "specs/featured.spec.js",
-          "specs/focus-modal.spec.js",
-          "specs/focus-lightbox.spec.js",
-          "specs/component-hit.spec.js"
+          "specs/focus-lightbox.spec.js"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "a11y-wave"
+      "wave": "focus-lightbox-wave"
     },
     {
       "step": 11,
-      "name": "final-verification",
-      "estimatedMinutes": 18,
+      "name": "print-pdf",
+      "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
         10
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/print.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "print-wave"
+    },
+    {
+      "step": 12,
+      "name": "integration-a11y-contract",
+      "estimatedMinutes": 19,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        11
       ],
       "acceptanceCommands": [
         [
@@ -443,8 +432,27 @@
         ],
         [
           "node",
-          "tests/scripts/verify-scope.mjs",
-          "--final"
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "collect",
+          "--pairs",
+          "tests/.tmp/axe-classify/pairs.json",
+          "--pairs-sha",
+          "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+          "--collected",
+          "tests/fixtures/axe-collected.json",
+          "--collected-sha",
+          "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--expect-pairs",
+          "25",
+          "--expect-occurrences",
+          "139",
+          "--expect-color",
+          "61",
+          "--expect-nested",
+          "78",
+          "--reject-new-rules"
         ],
         [
           "env",
@@ -457,7 +465,187 @@
           "exec",
           "playwright",
           "test",
-          "specs/screenshots.spec.js"
+          "specs/design-guard-color-rules.spec.js",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "integration-a11y-wave"
+    },
+    {
+      "step": 13,
+      "name": "a11y-remediation-wave",
+      "estimatedMinutes": 16,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        12
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--expect-color",
+          "0",
+          "--expect-nested",
+          "0",
+          "--reject-new-rules"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/modal-regression.spec.js",
+          "specs/featured.spec.js",
+          "specs/focus-modal.spec.js",
+          "specs/focus-lightbox.spec.js",
+          "specs/component-hit.spec.js",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-wave"
+    },
+    {
+      "step": 14,
+      "name": "canonical-final-verification",
+      "estimatedMinutes": 20,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        13
+      ],
+      "acceptanceCommands": [
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--expect-color",
+          "0",
+          "--expect-nested",
+          "0",
+          "--reject-new-rules"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/screenshots.spec.js",
+          "specs/final-contract.spec.js"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "--base",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--axe-zero",
+          "--baseline-empty",
+          "--plan-empty",
+          "--menu",
+          "mobile-dark",
+          "--modal-projects",
+          "1,5,7,0,2,12",
+          "--require-clean"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-scope.mjs",
+          "--final"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-gate-wave"
+    },
+    {
+      "step": 15,
+      "name": "exact-commit-astra-review",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        14
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "HARNESS_REVIEW_BACKEND=codex",
+          "HARNESS_REVIEW_MODEL=gpt-6-astra",
+          "/Volumes/P9/hoonlabs-data/dev-harness/bin/harness",
+          "--project-root",
+          ".",
+          "cross-review",
+          "diff",
+          "HEAD"
+        ],
+        [
+          "git",
+          "status",
+          "--porcelain"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 16,
+      "name": "publish-open-pr",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        15
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nr=subprocess.run(['gh','pr','view',branch,'--json','url,state,headRefOid'],capture_output=True,text=True)\nif r.returncode!=0:\n subprocess.run(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Verified with official Harness; exact evidence is recorded in HOO-103.'],check=True)\nprint(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid'],text=True))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 17,
+      "name": "published-sha-identity",
+      "estimatedMinutes": 5,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        16
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\nremote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]\npr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid'],text=True))\nstatus=subprocess.check_output(['git','status','--porcelain'],text=True)\nassert status=='',status\nassert head==remote==pr['headRefOid'],(head,remote,pr)\nassert pr['state']=='OPEN',pr\nprint(json.dumps({'testedSha':head,'reviewedSha':head,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
         ]
       ],
       "executor": "sequential",
