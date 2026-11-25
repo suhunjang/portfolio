@@ -1,22 +1,22 @@
 # Compact Step 2 — hero-first-screen (r19)
 
-- 목적: hero의 DOM 순서와 tagline을 맞추고, 1280×800 첫 화면 AC(원 §3)를 만족시킨다.
+- 목적: hero DOM 순서와 tagline을 바로잡고, 1280×800 첫 화면 AC(원 §3)를 만족시킨다.
 - 예상 16분, hard timeout 30분. 선행: step 1. 공통 선행조건: §C0.
 - 허용 파일(exact):
-  - `index.html`: section#hero 내부의 직계 순서와 tagline만
+  - `index.html`: hero 내부의 직계 순서와 tagline만
   - `js/main.js`: `setText('heroTagline', PROFILE.tagline);` 1줄만
   - `css/style.css`: hero 1열 간격, STATS, featured 반응형, `.hero-tagline` 비색 타이포만
   - `tests/specs/featured.spec.js`: 보강
 - runtime: §C4
-- 금지: `js/data.js` 수정, 색 변경, 문구 변경, hero 2열(step 3에서 처리), 섹션·nav 변경
+- 금지: `js/data.js`, 색 변경, 문구 변경, hero 2열, 섹션·nav 변경
 
 ## 작업
-1. `featured.spec.js`에 아래 assertion을 보강하고 실패(RED)를 확인한다.
-   - hero의 직계 자식 순서가 원 §3과 같다.
-   - `#heroTagline`의 텍스트가 `PROFILE.tagline`이다.
+1. `featured.spec.js`에 아래 assertion을 보강하고 RED를 확인한다.
+   - hero 직계 자식 순서가 원 §3과 같다.
+   - `#heroTagline`이 `PROFILE.tagline`과 같다.
    - CTA·eyebrow·typed·`#heroFeatured`의 role과 label이 유지된다.
-   - STATS: 375에서 2×2, 768과 1280에서 4×1이다.
-   - featured: 1열 / 2열 / 3열이다.
+   - STATS가 375px에서 2×2, 768·1280px에서 4×1이다.
+   - featured가 1/2/3열이다.
    - desktop-dark/light 1280×800에서 원 §3 첫 화면 AC를 모두 만족한다.
 2. 구현한다.
 
