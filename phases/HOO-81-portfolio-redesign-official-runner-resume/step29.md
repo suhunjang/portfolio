@@ -1,12 +1,12 @@
-# Step 29: canonical-zero-observation
+# Step 29: a11y-color-guard-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Single-owner observation lane at step29. Run the actual step24 shared expansion, require both rules zero, and produce `tests/fixtures/axe-zero-observation.json` using exactly the step25 schema. Acceptance invokes verify-observation with the complete scenario requirement, proving this consumer uses the same ordered expansion. No css/js/baseline/plan writes.
+Color-guard contract only. Keep immutable BASE and expected fixtures unchanged. Lane runs exact step24 expectation `--validate` in requiredCommands, then focused tests; it does not run FULL. Fan-in acceptance runs expectation `--validate` → FULL → focused tests in that exact order. Every colorChanges entry must match its change-unit decision, occurrence ID, existing css/style.css declaration/token/role and exact theme/state. Duplicate, unknown, new-literal or themes.css entries fail. No product/evidence/fixture writes.
 
 ## Exact write boundary
-zero-observation: tests/fixtures/axe-zero-observation.json
+a11y-color-guard: tests/helpers/design-guard-color-rules.js, tests/specs/design-guard-color-rules.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

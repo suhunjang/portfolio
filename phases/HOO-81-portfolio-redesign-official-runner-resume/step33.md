@@ -1,15 +1,15 @@
-# Step 33: canonical-tested-head
+# Step 33: final-fixture-transition
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Coordinator-only after runner commits step32 fan-in. Before tests, exact immutable Python argv creates `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots` with mode 0700 if absent, lstat-rejects symlink/non-directory, requires absolute path=realpath and W_OK|X_OK. Then at clean HEAD rerun FULL, exact scenarios, screenshot manifest/final contract with --require-clean, and record tested.json. Capture HEAD/status before and after; any mutation blocks evidence.
+Fixture transition only. Step16 initially creates remediation plan; only this step may empty it after verified zero, and only this step empties baseline. `prepare` verifies regular files, evidence SHA, complete scenarios, zero counts and original 139 mapping, then atomically writes baseline `[]` and plan `{"groups":[]}`; any failure leaves both byte-identical. Specs cover tampering and rollback. No browser/screenshots.
 
 ## Exact write boundary
-No repository writes; external release-gate evidence/actions only.
+final-prepare: tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json, tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
 
 ## Output subject
-This coordinator step produces only the external release-gate record or remote effect named above; it does not create a repository commit.
+The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
 
 ## Acceptance
-Run every immutable argv in index.json for this coordinator gate in order. Nonzero blocks; no worker wave or emptyAllowed rule applies.
+Each worker runs only its own execution.json lane `requiredCommands` and `focusedTests` in order; it never runs index.json `acceptanceCommands` inside the uncommitted lane worktree. Nonzero blocks and `emptyAllowed=false` requires the declared lane artifact/spec/source change. After all lane outputs form one deterministic fan-in candidate, the official runner applies it to an isolated detached staging tree, runs this step's index.json `acceptanceCommands` exactly once there, binds acceptanceEvidenceSha/inputsSha256 into the completion record, and only then publishes fan-in commits. Legacy no-op branches do not apply.
