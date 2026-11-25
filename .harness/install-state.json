@@ -39,7 +39,7 @@
       "status": "adopted"
     },
     ".harness/harness.lock.json": {
-      "hash": "c9a996bf931c9d0d9f92c65b5e6017c5aa2fa304281d9b95d26836c238bf7dbe",
+      "hash": "d7df38b1d032e1c7ef6c535f5257b69a42143ce323baf80cfc9bddee8be62aa3",
       "ownership": "config"
     },
     ".harness/policy.json": {
@@ -69,11 +69,11 @@
       "status": "created"
     }
   },
-  "manifestHash": "b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372",
+  "manifestHash": "8e4ea2f0e92670b0b6fe5c0f3d3b10f4e352e1b0e56a80d08fa97877dceca6d8",
   "migration": null,
   "profile": "ui",
   "schemaVersion": 2,
-  "sourceCommit": "e7a03919a460f975149f7c55343ca4b34d3d2352",
-  "stateHash": "f2c68f71a75928395a707499a5740acc5b71e91c224cae6c34a75885fb02b890",
-  "updatedAt": "2026-11-24T01:10:54.900959+00:00"
+  "sourceCommit": "8f9b39c02b8fa9ad26f468bc4aaf25d31605bc39",
+  "stateHash": "0ad31b86a1b89ed911417482c467f9841a807ba7d14b0ea3e5033f9aaf539381",
+  "updatedAt": "2026-11-25T13:50:31.491110+00:00"
 }

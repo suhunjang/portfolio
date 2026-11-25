@@ -1,7 +1,7 @@
 {
   "distributionName": "discord-claude-harness",
   "distributionVersion": "2.0.1",
-  "manifestHash": "b627e6a5ce4a903c24c400927ca2b49a14d0bd59632c691b2a5c2d74c6c08372",
+  "manifestHash": "8e4ea2f0e92670b0b6fe5c0f3d3b10f4e352e1b0e56a80d08fa97877dceca6d8",
   "schemaVersion": 1,
-  "sourceCommit": "e7a03919a460f975149f7c55343ca4b34d3d2352"
+  "sourceCommit": "8f9b39c02b8fa9ad26f468bc4aaf25d31605bc39"
 }
