@@ -1,13 +1,12 @@
-# Step 14: canonical-final-verification
+# Step 14: a11y-remediation-wave
 
-## Always-on invariants
-Do not modify historical phase records/evidence. Preserve all copy, numbers, font assets/weights, information architecture, 3 featured project identities, all 13 PROJECTS and order. No new copy, section, image, icon, project or placeholder content. css/themes.css is read-only; if it or index.html is required outside the listed lane, stop and replan. Implementation workers must not commit, push, merge, edit the canonical phase index, or write outside their exact lane files. Run only focused tests in lanes; canonical FULL/UI/a11y run at steps 12 and 14.
+## Current authoritative contract
+Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-## Exact work order
-Final gate only (not an invariant for earlier steps): first collect axe and require zero violations before replacing baseline with `[]` and remediation plan with `{"groups":[]}`. Then run FULL, screenshots/UI, state colors, mobile-dark menu open/close, modal open/close/focus return for six explicit project indices 1,5,7,0,2,12, and final diff contract. `verify-final-contract.mjs` checks BASE→HEAD/index/worktree are limited to allowedPaths plus this phase, HEAD→index and index→worktree are clean, js/data.js contains only three `featured: true` additions, css/themes.css is byte-identical, and historical phases/evidence are unchanged.
+Two fresh lanes. Each lane requires its owned rule=0 and reads the non-owned rule's approved residual count from the immutable step13 evidence (not a hardcoded historical 78/61); it must remain byte-for-byte/count-identical. After deterministic fan-in, canonical acceptance runs a fresh fixed-scenario collection and requires both 0. Color may change only css/style.css at evidence-listed declarations; nested only js/main.js at project-card render/event anchors. Preserve keyboard/internal-link/modal/focus behavior. index.html/css/themes.css need blocks.
 
 ## Exact write boundary
-final-gate-artifacts: tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json, tests/specs/screenshots.spec.js, tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
+a11y-color: css/style.css; a11y-nested: js/main.js
 
 ## Acceptance
-Run every argv in this step’s immutable `index.json.acceptanceCommands` in order. Any nonzero exit blocks the next step.
+Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.

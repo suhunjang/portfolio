@@ -1,13 +1,12 @@
-# Step 17: published-sha-identity
+# Step 17: exact-commit-astra-review
 
-## Always-on invariants
-Do not modify historical phase records/evidence. Preserve all copy, numbers, font assets/weights, information architecture, 3 featured project identities, all 13 PROJECTS and order. No new copy, section, image, icon, project or placeholder content. css/themes.css is read-only; if it or index.html is required outside the listed lane, stop and replan. Implementation workers must not commit, push, merge, edit the canonical phase index, or write outside their exact lane files. Run only focused tests in lanes; canonical FULL/UI/a11y run at steps 12 and 14.
+## Current authoritative contract
+Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-## Exact work order
-Coordinator-only final identity gate. Require clean index/worktree and exact equality of tested SHA, Astra-reviewed SHA, local HEAD, origin feature SHA and PR head SHA; require PR state OPEN. A mismatch blocks completion and must not be papered over.
+Coordinator-only. Read tested.json and require its HEAD=current clean HEAD. Run GPT-6 Astra exact commit review for `git diff HEAD^ HEAD`; accept stdout exactly CLEAN. Atomically write `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json` with reviewed HEAD, model, scope, CLEAN verdict and output hashes. Findings or ambiguous output block.
 
 ## Exact write boundary
-No repository file writes. Coordinator external actions/evidence only.
+No repository writes; external release-gate evidence/actions only.
 
 ## Acceptance
-Run every argv in this step’s immutable `index.json.acceptanceCommands` in order. Any nonzero exit blocks the next step.
+Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.

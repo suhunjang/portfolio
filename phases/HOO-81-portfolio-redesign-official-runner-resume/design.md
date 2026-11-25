@@ -1,22 +1,16 @@
-# HOO-81 Official Runner Continuation v63
+# HOO-81 Official Runner Continuation v64
 
-## Goal and completion line
-Resume only the unfinished HOO-81 redesign work with official Harness 2.0.1, preserve historical evidence, remediate 61 verified color-contrast and 78 verified nested-interactive occurrences, then finish at `blocker 0 + all acceptance criteria + exact-commit Astra CLEAN + OPEN PR with SHA identity`.
+## Goal
+Complete only unfinished redesign and verified accessibility remediation through official Harness 2.0.1. Completion is blocker 0 + step AC + exact-commit Astra CLEAN + OPEN PR + tested/reviewed/local/remote/PR SHA identity.
 
-## Immutable scope
-- BASE_HEAD `5a34759acf16e7beb96c415101c152d6e786c4b3`; historical original step 0~39 completed/40 blocked and resume step 0~16 completed/17 blocked are read-only.
-- Preserve copy, numbers, font assets/weights, IA hero→Career→Projects→Strengths→About→Contact, three featured project identities (existing records 1,5,7), all 13 PROJECTS and order.
-- No new copy, section, image, icon, project, placeholder content, generic framework, custom coordinator, unrelated refactor or palette redesign.
-- `css/themes.css` is read-only. Only minimal values/roles proved necessary for the 61 contrast occurrences may change in `css/style.css`.
+## Scope
+BASE_HEAD `5a34759acf16e7beb96c415101c152d6e786c4b3`. Historical original 0~39 completed/40 blocked and resume 0~16 completed/17 blocked are immutable. Preserve copy/numbers/fonts, IA hero→Career→Projects→Strengths→About→Contact, existing featured identities 1/5/7, all 13 PROJECTS/order. No new content, custom coordinator, unrelated refactor or palette. css/themes.css is read-only; verified 61 contrast occurrences may cause minimal css/style.css role/value changes only.
 
-## Execution and ownership
-Steps 0~14 run through official runner. Every implementation step is an exact-file wave, including single-lane waves, so phase-wide allowedPaths never grants a worker unrelated writes. Only step3 and step13 contain truly concurrent lanes. Official fresh worktrees, deterministic fan-in, maxAttempts=2 and recovery are required; partial fan-in is forbidden. Steps 15~17 are coordinator-only gates after the implementation runner stops. Workers never commit, push, merge, edit canonical phase metadata, or perform publication.
+## Artifact supply
+Before the step0 lane command, official runner keeps the inherited canonical artifact at `/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json` read-only. Step0 verifies it against continuation provenance (47392 bytes, SHA `1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1`) and copies exact bytes to tracked `tests/fixtures/axe-pairs-inherited.json` inside its fresh worktree. After step0 fan-in every later worktree receives that committed fixture. Collected input is already tracked at `tests/fixtures/axe-collected.json` (28809 bytes, SHA `ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c`). Runtime artifact inputs are read-only exceptions; worker writes remain limited to execution.json lane files.
 
-## Testing layers
-Lane workers run focused tests only. Canonical FULL and accessibility collection run at step12, and final FULL/UI/accessibility/diff checks run at step14. The final-gate conditions apply only at step14; earlier steps enforce the always-on invariants and their own focused AC.
+## Execution
+Steps 0~15 run in official exact-file waves; only steps3 and14 have concurrent disjoint lanes. Fresh retry max 2, deterministic fan-in, no partial fan-in. Historical step commands are reference-only and replaced by current argv; no legacy RSNAP/REQ/DI/RGATE/FULL/no-op branch executes. Steps8 and9 retain original separate time boundaries. Step14 lane-specific tests require owned rule=0 and non-owned rule unchanged; both=0 is canonical only after fan-in. Step15 prepares artifacts without pre-fan-in clean requirement. Steps16~19 are Ryan coordinator gates after runner commit.
 
-## Recovery and stop conditions
-A lane failure retries only that lane from a fresh base. Exact-anchor overlap, new axe rule, missing occurrence, need for index.html/css/themes.css during remediation, approval/snapshot mismatch, dirty protected path, or any SHA mismatch blocks and requires replanning/review. Scope or assumption changes require a new Astra plan review and exact approval.
-
-## Review and publication
-After step14, Ryan records the tested HEAD. Step15 obtains GPT-6 Astra CLEAN for that exact commit. Step16 pushes that same HEAD and creates/reuses an OPEN PR without merge. Step17 requires tested=reviewed=local=pushed=PR-head SHA and clean repository. Any HEAD change sends the work back through final tests and exact-commit review.
+## Evidence and final gates
+Original 139 mapping persists in `tests/fixtures/axe-remediation-evidence.json`; completion state is separate. Full verification always uses a fresh, fixed, nonempty scenario set independent of mutable plan, records observation SHA, and only then empties baseline/plan. Step16 writes tested HEAD external evidence; step17 independently writes Astra CLEAN reviewed HEAD; steps18~19 compare those stored values to local/remote/PR. HEAD change invalidates both and returns to step16.

@@ -39,7 +39,9 @@
     "tests/helpers/design-guard-color-rules.js",
     "tests/specs/design-guard-color-rules.spec.js",
     "tests/fixtures/axe-baseline.json",
-    "tests/fixtures/axe-remediation-plan.json"
+    "tests/fixtures/axe-remediation-plan.json",
+    "tests/fixtures/axe-pairs-inherited.json",
+    "tests/fixtures/axe-remediation-evidence.json"
   ],
   "testCommand": [
     "sh",
@@ -72,7 +74,7 @@
     {
       "step": 0,
       "name": "inherit-preflight",
-      "estimatedMinutes": 16,
+      "estimatedMinutes": 17,
       "timeoutMinutes": 30,
       "dependsOn": [],
       "acceptanceCommands": [
@@ -83,10 +85,20 @@
           "HOO-81-portfolio-redesign-official-runner-resume",
           "--base-head",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--pairs-source",
+          "/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json",
+          "--pairs-output",
+          "tests/fixtures/axe-pairs-inherited.json",
           "--pairs-sha",
           "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+          "--pairs-size",
+          "47392",
+          "--collected",
+          "tests/fixtures/axe-collected.json",
           "--collected-sha",
-          "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c"
+          "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
+          "--collected-size",
+          "28809"
         ],
         [
           "env",
@@ -282,7 +294,9 @@
         [
           "node",
           "tests/scripts/make-state-colors.mjs",
-          "--check"
+          "--check",
+          "--mode",
+          "base-expectation"
         ],
         [
           "env",
@@ -305,8 +319,8 @@
     },
     {
       "step": 8,
-      "name": "hover-and-clamp",
-      "estimatedMinutes": 19,
+      "name": "component-hover-active",
+      "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
         7
@@ -324,21 +338,48 @@
           "playwright",
           "test",
           "specs/component-hover.spec.js",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "hover-wave"
+    },
+    {
+      "step": 9,
+      "name": "component-clamp-stripe",
+      "estimatedMinutes": 15,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        8
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
           "specs/component-clamp.spec.js",
           "specs/state-colors.spec.js"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "hover-clamp-wave"
+      "wave": "clamp-wave"
     },
     {
-      "step": 9,
+      "step": 10,
       "name": "focus-modal",
       "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
-        8
+        9
       ],
       "acceptanceCommands": [
         [
@@ -360,12 +401,12 @@
       "wave": "focus-modal-wave"
     },
     {
-      "step": 10,
+      "step": 11,
       "name": "focus-lightbox",
       "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
-        9
+        10
       ],
       "acceptanceCommands": [
         [
@@ -387,12 +428,12 @@
       "wave": "focus-lightbox-wave"
     },
     {
-      "step": 11,
+      "step": 12,
       "name": "print-pdf",
       "estimatedMinutes": 11,
       "timeoutMinutes": 30,
       "dependsOn": [
-        10
+        11
       ],
       "acceptanceCommands": [
         [
@@ -414,12 +455,12 @@
       "wave": "print-wave"
     },
     {
-      "step": 12,
+      "step": 13,
       "name": "integration-a11y-contract",
       "estimatedMinutes": 19,
       "timeoutMinutes": 30,
       "dependsOn": [
-        11
+        12
       ],
       "acceptanceCommands": [
         [
@@ -435,7 +476,7 @@
           "tests/scripts/verify-a11y-remediation.mjs",
           "collect",
           "--pairs",
-          "tests/.tmp/axe-classify/pairs.json",
+          "tests/fixtures/axe-pairs-inherited.json",
           "--pairs-sha",
           "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
           "--collected",
@@ -444,6 +485,8 @@
           "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
           "--plan",
           "tests/fixtures/axe-remediation-plan.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
           "--expect-pairs",
           "25",
           "--expect-occurrences",
@@ -453,6 +496,15 @@
           "--expect-nested",
           "78",
           "--reject-new-rules"
+        ],
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--check",
+          "--mode",
+          "approved-remediation-delta",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json"
         ],
         [
           "env",
@@ -474,43 +526,29 @@
       "wave": "integration-a11y-wave"
     },
     {
-      "step": 13,
+      "step": 14,
       "name": "a11y-remediation-wave",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        12
+        13
       ],
       "acceptanceCommands": [
         [
           "node",
           "tests/scripts/verify-a11y-remediation.mjs",
-          "verify",
-          "--plan",
-          "tests/fixtures/axe-remediation-plan.json",
+          "verify-full",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
           "--expect-color",
           "0",
           "--expect-nested",
           "0",
-          "--reject-new-rules"
-        ],
-        [
-          "env",
-          "PW_PORT=4175",
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "exec",
-          "playwright",
-          "test",
-          "specs/modal-regression.spec.js",
-          "specs/featured.spec.js",
-          "specs/focus-modal.spec.js",
-          "specs/focus-lightbox.spec.js",
-          "specs/component-hit.spec.js",
-          "specs/state-colors.spec.js"
+          "--scenarios",
+          "page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light",
+          "--require-nonempty-scenario-set",
+          "--write-observation",
+          "tests/.tmp/HOO-103-axe-zero-observation.json"
         ]
       ],
       "executor": "parallel",
@@ -518,33 +556,46 @@
       "wave": "a11y-wave"
     },
     {
-      "step": 14,
-      "name": "canonical-final-verification",
-      "estimatedMinutes": 20,
+      "step": 15,
+      "name": "final-artifact-preparation",
+      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        13
+        14
       ],
       "acceptanceCommands": [
         [
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "test"
-        ],
-        [
           "node",
           "tests/scripts/verify-a11y-remediation.mjs",
-          "verify",
-          "--plan",
-          "tests/fixtures/axe-remediation-plan.json",
+          "verify-full",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
           "--expect-color",
           "0",
           "--expect-nested",
           "0",
-          "--reject-new-rules"
+          "--scenarios",
+          "page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light",
+          "--require-nonempty-scenario-set",
+          "--write-observation",
+          "tests/.tmp/HOO-103-axe-zero-observation.json"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "prepare",
+          "--base",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--zero-observation",
+          "tests/.tmp/HOO-103-axe-zero-observation.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--preserve-evidence",
+          "tests/fixtures/axe-remediation-evidence.json"
         ],
         [
           "env",
@@ -559,64 +610,16 @@
           "test",
           "specs/screenshots.spec.js",
           "specs/final-contract.spec.js"
-        ],
-        [
-          "node",
-          "tests/scripts/verify-final-contract.mjs",
-          "--base",
-          "5a34759acf16e7beb96c415101c152d6e786c4b3",
-          "--axe-zero",
-          "--baseline-empty",
-          "--plan-empty",
-          "--menu",
-          "mobile-dark",
-          "--modal-projects",
-          "1,5,7,0,2,12",
-          "--require-clean"
-        ],
-        [
-          "node",
-          "tests/scripts/verify-scope.mjs",
-          "--final"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "final-gate-wave"
-    },
-    {
-      "step": 15,
-      "name": "exact-commit-astra-review",
-      "estimatedMinutes": 12,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        14
-      ],
-      "acceptanceCommands": [
-        [
-          "env",
-          "HARNESS_REVIEW_BACKEND=codex",
-          "HARNESS_REVIEW_MODEL=gpt-6-astra",
-          "/Volumes/P9/hoonlabs-data/dev-harness/bin/harness",
-          "--project-root",
-          ".",
-          "cross-review",
-          "diff",
-          "HEAD"
-        ],
-        [
-          "git",
-          "status",
-          "--porcelain"
-        ]
-      ],
-      "executor": "sequential",
-      "status": "pending"
+      "wave": "final-artifact-wave"
     },
     {
       "step": 16,
-      "name": "publish-open-pr",
-      "estimatedMinutes": 8,
+      "name": "canonical-tested-head",
+      "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
         15
@@ -626,7 +629,7 @@
           "python3",
           "-I",
           "-c",
-          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nr=subprocess.run(['gh','pr','view',branch,'--json','url,state,headRefOid'],capture_output=True,text=True)\nif r.returncode!=0:\n subprocess.run(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Verified with official Harness; exact evidence is recorded in HOO-103.'],check=True)\nprint(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid'],text=True))\n"
+          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light\", \"--require-nonempty-scenario-set\", \"--write-observation\", \"tests/.tmp/HOO-103-axe-zero-observation.json\"], [\"env\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/.tmp/HOO-103-axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'head':head,'planCommit':head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
         ]
       ],
       "executor": "sequential",
@@ -634,8 +637,8 @@
     },
     {
       "step": 17,
-      "name": "published-sha-identity",
-      "estimatedMinutes": 5,
+      "name": "exact-commit-astra-review",
+      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         16
@@ -645,7 +648,45 @@
           "python3",
           "-I",
           "-c",
-          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\nremote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]\npr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid'],text=True))\nstatus=subprocess.check_output(['git','status','--porcelain'],text=True)\nassert status=='',status\nassert head==remote==pr['headRefOid'],(head,remote,pr)\nassert pr['state']=='OPEN',pr\nprint(json.dumps({'testedSha':head,'reviewedSha':head,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
+          "import hashlib,json,os,subprocess,tempfile,time\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); assert tested['head']==head,tested\ncmd=['/Volumes/P9/hoonlabs-data/dev-harness/bin/harness','--project-root','.','cross-review','diff','HEAD']; r=subprocess.run(cmd,text=True,capture_output=True,env={**os.environ,'HARNESS_REVIEW_BACKEND':'codex','HARNESS_REVIEW_MODEL':'gpt-6-astra'}); assert r.returncode==0,(r.stdout,r.stderr); assert r.stdout.strip()=='CLEAN',r.stdout\nout={'kind':'HOO-103-exact-commit-review','schemaVersion':1,'head':head,'model':'gpt-6-astra','verdict':'CLEAN','scope':'git diff HEAD^ HEAD','stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest(),'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 18,
+      "name": "publish-open-pr",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        17
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status; assert tested['head']==reviewed['head']==head; assert reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'\nlocal=subprocess.check_output(['git','rev-parse',branch],text=True).strip(); assert local==head,(local,head)\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nr=subprocess.run(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],capture_output=True,text=True)\nif r.returncode!=0:\n if 'no pull requests found' not in (r.stderr+r.stdout).lower(): raise RuntimeError(r.stderr+r.stdout)\n subprocess.run(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Official Harness evidence is recorded in HOO-103.'],check=True)\npr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; assert pr['state']=='OPEN' and pr['baseRefName']=='main' and remote==pr['headRefOid']==head,(remote,pr,head); print(json.dumps(pr))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 19,
+      "name": "published-sha-identity",
+      "estimatedMinutes": 5,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        18
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; pr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; assert reviewed['verdict']=='CLEAN'; assert tested['head']==reviewed['head']==head==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['baseRefName']=='main'; print(json.dumps({'testedSha':tested['head'],'reviewedSha':reviewed['head'],'localSha':head,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
         ]
       ],
       "executor": "sequential",

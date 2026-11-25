@@ -1,13 +1,12 @@
-# Step 15: exact-commit-astra-review
+# Step 15: final-artifact-preparation
 
-## Always-on invariants
-Do not modify historical phase records/evidence. Preserve all copy, numbers, font assets/weights, information architecture, 3 featured project identities, all 13 PROJECTS and order. No new copy, section, image, icon, project or placeholder content. css/themes.css is read-only; if it or index.html is required outside the listed lane, stop and replan. Implementation workers must not commit, push, merge, edit the canonical phase index, or write outside their exact lane files. Run only focused tests in lanes; canonical FULL/UI/a11y run at steps 12 and 14.
+## Current authoritative contract
+Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-## Exact work order
-Coordinator-only; implementation runner stops after step14 and hands control to Ryan. Record the tested HEAD from step14, run GPT-6 Astra exact-commit diff review read-only, and require CLEAN. If review changes or HEAD changes, return to step14 verification. No source edit, commit, push or PR is allowed in this step.
+Worker lane prepares final artifacts only. It runs fresh full-scenario zero independently of mutable plan, requires nonempty complete scenario set and writes observation SHA. Preserve `tests/fixtures/axe-remediation-evidence.json` with original 139 mapping. Only after zero does it set baseline [] and plan groups[]. Validate generated diff and UI specs, but do not require clean before official fan-in commit.
 
 ## Exact write boundary
-No repository file writes. Coordinator external actions/evidence only.
+final-artifacts: tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json, tests/specs/screenshots.spec.js, tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
 
 ## Acceptance
-Run every argv in this step’s immutable `index.json.acceptanceCommands` in order. Any nonzero exit blocks the next step.
+Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.

@@ -1,13 +1,12 @@
-# Step 13: a11y-remediation-wave
+# Step 13: integration-a11y-contract
 
-## Always-on invariants
-Do not modify historical phase records/evidence. Preserve all copy, numbers, font assets/weights, information architecture, 3 featured project identities, all 13 PROJECTS and order. No new copy, section, image, icon, project or placeholder content. css/themes.css is read-only; if it or index.html is required outside the listed lane, stop and replan. Implementation workers must not commit, push, merge, edit the canonical phase index, or write outside their exact lane files. Run only focused tests in lanes; canonical FULL/UI/a11y run at steps 12 and 14.
+## Current authoritative contract
+Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-## Exact work order
-Two exact-file lanes read the committed step12 remediation plan. Color lane may change only css/style.css and authorized state-color fixture values; only the verified 61 contrast occurrences and listed token/role declarations may change. Guard files are read-only in this step. Nested lane may change only js/main.js at the plan's project-card render/event anchors. Remove nested interactive semantics while preserving card click/Enter/Space activation, `.project-more` and internal-link propagation, modal selection, Escape/backdrop close, and trigger focus return. If index.html or css/themes.css is needed, stop and replan. Each lane retries fresh at most twice; no partial fan-in.
+Canonical integration. Use tracked `tests/fixtures/axe-pairs-inherited.json` and collected fixture. Preserve original mapping in `tests/fixtures/axe-remediation-evidence.json` permanently; remediation plan is mutable completion state. Evidence schema binds 25/139, 12 color/61, 13 nested/78, scenarios, canonical targets, CSS token/role or JS render/event anchors, allowed files, and pre/post status. Reject new rules, missing/duplicate occurrences, empty scenario set, index.html/css/themes.css need. Compute state-color approved remediation delta from evidence, never observed output.
 
 ## Exact write boundary
-a11y-color: css/style.css, tests/fixtures/component-state-colors.json; a11y-nested: js/main.js
+a11y-contract: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/helpers/design-guard-color-rules.js, tests/specs/design-guard-color-rules.spec.js, tests/fixtures/axe-remediation-plan.json, tests/fixtures/axe-remediation-evidence.json, tests/fixtures/component-state-colors.json
 
 ## Acceptance
-Run every argv in this step’s immutable `index.json.acceptanceCommands` in order. Any nonzero exit blocks the next step.
+Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.
