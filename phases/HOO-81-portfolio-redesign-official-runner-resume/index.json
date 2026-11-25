@@ -539,7 +539,7 @@
         [
           "node",
           "tests/scripts/make-state-colors.mjs",
-          "--check",
+          "--validate",
           "--mode",
           "approved-remediation-delta",
           "--base-ref",
@@ -558,8 +558,7 @@
           "exec",
           "playwright",
           "test",
-          "specs/design-guard-color-rules.spec.js",
-          "specs/state-colors.spec.js"
+          "specs/design-guard-color-rules.spec.js"
         ]
       ],
       "executor": "parallel",
@@ -587,7 +586,6 @@
           "playwright",
           "test",
           "specs/design-guard-color-rules.spec.js",
-          "specs/state-colors.spec.js",
           "specs/modal-regression.spec.js",
           "specs/featured.spec.js",
           "specs/focus-modal.spec.js",
@@ -601,11 +599,50 @@
     },
     {
       "step": 16,
-      "name": "canonical-zero-observation",
+      "name": "state-color-remediation-expectation",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
         15
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--check",
+          "--mode",
+          "approved-remediation-delta",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js",
+          "specs/component-hover.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-remediation-wave"
+    },
+    {
+      "step": 17,
+      "name": "canonical-zero-observation",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        16
       ],
       "acceptanceCommands": [
         [
@@ -628,12 +665,12 @@
       "wave": "zero-observation-wave"
     },
     {
-      "step": 17,
+      "step": 18,
       "name": "final-artifact-preparation",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        16
+        17
       ],
       "acceptanceCommands": [
         [
@@ -656,12 +693,12 @@
       "wave": "final-artifact-wave"
     },
     {
-      "step": 18,
+      "step": 19,
       "name": "canonical-tested-head",
       "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
-        17
+        18
       ],
       "acceptanceCommands": [
         [
@@ -675,12 +712,12 @@
       "status": "pending"
     },
     {
-      "step": 19,
+      "step": 20,
       "name": "exact-commit-astra-review",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        18
+        19
       ],
       "acceptanceCommands": [
         [
@@ -694,12 +731,12 @@
       "status": "pending"
     },
     {
-      "step": 20,
+      "step": 21,
       "name": "publish-open-pr",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        19
+        20
       ],
       "acceptanceCommands": [
         [
@@ -713,12 +750,12 @@
       "status": "pending"
     },
     {
-      "step": 21,
+      "step": 22,
       "name": "published-sha-identity",
       "estimatedMinutes": 5,
       "timeoutMinutes": 30,
       "dependsOn": [
-        20
+        21
       ],
       "acceptanceCommands": [
         [

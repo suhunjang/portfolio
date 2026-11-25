@@ -1,12 +1,12 @@
-# Step 16: canonical-zero-observation
+# Step 16: state-color-remediation-expectation
 
 ## Current authoritative contract
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-Single-owner observation lane. After remediation fan-in, run fresh fixed nonempty scenarios, require both rules zero, and produce tracked `tests/fixtures/axe-zero-observation.json`. Store schemaVersion, evidence SHA, exact scenarios, color=0, nested=0, occurrenceCount=0, and collection-output SHA. Acceptance is read-only verify-observation; no css/js/baseline/plan writes.
+Post-remediation state-color expectation lane. It is the sole writer of `tests/fixtures/component-state-colors.json`: run approved-remediation-delta `--write` to derive expected colors from BASE plus frozen evidence, never current DOM, then `--check` and state-colors/component-hover compare the current remediated UI to that committed expectation. Any mismatch blocks observation.
 
 ## Exact write boundary
-zero-observation: tests/fixtures/axe-zero-observation.json
+state-color-remediation: tests/fixtures/component-state-colors.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

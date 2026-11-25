@@ -629,8 +629,7 @@
           "laneId": "a11y-color-guard",
           "files": [
             "tests/helpers/design-guard-color-rules.js",
-            "tests/specs/design-guard-color-rules.spec.js",
-            "tests/fixtures/component-state-colors.json"
+            "tests/specs/design-guard-color-rules.spec.js"
           ],
           "requiredCommands": [
             [
@@ -697,8 +696,7 @@
               "exec",
               "playwright",
               "test",
-              "specs/design-guard-color-rules.spec.js",
-              "specs/state-colors.spec.js"
+              "specs/design-guard-color-rules.spec.js"
             ]
           ],
           "maxAttempts": 2
@@ -748,9 +746,53 @@
       ]
     },
     {
-      "waveId": "zero-observation-wave",
+      "waveId": "state-color-remediation-wave",
       "step": 16,
       "baseSelector": "completedStep:15",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation",
+          "files": [
+            "tests/fixtures/component-state-colors.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--write",
+              "--mode",
+              "approved-remediation-delta",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js",
+              "specs/component-hover.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "zero-observation-wave",
+      "step": 17,
+      "baseSelector": "completedStep:16",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -798,8 +840,8 @@
     },
     {
       "waveId": "final-artifact-wave",
-      "step": 17,
-      "baseSelector": "completedStep:16",
+      "step": 18,
+      "baseSelector": "completedStep:17",
       "emptyAllowed": false,
       "lanes": [
         {

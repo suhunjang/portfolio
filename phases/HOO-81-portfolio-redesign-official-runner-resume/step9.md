@@ -4,9 +4,7 @@
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step27.md`, SHA-256 `e92b00655ea81a66ac48f61a43e5e4fb9e7e648e5999c4ddfea096cf4b2c9edb`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
-### Current carried-forward requirements from historical boundary 27 (authoritative, not a command)
-
-Current contract: clamp/stripe selectors and focused spec only, separate 15-minute original boundary. Keep state-color expectation check. No-op forbidden.
+Current contract: `.featured-blurb` three cards and all 13 grid blurbs use `-webkit-line-clamp: 3` at 375/768/1280 while DOM text equals PROJECTS blurb; modal blurb clamp is none/unset and full text. `.strength-card::before` remains a left full-height stripe with inset `0 auto 0 0`, width 3px, opacity .85 at all viewports; no responsive exception or new color. Strength cards remain six in STRENGTHS order. component-clamp.spec.js asserts all counts, clamp values, full modal text and stripe box width 3px ±1/full card height ±1.
 
 ## Exact write boundary
 clamp: css/style.css, tests/specs/component-clamp.spec.js
