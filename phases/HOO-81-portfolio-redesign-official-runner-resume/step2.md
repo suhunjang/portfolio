@@ -15,4 +15,4 @@ hero: index.html, js/main.js, css/style.css, tests/specs/hero.spec.js
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
 
 ## Acceptance
-Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means the worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.
+Each worker runs only its own execution.json lane `requiredCommands` and `focusedTests` in order; it never runs index.json `acceptanceCommands` inside the uncommitted lane worktree. Nonzero blocks and `emptyAllowed=false` requires the declared lane artifact/spec/source change. After all lane outputs are deterministically fanned in and committed, the official runner runs this step's index.json `acceptanceCommands` exactly once. Legacy no-op branches do not apply.
