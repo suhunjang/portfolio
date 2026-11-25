@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "initialSourceBaseSha": "5a34759acf16e7beb96c415101c152d6e786c4b3",
+  "waves": [
+    {
+      "waveId": "wave-a",
+      "step": 3,
+      "baseSelector": "completedStep:2",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "wave-a-css",
+          "files": [
+            "css/style.css",
+            "tests/specs/hero-layout.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/hero-layout.spec.js",
+              "specs/hero.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "wave-a-markup",
+          "files": [
+            "index.html",
+            "js/main.js",
+            "tests/specs/structure.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4176",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/structure.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "wave-a-state",
+          "files": [
+            "tests/helpers/state-sequence.js",
+            "tests/specs/state-sequence.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4177",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-sequence.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "wave-b",
+      "step": 4,
+      "baseSelector": "completedStep:3",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "wave-b-css",
+          "files": [
+            "css/style.css",
+            "tests/specs/layout.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/layout.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "wave-b-js",
+          "files": [
+            "js/main.js",
+            "tests/specs/focus-modal.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4176",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/focus-modal.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "wave-b-state",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/fixtures/component-state-colors.json",
+            "tests/specs/state-colors.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--check"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4177",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js",
+              "specs/state-sequence.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-wave",
+      "step": 10,
+      "baseSelector": "completedStep:9",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-color",
+          "files": [
+            "css/style.css"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/design-guard-color-rules.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "a11y-nested",
+          "files": [
+            "js/main.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4176",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/modal-regression.spec.js",
+              "specs/featured.spec.js",
+              "specs/focus-modal.spec.js",
+              "specs/focus-lightbox.spec.js",
+              "specs/component-hit.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    }
+  ]
+}

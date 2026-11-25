@@ -1,0 +1,467 @@
+{
+  "project": "suhunjang/portfolio",
+  "phase": "HOO-81-portfolio-redesign-official-runner-resume",
+  "baseBranch": "main",
+  "designDoc": "phases/HOO-81-portfolio-redesign-official-runner-resume/design.md",
+  "allowedPaths": [
+    "index.html",
+    "css/style.css",
+    "js/main.js",
+    "js/data.js",
+    "tests/scripts/verify-scope.mjs",
+    "tests/specs/verify-scope-resume.spec.js",
+    "tests/playwright.config.js",
+    "tests/specs/smoke.spec.js",
+    "tests/specs/featured.spec.js",
+    "tests/specs/hero.spec.js",
+    "tests/specs/hero-layout.spec.js",
+    "tests/specs/structure.spec.js",
+    "tests/specs/layout.spec.js",
+    "tests/specs/component-hit.spec.js",
+    "tests/specs/state-sequence.spec.js",
+    "tests/specs/state-colors.spec.js",
+    "tests/specs/component-hover.spec.js",
+    "tests/specs/component-clamp.spec.js",
+    "tests/specs/focus-modal.spec.js",
+    "tests/specs/focus-lightbox.spec.js",
+    "tests/specs/print.spec.js",
+    "tests/specs/screenshots.spec.js",
+    "tests/helpers/component-state.js",
+    "tests/helpers/state-sequence.js",
+    "tests/scripts/make-state-colors.mjs",
+    "tests/fixtures/component-state-colors.json",
+    "tests/helpers/design-guard-color-rules.js",
+    "tests/specs/design-guard-color-rules.spec.js",
+    "tests/fixtures/axe-baseline.json",
+    "tests/fixtures/axe-remediation-plan.json"
+  ],
+  "testCommand": [
+    "sh",
+    "tests/scripts/with-env.sh",
+    "npm",
+    "--prefix",
+    "tests",
+    "test"
+  ],
+  "planSchemaVersion": 2,
+  "executionPlan": "execution.json",
+  "continuation": {
+    "continuationOf": "HOO-81-portfolio-redesign-resume",
+    "parentPlanSha": "427543e7cbe9a9cbb7d62adb28974014e7921f8a8d88c56c11612fb0940a8551",
+    "inputArtifactSha": "439ff4e306bec12163155310955f70510cf2ff402fc04dedce57832bc66debb9",
+    "provenanceType": "legacy-attestation",
+    "attestationSha": "e43ab775e1f797df6186a7fa3af4083fff9fd8a0627d09dfc0f0518903018512",
+    "inheritedArtifacts": [
+      {
+        "metadataCommitSha": "dce163d89666acdd30a49705ebc4e93c6dba4636",
+        "path": "/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json",
+        "producerStep": 16,
+        "sha256": "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+        "size": 47392,
+        "sourceCommitSha": null
+      }
+    ]
+  },
+  "steps": [
+    {
+      "step": 0,
+      "name": "inherit-preflight",
+      "estimatedMinutes": 15,
+      "timeoutMinutes": 30,
+      "dependsOn": [],
+      "acceptanceCommands": [
+        [
+          "/Volumes/P9/hoonlabs-data/dev-harness/bin/harness",
+          "--project-root",
+          ".",
+          "check"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-scope.mjs"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/smoke.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "featured-projects",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        0
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/featured.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "hero-first-screen",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        1
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/hero.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "wave-a-layout-structure-state",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        2
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/hero-layout.spec.js",
+          "specs/structure.spec.js",
+          "specs/state-sequence.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "wave-a"
+    },
+    {
+      "step": 4,
+      "name": "wave-b-layout-focus-state",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        3
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/layout.spec.js",
+          "specs/focus-modal.spec.js",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "wave-b"
+    },
+    {
+      "step": 5,
+      "name": "component-hit-targets",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        4
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/component-hit.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "hover-and-clamp",
+      "estimatedMinutes": 19,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        5
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/component-hover.spec.js",
+          "specs/component-clamp.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "focus-lightbox",
+      "estimatedMinutes": 11,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        6
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/focus-lightbox.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "print-pdf",
+      "estimatedMinutes": 11,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        7
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/print.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "integration-a11y-collect",
+      "estimatedMinutes": 18,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        8
+      ],
+      "acceptanceCommands": [
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-scope.mjs"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/featured.spec.js",
+          "specs/hero.spec.js",
+          "specs/hero-layout.spec.js",
+          "specs/structure.spec.js",
+          "specs/layout.spec.js",
+          "specs/component-hit.spec.js",
+          "specs/state-sequence.spec.js",
+          "specs/state-colors.spec.js",
+          "specs/component-hover.spec.js",
+          "specs/component-clamp.spec.js",
+          "specs/focus-modal.spec.js",
+          "specs/focus-lightbox.spec.js",
+          "specs/print.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending",
+      "batch": {
+        "items": [
+          "pair-001",
+          "pair-002",
+          "pair-003",
+          "pair-004",
+          "pair-005",
+          "pair-006",
+          "pair-007",
+          "pair-008",
+          "pair-009",
+          "pair-010",
+          "pair-011",
+          "pair-012",
+          "pair-013",
+          "pair-014",
+          "pair-015",
+          "pair-016",
+          "pair-017",
+          "pair-018",
+          "pair-019",
+          "pair-020",
+          "pair-021",
+          "pair-022",
+          "pair-023",
+          "pair-024",
+          "pair-025"
+        ],
+        "maxItemsPerStep": 25,
+        "inputArtifactSha": "439ff4e306bec12163155310955f70510cf2ff402fc04dedce57832bc66debb9"
+      }
+    },
+    {
+      "step": 10,
+      "name": "a11y-remediation-wave",
+      "estimatedMinutes": 15,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        9
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/modal-regression.spec.js",
+          "specs/featured.spec.js",
+          "specs/focus-modal.spec.js",
+          "specs/focus-lightbox.spec.js",
+          "specs/component-hit.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-wave"
+    },
+    {
+      "step": 11,
+      "name": "final-verification",
+      "estimatedMinutes": 18,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        10
+      ],
+      "acceptanceCommands": [
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-scope.mjs",
+          "--final"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/screenshots.spec.js"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    }
+  ]
+}
