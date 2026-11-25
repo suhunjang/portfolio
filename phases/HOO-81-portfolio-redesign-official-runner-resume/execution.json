@@ -788,9 +788,56 @@
       ]
     },
     {
-      "waveId": "a11y-contrast-measurement-wave",
+      "waveId": "a11y-change-unit-map-wave",
       "step": 17,
       "baseSelector": "completedStep:16",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-change-unit-map",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-change-units.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "map-change-units",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--css",
+              "css/style.css",
+              "--out",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-contrast-measurement-wave",
+      "step": 18,
+      "baseSelector": "completedStep:17",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -805,8 +852,8 @@
               "node",
               "tests/scripts/verify-a11y-remediation.mjs",
               "collect-contrast-measurements",
-              "--occurrences",
-              "tests/fixtures/axe-remediation-occurrences.json",
+              "--map",
+              "tests/fixtures/axe-contrast-change-units.json",
               "--base-ref",
               "5a34759acf16e7beb96c415101c152d6e786c4b3",
               "--css",
@@ -838,8 +885,8 @@
     },
     {
       "waveId": "a11y-contrast-validation-wave",
-      "step": 18,
-      "baseSelector": "completedStep:17",
+      "step": 19,
+      "baseSelector": "completedStep:18",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -887,8 +934,8 @@
     },
     {
       "waveId": "a11y-color-derive-wave",
-      "step": 19,
-      "baseSelector": "completedStep:18",
+      "step": 20,
+      "baseSelector": "completedStep:19",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -946,8 +993,8 @@
     },
     {
       "waveId": "state-color-remediation-contract-wave",
-      "step": 20,
-      "baseSelector": "completedStep:19",
+      "step": 21,
+      "baseSelector": "completedStep:20",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1018,8 +1065,8 @@
     },
     {
       "waveId": "state-color-remediation-apply-wave",
-      "step": 21,
-      "baseSelector": "completedStep:20",
+      "step": 22,
+      "baseSelector": "completedStep:21",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1066,8 +1113,8 @@
     },
     {
       "waveId": "a11y-lifecycle-wave",
-      "step": 22,
-      "baseSelector": "completedStep:21",
+      "step": 23,
+      "baseSelector": "completedStep:22",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1103,8 +1150,8 @@
     },
     {
       "waveId": "a11y-live-scan-wave",
-      "step": 23,
-      "baseSelector": "completedStep:22",
+      "step": 24,
+      "baseSelector": "completedStep:23",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1140,8 +1187,8 @@
     },
     {
       "waveId": "a11y-observation-contract-wave",
-      "step": 24,
-      "baseSelector": "completedStep:23",
+      "step": 25,
+      "baseSelector": "completedStep:24",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1180,8 +1227,8 @@
     },
     {
       "waveId": "a11y-color-guard-wave",
-      "step": 25,
-      "baseSelector": "completedStep:24",
+      "step": 26,
+      "baseSelector": "completedStep:25",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1237,8 +1284,8 @@
     },
     {
       "waveId": "a11y-wave",
-      "step": 26,
-      "baseSelector": "completedStep:25",
+      "step": 27,
+      "baseSelector": "completedStep:26",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1335,8 +1382,8 @@
     },
     {
       "waveId": "state-color-remediation-wave",
-      "step": 27,
-      "baseSelector": "completedStep:26",
+      "step": 28,
+      "baseSelector": "completedStep:27",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1374,8 +1421,8 @@
     },
     {
       "waveId": "zero-observation-wave",
-      "step": 28,
-      "baseSelector": "completedStep:27",
+      "step": 29,
+      "baseSelector": "completedStep:28",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1428,8 +1475,8 @@
     },
     {
       "waveId": "final-prepare-wave",
-      "step": 29,
-      "baseSelector": "completedStep:28",
+      "step": 30,
+      "baseSelector": "completedStep:29",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1480,8 +1527,8 @@
     },
     {
       "waveId": "final-verify-wave",
-      "step": 30,
-      "baseSelector": "completedStep:29",
+      "step": 31,
+      "baseSelector": "completedStep:30",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1517,8 +1564,8 @@
     },
     {
       "waveId": "final-screenshot-wave",
-      "step": 31,
-      "baseSelector": "completedStep:30",
+      "step": 32,
+      "baseSelector": "completedStep:31",
       "emptyAllowed": false,
       "lanes": [
         {

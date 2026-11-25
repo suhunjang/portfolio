@@ -1,12 +1,12 @@
-# Step 19: a11y-color-derivation
+# Step 19: a11y-contrast-validation
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-ColorChanges derivation only, after validated contrast BASE. Exact 61 remains inherited classification, but selection is per `changeUnitId`, not per occurrence. For each change unit, candidate set is existing tokens whose state-specific resolvedColor yields WCAG2 >=4.5 in every linked state for every occurrence in that unit. Sum squared 8-bit sRGB distance to each member's BASE changed-property value; choose minimum sum, then code-unit token name. Emit one unit decision plus colorChanges entries for every occurrenceId, all sharing the same token/declaration decision. Reject any unit split, multiple tokens for one declaration/scope, incomplete member, new literal or themes.css need; no candidate stops `color-scope-themes-required`. Specs cover shared declarations across scenarios/themes, conflict rejection, distance/tie and no-candidate stop. <=14 minutes.
+Contrast completeness validation and canonical publication only. Read occurrence/map/measurement fixtures without browser. Require all 61 IDs exactly once; unit mapping and requiredStates exact; every state carries all candidate per-state colors. Reject missing/extra/duplicate, split/overlap, incomplete state, alpha/unresolved colors or candidate mismatch. Publish `tests/fixtures/axe-contrast-base.json` canonically. Lane writes; fan-in verify-contrast-base is read-only and validates submitted bytes before any generation. <=12 minutes.
 
 ## Exact write boundary
-a11y-color-derive: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/fixtures/axe-remediation-evidence.json
+a11y-contrast-validation: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/fixtures/axe-contrast-base.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
