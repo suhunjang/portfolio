@@ -9,7 +9,7 @@ Always-on preparation: before each worker acts, read CLAUDE.md and both pinned d
 Current contract: existing records 1,5,7 only; #heroFeatured immediately after #heroStats; renderFeaturedProjects() delegates to unchanged openProjectModal(idx); featured buttons contain no nested interactive; click/Enter/modal close restores trigger focus. No-op forbidden; focused spec must be added.
 
 ## Exact write boundary
-featured: index.html, js/data.js, js/main.js, css/style.css, tests/specs/featured.spec.js
+featured: index.html, js/main.js, css/style.css, tests/specs/featured.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

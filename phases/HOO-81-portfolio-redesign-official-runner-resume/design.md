@@ -1,4 +1,4 @@
-# HOO-81 Official Runner Continuation v68
+# HOO-81 Official Runner Continuation v70
 
 ## Goal
 Complete only unfinished redesign and verified accessibility remediation through official Harness 2.0.1. Completion is blocker 0 + step AC + exact-commit Astra CLEAN + OPEN PR + tested/reviewed/local/remote/PR SHA identity.
@@ -10,7 +10,7 @@ BASE_HEAD `5a34759acf16e7beb96c415101c152d6e786c4b3`. Historical original 0~39 c
 Before the step0 lane command, official runner keeps the inherited canonical artifact at `/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json` read-only. Step0 verifies it against continuation provenance (47392 bytes, SHA `1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1`) and copies exact bytes to tracked `tests/fixtures/axe-pairs-inherited.json` inside its fresh worktree. After step0 fan-in every later worktree receives that committed fixture. Collected input is already tracked at `tests/fixtures/axe-collected.json` (28809 bytes, SHA `ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c`). Runtime artifact inputs are read-only exceptions; worker writes remain limited to execution.json lane files.
 
 ## Execution
-Steps 0~19 run in official exact-file waves; only steps3 and16 have concurrent disjoint lanes. Step13 owns evidence/collect, step14 live verifier, step15 guard/delta, step16 remediation, step17 remediated colors, step18 zero observation, step19 final artifacts. Steps20~23 are coordinator gates.
+Steps 0~23 run in official exact-file waves; only steps3 and18 have concurrent disjoint lanes. Steps14~16 split lifecycle/live scan/observation validation. Steps21~23 split fixture transition/final verification/screenshots. Steps24~27 are coordinator gates.
 
 ## Evidence and final gates
-Original 139 mapping persists in `tests/fixtures/axe-remediation-evidence.json`. Step18 stores fresh zero; step19 consumes it before emptying baseline/plan. Step20 reruns zero read-only and writes tested base/head. Step21 reviews full `5a34759acf16e7beb96c415101c152d6e786c4b3..HEAD`; steps22~23 compare all bindings. HEAD change returns to step20.
+Original 139 mapping persists in `tests/fixtures/axe-remediation-evidence.json`. Step20 stores fresh zero; step21 consumes it before emptying baseline/plan. Step24 reruns zero read-only and writes tested base/head. Step25 reviews full `5a34759acf16e7beb96c415101c152d6e786c4b3..HEAD`; steps26~27 compare all bindings. HEAD change returns to step24.
