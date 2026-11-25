@@ -1,33 +1,32 @@
-# Compact Step 6 — visual-final-contract
+# Compact Step 6 — component-states (r23·r26·r27, clamp·stripe 담당)
 
-- 목적: 시각 증거 spec과 최종 계약 spec을 작성한다.
-- 예상 20분, hard timeout 30분. 선행: step 5. 공통 선행조건: §C0.
-- 허용 파일(exact): `tests/specs/screenshots.spec.js`, `tests/specs/final-contract.spec.js`(둘 다 신규)
-- runtime: `tests/screenshots/**`
-- 금지: product 파일 수정, 다른 spec 수정. 실패하면 원인 step을 보고하고 중단한다.
+- 목적: hit target 44px 이상, 비색 hover/active, blurb line clamp 3, `.strength-card::before` stripe 제거.
+- 예상 18분, hard timeout 30분. 선행: step 5. 공통 선행조건 §C0.
+- 허용 파일(exact):
+  - `css/style.css`: 대상 요소의 hit target, `:hover`·`:active`의 transform·opacity·transition, `.featured-blurb`·카드 blurb clamp, BASE `.strength-card::before` 삭제. 모두 비색만.
+  - `tests/specs/final-contract.spec.js`: 보강
+- runtime: §C4
+- 금지:
+  - `index.html`, `js/*`
+  - 색 선언·순서
+  - 무한 장식 애니메이션 제거
+  - print(step 7)
 
 ## 작업
-1. `tests/specs/screenshots.spec.js`를 작성한다.
-   - 설계 §C7의 15장을 그 정확한 파일명으로 찍는다.
-   - 각 장은 `prepareForAxe`를 거친 뒤 찍는다. 대상 project에 맞지 않는 장은 test.skip한다.
-   - lightbox 장은 기존 helper가 찾은 첫 shots project ID를 `tests/.tmp/compact/lightbox-project.txt`에 기록한다.
-   - 모달 SVG text의 font-family가 Space Grotesk인지 확인한다.
-2. `tests/specs/final-contract.spec.js`를 작성한다. 이 spec이 소유하는 assertion:
-   - `js/data.js`:
-     - `tests/.tmp/compact/evidence-step0.json`의 `baselineHead`에서 `git show`로 bytes를 읽어 최종 bytes와 비교한다.
-     - PROJECTS index 1·5·7의 title 다음에 `featured: true,` 정확히 3줄만 추가됐고, 나머지 bytes는 같아야 한다.
-     - `featured: false`, 다른 field, format 변경은 거부한다.
-   - `css/themes.css` bytes가 BASE `d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d`와 같다.
-   - FINAL IA 6개 섹션 순서, PROJECTS 13개의 순서·title.
-   - 375·768·1280에서 가로 스크롤 0.
-   - mobile-dark에서 menu를 열고 닫을 수 있다.
-   - project 0·1·2·5·7·12의 modal이 열리고 닫힌다.
-   - print에서 본문·featured가 보이고, interaction·modal은 숨겨진다.
-   - `tests/screenshots/`의 png 목록이 §C7 15장과 정확히 같다. screenshots spec 실행 후에 검사한다.
-3. 두 spec 각각 `OWN_SPEC`을 통과한 뒤 실행한다.
+1. `final-contract.spec.js`에 assertion을 보강하고 RED를 확인한다. 측정 전에 유한 애니메이션이 끝날 때까지 기다린다.
+   - 6 project에서 다음 요소의 rect가 tokens.`hitTargetMinPx`(44) 이상이다:
+     - `.nav-link`(보이는 것), `#menuToggle`(보이면), `#themeToggle`, `.hero-cta .btn`
+     - `.featured-card` 3개, `#projectGrid .project-card` 13개
+     - `#contactActions a`(있으면), `.scroll-hint`(보이면)
+   - desktop-dark/light에서 `.hero-cta .btn`·`.featured-card`·`#projectGrid .project-card`의 hover와 active 상태:
+     - 각각 transform 또는 opacity가 default와 다르다.
+     - color·backgroundColor·borderColor는 default와 같다.
+   - `.featured-blurb` 3개와 grid 카드 blurb 13개의 `-webkit-line-clamp`가 `3`이다. textContent는 `PROJECTS[i].blurb`와 같다. 카드 0의 모달 `.modal-blurb`는 clamp가 `none`이고 전문이 보인다.
+   - `.strength-card::before`의 content가 `none`이거나 rect 0이다. `.strength-card` 6개의 순서와 내용은 `STRENGTHS`와 같다.
+2. 구현한다.
 
 ## AC
-- `OWN_SPEC tests/specs/screenshots.spec.js`
 - `OWN_SPEC tests/specs/final-contract.spec.js`
-- `T specs/screenshots.spec.js`
-- `T specs/final-contract.spec.js`
+- `T specs/final-contract.spec.js specs/featured.spec.js specs/ui-regression.spec.js`
+- `DI`
+- `T <GS>`
