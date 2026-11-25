@@ -294,8 +294,8 @@
     },
     {
       "step": 7,
-      "name": "state-color-contract",
-      "estimatedMinutes": 14,
+      "name": "state-color-base-contract",
+      "estimatedMinutes": 15,
       "timeoutMinutes": 30,
       "dependsOn": [
         6
@@ -304,11 +304,32 @@
         [
           "node",
           "tests/scripts/make-state-colors.mjs",
-          "--check",
           "--mode",
           "base-expectation",
           "--base-ref",
-          "5a34759acf16e7beb96c415101c152d6e786c4b3"
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--write",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "base-expectation",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--check",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
         ],
         [
           "env",
@@ -327,7 +348,7 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "state-color-wave"
+      "wave": "state-color-base-wave"
     },
     {
       "step": 8,
@@ -521,13 +542,30 @@
     },
     {
       "step": 14,
-      "name": "a11y-server-lifecycle-contract",
-      "estimatedMinutes": 10,
+      "name": "state-color-remediation-contract",
+      "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
         13
       ],
       "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "approved-remediation-delta",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--validate",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
         [
           "env",
           "PW_PORT=4175",
@@ -539,17 +577,17 @@
           "exec",
           "playwright",
           "test",
-          "specs/verify-a11y-remediation.spec.js"
+          "specs/state-colors.spec.js"
         ]
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "a11y-lifecycle-wave"
+      "wave": "state-color-remediation-contract-wave"
     },
     {
       "step": 15,
-      "name": "a11y-live-scan-contract",
-      "estimatedMinutes": 12,
+      "name": "a11y-server-lifecycle-contract",
+      "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
         14
@@ -571,15 +609,42 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "a11y-live-scan-wave"
+      "wave": "a11y-lifecycle-wave"
     },
     {
       "step": 16,
-      "name": "a11y-observation-contract",
-      "estimatedMinutes": 10,
+      "name": "a11y-live-scan-contract",
+      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         15
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-live-scan-wave"
+    },
+    {
+      "step": 17,
+      "name": "a11y-observation-contract",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        16
       ],
       "acceptanceCommands": [
         [
@@ -608,12 +673,12 @@
       "wave": "a11y-observation-contract-wave"
     },
     {
-      "step": 17,
+      "step": 18,
       "name": "a11y-color-guard-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        16
+        17
       ],
       "acceptanceCommands": [
         [
@@ -627,13 +692,19 @@
         [
           "node",
           "tests/scripts/make-state-colors.mjs",
-          "--validate",
           "--mode",
           "approved-remediation-delta",
           "--base-ref",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
           "--remediation",
-          "tests/fixtures/axe-remediation-evidence.json"
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--validate",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
         ],
         [
           "env",
@@ -654,12 +725,12 @@
       "wave": "a11y-color-guard-wave"
     },
     {
-      "step": 18,
+      "step": 19,
       "name": "a11y-remediation-wave",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        17
+        18
       ],
       "acceptanceCommands": [
         [
@@ -686,24 +757,47 @@
       "wave": "a11y-wave"
     },
     {
-      "step": 19,
+      "step": 20,
       "name": "state-color-remediation-expectation",
-      "estimatedMinutes": 10,
+      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        18
+        19
       ],
       "acceptanceCommands": [
         [
           "node",
           "tests/scripts/make-state-colors.mjs",
-          "--check",
           "--mode",
           "approved-remediation-delta",
           "--base-ref",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
           "--remediation",
-          "tests/fixtures/axe-remediation-evidence.json"
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--write",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "approved-remediation-delta",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--check",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
         ],
         [
           "env",
@@ -725,12 +819,12 @@
       "wave": "state-color-remediation-wave"
     },
     {
-      "step": 20,
+      "step": 21,
       "name": "canonical-zero-observation",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
-        19
+        20
       ],
       "acceptanceCommands": [
         [
@@ -753,36 +847,9 @@
       "wave": "zero-observation-wave"
     },
     {
-      "step": 21,
+      "step": 22,
       "name": "final-fixture-transition",
       "estimatedMinutes": 8,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        20
-      ],
-      "acceptanceCommands": [
-        [
-          "env",
-          "PW_PORT=4175",
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "exec",
-          "playwright",
-          "test",
-          "specs/final-contract.spec.js"
-        ]
-      ],
-      "executor": "parallel",
-      "status": "pending",
-      "wave": "final-prepare-wave"
-    },
-    {
-      "step": 22,
-      "name": "final-contract-verification",
-      "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
         21
@@ -804,15 +871,42 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "final-verify-wave"
+      "wave": "final-prepare-wave"
     },
     {
       "step": 23,
+      "name": "final-contract-verification",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        22
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-verify-wave"
+    },
+    {
+      "step": 24,
       "name": "final-screenshots",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        22
+        23
       ],
       "acceptanceCommands": [
         [
@@ -835,31 +929,31 @@
       "wave": "final-screenshot-wave"
     },
     {
-      "step": 24,
+      "step": 25,
       "name": "canonical-tested-head",
       "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
-        23
+        24
       ],
       "acceptanceCommands": [
         [
           "python3",
           "-I",
           "-c",
-          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"env\", \"PW_PORT=4175\", \"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--server-root\", \".\", \"--forbid-existing-server\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:desktop-dark,page:desktop-light,page:mobile-dark,page:mobile-light,page:tablet-dark,page:tablet-light,modal:desktop-dark,modal:desktop-light,lightbox:desktop-dark,lightbox:desktop-light\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head\nassert subprocess.check_output(['git','status','--porcelain'],text=True)==''\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
+          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"env\", \"PW_PORT=4175\", \"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--server-root\", \".\", \"--forbid-existing-server\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:mobile-dark:null,page:mobile-light:null,page:tablet-dark:null,page:tablet-light:null,page:desktop-dark:null,page:desktop-light:null,modal:desktop-dark:0,modal:desktop-light:0,lightbox:desktop-dark:0,lightbox:desktop-light:0\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head\nassert subprocess.check_output(['git','status','--porcelain'],text=True)==''\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
         ]
       ],
       "executor": "sequential",
       "status": "pending"
     },
     {
-      "step": 25,
+      "step": 26,
       "name": "exact-commit-astra-review",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        24
+        25
       ],
       "acceptanceCommands": [
         [
@@ -873,12 +967,12 @@
       "status": "pending"
     },
     {
-      "step": 26,
+      "step": 27,
       "name": "publish-open-pr",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        25
+        26
       ],
       "acceptanceCommands": [
         [
@@ -892,19 +986,19 @@
       "status": "pending"
     },
     {
-      "step": 27,
+      "step": 28,
       "name": "published-sha-identity",
       "estimatedMinutes": 5,
       "timeoutMinutes": 30,
       "dependsOn": [
-        26
+        27
       ],
       "acceptanceCommands": [
         [
           "python3",
           "-I",
           "-c",
-          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; pr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'; assert tested['head']==reviewed['head']==head==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['baseRefName']=='main'; print(json.dumps({'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','diffSha256':diff,'testedSha':tested['head'],'reviewedSha':reviewed['head'],'localSha':head,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); local_branch=subprocess.check_output(['git','rev-parse','refs/heads/'+branch],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; pr=json.loads(subprocess.check_output(['gh','pr','view',branch,'--json','url,state,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'; assert tested['head']==reviewed['head']==head==local_branch==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['baseRefName']=='main'; print(json.dumps({'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','diffSha256':diff,'testedSha':tested['head'],'reviewedSha':reviewed['head'],'headSha':head,'localBranchSha':local_branch,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'pr':pr['url']}))\n"
         ]
       ],
       "executor": "sequential",
