@@ -3,7 +3,7 @@
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Two fresh remediation lanes. Workers run only own lane commands on ports 4175/4176. Detached staging runs step36 acceptance once before commit publication. Each lane requires owned rule=0 and exact non-owned residual identity from evidence. Color changes only css/style.css; nested changes only js/main.js. Preserve keyboard/internal-link/modal/focus. No observation artifact.
+Two fresh remediation lanes. Workers run only their own lane commands on ports 4175/4176. Detached staging runs exactly the Step37 index acceptanceCommands once before commit publication: the specified remediation regression specs only, with no FULL and no Step36 acceptance replay. This prevents stale working color fixture assertions before Step38 updates it. Each lane requires owned rule=0 and exact non-owned residual identity from evidence. Color changes only css/style.css; nested changes only js/main.js. Preserve keyboard/internal-link/modal/focus. No observation artifact.
 
 ## Exact write boundary
 a11y-color: css/style.css; a11y-nested: js/main.js

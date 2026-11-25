@@ -2098,8 +2098,9 @@
               "node",
               "tests/scripts/verify-final-contract.mjs",
               "self-test-transition-transaction",
-              "--manifest",
-              "tests/fixtures/final-transition-ready.json",
+              "--prepare-manifest-in-temp",
+              "--temp-root-env",
+              "TMPDIR",
               "--baseline",
               "tests/fixtures/axe-baseline.json",
               "--plan",
@@ -2137,8 +2138,6 @@
         {
           "laneId": "final-transition",
           "files": [
-            "tests/scripts/verify-final-contract.mjs",
-            "tests/specs/final-contract.spec.js",
             "tests/fixtures/final-transition-ready.json",
             "tests/fixtures/axe-baseline.json",
             "tests/fixtures/axe-remediation-plan.json"
@@ -2161,6 +2160,8 @@
               "--expect-original-occurrences",
               "139",
               "--out",
+              "tests/fixtures/final-transition-ready.json",
+              "--expect-worker-diff-only",
               "tests/fixtures/final-transition-ready.json"
             ]
           ],
