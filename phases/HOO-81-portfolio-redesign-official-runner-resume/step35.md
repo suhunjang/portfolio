@@ -1,12 +1,12 @@
-# Step 35: final-screenshots
+# Step 35: final-fixture-transition
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Screenshot contract with exact exhaustive manifest, all fullPage=false and PNG output equal viewport bytes: desktop-dark-page.png 1280x800 dark page; desktop-light-page.png 1280x800 light page; mobile-dark-menu-open.png 375x812 dark menu visible/expanded; desktop-dark-modal-1.png, -5.png, -7.png, -0.png, -2.png, -12.png each 1280x800 dark with matching project modal open. No additional PNG is allowed. Spec asserts manifest set, viewport, theme, state, project index, fullPage=false, decoded PNG dimensions and nonempty bytes. Worker/fan-in use TMPDIR; coordinator uses `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots`. No descriptor/control access.
+Fixture transition only. Step16 initially creates remediation plan. Worker lane never mutates baseline/plan: `prepare-transition-manifest` read-only validates regular original inputs, evidence SHA, complete zero scenarios and original 139 mapping, then writes only canonical `tests/fixtures/final-transition-ready.json` containing exact input hashes and expected empty-output hashes. Fan-in first validates that manifest and the still-nonempty submitted baseline/plan read-only, then runs exact `verify-transition`; any mismatch exits before mutation. Only then fan-in runs `prepare`, which revalidates the same hashes and atomically writes baseline `[]` and plan `{"groups":[]}`; final clean verification follows. The official acceptance mutation record must name only baseline and plan so Harness folds these two checked bytes into the accepted candidate. Any failure preserves both original bytes. Specs cover already-empty input, hash/occurrence mismatch, manifest tamper, mutation targetPaths, and rollback. No browser/screenshots.
 
 ## Exact write boundary
-final-screenshot: tests/specs/screenshots.spec.js
+final-prepare: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js, tests/fixtures/final-transition-ready.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
