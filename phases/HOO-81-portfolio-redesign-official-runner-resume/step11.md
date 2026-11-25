@@ -1,7 +1,7 @@
 # Step 11: focus-lightbox
 
 ## Current authoritative contract
-Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
+Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step29.md`, SHA-256 `08818749836570271a3c2ed0c809e3af5352697d9ac3bc74b3153691de5ff746`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
 ### Current carried-forward requirements from historical boundary 29 (authoritative, not a command)

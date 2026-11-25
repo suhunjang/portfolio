@@ -1,7 +1,7 @@
 # Step 3: hero-and-structure-wave
 
 ## Current authoritative contract
-Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
+Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step20.md`, SHA-256 `9af3100b185a664d99a3baf1785ebbf97469536e4df7064bbeecff6b83dd25d6`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step21.md`, SHA-256 `20cdb7835e939c7e1c4562121ebf3e7ba226be28621fca6fb2817ff4bdc76b78`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.

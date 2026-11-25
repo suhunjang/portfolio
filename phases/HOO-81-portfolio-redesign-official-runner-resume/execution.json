@@ -852,9 +852,14 @@
           ],
           "requiredCommands": [
             [
+              "env",
+              "PW_PORT=4175",
               "node",
               "tests/scripts/verify-a11y-remediation.mjs",
               "verify-full",
+              "--server-root",
+              ".",
+              "--forbid-existing-server",
               "--evidence",
               "tests/fixtures/axe-remediation-evidence.json",
               "--expect-color",

@@ -1,7 +1,7 @@
 # Step 16: a11y-remediation-wave
 
 ## Current authoritative contract
-Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
+Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
 Two fresh remediation lanes. Each lane requires its owned rule=0 and reads the non-owned rule's approved residual count from immutable evidence; it remains count/identity-equal. Color changes only css/style.css at evidence-listed declarations and passes approved delta guard; nested changes only js/main.js project-card render/event anchors. Preserve keyboard/internal-link/modal/focus. No observation artifact in these lanes.
 
