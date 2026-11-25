@@ -1,12 +1,12 @@
-# Step 29: state-color-remediation-winning-source-map
+# Step 29: a11y-color-derivation
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-BASE winning-source/current-unit correspondence only. Browser cascade selects the winner, but persisted identity must never contain backend node IDs. mapWinningSource returns source null or exact stable `{changeUnitId,occurrenceId,sourceSelector,cssProperty,startLine,startColumn,atRuleChain,scopeHash,domIdentity,relation,value}`; domIdentity is role-preserving `{projectRootSelector,relativeSelector,pseudoSelector,canonicalTargetFallback}` and relation is direct|inherited. Validate correspondence through authored source ranges plus role-preserving DOM identity; reject unstable/ambiguous correspondence. Re-run the complete 90-entry trace in a fresh BASE browser and require canonical byte equality, proving reload/restart stability. Publish `tests/fixtures/component-state-color-winning-sources.json` with exact hashes/coverage; shared/outcome classification remains forbidden until the next step. <=16 minutes.
+Token selection only after Step28 guard. For color candidates compute contrast against recorded final background. For background-color require backgroundReplacementMode=`direct-opaque`; then the opaque candidate is the measured final effective background by Step24 contract and contrast is computed against recorded foreground. Any null/other mode or layered case is unsupported, never approximated by substituting into a composite. Preserve existing WCAG2 >=4.5, all-linked-state eligibility, distance and token-name tie-break rules. Tests include opaque direct background success and semi-transparent child over changed ancestor rejection. <=14 minutes.
 
 ## Exact write boundary
-state-color-remediation-winning-source: tests/scripts/make-state-colors.mjs, tests/specs/state-colors.spec.js, tests/fixtures/component-state-color-winning-sources.json
+a11y-color-derive: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/fixtures/axe-remediation-evidence.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

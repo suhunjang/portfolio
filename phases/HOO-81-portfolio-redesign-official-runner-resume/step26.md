@@ -1,12 +1,12 @@
-# Step 26: a11y-contrast-validation
+# Step 26: a11y-contrast-measurement
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Contrast completeness validation/canonical publication only. Read map and `tests/fixtures/axe-contrast-measurements.json` browser-free. Publish `tests/fixtures/axe-contrast-base.json` preserving each measurement state including foregroundChangeUnitIds/backgroundChangeUnitIds byte-semantically in the exact state order; no field may be dropped or reconstructed. Validate all 61 IDs, map/hash/unit/state/candidate/link schemas, unique known links and eligibility coverage. Tests cover link omission, mutation, reorder, duplicate, unknown unit and Step27 consumption. Writer publishes canonically; fan-in validates submitted bytes first and never regenerates. <=20 minutes.
+Measurement join/serialization/remeasurement only. State exact `{occurrenceId,scenarioKind,viewport,theme,projectIndex,state,baseMapping,foreground,background,changedPropertyBase,backgroundReplacementMode,foregroundChangeUnitIds,backgroundChangeUnitIds,candidates}`; copy target state links/mode byte-semantically, join eligibility and validate own schemas/hashes/order. Tests here cover missing/altered/reordered/duplicate/unknown links and mode tamper only; they do not call or implement the future coupled guard. Read-only verifier re-observes/evaluates and byte-compares. <=20 minutes.
 
 ## Exact write boundary
-a11y-contrast-validation: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/fixtures/axe-contrast-base.json
+a11y-contrast-measurement: tests/scripts/verify-a11y-remediation.mjs, tests/specs/verify-a11y-remediation.spec.js, tests/fixtures/axe-contrast-measurements.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

@@ -3,7 +3,7 @@
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-BASE archive/server lifecycle only. Export exactly async withBaseArchiveBrowser({baseRef,serverRoot='.',port,tempRoot=process.env.TMPDIR},callback) with process-owned UUID archive/server/browser and scoped cleanup. Actual BASE-browser consumers are Steps9,23,24,25 and29, each of which must import/call this exact export; Steps22 and28 are explicitly browser-free fixture consumers and must not call it. Tests prove signature, import side-effect freedom, callback values/result/error, symlink/occupied-port rejection and scoped cleanup. <=20 minutes.
+BASE archive/server lifecycle only. Export exact withBaseArchiveBrowser with process-owned archive/server/browser and scoped cleanup. Actual BASE-browser consumers are Steps9,24,25,26,30; Steps23 and29 are browser-free. Tests prove lifecycle, ports/symlink failures and cleanup. <=20 minutes.
 
 ## Exact write boundary
 state-color-base-lifecycle: tests/scripts/make-state-colors.mjs, tests/specs/state-colors.spec.js

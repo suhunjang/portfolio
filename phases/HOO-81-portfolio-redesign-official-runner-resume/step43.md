@@ -1,12 +1,12 @@
-# Step 43: final-contract-verification
+# Step 43: final-fixture-transition
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Read-only final browser contract on the detached Step43 candidate. Run menu/modal assertions with `--candidate-diff-only --no-clean-tree-check`; do not require a clean git status because Step43's own submitted script/spec diff is intentionally uncommitted. `--require-clean` is forbidden in worker/fan-in and is reserved for coordinator Step45 after Step44 fan-in commit publication. Resolver takes explicit HOO103_SCREENSHOT_OUTPUT_ROOT or TMPDIR, requires absolute existing non-symlink writable root, and returns its HOO-81-screenshots child. Menu mobile-dark means viewport 375x812 dark theme: button opens visible nav and aria-expanded=true; Escape hides nav, sets false and restores button focus. For projects 1,5,7,0,2,12 at desktop-dark 1280x800, each trigger opens the matching visible dialog/title/full content, focus starts inside, Tab and Shift+Tab wrap, and close button, backdrop, and Escape each close and restore that exact trigger. CLI project list order is exact; omission/extra/wrong identity/focus fails.
+Actual tracked transition only after Steps41/42. Step43 worker writes only canonical `tests/fixtures/final-transition-ready.json`; worker-diff validation rejects every other path. Lane files include baseline/plan solely because Harness requires mutation targets there; worker treats them read-only. Detached acceptance is read-only, then Harness alone executes checks.mutation.command with exact targets and requireChanged, revalidates original 139 and empties both transactionally with rollback. <=12 minutes.
 
 ## Exact write boundary
-final-verify: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
+final-transition: tests/fixtures/final-transition-ready.json, tests/fixtures/axe-baseline.json, tests/fixtures/axe-remediation-plan.json
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.

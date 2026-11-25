@@ -1,12 +1,12 @@
-# Step 41: final-transition-transaction-contract
+# Step 41: final-transition-manifest-contract
 
 ## Current authoritative contract
 Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
 
-Transactional commit implementation only. Implement commit-fixture-transition and self-test exclusively on process-owned temporary copies. The exact self-test argv uses --prepare-manifest-in-temp --temp-root-env TMPDIR, not tracked final-transition-ready.json: inside the owned temp root it invokes the Step40 prepare-manifest implementation on temp baseline/plan/evidence/zero data, then injects validation, first/second rename, file/directory fsync and cleanup failures and proves both original byte sequences restored/fsynced. It must succeed when tracked manifest is absent and must not create or modify any tracked manifest/baseline/plan. <=10 minutes.
+Step41 manifest implementation only. Implement prepare/verify and `--expect-worker-diff-only` via NUL-safe porcelain parsing, exact one-path set, rename/space/untracked/unsafe rejection. Temp-git self-tests; no tracked write or baseline/plan mutation. Step43 invokes it. <=10 minutes.
 
 ## Exact write boundary
-final-transition-transaction-contract: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
+final-transition-manifest-contract: tests/scripts/verify-final-contract.mjs, tests/specs/final-contract.spec.js
 
 ## Output subject
 The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
