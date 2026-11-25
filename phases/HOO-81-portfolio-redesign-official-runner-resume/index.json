@@ -662,11 +662,51 @@
     },
     {
       "step": 18,
-      "name": "a11y-current-declaration-resolution",
+      "name": "a11y-declaration-resolver-contract",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         17
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-declaration-resolver",
+          "--css",
+          "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-declaration-resolver-wave"
+    },
+    {
+      "step": 19,
+      "name": "a11y-current-declaration-resolution",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        18
       ],
       "acceptanceCommands": [
         [
@@ -707,12 +747,12 @@
       "wave": "a11y-current-declaration-wave"
     },
     {
-      "step": 19,
+      "step": 20,
       "name": "a11y-change-unit-mapping",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        18
+        19
       ],
       "acceptanceCommands": [
         [
@@ -751,12 +791,12 @@
       "wave": "a11y-change-unit-map-wave"
     },
     {
-      "step": 20,
+      "step": 21,
       "name": "a11y-contrast-base-target-observation",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        19
+        20
       ],
       "acceptanceCommands": [
         [
@@ -797,12 +837,12 @@
       "wave": "a11y-contrast-target-wave"
     },
     {
-      "step": 21,
+      "step": 22,
       "name": "a11y-contrast-candidate-eligibility",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        20
+        21
       ],
       "acceptanceCommands": [
         [
@@ -845,12 +885,12 @@
       "wave": "a11y-contrast-eligibility-wave"
     },
     {
-      "step": 22,
+      "step": 23,
       "name": "a11y-contrast-measurement",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        21
+        22
       ],
       "acceptanceCommands": [
         [
@@ -895,12 +935,12 @@
       "wave": "a11y-contrast-measurement-wave"
     },
     {
-      "step": 23,
+      "step": 24,
       "name": "a11y-contrast-validation",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        22
+        23
       ],
       "acceptanceCommands": [
         [
@@ -939,12 +979,12 @@
       "wave": "a11y-contrast-validation-wave"
     },
     {
-      "step": 24,
+      "step": 25,
       "name": "a11y-color-derivation",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        23
+        24
       ],
       "acceptanceCommands": [
         [
@@ -991,12 +1031,12 @@
       "wave": "a11y-color-derive-wave"
     },
     {
-      "step": 25,
+      "step": 26,
       "name": "state-color-remediation-influence-analysis",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        24
+        25
       ],
       "acceptanceCommands": [
         [
@@ -1041,12 +1081,12 @@
       "wave": "state-color-remediation-influence-wave"
     },
     {
-      "step": 26,
+      "step": 27,
       "name": "state-color-remediation-contract",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        25
+        26
       ],
       "acceptanceCommands": [
         [
@@ -1093,12 +1133,12 @@
       "wave": "state-color-remediation-contract-wave"
     },
     {
-      "step": 27,
+      "step": 28,
       "name": "state-color-remediation-apply-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        26
+        27
       ],
       "acceptanceCommands": [
         [
@@ -1135,36 +1175,9 @@
       "wave": "state-color-remediation-apply-wave"
     },
     {
-      "step": 28,
+      "step": 29,
       "name": "a11y-server-lifecycle-contract",
       "estimatedMinutes": 10,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        27
-      ],
-      "acceptanceCommands": [
-        [
-          "env",
-          "PW_PORT=4175",
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "exec",
-          "playwright",
-          "test",
-          "specs/verify-a11y-remediation.spec.js"
-        ]
-      ],
-      "executor": "parallel",
-      "status": "pending",
-      "wave": "a11y-lifecycle-wave"
-    },
-    {
-      "step": 29,
-      "name": "a11y-live-scan-contract",
-      "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         28
@@ -1186,15 +1199,42 @@
       ],
       "executor": "parallel",
       "status": "pending",
-      "wave": "a11y-live-scan-wave"
+      "wave": "a11y-lifecycle-wave"
     },
     {
       "step": 30,
-      "name": "a11y-observation-contract",
+      "name": "a11y-live-scan-contract",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
         29
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-live-scan-wave"
+    },
+    {
+      "step": 31,
+      "name": "a11y-observation-contract",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        30
       ],
       "acceptanceCommands": [
         [
@@ -1223,12 +1263,12 @@
       "wave": "a11y-observation-contract-wave"
     },
     {
-      "step": 31,
+      "step": 32,
       "name": "a11y-color-guard-contract",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        30
+        31
       ],
       "acceptanceCommands": [
         [
@@ -1284,12 +1324,12 @@
       "wave": "a11y-color-guard-wave"
     },
     {
-      "step": 32,
+      "step": 33,
       "name": "a11y-remediation-wave",
       "estimatedMinutes": 16,
       "timeoutMinutes": 30,
       "dependsOn": [
-        31
+        32
       ],
       "acceptanceCommands": [
         [
@@ -1316,12 +1356,12 @@
       "wave": "a11y-wave"
     },
     {
-      "step": 33,
+      "step": 34,
       "name": "state-color-remediation-expectation",
       "estimatedMinutes": 14,
       "timeoutMinutes": 30,
       "dependsOn": [
-        32
+        33
       ],
       "acceptanceCommands": [
         [
@@ -1350,12 +1390,12 @@
       "wave": "state-color-remediation-wave"
     },
     {
-      "step": 34,
+      "step": 35,
       "name": "canonical-zero-observation",
       "estimatedMinutes": 10,
       "timeoutMinutes": 30,
       "dependsOn": [
-        33
+        34
       ],
       "acceptanceCommands": [
         [
@@ -1378,12 +1418,12 @@
       "wave": "zero-observation-wave"
     },
     {
-      "step": 35,
+      "step": 36,
       "name": "final-fixture-transition",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        34
+        35
       ],
       "acceptanceCommands": [
         [
@@ -1444,6 +1484,53 @@
         [
           "node",
           "tests/scripts/verify-final-contract.mjs",
+          "verify-fixture-transition",
+          "--base",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--zero-observation",
+          "tests/fixtures/axe-zero-observation.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--baseline-empty",
+          "--plan-empty",
+          "--evidence-preserved",
+          "--candidate-diff-only",
+          "--allowed-mutations",
+          "tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json"
+        ],
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "self-test-fixture-transition",
+          "--manifest",
+          "tests/fixtures/final-transition-ready.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--no-browser"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-prepare-wave"
+    },
+    {
+      "step": 37,
+      "name": "final-contract-verification",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        36
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
           "verify",
           "--base",
           "5a34759acf16e7beb96c415101c152d6e786c4b3",
@@ -1459,35 +1546,9 @@
           "mobile-dark",
           "--modal-projects",
           "1,5,7,0,2,12",
-          "--require-clean"
+          "--candidate-diff-only",
+          "--no-clean-tree-check"
         ],
-        [
-          "env",
-          "PW_PORT=4175",
-          "sh",
-          "tests/scripts/with-env.sh",
-          "npm",
-          "--prefix",
-          "tests",
-          "exec",
-          "playwright",
-          "test",
-          "specs/final-contract.spec.js"
-        ]
-      ],
-      "executor": "parallel",
-      "status": "pending",
-      "wave": "final-prepare-wave"
-    },
-    {
-      "step": 36,
-      "name": "final-contract-verification",
-      "estimatedMinutes": 12,
-      "timeoutMinutes": 30,
-      "dependsOn": [
-        35
-      ],
-      "acceptanceCommands": [
         [
           "env",
           "PW_PORT=4175",
@@ -1507,12 +1568,12 @@
       "wave": "final-verify-wave"
     },
     {
-      "step": 37,
+      "step": 38,
       "name": "final-screenshots",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        36
+        37
       ],
       "acceptanceCommands": [
         [
@@ -1535,12 +1596,12 @@
       "wave": "final-screenshot-wave"
     },
     {
-      "step": 38,
+      "step": 39,
       "name": "canonical-tested-head",
       "estimatedMinutes": 20,
       "timeoutMinutes": 30,
       "dependsOn": [
-        37
+        38
       ],
       "acceptanceCommands": [
         [
@@ -1554,12 +1615,12 @@
       "status": "pending"
     },
     {
-      "step": 39,
+      "step": 40,
       "name": "exact-commit-astra-review",
       "estimatedMinutes": 12,
       "timeoutMinutes": 30,
       "dependsOn": [
-        38
+        39
       ],
       "acceptanceCommands": [
         [
@@ -1573,12 +1634,12 @@
       "status": "pending"
     },
     {
-      "step": 40,
+      "step": 41,
       "name": "publish-open-pr",
       "estimatedMinutes": 8,
       "timeoutMinutes": 30,
       "dependsOn": [
-        39
+        40
       ],
       "acceptanceCommands": [
         [
@@ -1592,12 +1653,12 @@
       "status": "pending"
     },
     {
-      "step": 41,
+      "step": 42,
       "name": "published-sha-identity",
       "estimatedMinutes": 5,
       "timeoutMinutes": 30,
       "dependsOn": [
-        40
+        41
       ],
       "acceptanceCommands": [
         [
