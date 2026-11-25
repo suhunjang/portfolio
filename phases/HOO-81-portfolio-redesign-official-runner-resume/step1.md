@@ -4,10 +4,16 @@
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
 - Reference-only: `phases/HOO-81-portfolio-redesign-resume/step18.md`, SHA-256 `2257f62944d6ec4ca95c96f8144a3c4463c2b1ee7030f759f7ae7d896b116cc9`. Do **not** execute its legacy RSNAP/REQ/DI/RGATE/FULL/no-op commands; the current argv contract below replaces them.
+### Current carried-forward requirements from historical boundary 18 (authoritative, not a command)
+2. `DI`(이후 `DesktopTop.dc.html`·`Components.dc.html` 읽기만). RED spec(6 project): 컨테이너 1개·div·role `region`·aria-label `대표 프로젝트`·`#heroStats` 다음 형제; 카드 3개 `button[type=button]`, data-project 1·5·7, span 2개, 금지 자손 0, 텍스트, span block, background-image none; click 후 button·backdrop·esc 닫기 → 카드 포커스, 제목, Enter·esc 복귀; `findProjectWithShots`·`prepareForAxe({ scenario: 'modal', projectIndex: 1 })`는 grid만; `.featured-card` 색 3속성 = `#projectGrid .project-card`.
+3. 구현(`esc()`, 그리드 직후). axe 새 target은 색 변경 없이 해결, 식별 손실이면 중단·재계획.
 Current contract: existing records 1,5,7 only; #heroFeatured immediately after #heroStats; renderFeaturedProjects() delegates to unchanged openProjectModal(idx); featured buttons contain no nested interactive; click/Enter/modal close restores trigger focus. No-op forbidden; focused spec must be added.
 
 ## Exact write boundary
 featured: index.html, js/data.js, js/main.js, css/style.css, tests/specs/featured.spec.js
+
+## Output subject
+The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
 
 ## Acceptance
 Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.

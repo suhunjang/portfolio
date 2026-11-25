@@ -8,5 +8,8 @@ Read/hash-check CLAUDE.md and both design docs. Official runner binds read-only 
 ## Exact write boundary
 preflight-contract: tests/scripts/continuation-preflight.mjs, tests/specs/continuation-preflight.spec.js, tests/fixtures/axe-pairs-inherited.json
 
+## Output subject
+The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
+
 ## Acceptance
 Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.

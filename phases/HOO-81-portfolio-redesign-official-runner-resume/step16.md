@@ -3,10 +3,13 @@
 ## Current authoritative contract
 Always-on: preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata. Historical references are read-only context; only current index argv and current contract execute.
 
-Coordinator-only after runner commits step15 fan-in. At clean HEAD, rerun FULL, fixed-scenario fresh zero, screenshots/final contract and --require-clean. Atomically write external `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json` containing tested HEAD and command-output hashes. Any failure or later HEAD change invalidates the record.
+Coordinator-only after runner commits step15 fan-in. At clean HEAD, rerun FULL, fixed-scenario fresh zero in read-only observation-stdout mode, screenshots/final contract and --require-clean. Atomically write external `/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json` containing implementation base `5a34759acf16e7beb96c415101c152d6e786c4b3`, tested HEAD, `5a34759acf16e7beb96c415101c152d6e786c4b3..HEAD` range and command-output hashes. Any failure or later HEAD change invalidates the record.
 
 ## Exact write boundary
 No repository writes; external release-gate evidence/actions only.
+
+## Output subject
+This coordinator step produces only the external release-gate record or remote effect named above; it does not create a repository commit.
 
 ## Acceptance
 Run every immutable argv in index.json for this step in order. Nonzero blocks. emptyAllowed=false means each worker wave must produce its declared artifact/spec/source change; legacy no-op branches do not apply.
