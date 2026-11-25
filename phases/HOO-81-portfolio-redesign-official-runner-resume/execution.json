@@ -663,24 +663,24 @@
       ]
     },
     {
-      "waveId": "a11y-evidence-wave",
+      "waveId": "a11y-occurrence-wave",
       "step": 15,
       "baseSelector": "completedStep:14",
       "emptyAllowed": false,
       "lanes": [
         {
-          "laneId": "a11y-evidence",
+          "laneId": "a11y-occurrence",
           "files": [
             "tests/scripts/verify-a11y-remediation.mjs",
             "tests/specs/verify-a11y-remediation.spec.js",
             "tests/fixtures/axe-remediation-plan.json",
-            "tests/fixtures/axe-remediation-evidence.json"
+            "tests/fixtures/axe-remediation-occurrences.json"
           ],
           "requiredCommands": [
             [
               "node",
               "tests/scripts/verify-a11y-remediation.mjs",
-              "collect",
+              "collect-occurrences",
               "--pairs",
               "tests/fixtures/axe-pairs-inherited.json",
               "--pairs-sha",
@@ -691,8 +691,8 @@
               "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
               "--plan",
               "tests/fixtures/axe-remediation-plan.json",
-              "--evidence",
-              "tests/fixtures/axe-remediation-evidence.json",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
               "--expect-pairs",
               "25",
               "--expect-occurrences",
@@ -724,9 +724,66 @@
       ]
     },
     {
-      "waveId": "state-color-remediation-contract-wave",
+      "waveId": "a11y-color-derive-wave",
       "step": 16,
       "baseSelector": "completedStep:15",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-color-derive",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-remediation-evidence.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "derive-color-changes",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--css",
+              "css/style.css",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expect-occurrences",
+              "139",
+              "--expect-color",
+              "61",
+              "--expect-nested",
+              "78",
+              "--contrast-algorithm",
+              "wcag2-relative-luminance",
+              "--min-ratio",
+              "4.5"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-remediation-contract-wave",
+      "step": 17,
+      "baseSelector": "completedStep:16",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -777,8 +834,8 @@
     },
     {
       "waveId": "a11y-lifecycle-wave",
-      "step": 17,
-      "baseSelector": "completedStep:16",
+      "step": 18,
+      "baseSelector": "completedStep:17",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -814,8 +871,8 @@
     },
     {
       "waveId": "a11y-live-scan-wave",
-      "step": 18,
-      "baseSelector": "completedStep:17",
+      "step": 19,
+      "baseSelector": "completedStep:18",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -851,8 +908,8 @@
     },
     {
       "waveId": "a11y-observation-contract-wave",
-      "step": 19,
-      "baseSelector": "completedStep:18",
+      "step": 20,
+      "baseSelector": "completedStep:19",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -891,8 +948,8 @@
     },
     {
       "waveId": "a11y-color-guard-wave",
-      "step": 20,
-      "baseSelector": "completedStep:19",
+      "step": 21,
+      "baseSelector": "completedStep:20",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -948,8 +1005,8 @@
     },
     {
       "waveId": "a11y-wave",
-      "step": 21,
-      "baseSelector": "completedStep:20",
+      "step": 22,
+      "baseSelector": "completedStep:21",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1046,8 +1103,8 @@
     },
     {
       "waveId": "state-color-remediation-wave",
-      "step": 22,
-      "baseSelector": "completedStep:21",
+      "step": 23,
+      "baseSelector": "completedStep:22",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1085,8 +1142,8 @@
     },
     {
       "waveId": "zero-observation-wave",
-      "step": 23,
-      "baseSelector": "completedStep:22",
+      "step": 24,
+      "baseSelector": "completedStep:23",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1139,8 +1196,8 @@
     },
     {
       "waveId": "final-prepare-wave",
-      "step": 24,
-      "baseSelector": "completedStep:23",
+      "step": 25,
+      "baseSelector": "completedStep:24",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1191,8 +1248,8 @@
     },
     {
       "waveId": "final-verify-wave",
-      "step": 25,
-      "baseSelector": "completedStep:24",
+      "step": 26,
+      "baseSelector": "completedStep:25",
       "emptyAllowed": false,
       "lanes": [
         {
@@ -1228,8 +1285,8 @@
     },
     {
       "waveId": "final-screenshot-wave",
-      "step": 26,
-      "baseSelector": "completedStep:25",
+      "step": 27,
+      "baseSelector": "completedStep:26",
       "emptyAllowed": false,
       "lanes": [
         {
