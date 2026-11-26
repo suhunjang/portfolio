@@ -55,7 +55,7 @@ test.describe('compact step 4 final-contract: section-structure', () => {
     await expect(page.locator('#strengths .section-head .section-sub')).toHaveCount(1);
   });
 
-  test('about: 본문 뒤 h3.subsection-title 기술 스택 1개, 그 뒤 #skillsGrid, skill-group 제목은 h4', async ({ page }) => {
+  test('about: 본문 뒤 h3.subsection-title 기술 스택 1개, 그 뒤 #skillsGrid, skill-group 제목은 h3', async ({ page }) => {
     await expect(page.locator('h3.subsection-title')).toHaveCount(1);
     await expect(page.locator('#about h3.subsection-title')).toHaveText('기술 스택');
     await expect(page.locator('#about #skillsGrid')).toHaveCount(1);
@@ -69,8 +69,8 @@ test.describe('compact step 4 final-contract: section-structure', () => {
     expect(order).toEqual({ h3AfterBody: true, gridAfterH3: true });
     const groups = page.locator('#skillsGrid .skill-group');
     await expect(groups).toHaveCount(baseline.SKILLS.length);
-    await expect(page.locator('#skillsGrid .skill-group > h4')).toHaveText(baseline.SKILLS.map((g) => g.category));
-    await expect(page.locator('#skillsGrid h3')).toHaveCount(0);
+    await expect(page.locator('#skillsGrid .skill-group > h3')).toHaveText(baseline.SKILLS.map((g) => g.category));
+    await expect(page.locator('#skillsGrid h4')).toHaveCount(0);
   });
 
   test('contact: .contact-card와 h3 함께 만들어요 유지, 기술 스택은 없음', async ({ page }) => {

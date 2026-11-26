@@ -45,7 +45,7 @@
 | 5 | about | section section-alt | `04 — About` | h2 소개 |
 | 6 | contact | section | `05 — Contact` | h2 연락처 |
 
-  - about: 본문 뒤에 `h3.subsection-title` 기술 스택과 `#skillsGrid`를 둔다. skill-group 제목은 h4다.
+  - about: 본문 뒤에 `h3.subsection-title` 기술 스택과 `#skillsGrid`를 둔다. skill-group 제목은 h3다(기존 `.skill-group h3` 색·서체 규칙 유지, design-guard 불변. 2026-11-26 대표 결정). 이 결정은 원 설계 §4와 원·resume phase의 skill-group `h4` 요구를 대체하며, C0의 충돌 중단 대상이 아니다.
   - contact: `.contact-card`와 h3 함께 만들어요를 유지한다.
   - nav와 스크롤스파이 순서: career, projects, strengths, about, contact.
   - `.scroll-hint`의 href는 `#career`다.
