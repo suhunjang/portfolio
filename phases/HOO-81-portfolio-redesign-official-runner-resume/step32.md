@@ -1,0 +1,15 @@
+# Step 32: state-color-remediation-contract
+
+## Current authoritative contract
+Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
+
+Remediation expected-fixture publication only. CLI must include map, contrast-base, exact `tests/fixtures/component-state-color-influences.json`, remediation, BASE and expected paths. Output `tests/fixtures/component-state-colors.remediation-expected.json` exact top-level `{schemaVersion,baseFixtureSha256,evidenceSha256,contrastMapSha256,contrastBaseSha256,influenceSha256,components}`; fixed components hero-cta-btn-0, hero-cta-btn-1, featured-card-0, grid-card-0, grid-card-1, each `{componentKey,target,nth,themes}`; targets/nth `.hero-cta .btn` 0/1, `.featured-card` 0, `.project-card` 0/1. Themes fixed desktop-dark then desktop-light; each `{theme,states}`; states default/hover/active; properties exactly `{color,backgroundColor,borderColor}` canonical browser strings. For every theme/component/state/property copy the influence outcome value; unaffected copies baseValue; changed uses the single derived value; conflict is rejected. No DOM/declaration exploration occurs here. Require complete 2×5×3×3 coverage and exact input hashes. Writer derives then validates; fan-in validates submitted bytes first and never writes. Canonical compact UTF-8+LF fixed order. Step33 apply consumes only this schema. <=20 minutes.
+
+## Exact write boundary
+state-color-remediation-contract: tests/scripts/make-state-colors.mjs, tests/specs/state-colors.spec.js, tests/fixtures/component-state-colors.remediation-expected.json
+
+## Output subject
+The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
+
+## Acceptance
+Each worker runs only its own execution.json lane `requiredCommands` and `focusedTests` in order; it never runs index.json `acceptanceCommands` inside the uncommitted lane worktree. Nonzero blocks and `emptyAllowed=false` requires the declared lane artifact/spec/source change. After all lane outputs form one deterministic fan-in candidate, the official runner applies it to an isolated detached staging tree, runs this step's index.json `acceptanceCommands` exactly once there, binds acceptanceEvidenceSha/inputsSha256 into the completion record, and only then publishes fan-in commits. Legacy no-op branches do not apply.

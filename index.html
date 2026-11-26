@@ -38,10 +38,10 @@
       </a>
 
       <nav class="nav-links" id="navLinks" aria-label="주요 메뉴">
-        <a href="#about" class="nav-link">About</a>
-        <a href="#strengths" class="nav-link">Strengths</a>
         <a href="#career" class="nav-link">Career</a>
         <a href="#projects" class="nav-link">Projects</a>
+        <a href="#strengths" class="nav-link">Strengths</a>
+        <a href="#about" class="nav-link">About</a>
         <a href="#contact" class="nav-link">Contact</a>
       </nav>
 
@@ -94,6 +94,7 @@
       <div class="container hero-inner">
         <p class="hero-eyebrow reveal">👋 안녕하세요, 저는</p>
         <h1 class="hero-name reveal" id="heroName">장수훈</h1>
+        <p class="hero-tagline reveal" id="heroTagline"></p>
         <h2 class="hero-role reveal">
           <span class="typed" id="typed"></span><span class="caret" aria-hidden="true">|</span>
         </h2>
@@ -105,17 +106,52 @@
         </div>
 
         <ul class="hero-stats reveal" id="heroStats" aria-label="핵심 지표"></ul>
+        <div id="heroFeatured" role="region" aria-label="대표 프로젝트"></div>
       </div>
-      <a href="#about" class="scroll-hint" aria-label="아래로 스크롤">
+      <a href="#career" class="scroll-hint" aria-label="아래로 스크롤">
         <span></span>
       </a>
     </section>
 
-    <!-- ============ ABOUT ============ -->
-    <section class="section" id="about">
+    <!-- ============ CAREER ============ -->
+    <section class="section" id="career">
       <div class="container">
         <div class="section-head reveal">
-          <span class="section-kicker">01 — About</span>
+          <span class="section-kicker">01 — Career</span>
+          <h2 class="section-title">경력 &amp; 창업</h2>
+        </div>
+        <ol class="timeline" id="timeline" aria-label="경력 타임라인"></ol>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section section-alt" id="projects">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">02 — Projects</span>
+          <h2 class="section-title">프로젝트 &amp; 제품</h2>
+        </div>
+        <div class="project-grid" id="projectGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ STRENGTHS ============ -->
+    <section class="section" id="strengths">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">03 — Strengths</span>
+          <h2 class="section-title">업무상 강점</h2>
+          <p class="section-sub reveal">이력서에 정리된 6가지 핵심 강점 — 기술·제품·경영이 한 사람 안에서 만나는 지점입니다.</p>
+        </div>
+        <div class="strengths-grid" id="strengthsGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT + SKILLS ============ -->
+    <section class="section section-alt" id="about">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">04 — About</span>
           <h2 class="section-title">소개</h2>
         </div>
         <div class="about-grid">
@@ -140,52 +176,19 @@
             </dl>
           </aside>
         </div>
-      </div>
-    </section>
 
-    <!-- ============ STRENGTHS ============ -->
-    <section class="section section-alt" id="strengths">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-kicker">02 — Strengths</span>
-          <h2 class="section-title">업무상 강점</h2>
-          <p class="section-sub reveal">이력서에 정리된 6가지 핵심 강점 — 기술·제품·경영이 한 사람 안에서 만나는 지점입니다.</p>
-        </div>
-        <div class="strengths-grid" id="strengthsGrid"></div>
-      </div>
-    </section>
-
-    <!-- ============ CAREER ============ -->
-    <section class="section" id="career">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-kicker">03 — Career</span>
-          <h2 class="section-title">경력 &amp; 창업</h2>
-        </div>
-        <ol class="timeline" id="timeline" aria-label="경력 타임라인"></ol>
-      </div>
-    </section>
-
-    <!-- ============ PROJECTS ============ -->
-    <section class="section" id="projects">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-kicker">04 — Projects</span>
-          <h2 class="section-title">프로젝트 &amp; 제품</h2>
-        </div>
-        <div class="project-grid" id="projectGrid"></div>
-      </div>
-    </section>
-
-    <!-- ============ SKILLS + CONTACT ============ -->
-    <section class="section section-alt" id="contact">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-kicker">05 — Stack &amp; Contact</span>
-          <h2 class="section-title">기술 스택 &amp; 연락처</h2>
-        </div>
-
+        <h3 class="subsection-title">기술 스택</h3>
         <div class="skills-grid" id="skillsGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">05 — Contact</span>
+          <h2 class="section-title">연락처</h2>
+        </div>
 
         <div class="contact-card reveal">
           <div class="contact-text">

@@ -1,0 +1,254 @@
+{
+  "project": "suhunjang/portfolio",
+  "phase": "HOO-81-portfolio-redesign-resume",
+  "baseBranch": "main",
+  "designDoc": "docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md",
+  "allowedPaths": [
+    "index.html",
+    "css/style.css",
+    "js/main.js",
+    "js/data.js",
+    "tests/"
+  ],
+  "testCommand": [
+    "sh",
+    "tests/scripts/with-env.sh",
+    "npm",
+    "--prefix",
+    "tests",
+    "test"
+  ],
+  "steps": [
+    {
+      "step": 0,
+      "name": "verify-scope-resume-compat",
+      "status": "completed",
+      "started_at": "2026-11-24T22:37:14+0900",
+      "completed_at": "2026-11-24T22:42:19+0900",
+      "summary": "verify-scope에 §R3 면제 2개(resume 설계 exact committed 면제, phases/HOO-81-portfolio-redesign-resume/ 런타임 면제)와 self-test 사례를 추가하고 verify-scope-resume.spec.js 신규 작성; T·selftest·FULL(429 passed)·VS OK·RGATE 0 OK"
+    },
+    {
+      "step": 1,
+      "name": "resume-preflight",
+      "status": "completed",
+      "started_at": "2026-11-24T22:42:19+0900",
+      "completed_at": "2026-11-24T22:46:38+0900",
+      "summary": "resume-preflight 검증 전용: RSNAP 1(step101 snapshot) · PREFLIGHT(§R4 블록) resume-preflight: OK · FULL 429 passed · VS OK · RGATE 1 (빈 허용) OK, 파일 변경 없음"
+    },
+    {
+      "step": 2,
+      "name": "axe-classify-occ-batch-1",
+      "status": "completed",
+      "started_at": "2026-11-24T22:46:38+0900",
+      "completed_at": "2026-11-24T22:57:44+0900",
+      "summary": "OCC_RUN 1(§R5.1 골격 그대로, import·config 자가 검사 통과, 소유 서버 spawn→정리): batch 1 occurrence 10개(page:desktop-dark color-contrast) 전부 axe 재현 — --text-faint 라벨 3.67~3.97:1, --accent 위 #fff 2.47:1, opacity/render 원인 없음 → 모두 css-rule·requiresColorChange true, pair 불일치 없음; occ-batch-1.json·server-1.json 기록. OCC_CHECK 1 'occ-check 1: OK 10' · FULL 429 passed(1차 실행 1건 page.goto timeout flake, 재실행 통과) · VS OK · RGATE 2 '' OK"
+    },
+    {
+      "step": 3,
+      "name": "axe-classify-occ-batch-2",
+      "status": "completed",
+      "started_at": "2026-11-24T22:57:44+0900",
+      "completed_at": "2026-11-24T23:03:35+0900",
+      "summary": "RSNAP 3(step103) · OCC_RUN 2(§R5.1 골격, 소유 서버 spawn→정리): batch 2 occurrence 10개 axe 재현 — color-contrast 2(.stat-label·.footer-inner --text-faint 3.97:1, opacity 원인 없음 → css-rule·requiresColorChange true), nested-interactive 8(project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-2.json·server-2.json 기록. OCC_CHECK 2 'occ-check 2: OK 10' · FULL 429 passed · VS OK · RGATE 3 '' OK"
+    },
+    {
+      "step": 4,
+      "name": "axe-classify-occ-batch-3",
+      "status": "completed",
+      "started_at": "2026-11-24T23:03:35+0900",
+      "completed_at": "2026-11-24T23:09:26+0900",
+      "summary": "RSNAP 4(step104) · OCC_RUN 3(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 3 occurrence 10개 axe 재현 — nested-interactive 5(project:5~9 project-card role=button tabindex=0 안 button.project-more → js-render·false), color-contrast 5(desktop-light .about-meta dt Focus/Location/Role 3.42:1, .stat-label·.footer-inner(#footerName) --text-faint 3.27:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), pair 불일치 없음; occ-batch-3.json·server-3.json 기록. OCC_CHECK 3 'occ-check 3: OK 10' · FULL 429 passed · VS OK · RGATE 4 '' OK"
+    },
+    {
+      "step": 5,
+      "name": "axe-classify-occ-batch-4",
+      "status": "completed",
+      "started_at": "2026-11-24T23:09:26+0900",
+      "completed_at": "2026-11-24T23:15:10+0900",
+      "summary": "RSNAP 5(step105) · OCC_RUN 4(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 4 occurrence 10개 axe 재현 — color-contrast 4(desktop-light #heroStats .stat-label 3개·footer span.footer-note(.footer-inner 상속) --text-faint #8a8a93 on #fafafa 3.27:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 6(project:0,1,2,10,11,12 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-4.json·server-4.json 기록. OCC_CHECK 4 'occ-check 4: OK 10' · FULL 429 passed · VS OK · RGATE 5 '' OK"
+    },
+    {
+      "step": 6,
+      "name": "axe-classify-occ-batch-5",
+      "status": "completed",
+      "started_at": "2026-11-24T23:15:10+0900",
+      "completed_at": "2026-11-24T23:33:11+0900",
+      "summary": "RSNAP 6(step106) · OCC_RUN 5(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 5 occurrence 10개 axe 재현 — nested-interactive 7(desktop-light project:3~9 project-card role=button tabindex=0 안 button.project-more → js-render·false), color-contrast 3(mobile-dark #about .about-meta dt Focus/Location/Role --text-faint #71717a on #16181c 3.67:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), pair 불일치 없음; occ-batch-5.json·server-5.json 기록. OCC_CHECK 5 'occ-check 5: OK 10' · FULL 429 passed(앞선 2회는 scope-snapshot-parity-artifacts의 tests/.tmp inventory race로 서로 다른 1건 flake, 재실행 통과) · VS OK · RGATE 6 '' OK"
+    },
+    {
+      "step": 7,
+      "name": "axe-classify-occ-batch-6",
+      "status": "completed",
+      "started_at": "2026-11-24T23:33:11+0900",
+      "completed_at": "2026-11-24T23:48:03+0900",
+      "summary": "RSNAP 7(step107) · OCC_RUN 6(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 6 occurrence 10개 axe 재현 — color-contrast 8(mobile-dark #aboutAvatar·#brandMark·#hero .btn-primary #fff on --accent #7ea8d8 2.47:1, #heroStats .stat-label 3개·#footerName·footer .footer-note --text-faint #71717a on #0d0f12 3.97:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 2(project:0,10 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-6.json·server-6.json 기록. OCC_CHECK 6 'occ-check 6: OK 10' · FULL 429 passed(앞선 2회는 modal-regression page.goto timeout과 scope-snapshot-parity-artifacts tests/.tmp inventory race로 서로 다른 1건 flake, 재실행 통과) · VS OK · RGATE 7 '' OK"
+    },
+    {
+      "step": 8,
+      "name": "axe-classify-occ-batch-7",
+      "status": "completed",
+      "started_at": "2026-11-24T23:48:03+0900",
+      "completed_at": "2026-11-24T23:55:39+0900",
+      "summary": "RSNAP 8(step108) · OCC_RUN 7(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 7 occurrence 10개 axe 재현 — 전부 nested-interactive(mobile-dark project:1~8,11,12 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-7.json·server-7.json 기록. OCC_CHECK 7 'occ-check 7: OK 10' · FULL 429 passed(1차 OCC_RUN은 page.goto timeout flake로 exit 1, 재실행 통과) · VS OK · RGATE 8 '' OK"
+    },
+    {
+      "step": 9,
+      "name": "axe-classify-occ-batch-8",
+      "status": "completed",
+      "started_at": "2026-11-24T23:55:39+0900",
+      "completed_at": "2026-11-25T00:05:47+0900",
+      "summary": "RSNAP 9(step109) · OCC_RUN 8(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 8 occurrence 10개 axe 재현 — color-contrast 8(mobile-light #about .about-meta dt Focus/Location/Role --text-faint #8a8a93 on #ffffff 3.42:1, #heroStats .stat-label 3개·#footerName·footer .footer-note --text-faint #8a8a93 on #fafafa 3.27:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 2(mobile-dark project:9, mobile-light project:0 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-8.json·server-8.json 기록. OCC_CHECK 8 'occ-check 8: OK 10' · FULL 429 passed(1차는 modal-regression page.goto timeout 1건 flake, 재실행 통과) · VS OK · RGATE 9 '' OK"
+    },
+    {
+      "step": 10,
+      "name": "axe-classify-occ-batch-9",
+      "status": "completed",
+      "started_at": "2026-11-25T00:05:47+0900",
+      "completed_at": "2026-11-25T00:23:08+0900",
+      "summary": "RSNAP 10(step110) · OCC_RUN 9(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 9 occurrence 10개 axe 재현 — 전부 nested-interactive(mobile-light project:1~7,10,11,12 project-card role=button tabindex=0 안 button.project-more(project:2는 a 링크도 포함) → js-render·false), pair 불일치 없음; occ-batch-9.json·server-9.json 기록. OCC_CHECK 9 'occ-check 9: OK 10' · FULL 429 passed(앞선 3회는 scope-snapshot-parity-artifacts tests/.tmp race 2건·modal-regression page.goto timeout 1건으로 매번 다른 1건 flake, 단독 재실행 통과) · VS OK · RGATE 10 '' OK"
+    },
+    {
+      "step": 11,
+      "name": "axe-classify-occ-batch-10",
+      "status": "completed",
+      "started_at": "2026-11-25T00:23:08+0900",
+      "completed_at": "2026-11-25T00:30:09+0900",
+      "summary": "RSNAP 11(step111) · OCC_RUN 10(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 10 occurrence 10개 axe 재현 — nested-interactive 2(mobile-light project:8,9 project-card role=button tabindex=0 안 button.project-more → js-render·false), color-contrast 8(tablet-dark #about .about-meta dt Focus/Location/Role --text-faint #71717a on --bg-elev #16181c 3.67:1, #aboutAvatar·#brandMark·#hero .btn-primary #fff on --accent #7ea8d8 2.47:1, #footerName·#heroStats .stat-label --text-faint #71717a on #0d0f12 3.97:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), pair 불일치 없음; occ-batch-10.json·server-10.json 기록. OCC_CHECK 10 'occ-check 10: OK 10' · FULL 429 passed · VS OK · RGATE 11 '' OK"
+    },
+    {
+      "step": 12,
+      "name": "axe-classify-occ-batch-11",
+      "status": "completed",
+      "started_at": "2026-11-25T00:30:09+0900",
+      "completed_at": "2026-11-25T00:36:27+0900",
+      "summary": "RSNAP 12(step112) · OCC_RUN 11(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 11 occurrence 10개 axe 재현 — color-contrast 4(tablet-dark #heroStats .stat-label 3개·footer span.footer-note(.footer-inner 상속) --text-faint #71717a on #0d0f12 3.97:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 6(tablet-dark project:0,1,2,10,11,12 project-card role=button tabindex=0 안 button.project-more(project:2는 a 링크도 포함) → js-render·false), pair 불일치 없음; occ-batch-11.json·server-11.json 기록. OCC_CHECK 11 'occ-check 11: OK 10' · FULL 429 passed · VS OK · RGATE 12 '' OK"
+    },
+    {
+      "step": 13,
+      "name": "axe-classify-occ-batch-12",
+      "status": "completed",
+      "started_at": "2026-11-25T00:36:27+0900",
+      "completed_at": "2026-11-25T00:42:05+0900",
+      "summary": "RSNAP 13(step113) · OCC_RUN 12(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 12 occurrence 10개 axe 재현 — nested-interactive 7(tablet-dark project:3~9 project-card role=button tabindex=0 안 button.project-more → js-render·false), color-contrast 3(tablet-light #about .about-meta dt Focus/Location/Role --text-faint #8a8a93 on --bg-elev #ffffff 3.42:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), pair 불일치 없음; occ-batch-12.json·server-12.json 기록. OCC_CHECK 12 'occ-check 12: OK 10' · FULL 429 passed · VS OK · RGATE 13 '' OK"
+    },
+    {
+      "step": 14,
+      "name": "axe-classify-occ-batch-13",
+      "status": "completed",
+      "started_at": "2026-11-25T00:42:05+0900",
+      "completed_at": "2026-11-25T00:47:41+0900",
+      "summary": "RSNAP 14(step114) · OCC_RUN 13(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 13 occurrence 10개 axe 재현 — color-contrast 6(tablet-light #footerName·footer span.footer-note(.footer-inner 상속)·#heroStats .stat-label 4개 --text-faint #8a8a93 on #fafafa 3.27:1, opacity/render 원인 없음 → css-rule·requiresColorChange true), nested-interactive 4(tablet-light project:0,10,11,12 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-13.json·server-13.json 기록. OCC_CHECK 13 'occ-check 13: OK 10' · FULL 429 passed · VS OK · RGATE 14 '' OK"
+    },
+    {
+      "step": 15,
+      "name": "axe-classify-occ-batch-14",
+      "status": "completed",
+      "started_at": "2026-11-25T00:47:41+0900",
+      "completed_at": "2026-11-25T00:53:02+0900",
+      "summary": "RSNAP 15(step115) · OCC_RUN 14(§R5.1 골격 그대로, 소유 서버 spawn→정리): batch 14 occurrence 9개 axe 재현 — 전부 nested-interactive(tablet-light project:1~9 project-card role=button tabindex=0 안 button.project-more → js-render·false), pair 불일치 없음; occ-batch-14.json·server-14.json 기록. OCC_CHECK 14 'occ-check 14: OK 9' · FULL 429 passed · VS OK · RGATE 15 '' OK"
+    },
+    {
+      "step": 16,
+      "name": "axe-classify-pair-integrate",
+      "status": "completed",
+      "started_at": "2026-11-25T00:53:02+0900",
+      "completed_at": "2026-11-25T01:08:48+0900",
+      "summary": "RSNAP 16(step116) · occ-batch 1→14를 배열 순서로 읽어 139 occurrence를 25 pair로 통합. 누락·중복 없고 batch 간 판정도 모두 일치(color-contrast 12 pair css-rule·true, nested-interactive 13 pair js-render·false). evidence는 순회 순서 그대로 '; '.join, occurrenceCount 3~6. pairs.json만 작성(O_EXCL). INTEGRATE_CHECK 'integrate-check: OK 25 139' · FULL 429 passed(앞선 3회는 실행마다 다른 1건 flake: scope-snapshot-parity-artifacts의 tests/.tmp race 2건, modal-regression 1건. 4번째 실행 통과) · VS OK · RGATE 16 '' OK"
+    },
+    {
+      "step": 17,
+      "name": "axe-classify-merge",
+      "status": "blocked",
+      "started_at": "2026-11-25T01:08:48+0900",
+      "blocked_reason": "resume step17 §R7 작업3에 따라 중단, 원 §6.2 remediation 재계획 필요: pairs.json 25 pair 중 color-contrast 12 pair(61 occurrence)가 모두 css-rule·requiresColorChange=true라서 requiredBlockReason='color change excluded (HOO-81 §16.3)'이다. 따라서 coverage가 완전한 plan에는 blocked 그룹이 반드시 생기고, AC의 AXE --check-executable(blocked-group)을 통과할 수 없다. 메모리 검증 결과: pairs 결정 그대로 만든 baseline은 validateBaseline []·compareCollectedBaseline ok. plan(color-contrast 61 target blocked / nested-interactive 78 target js/main.js blocked=false)은 validateRemediationPlan(coverage) []이지만 validateRemediationExecutable ['blocked-group:color-contrast']. pairs와 다른 requiresColorChange나 manual block은 금지라서 허용 범위 안에서는 해결할 수 없다. RSNAP 17(step117)만 생성했고 tracked 파일(axe-baseline.json·axe-remediation-plan.json)은 쓰지 않았다.",
+      "blocked_at": "2026-11-25T01:09:56+0900"
+    },
+    {
+      "step": 18,
+      "name": "featured-projects",
+      "status": "pending"
+    },
+    {
+      "step": 19,
+      "name": "hero-first-screen",
+      "status": "pending"
+    },
+    {
+      "step": 20,
+      "name": "hero-two-column",
+      "status": "pending"
+    },
+    {
+      "step": 21,
+      "name": "section-structure",
+      "status": "pending"
+    },
+    {
+      "step": 22,
+      "name": "section-layout",
+      "status": "pending"
+    },
+    {
+      "step": 23,
+      "name": "component-hit-open",
+      "status": "pending"
+    },
+    {
+      "step": 24,
+      "name": "state-sequence",
+      "status": "pending"
+    },
+    {
+      "step": 25,
+      "name": "state-colors-fixture",
+      "status": "pending"
+    },
+    {
+      "step": 26,
+      "name": "component-hover-active",
+      "status": "pending"
+    },
+    {
+      "step": 27,
+      "name": "component-clamp-stripe",
+      "status": "pending"
+    },
+    {
+      "step": 28,
+      "name": "focus-trap-modal",
+      "status": "pending"
+    },
+    {
+      "step": 29,
+      "name": "focus-trap-lightbox",
+      "status": "pending"
+    },
+    {
+      "step": 30,
+      "name": "print-pdf",
+      "status": "pending"
+    },
+    {
+      "step": 31,
+      "name": "axe-remediation-gate",
+      "status": "pending"
+    },
+    {
+      "step": 32,
+      "name": "axe-remediation-recheck",
+      "status": "pending"
+    },
+    {
+      "step": 33,
+      "name": "axe-finalize",
+      "status": "pending"
+    },
+    {
+      "step": 34,
+      "name": "final-verification",
+      "status": "pending"
+    }
+  ],
+  "reviewBaseSha": "d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d",
+  "created_at": "2026-11-24T22:37:14+0900"
+}

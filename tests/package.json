@@ -1,0 +1,14 @@
+{
+  "name": "portfolio-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "browsers:install": "playwright install chromium",
+    "fixtures": "node scripts/make-fixtures.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.56.1"
+  }
+}

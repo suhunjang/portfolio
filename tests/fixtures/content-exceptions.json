@@ -1,0 +1,14 @@
+{
+  "kickers": {
+    "base": ["01 — About", "02 — Strengths", "03 — Career", "04 — Projects", "05 — Stack & Contact"],
+    "final": ["01 — Career", "02 — Projects", "03 — Strengths", "04 — About", "05 — Contact"]
+  },
+  "titles": {
+    "base": ["소개", "업무상 강점", "경력 & 창업", "프로젝트 & 제품", "기술 스택 & 연락처"],
+    "final": ["경력 & 창업", "프로젝트 & 제품", "업무상 강점", "소개", "연락처"]
+  },
+  "featured": {
+    "indexes": [1, 5, 7]
+  },
+  "subsectionTitleFinal": "기술 스택"
+}

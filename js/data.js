@@ -252,6 +252,7 @@ const PROJECTS = [
   },
   {
     title: "Motion AD",
+    featured: true,
     blurb:
       "GPT·Midjourney·n8n 기반 병의원 마케팅 자동화 SaaS. 콘텐츠 기획·생성·배포를 자동화해 운영 프로세스를 80% 단축하고 신규 수익 모델로 제품화.",
     tags: ["ChatGPT/GPTs", "Midjourney", "n8n", "Notion API"],
@@ -481,6 +482,7 @@ const PROJECTS = [
   },
   {
     title: "VigoRight (의료 AI/VR)",
+    featured: true,
     blurb:
       "VR 안과·신경과 검사 장비. RANSAC 기하 정합 + CNN 회귀로 안구 토션을 정량화하고 Grad-CAM XAI로 검증. 대학병원·개원가 진입으로 약 3억 원 매출.",
     tags: ["Django", "PyTorch", "Computer Vision", "XAI"],
@@ -593,6 +595,7 @@ const PROJECTS = [
   },
   {
     title: "Lost Energy Intel",
+    featured: true,
     blurb:
       "풍력발전 SCADA 데이터 기반 에너지 손실 예측 시스템. 설비 이상을 사전 감지해 연간 2억 원 원가 절감을 달성한 상용 ML 모델.",
     tags: ["Python", "TensorFlow", "Scikit-learn", "Time-Series"],

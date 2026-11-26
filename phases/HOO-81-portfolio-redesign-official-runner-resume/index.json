@@ -1,0 +1,1931 @@
+{
+  "project": "suhunjang/portfolio",
+  "phase": "HOO-81-portfolio-redesign-official-runner-resume",
+  "baseBranch": "main",
+  "designDoc": "phases/HOO-81-portfolio-redesign-official-runner-resume/design.md",
+  "allowedPaths": [
+    "index.html",
+    "css/style.css",
+    "js/main.js",
+    "js/data.js",
+    "tests/scripts/continuation-preflight.mjs",
+    "tests/specs/continuation-preflight.spec.js",
+    "tests/scripts/verify-a11y-remediation.mjs",
+    "tests/specs/verify-a11y-remediation.spec.js",
+    "tests/scripts/verify-final-contract.mjs",
+    "tests/specs/final-contract.spec.js",
+    "tests/specs/featured.spec.js",
+    "tests/specs/hero.spec.js",
+    "tests/specs/hero-layout.spec.js",
+    "tests/specs/structure.spec.js",
+    "tests/specs/layout.spec.js",
+    "tests/specs/component-hit.spec.js",
+    "tests/specs/state-sequence.spec.js",
+    "tests/specs/state-colors.spec.js",
+    "tests/specs/component-hover.spec.js",
+    "tests/specs/component-clamp.spec.js",
+    "tests/specs/focus-modal.spec.js",
+    "tests/specs/focus-lightbox.spec.js",
+    "tests/specs/print.spec.js",
+    "tests/specs/screenshots.spec.js",
+    "tests/helpers/component-state.js",
+    "tests/helpers/state-sequence.js",
+    "tests/scripts/make-state-colors.mjs",
+    "tests/fixtures/component-state-colors.json",
+    "tests/helpers/design-guard-color-rules.js",
+    "tests/specs/design-guard-color-rules.spec.js",
+    "tests/fixtures/axe-baseline.json",
+    "tests/fixtures/axe-remediation-plan.json",
+    "tests/fixtures/axe-pairs-inherited.json",
+    "tests/fixtures/axe-remediation-evidence.json",
+    "tests/fixtures/axe-zero-observation.json",
+    "tests/fixtures/component-state-colors.base.json",
+    "tests/fixtures/axe-remediation-occurrences.json",
+    "tests/fixtures/axe-contrast-base.json",
+    "tests/fixtures/component-state-colors.candidate.json",
+    "tests/fixtures/axe-contrast-measurements.json",
+    "tests/fixtures/component-state-colors.remediation-expected.json",
+    "tests/fixtures/axe-contrast-change-units.json",
+    "tests/fixtures/axe-contrast-base-targets.json",
+    "tests/fixtures/axe-contrast-candidate-eligibility.json",
+    "tests/fixtures/axe-contrast-current-declarations.json",
+    "tests/fixtures/component-state-color-influences.json",
+    "tests/fixtures/final-transition-ready.json",
+    "tests/fixtures/component-state-color-winning-sources.json"
+  ],
+  "testCommand": [
+    "sh",
+    "tests/scripts/with-env.sh",
+    "npm",
+    "--prefix",
+    "tests",
+    "test"
+  ],
+  "planSchemaVersion": 2,
+  "executionPlan": "execution.json",
+  "continuation": {
+    "continuationOf": "HOO-81-portfolio-redesign-resume",
+    "parentPlanSha": "427543e7cbe9a9cbb7d62adb28974014e7921f8a8d88c56c11612fb0940a8551",
+    "inputArtifactSha": "439ff4e306bec12163155310955f70510cf2ff402fc04dedce57832bc66debb9",
+    "provenanceType": "legacy-attestation",
+    "attestationSha": "e43ab775e1f797df6186a7fa3af4083fff9fd8a0627d09dfc0f0518903018512",
+    "inheritedArtifacts": [
+      {
+        "metadataCommitSha": "dce163d89666acdd30a49705ebc4e93c6dba4636",
+        "path": "/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json",
+        "producerStep": 16,
+        "sha256": "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+        "size": 47392,
+        "sourceCommitSha": null
+      }
+    ]
+  },
+  "steps": [
+    {
+      "step": 0,
+      "name": "static-input-preflight",
+      "estimatedMinutes": 9,
+      "timeoutMinutes": 30,
+      "dependsOn": [],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/continuation-preflight.mjs",
+          "--mode",
+          "static-post",
+          "--document",
+          "CLAUDE.md:b63e8c71bea72313c7ae312c6c5582e6fd1ccc98b122d2f4ade46f09e65cb8aa",
+          "--document",
+          "docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md:eb229f57acb23bd9a24d990d3c510ec3fb824fc24051909bb02665408cd54e49",
+          "--document",
+          "docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md:351a18f1b6ca30f46606ab25ff310329eeecd8cd4db138d7848a86d414b3ffe1",
+          "--lock",
+          ".harness/harness.lock.json:d7df38b1d032e1c7ef6c535f5257b69a42143ce323baf80cfc9bddee8be62aa3",
+          "--lock",
+          ".harness/install-state.json:a022500410b8a145121b6693f4315dfd90ae9a06f2082621a623ad5a39ec5e7f",
+          "--lock",
+          ".harness/policy.json:ad59822299dee5f9aeaca8dba8ee6232e788b9e66af09c70b1ec4b9ba838aaa0",
+          "--expect-fan-in-paths",
+          "tests/scripts/continuation-preflight.mjs,tests/specs/continuation-preflight.spec.js"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/continuation-preflight.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "static-preflight-wave"
+    },
+    {
+      "step": 1,
+      "name": "inherited-artifact-supply",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        0
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/continuation-preflight.mjs",
+          "--mode",
+          "artifact-post",
+          "--pairs-output",
+          "tests/fixtures/axe-pairs-inherited.json",
+          "--pairs-sha",
+          "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+          "--pairs-size",
+          "47392",
+          "--collected",
+          "tests/fixtures/axe-collected.json",
+          "--collected-sha",
+          "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
+          "--collected-size",
+          "28809",
+          "--expect-fan-in-paths",
+          "tests/scripts/continuation-preflight.mjs,tests/specs/continuation-preflight.spec.js,tests/fixtures/axe-pairs-inherited.json"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/continuation-preflight.spec.js",
+          "specs/smoke.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "artifact-supply-wave"
+    },
+    {
+      "step": 2,
+      "name": "featured-projects",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        1
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/featured.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "featured-wave"
+    },
+    {
+      "step": 3,
+      "name": "hero-first-screen",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        2
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/hero.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "hero-wave"
+    },
+    {
+      "step": 4,
+      "name": "hero-and-structure-wave",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        3
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/hero-layout.spec.js",
+          "specs/structure.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "hero-structure-wave"
+    },
+    {
+      "step": 5,
+      "name": "section-layout",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        4
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/layout.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "section-layout-wave"
+    },
+    {
+      "step": 6,
+      "name": "component-hit-targets",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        5
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/component-hit.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "component-hit-wave"
+    },
+    {
+      "step": 7,
+      "name": "state-sequence",
+      "estimatedMinutes": 13,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        6
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-sequence.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-sequence-wave"
+    },
+    {
+      "step": 8,
+      "name": "state-color-base-lifecycle",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        7
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-base-lifecycle-wave"
+    },
+    {
+      "step": 9,
+      "name": "state-color-base-measurement",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        8
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "base-measurement",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--measure-check",
+          "--candidate",
+          "tests/fixtures/component-state-colors.candidate.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js",
+          "specs/state-sequence.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-base-measurement-wave"
+    },
+    {
+      "step": 10,
+      "name": "state-color-base-transaction",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        9
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "base-fixture-transaction",
+          "--candidate",
+          "tests/fixtures/component-state-colors.candidate.json",
+          "--check",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--fixture",
+          "tests/fixtures/component-state-colors.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-base-transaction-wave"
+    },
+    {
+      "step": 11,
+      "name": "component-hover-active",
+      "estimatedMinutes": 16,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        10
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/component-hover.spec.js",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "hover-wave"
+    },
+    {
+      "step": 12,
+      "name": "component-clamp-stripe",
+      "estimatedMinutes": 15,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        11
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/component-clamp.spec.js",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "clamp-wave"
+    },
+    {
+      "step": 13,
+      "name": "focus-modal",
+      "estimatedMinutes": 11,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        12
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/focus-modal.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "focus-modal-wave"
+    },
+    {
+      "step": 14,
+      "name": "focus-lightbox",
+      "estimatedMinutes": 11,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        13
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/focus-lightbox.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "focus-lightbox-wave"
+    },
+    {
+      "step": 15,
+      "name": "print-pdf",
+      "estimatedMinutes": 11,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        14
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/print.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "print-wave"
+    },
+    {
+      "step": 16,
+      "name": "a11y-occurrence-contract",
+      "estimatedMinutes": 20,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        15
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-occurrences",
+          "--pairs",
+          "tests/fixtures/axe-pairs-inherited.json",
+          "--collected",
+          "tests/fixtures/axe-collected.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--occurrences",
+          "tests/fixtures/axe-remediation-occurrences.json",
+          "--expect-pairs",
+          "25",
+          "--expect-occurrences",
+          "139",
+          "--expect-color",
+          "61",
+          "--expect-nested",
+          "78"
+        ],
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-occurrence-wave"
+    },
+    {
+      "step": 17,
+      "name": "a11y-current-browser-mapping-lifecycle",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        16
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-current-mapping-lifecycle-wave"
+    },
+    {
+      "step": 18,
+      "name": "a11y-declaration-resolver-contract",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        17
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-declaration-collector-core",
+          "--css",
+          "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-declaration-resolver-wave"
+    },
+    {
+      "step": 19,
+      "name": "a11y-declaration-collector-completion",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        18
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-declaration-collector-completion",
+          "--css",
+          "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-declaration-completion-wave"
+    },
+    {
+      "step": 20,
+      "name": "a11y-declaration-winner-contract",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        19
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-declaration-winner",
+          "--css",
+          "css/style.css"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-declaration-winner-wave"
+    },
+    {
+      "step": 21,
+      "name": "a11y-scope-role-extractor-contract",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        20
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-scope-role-extractor",
+          "--css",
+          "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-scope-role-extractor-wave"
+    },
+    {
+      "step": 22,
+      "name": "a11y-current-declaration-resolution",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        21
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-current-declarations",
+          "--occurrences",
+          "tests/fixtures/axe-remediation-occurrences.json",
+          "--css",
+          "css/style.css",
+          "--server-root",
+          ".",
+          "--port",
+          "4188",
+          "--temp-root-env",
+          "TMPDIR",
+          "--declarations",
+          "tests/fixtures/axe-contrast-current-declarations.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-current-declaration-wave"
+    },
+    {
+      "step": 23,
+      "name": "a11y-change-unit-mapping",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        22
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-change-units",
+          "--occurrences",
+          "tests/fixtures/axe-remediation-occurrences.json",
+          "--declarations",
+          "tests/fixtures/axe-contrast-current-declarations.json",
+          "--css",
+          "css/style.css",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-change-unit-map-wave"
+    },
+    {
+      "step": 24,
+      "name": "a11y-contrast-base-target-observation",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        23
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-contrast-targets",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--server-root",
+          ".",
+          "--port",
+          "4189",
+          "--temp-root-env",
+          "TMPDIR",
+          "--targets",
+          "tests/fixtures/axe-contrast-base-targets.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-contrast-target-wave"
+    },
+    {
+      "step": 25,
+      "name": "a11y-contrast-candidate-eligibility",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        24
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-contrast-candidates",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--targets",
+          "tests/fixtures/axe-contrast-base-targets.json",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--server-root",
+          ".",
+          "--port",
+          "4190",
+          "--temp-root-env",
+          "TMPDIR",
+          "--eligibility",
+          "tests/fixtures/axe-contrast-candidate-eligibility.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-contrast-eligibility-wave"
+    },
+    {
+      "step": 26,
+      "name": "a11y-contrast-measurement",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        25
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-contrast-measurements",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--targets",
+          "tests/fixtures/axe-contrast-base-targets.json",
+          "--eligibility",
+          "tests/fixtures/axe-contrast-candidate-eligibility.json",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--server-root",
+          ".",
+          "--port",
+          "4191",
+          "--temp-root-env",
+          "TMPDIR",
+          "--measurements",
+          "tests/fixtures/axe-contrast-measurements.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-contrast-measurement-wave"
+    },
+    {
+      "step": 27,
+      "name": "a11y-contrast-validation",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        26
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-contrast-base",
+          "--occurrences",
+          "tests/fixtures/axe-remediation-occurrences.json",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--measurements",
+          "tests/fixtures/axe-contrast-measurements.json",
+          "--css",
+          "css/style.css",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--expect-color",
+          "61"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-contrast-validation-wave"
+    },
+    {
+      "step": 28,
+      "name": "a11y-coupled-contrast-guard",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        27
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "reject-coupled-contrast-units",
+          "--map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--read-only",
+          "--reject-foreground-background-coupling"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-coupled-contrast-guard-wave"
+    },
+    {
+      "step": 29,
+      "name": "a11y-color-derivation",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        28
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-color-changes",
+          "--occurrences",
+          "tests/fixtures/axe-remediation-occurrences.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--css",
+          "css/style.css",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--expect-occurrences",
+          "139",
+          "--expect-color",
+          "61",
+          "--expect-nested",
+          "78",
+          "--contrast-algorithm",
+          "wcag2-relative-luminance",
+          "--min-ratio",
+          "4.5",
+          "--token-choice",
+          "minimum-srgb-distance-sum-then-code-unit-token"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-color-derive-wave"
+    },
+    {
+      "step": 30,
+      "name": "state-color-remediation-winning-source-map",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        29
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "remediation-winning-source-map",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--contrast-map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175",
+          "--validate",
+          "--winning-sources",
+          "tests/fixtures/component-state-color-winning-sources.json"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-winning-source-wave"
+    },
+    {
+      "step": 31,
+      "name": "state-color-remediation-influence-analysis",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        30
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "remediation-influence-classification",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--contrast-map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--winning-sources",
+          "tests/fixtures/component-state-color-winning-sources.json",
+          "--validate",
+          "--influences",
+          "tests/fixtures/component-state-color-influences.json"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-remediation-influence-wave"
+    },
+    {
+      "step": 32,
+      "name": "state-color-remediation-contract",
+      "estimatedMinutes": 16,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        31
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "approved-remediation-expectation",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--contrast-map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--influences",
+          "tests/fixtures/component-state-color-influences.json",
+          "--expected-fixture",
+          "tests/fixtures/component-state-colors.remediation-expected.json",
+          "--validate",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-remediation-contract-wave"
+    },
+    {
+      "step": 33,
+      "name": "state-color-remediation-apply-contract",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        32
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "approved-remediation-apply",
+          "--expected-fixture",
+          "tests/fixtures/component-state-colors.remediation-expected.json",
+          "--self-test-atomic-live",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-remediation-apply-wave"
+    },
+    {
+      "step": 34,
+      "name": "a11y-server-lifecycle-contract",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        33
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-lifecycle-wave"
+    },
+    {
+      "step": 35,
+      "name": "a11y-live-scan-contract",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        34
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-live-scan-wave"
+    },
+    {
+      "step": 36,
+      "name": "a11y-observation-contract",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        35
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "self-test-live",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/verify-a11y-remediation.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-observation-contract-wave"
+    },
+    {
+      "step": 37,
+      "name": "a11y-color-guard-contract",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        36
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/make-state-colors.mjs",
+          "--mode",
+          "approved-remediation-expectation",
+          "--base-ref",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--remediation",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--contrast-map",
+          "tests/fixtures/axe-contrast-change-units.json",
+          "--contrast-base",
+          "tests/fixtures/axe-contrast-base.json",
+          "--influences",
+          "tests/fixtures/component-state-color-influences.json",
+          "--expected-fixture",
+          "tests/fixtures/component-state-colors.remediation-expected.json",
+          "--validate",
+          "--base-fixture",
+          "tests/fixtures/component-state-colors.base.json",
+          "--server-root",
+          ".",
+          "--port",
+          "4175"
+        ],
+        [
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "test"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/design-guard-color-rules.spec.js",
+          "specs/state-colors.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-color-guard-wave"
+    },
+    {
+      "step": 38,
+      "name": "a11y-remediation-wave",
+      "estimatedMinutes": 16,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        37
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/design-guard-color-rules.spec.js",
+          "specs/modal-regression.spec.js",
+          "specs/featured.spec.js",
+          "specs/focus-modal.spec.js",
+          "specs/focus-lightbox.spec.js",
+          "specs/component-hit.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "a11y-wave"
+    },
+    {
+      "step": 39,
+      "name": "state-color-remediation-expectation",
+      "estimatedMinutes": 14,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        38
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "from pathlib import Path\nimport os,shutil,subprocess,tempfile\np=Path('tests/fixtures/component-state-colors.json'); initial=p.read_bytes()\nsubprocess.run([\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"],check=True)\nroot=Path(tempfile.mkdtemp(prefix='hoo103-state-fanin-',dir=os.environ['TMPDIR']))\ntry:\n snaps=[]\n for i in range(2):\n  q=root/f'candidate-{i}.json'; q.write_bytes(initial)\n  cmd=[\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\"]+['--fixture',str(q),'--server-root','.','--port','4175']\n  subprocess.run(cmd,check=True); snaps.append(q.read_bytes())\n assert p.read_bytes()==initial, 'fan-in acceptance mutated submitted fixture'\n assert initial==snaps[0]==snaps[1], 'submitted fixture differs from temp regeneration'\nfinally:\n shutil.rmtree(root)\n"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/state-colors.spec.js",
+          "specs/component-hover.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "state-color-remediation-wave"
+    },
+    {
+      "step": 40,
+      "name": "canonical-zero-observation",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        39
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-a11y-remediation.mjs",
+          "verify-observation",
+          "--observation",
+          "tests/fixtures/axe-zero-observation.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--expect-color",
+          "0",
+          "--expect-nested",
+          "0",
+          "--require-complete-scenarios"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "zero-observation-wave"
+    },
+    {
+      "step": 41,
+      "name": "final-transition-manifest-contract",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        40
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "self-test-transition-manifest",
+          "--expect-original-occurrences",
+          "139",
+          "--no-browser"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-transition-manifest-wave"
+    },
+    {
+      "step": 42,
+      "name": "final-transition-transaction-contract",
+      "estimatedMinutes": 10,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        41
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "self-test-transition-transaction",
+          "--prepare-manifest-in-temp",
+          "--temp-root-env",
+          "TMPDIR",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--inject-each-post-validation-failure",
+          "--require-original-bytes-restored",
+          "--no-browser"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-transition-transaction-wave"
+    },
+    {
+      "step": 43,
+      "name": "final-fixture-transition",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        42
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "verify-transition-manifest",
+          "--base",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--zero-observation",
+          "tests/fixtures/axe-zero-observation.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--baseline",
+          "tests/fixtures/axe-baseline.json",
+          "--plan",
+          "tests/fixtures/axe-remediation-plan.json",
+          "--expect-original-occurrences",
+          "139",
+          "--manifest",
+          "tests/fixtures/final-transition-ready.json",
+          "--read-only"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-prepare-wave",
+      "checks": {
+        "mutation": {
+          "command": [
+            "node",
+            "tests/scripts/verify-final-contract.mjs",
+            "commit-fixture-transition",
+            "--base",
+            "5a34759acf16e7beb96c415101c152d6e786c4b3",
+            "--zero-observation",
+            "tests/fixtures/axe-zero-observation.json",
+            "--evidence",
+            "tests/fixtures/axe-remediation-evidence.json",
+            "--baseline",
+            "tests/fixtures/axe-baseline.json",
+            "--plan",
+            "tests/fixtures/axe-remediation-plan.json",
+            "--manifest",
+            "tests/fixtures/final-transition-ready.json",
+            "--expect-original-occurrences",
+            "139",
+            "--baseline-empty",
+            "--plan-empty",
+            "--evidence-preserved",
+            "--candidate-diff-only",
+            "--allowed-mutations",
+            "tests/fixtures/axe-baseline.json,tests/fixtures/axe-remediation-plan.json",
+            "--transactional"
+          ],
+          "targetPaths": [
+            "tests/fixtures/axe-baseline.json",
+            "tests/fixtures/axe-remediation-plan.json"
+          ],
+          "forbiddenPaths": [],
+          "requireChanged": true
+        }
+      }
+    },
+    {
+      "step": 44,
+      "name": "final-contract-verification",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        43
+      ],
+      "acceptanceCommands": [
+        [
+          "node",
+          "tests/scripts/verify-final-contract.mjs",
+          "verify",
+          "--base",
+          "5a34759acf16e7beb96c415101c152d6e786c4b3",
+          "--zero-observation",
+          "tests/fixtures/axe-zero-observation.json",
+          "--evidence",
+          "tests/fixtures/axe-remediation-evidence.json",
+          "--axe-zero",
+          "--scenario-complete",
+          "--baseline-empty",
+          "--plan-empty",
+          "--menu",
+          "mobile-dark",
+          "--modal-projects",
+          "1,5,7,0,2,12",
+          "--candidate-diff-only",
+          "--no-clean-tree-check"
+        ],
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-verify-wave"
+    },
+    {
+      "step": 45,
+      "name": "final-screenshots",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        44
+      ],
+      "acceptanceCommands": [
+        [
+          "env",
+          "PW_PORT=4175",
+          "sh",
+          "tests/scripts/with-env.sh",
+          "npm",
+          "--prefix",
+          "tests",
+          "exec",
+          "playwright",
+          "test",
+          "specs/screenshots.spec.js",
+          "specs/final-contract.spec.js"
+        ]
+      ],
+      "executor": "parallel",
+      "status": "pending",
+      "wave": "final-screenshot-wave"
+    },
+    {
+      "step": 46,
+      "name": "canonical-tested-head",
+      "estimatedMinutes": 20,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        45
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import hashlib,json,os,subprocess,tempfile,time\nroot=os.getcwd(); screenshot_root='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots'; os.makedirs(screenshot_root,mode=0o700,exist_ok=True); st=os.lstat(screenshot_root); assert not os.path.islink(screenshot_root) and os.path.isdir(screenshot_root) and os.path.realpath(screenshot_root)==os.path.abspath(screenshot_root) and os.access(screenshot_root,os.W_OK|os.X_OK)\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status\ncommands=[[\"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"test\"], [\"env\", \"PW_PORT=4175\", \"node\", \"tests/scripts/verify-a11y-remediation.mjs\", \"verify-full\", \"--server-root\", \".\", \"--forbid-existing-server\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--expect-color\", \"0\", \"--expect-nested\", \"0\", \"--scenarios\", \"page:mobile-dark:null,page:mobile-light:null,page:tablet-dark:null,page:tablet-light:null,page:desktop-dark:null,page:desktop-light:null,modal:desktop-dark:0,modal:desktop-light:0,lightbox:desktop-dark:0,lightbox:desktop-light:0\", \"--require-nonempty-scenario-set\", \"--observation-stdout\"], [\"env\", \"HOO103_SCREENSHOT_OUTPUT_ROOT=/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/screenshots\", \"PW_PORT=4175\", \"sh\", \"tests/scripts/with-env.sh\", \"npm\", \"--prefix\", \"tests\", \"exec\", \"playwright\", \"test\", \"specs/screenshots.spec.js\", \"specs/final-contract.spec.js\"], [\"node\", \"tests/scripts/verify-final-contract.mjs\", \"verify\", \"--base\", \"5a34759acf16e7beb96c415101c152d6e786c4b3\", \"--zero-observation\", \"tests/fixtures/axe-zero-observation.json\", \"--evidence\", \"tests/fixtures/axe-remediation-evidence.json\", \"--axe-zero\", \"--scenario-complete\", \"--baseline-empty\", \"--plan-empty\", \"--menu\", \"mobile-dark\", \"--modal-projects\", \"1,5,7,0,2,12\", \"--require-clean\"]]\nresults=[]\nfor cmd in commands:\n r=subprocess.run(cmd,text=True,capture_output=True); results.append({'argv':cmd,'exitCode':r.returncode,'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest()}); assert r.returncode==0,(cmd,r.stdout,r.stderr)\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head\nassert subprocess.check_output(['git','status','--porcelain'],text=True)==''\nout={'kind':'HOO-103-tested-head','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'reviewRange':'5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'commands':results,'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 47,
+      "name": "exact-commit-astra-review",
+      "estimatedMinutes": 12,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        46
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import hashlib,json,os,subprocess,tempfile,time\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); assert subprocess.check_output(['git','status','--porcelain'],text=True)==''; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['head']==head and tested['reviewRange']=='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,tested\ncmd=['/Volumes/P9/hoonlabs-data/dev-harness/bin/harness','--project-root','.','cross-review','diff','5a34759acf16e7beb96c415101c152d6e786c4b3']; r=subprocess.run(cmd,text=True,capture_output=True,env={**os.environ,'HARNESS_REVIEW_BACKEND':'codex','HARNESS_REVIEW_MODEL':'gpt-6-astra'}); assert r.returncode==0,(r.stdout,r.stderr); assert r.stdout.strip()=='CLEAN',r.stdout\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head; assert subprocess.check_output(['git','status','--porcelain'],text=True)==''\ndiff=subprocess.check_output(['git','diff','--binary','5a34759acf16e7beb96c415101c152d6e786c4b3..'+head],text=False)\nout={'kind':'HOO-103-exact-commit-review','schemaVersion':1,'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','head':head,'model':'gpt-6-astra','verdict':'CLEAN','scope':'git diff 5a34759acf16e7beb96c415101c152d6e786c4b3..'+head,'diffSha256':hashlib.sha256(diff).hexdigest(),'stdoutSha256':hashlib.sha256(r.stdout.encode()).hexdigest(),'stderrSha256':hashlib.sha256(r.stderr.encode()).hexdigest(),'recordedAt':time.time()}\np='/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json'; os.makedirs(os.path.dirname(p),exist_ok=True); fd,tmp=tempfile.mkstemp(dir=os.path.dirname(p)); os.write(fd,json.dumps(out,sort_keys=True,separators=(',',':')).encode()); os.close(fd); os.replace(tmp,p); print(json.dumps(out))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 48,
+      "name": "publish-open-pr",
+      "estimatedMinutes": 8,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        47
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status=='',status; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['head']==head and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['head']==head and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'\nlocal=subprocess.check_output(['git','rev-parse',branch],text=True).strip(); assert local==head,(local,head)\nsubprocess.run(['git','push','--set-upstream','origin',branch],check=True)\nq=subprocess.run(['gh','pr','list','--head',branch,'--base','main','--state','open','--json','number,url,state,headRefName,headRefOid,baseRefName'],capture_output=True,text=True); q.check_returncode(); prs=json.loads(q.stdout)\nif not prs:\n pr_id=subprocess.check_output(['gh','pr','create','--base','main','--head',branch,'--title','feat: portfolio redesign','--body','HOO-81 portfolio redesign. Official Harness evidence is recorded in HOO-103.'],text=True).strip()\nelif len(prs)!=1: raise RuntimeError('multiple OPEN PRs for exact head/base')\nelse: pr_id=str(prs[0]['number'])\npr=json.loads(subprocess.check_output(['gh','pr','view',pr_id,'--json','number,url,state,headRefName,headRefOid,baseRefName'],text=True)); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; assert pr['state']=='OPEN' and pr['headRefName']==branch and pr['baseRefName']=='main' and remote==pr['headRefOid']==head,(remote,pr,head); print(json.dumps(pr))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    },
+    {
+      "step": 49,
+      "name": "published-sha-identity",
+      "estimatedMinutes": 5,
+      "timeoutMinutes": 30,
+      "dependsOn": [
+        48
+      ],
+      "acceptanceCommands": [
+        [
+          "python3",
+          "-I",
+          "-c",
+          "import hashlib,json,subprocess\nbranch='feat/HOO-81/portfolio-redesign'; tested=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/tested.json')); reviewed=json.load(open('/Volumes/P9/hoonlabs-data/hermes/company/development/product-management/HOO-81-evidence/HOO-81-portfolio-redesign-official-runner-resume/release-gates/reviewed.json')); head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); local_branch=subprocess.check_output(['git','rev-parse','refs/heads/'+branch],text=True).strip(); remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+branch],text=True).split()[0]; prs=json.loads(subprocess.check_output(['gh','pr','list','--head',branch,'--base','main','--state','open','--json','number,url,state,headRefName,headRefOid,baseRefName'],text=True)); assert len(prs)==1,prs; pr_id=str(prs[0]['number']); pr=json.loads(subprocess.check_output(['gh','pr','view',pr_id,'--json','number,url,state,headRefName,headRefOid,baseRefName'],text=True)); status=subprocess.check_output(['git','status','--porcelain'],text=True); assert status==''; scope='5a34759acf16e7beb96c415101c152d6e786c4b3..'+head; diff=hashlib.sha256(subprocess.check_output(['git','diff','--binary',scope])).hexdigest(); assert tested['kind']=='HOO-103-tested-head' and tested['schemaVersion']==1 and tested['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and tested['reviewRange']==scope; assert reviewed['kind']=='HOO-103-exact-commit-review' and reviewed['schemaVersion']==1 and reviewed['implementationBase']=='5a34759acf16e7beb96c415101c152d6e786c4b3' and reviewed['scope']=='git diff '+scope and reviewed['diffSha256']==diff and reviewed['verdict']=='CLEAN' and reviewed['model']=='gpt-6-astra'; assert tested['head']==reviewed['head']==head==local_branch==remote==pr['headRefOid']; assert pr['state']=='OPEN' and pr['headRefName']==branch and pr['baseRefName']=='main'; print(json.dumps({'implementationBase':'5a34759acf16e7beb96c415101c152d6e786c4b3','diffSha256':diff,'testedSha':tested['head'],'reviewedSha':reviewed['head'],'headSha':head,'localBranchSha':local_branch,'pushedSha':remote,'prHeadSha':pr['headRefOid'],'prNumber':pr['number'],'pr':pr['url']}))\n"
+        ]
+      ],
+      "executor": "sequential",
+      "status": "pending"
+    }
+  ]
+}

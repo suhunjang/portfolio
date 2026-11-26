@@ -1,0 +1,438 @@
+{
+  "project": "suhunjang/portfolio",
+  "phase": "HOO-81-portfolio-redesign",
+  "baseBranch": "main",
+  "designDoc": "docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md",
+  "allowedPaths": [
+    "index.html",
+    "css/style.css",
+    "js/main.js",
+    "js/data.js",
+    "tests/"
+  ],
+  "testCommand": [
+    "sh",
+    "tests/scripts/with-env.sh",
+    "npm",
+    "--prefix",
+    "tests",
+    "test"
+  ],
+  "steps": [
+    {
+      "step": 0,
+      "name": "tests-env-bootstrap",
+      "status": "completed",
+      "started_at": "2026-11-24T19:25:09+0900",
+      "completed_at": "2026-11-24T19:26:55+0900",
+      "summary": "reverify step0: fixed tests/scripts/start-snapshot.py,tests/scripts/scope-snapshot.mjs,tests/specs/bootstrap.spec.js — start-snapshot.py synced byte-identical to design S block, HARNESS_IDENTITY set to §ID (e7a03919…/b627e6a5…/2.0.1), bootstrap spec gained HARNESS_IDENTITY deep-equal S HARNESS check; identity-diff OK, bootstrap+scope-snapshot specs+FULL (81 passed) green, SNAP 0 reused, CGATE scope-snapshot: OK"
+    },
+    {
+      "step": 1,
+      "name": "scope-snapshot-paths",
+      "status": "completed",
+      "started_at": "2026-11-24T19:26:55+0900",
+      "completed_at": "2026-11-24T19:27:57+0900",
+      "summary": "reverify step1: no-op — SNAP 1 created→reused, scope-snapshot-paths.spec.js 7 passed (desktop-dark), FULL 81 passed, CGATE 1 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 2,
+      "name": "scope-snapshot-parse",
+      "status": "completed",
+      "started_at": "2026-11-24T19:27:57+0900",
+      "completed_at": "2026-11-24T19:28:54+0900",
+      "summary": "reverify step2: no-op — SNAP 2 created→reused, scope-snapshot-parse+paths specs 13 passed (desktop-dark), FULL 81 passed, CGATE 2 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 3,
+      "name": "scope-snapshot-loader",
+      "status": "completed",
+      "started_at": "2026-11-24T19:28:54+0900",
+      "completed_at": "2026-11-24T19:29:55+0900",
+      "summary": "reverify step3: no-op — SNAP 3 created→reused, scope-snapshot-loader+parse+paths specs 19 passed (desktop-dark), FULL 81 passed, CGATE 3 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 4,
+      "name": "scope-snapshot-state",
+      "status": "completed",
+      "started_at": "2026-11-24T19:29:55+0900",
+      "completed_at": "2026-11-24T19:30:52+0900",
+      "summary": "reverify step4: no-op — SNAP 4 created→reused, scope-snapshot-state+loader specs 13 passed (desktop-dark), FULL 81 passed, CGATE 4 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 5,
+      "name": "scope-snapshot-symlink",
+      "status": "completed",
+      "started_at": "2026-11-24T19:30:52+0900",
+      "completed_at": "2026-11-24T19:31:51+0900",
+      "summary": "reverify step5: no-op — SNAP 5 created→reused, scope-snapshot-symlink.spec.js 5 passed (desktop-dark), FULL 81 passed, CGATE 5 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 6,
+      "name": "scope-snapshot-special-files",
+      "status": "completed",
+      "started_at": "2026-11-24T19:31:51+0900",
+      "completed_at": "2026-11-24T19:32:48+0900",
+      "summary": "reverify step6: no-op — SNAP 6 created→reused, scope-snapshot-special.spec.js 12 passed (desktop-dark), FULL 81 passed, CGATE 6 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 7,
+      "name": "scope-snapshot-identity",
+      "status": "completed",
+      "started_at": "2026-11-24T19:32:48+0900",
+      "completed_at": "2026-11-24T19:33:37+0900",
+      "summary": "reverify step7: no-op — SNAP 7 created→reused, scope-snapshot-identity.spec.js 9 passed (desktop-dark), FULL 81 passed, CGATE 7 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 8,
+      "name": "scope-snapshot-cli",
+      "status": "completed",
+      "started_at": "2026-11-24T19:33:37+0900",
+      "completed_at": "2026-11-24T19:34:21+0900",
+      "summary": "reverify step8: no-op — SNAP 8 created→reused, scope-snapshot-cli+identity specs 18 passed (desktop-dark), FULL 81 passed, GATE 8 OK, CGATE 8 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 9,
+      "name": "scope-snapshot-parity-core",
+      "status": "completed",
+      "started_at": "2026-11-24T19:34:21+0900",
+      "completed_at": "2026-11-24T19:35:16+0900",
+      "summary": "reverify step9: no-op — SNAP 9 created→reused, scope-snapshot-parity-core.spec.js 5 passed (desktop-dark), FULL 81 passed, GATE 9 OK, CGATE 9 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 10,
+      "name": "scope-snapshot-parity-paths",
+      "status": "completed",
+      "started_at": "2026-11-24T19:35:16+0900",
+      "completed_at": "2026-11-24T19:36:11+0900",
+      "summary": "reverify step10: no-op — SNAP 10 created→reused, scope-snapshot-parity-paths.spec.js 2 passed (desktop-dark), FULL 81 passed, GATE 10 OK, CGATE 10 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 11,
+      "name": "scope-snapshot-parity-artifacts",
+      "status": "completed",
+      "started_at": "2026-11-24T19:36:11+0900",
+      "completed_at": "2026-11-24T19:37:05+0900",
+      "summary": "reverify step11: no-op — SNAP 11 created→reused, scope-snapshot-parity-artifacts.spec.js 7 passed (desktop-dark), FULL 81 passed, GATE 11 OK, CGATE 11 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 12,
+      "name": "claude-design-intake",
+      "status": "completed",
+      "started_at": "2026-11-24T19:37:05+0900",
+      "completed_at": "2026-11-24T19:39:00+0900",
+      "summary": "step12: added tests/fixtures/claude-design-intake.json (byte-identical to design §11.1 block), tests/scripts/design-intake-check.py (§11.1 contract: unsafe→files→hash→summary, read-only O_NOFOLLOW), tests/specs/design-intake.spec.js (3 passed desktop-dark; synthetic bundle OK/hash/files/symlink/summary cases, copy unchanged, cleaned); SNAP 12 created, DI OK on real bundle, FULL 84 passed, GATE 12 scope-snapshot: OK"
+    },
+    {
+      "step": 13,
+      "name": "css-parser",
+      "status": "completed",
+      "started_at": "2026-11-24T19:39:01+0900",
+      "completed_at": "2026-11-24T19:41:21+0900",
+      "summary": "step13: added tests/helpers/css-parse.js (pure parseCssRules/splitSelectors/normalizeValue per §11.4: comments stripped, strings/url() opaque, @media/@supports/@layer/@container/@keyframes chain recursion, @import/@charset/@font-face Rules, nested index) and tests/specs/css-parse.spec.js (21 passed desktop-dark); SNAP 13 created, FULL 105 passed, GATE 13 scope-snapshot: OK"
+    },
+    {
+      "step": 14,
+      "name": "color-vocab-graph",
+      "status": "completed",
+      "started_at": "2026-11-24T19:41:21+0900",
+      "completed_at": "2026-11-24T19:43:43+0900",
+      "summary": "step14: added tests/helpers/color-vocab.js (NAMED_COLORS 149, COLOR_LITERAL_RE per §11.4 /i, COLOR_PROPS design set with 0/none shorthand exclusion, valueIdentifiers/varRefs/isColorLiteralValue with string·url() stripping, isColorDecl, customPropertyDefs, bidirectional colorTokenSet fixpoint, isColorValue) and tests/specs/color-vocab.spec.js (11 passed desktop-dark); SNAP 14 created, T color-vocab+css-parse 32 passed, FULL 116 passed, GATE 14 scope-snapshot: OK"
+    },
+    {
+      "step": 15,
+      "name": "color-rule-pairs",
+      "status": "completed",
+      "started_at": "2026-11-24T19:43:43+0900",
+      "completed_at": "2026-11-24T19:45:30+0900",
+      "summary": "step15: added tests/helpers/design-guard-color-pairs.js (featuredCounterpart class-boundary .project-card→.featured-card else null; pairColorRules over BASE color Rules in (file,index) order, same file·chain, selectors ⊇, same-selectors groups 1:1 by appearance; checkColorRulePairs rule 1 color-rule-missing with .strength-card::before exemption → rule 2 selector-extended (non-featured extras) → per-file rule 3 color-rule-reordered, dedup, no sorting, inputs unmutated) and tests/specs/design-guard-color-pairs.spec.js (5 passed desktop-dark, all step15 BASE cases); SNAP 15 created, T pairs+color-vocab+css-parse 37 passed, FULL 121 passed, GATE 15 scope-snapshot: OK"
+    },
+    {
+      "step": 16,
+      "name": "color-decl-rules",
+      "status": "completed",
+      "started_at": "2026-11-24T19:45:30+0900",
+      "completed_at": "2026-11-24T19:47:39+0900",
+      "summary": "step16: added tests/helpers/design-guard-color-rules.js (checkColorRules = checkColorRulePairs result + per paired BASE color Rule in BASE order rule 4 color-decl-changed -> 5 color-decl-reordered (subsequence of BASE color decls, non-color ignored) -> 6 color-decl-new (decls absent from BASE Rule with isColorDecl/isColorValue), then unpaired current Rules in current order rule 7 (color decl or isColorValue, :focus-visible outline/outline-offset token-only exception) -> 8 (non-color currentColor/named color absent at same file/chain/selectors in BASE); custom properties excluded, global dedup, no sorting, inputs unmutated; pairs import only) and tests/specs/design-guard-color-rules.spec.js (5 passed desktop-dark, all step16 BASE cases); SNAP 16 created, T rules+pairs+color-vocab+css-parse 42 passed, FULL 126 passed, GATE 16 scope-snapshot: OK"
+    },
+    {
+      "step": 17,
+      "name": "design-guard-color-tokens",
+      "status": "completed",
+      "started_at": "2026-11-24T19:47:39+0900",
+      "completed_at": "2026-11-24T19:49:40+0900",
+      "summary": "step17: added tests/helpers/design-guard-color.js (checkColorTokens over position key (file,chain,selectors,name): rule 0 duplicate definition '색 토큰 중복 정의: <name> @ <file> <chain|-> <selectors> (count=N)' first in current key order when name in colorTokens or any value isColorValue, those keys excluded from 1-3; rule 1 color-token-removed/changed (BASE order), rule 2 color-token-redefined/added (current order, exactly one), rule 3 non-color BASE prop turned color -> color-token-added; global dedup, no sorting, inputs unmutated; checkColors = [...checkColorRules, ...checkColorTokens] with colorTokenSet(baseRules)) and tests/specs/design-guard-color.spec.js (7 passed desktop-dark: preservation, color()/CoLoR() add, duplicates a-i, checkColors allow/reject, immutability); SNAP 17 created, T color+rules+pairs+color-vocab+css-parse 49 passed, FULL 133 passed, GATE 17 scope-snapshot: OK"
+    },
+    {
+      "step": 18,
+      "name": "font-preservation",
+      "status": "completed",
+      "started_at": "2026-11-24T19:49:40+0900",
+      "completed_at": "2026-11-24T19:51:04+0900",
+      "summary": "step18: added tests/helpers/design-guard-font.js (matchesBaseRule: same file·chain, base selectors ⊆ current, extras only featuredCounterpart; checkFontDecls over atRule-null Rules: (1) BASE order font-family/font decl with no matching current Rule having same prop·value -> 'font-decl-missing:{chain}|{selectors}|{prop}', (2) current order/decl order font decl with no matching BASE Rule having same prop·value -> 'font-asset:{current selectors}'; dedup, no sorting, inputs unmutated) and tests/specs/design-guard-font.spec.js (4 passed desktop-dark: matchesBaseRule cases, allowed [], exact diagnostics, immutability); RED confirmed (module missing), SNAP 18 created, T font+color+rules+pairs+color-vocab+css-parse 53 passed, FULL 137 passed, GATE 18 scope-snapshot: OK"
+    },
+    {
+      "step": 19,
+      "name": "design-guard-css",
+      "status": "completed",
+      "started_at": "2026-11-24T19:51:04+0900",
+      "completed_at": "2026-11-24T19:52:57+0900",
+      "summary": "step19: added tests/helpers/design-guard-css.js (checkTypeAndAssets = checkFontDecls results first, then current order/decl order: @import without same file·chain·prelude in BASE -> asset:@import; @font-face without same file·chain·decls -> font-asset:@font-face (+asset:@font-face if url()); font-weight not in BASE style.css values -> font-weight:{v}; new url() decl -> asset:{selectors}; new content not none/''/\"\"/normal -> content:{selectors}; unknown-token for varRefs of non-custom decls not in KNOWN = union of custom property names in BASE+current style/themes; global dedup, no sorting, inputs unmutated; checkCss = parse style/themes then [...checkColors, ...checkTypeAndAssets] + themes-changed) and tests/specs/design-guard-css.spec.js (4 passed desktop-dark: allowed [], exact diagnostics, checkCss, immutability); RED confirmed (module missing), SNAP 19 created, T css+font+color+rules+pairs+color-vocab+css-parse 57 passed, FULL 141 passed, GATE 19 scope-snapshot: OK"
+    },
+    {
+      "step": 20,
+      "name": "design-guard-integration",
+      "status": "completed",
+      "started_at": "2026-11-24T19:52:57+0900",
+      "completed_at": "2026-11-24T19:55:01+0900",
+      "summary": "step20: added tests/helpers/design-guard.js (GUARD_BASE; checkMarkupPatch scans only added lines inside hunks for <img/<svg/<picture/<video/<i /<i>/<link/<script/<font/style= (case-insensitive) and .style.color/.style.background/.style.font -> 'markup-asset:{kind}:{new-file line from hunk header}', ignoring headers/deleted/context/'\\' lines; collectGuardInput({git,fs,root}) reads git show BASE:css/style.css, BASE:css/themes.css, fs.readFile of both worktree CSS, git diff --no-renames --unified=0 BASE -- index.html, -- js/main.js; runGuard = [...checkCss, ...checkMarkupPatch(html,'index.html'), ...checkMarkupPatch(js,'js/main.js')]) and tests/specs/design-guard.spec.js (4 passed desktop-dark: asset kinds with line numbers, ignored lines/normal [], fake git/fs call record + runGuard, real repo runGuard(await collectGuardInput()) -> []); RED confirmed (module missing), SNAP 20 created, T GS 61 passed, FULL 145 passed, GATE 20 scope-snapshot: OK"
+    },
+    {
+      "step": 21,
+      "name": "tests-browser-smoke",
+      "status": "completed",
+      "started_at": "2026-11-24T19:55:01+0900",
+      "completed_at": "2026-11-24T19:57:00+0900",
+      "summary": "step21: browsers:install (chromium-1255 into tests/.pw-browsers); added tests/helpers/theme.js (§THEME installProjectTheme: strict /-(dark|light)$/ project suffix else throw, THEME_KEY regex-extracted from js/main.js, exactly one context.addInitScript with null-only localStorage setItem; test = base.extend context fixture installing theme before navigation; collectConsoleErrors immediate pageerror/console.error listeners excluding Google Fonts domains, finish() after networkidle -> {pageErrors, consoleErrors}) and tests/specs/smoke.spec.js (6 projects: (a) default page data-theme=suffix + #heroName visible, (b) context.newPage inherits, (c) seeded opposite theme not overwritten, installProjectTheme throw/1-call spy, console [] + async throw -> 1 pageError); RED confirmed (module missing), SNAP 21 created, T smoke 30 passed, FULL 175 passed, GATE 21 scope-snapshot: OK"
+    },
+    {
+      "step": 22,
+      "name": "scope-paths",
+      "status": "completed",
+      "started_at": "2026-11-24T19:57:00+0900",
+      "completed_at": "2026-11-24T19:59:56+0900",
+      "summary": "step22: added tests/scripts/verify-scope.mjs (frozen GIT_DIFF_PATH_ARGS ['--no-renames','--name-only'] / GIT_DIFF_PATCH_ARGS ['--no-renames','--unified=0']; read-only collectInput({git}) = name-only diffs committed BASE..HEAD, staged --cached HEAD, worktree + ls-files --others/ls-files, data.js patch for 4 intervals baseHead/baseIndex/indexWorktree/baseWorktree; pure evaluatePaths: §8.1 builder paths allowed, runtime-exempt .harness/** (except lock/policy) .venv/** phases/HOO-81-portfolio-redesign/**, harness-owned (CLAUDE.md, pytest.ini, .python-version, .gitattributes, root .gitignore, .claude/**, .codex/**, lock, policy, design doc, legacy scripts/** templates/** harness-manifest.json, harness seed docs/PRD.md docs/UI_GUIDE.md phases/index.json) committed-exempt/uncommitted harness-uncommitted, runtime-tracked, root-package-json, themes-changed, else outside-scope; CLI no args 'verify-scope: OK (paths)', --self-test covering constants, fake git call record, normal 0, all listed violations/allowances and 4 rename-bypass cases) and tests/package.json verify-scope + verify-scope:selftest scripts; RED confirmed (module missing), SNAP 22 created, selftest OK, VS OK, FULL 175 passed, GATE 22 scope-snapshot: OK"
+    },
+    {
+      "step": 23,
+      "name": "scope-content",
+      "status": "completed",
+      "started_at": "2026-11-24T19:59:57+0900",
+      "completed_at": "2026-11-24T20:03:05+0900",
+      "summary": "step23: extended tests/scripts/verify-scope.mjs (diff arg constants and collectInput unchanged) with checkGitignore (exact 7 §8.1 lines, only one trailing newline normalized), checkSpaceGrotesk, checkDataJsDiff(patch,{requireExactly3}) (hunk-parsed: deleted:N, added-non-featured:N for lines other than trimmed 'featured: true,', featured-count:N if >3 or !=3 when required; name-only output = 0 lines), read-only collectContentInput (git show HEAD:index.html, :index.html, :tests/.gitignore + worktree fs) / collectScopeInput, evaluateContent(input,{final}) (data-js 4 intervals, final = baseHead/baseIndex/baseWorktree exactly 3, indexWorktree featured-only <=3; Space+Grotesk head/index/worktree; gitignore index/worktree), evaluateScope = paths+content; CLI default 'verify-scope: OK', --final 'verify-scope: OK (final)'; self-test covers synthesized patches (final 0), title 'x', name-only shortfall, data.js deleted/non-featured/4 lines/stage-then-revert, final violations (BASE->HEAD 0, BASE->index 2, index->worktree non-featured), Space Grotesk staged removal then revert, gitignore added/dup/blank/order/comment/CRLF/missing/index-only, no-trailing-newline pass; RED confirmed, SNAP 23 created, selftest OK, VS OK, FULL 175 passed, GATE 23 scope-snapshot: OK"
+    },
+    {
+      "step": 24,
+      "name": "content-data-baseline",
+      "status": "completed",
+      "started_at": "2026-11-24T20:03:05+0900",
+      "completed_at": "2026-11-24T20:05:54+0900",
+      "summary": "step24: added tests/scripts/make-fixtures.mjs (git show BASE:js/data.js evaluated in node:vm -> tests/fixtures/baseline-data.json {PROFILE,STATS,CAREER,VIS_ACCENT,PROJECTS,STRENGTHS,SKILLS}; git show BASE:index.html byte-identical -> tests/fixtures/baseline-index.html), tests/package.json fixtures script (run), tests/helpers/content.js (norm, readLiveData via page globals, normalizeFeatured: structuredClone, drops featured only at index 1/5/7 when === true, else throw), tests/specs/content-data.spec.js (7 tests x 6 projects: fixture shape, norm, normalizeFeatured immutability/throw, live data = baseline + featured none or 1/5/7 + empty email/phone/social, stats 4/timeline=CAREER/project-card 13/strengths 6, #projectGrid data-project 0..12 order + titles = baseline); RED confirmed (module missing), SNAP 24 created, T content-data 42 passed, FULL 217 passed, VS OK, GATE 24 scope-snapshot: OK"
+    },
+    {
+      "step": 25,
+      "name": "content-static-baseline",
+      "status": "completed",
+      "started_at": "2026-11-24T20:05:54+0900",
+      "completed_at": "2026-11-24T20:09:19+0900",
+      "summary": "step25: added tests/fixtures/content-exceptions.json (kickers.base/final, titles.base/final, featured.indexes [1,5,7], subsectionTitleFinal '기술 스택'), tests/helpers/content.js extractStatic (append only: norm'd StaticContent title/metaDescription/navLabels(sorted)/heroEyebrow/ctaLabels/kickers/sectionTitles/sectionSubs/aboutParagraphs(.about-text p:not([id]))/aboutPoints/aboutMetaTerms/contactHeading/contactText/footerNote/footerTop), tests/specs/content-static.spec.js (4 tests x 6 projects: exceptions shape, baseline-index.html setContent javaScriptEnabled:false extraction values, synthetic base/final pass + final requires exactly one h3.subsection-title 기술 스택 + mixed/one-char diffs rejected per key + synthetic final HTML extraction passes, live index.html (JS off) = BASE under §5 exceptions); RED confirmed (extractStatic export missing), SNAP 25 created, T content-static 24 passed, FULL 241 passed, VS OK, GATE 25 scope-snapshot: OK"
+    },
+    {
+      "step": 26,
+      "name": "modal-regression",
+      "status": "completed",
+      "started_at": "2026-11-24T20:09:20+0900",
+      "completed_at": "2026-11-24T20:19:57+0900",
+      "summary": "step26: added tests/helpers/modal.js (GRID_CARD '#projectGrid .project-card'; gridCard(page,N) exact data-project locator; openFirstProjectByClick/openFirstProjectByEnter (focus+Enter) waiting #projectModal visible; closeVia button '#projectModal .modal-close[data-modal-close]' / backdrop click position {x:5,y:5} / esc, unknown -> throw; expectFocused toBeFocused; modalTitle '#projectModal #modalTitle'; findProjectWithShots = first grid card (DOM order) whose PROJECTS[N].detail.shots non-empty else null) and tests/specs/modal-regression.spec.js (6 projects: helper selectors, click & Enter open x button/backdrop/esc close -> title = baseline title, modal-open set/cleared, close-button focus on open, trigger card focus restored, closeVia throw; desktop-only lightbox: findProjectWithShots, open/close modal leaves no lightbox, .shot-zoom opens lightbox with src + close focus, Esc 1 closes lightbox only (modal-open kept, zoom refocused), Esc 2 closes modal + card focus); RED confirmed (module missing), SNAP 26 created, T modal-regression 50 passed/4 skipped (repeat-each 4: 200 passed), FULL 291 passed, VS OK, GATE 26 scope-snapshot: OK"
+    },
+    {
+      "step": 27,
+      "name": "ui-regression",
+      "status": "completed",
+      "started_at": "2026-11-24T20:19:57+0900",
+      "completed_at": "2026-11-24T20:25:26+0900",
+      "summary": "step27: added tests/specs/ui-regression.spec.js (§THEME test, 6 projects: theme toggle flips html[data-theme] + localStorage THEME_KEY (regex from js/main.js) and persists across reload both ways; mobile-only #menuToggle -> #navLinks.open + aria-expanded=true, .nav-link[href=#projects] click closes (aria-expanded=false); desktop-only §4 exact scrollspy syntax for projects -> toHaveClass(/active/); typing: #typed takes >=3 distinct values, all prefixes of baseline PROFILE.roles; test.use reducedMotion 'reduce': all .reveal have .in right after load, #typed = roles[0] stays fixed) and tests/specs/first-visit.spec.js (desktop-dark only, browser.newContext without installProjectTheme for colorScheme light/dark -> data-theme = colorScheme, localStorage THEME_KEY null); regression tests over existing BASE behavior so no implementation change (no RED phase); SNAP 27 created, T 24 passed/18 skipped (repeat-each 3: 72 passed), FULL 315 passed, VS OK, GATE 27 scope-snapshot: OK"
+    },
+    {
+      "step": 28,
+      "name": "axe-canonical",
+      "status": "completed",
+      "started_at": "2026-11-24T20:25:26+0900",
+      "completed_at": "2026-11-24T20:29:06+0900",
+      "summary": "step28: added tests/helpers/axe.js (ALIASES {'## — Stack & Contact'->'## — Contact','기술 스택 & 연락처'->'연락처'}; canonicalFromDescriptor -> '{ruleId}::{anchor}::{textSig}' with anchor featured:N|project:N|#id|landmark tag|document (unknown kind throws), textSig = first non-empty norm(textContent)/aria-label/alt/title else src filename, digits -> '#', ALIASES, 80 chars; canonicalTargetInPage(page, ruleId, selector) resolves anchor by priority [data-featured-card][data-project] > [data-project] > [id] > landmark > document via closest(), throws 'target not found'; runAxe(page,{include}) = AxeBuilder wcag2a/wcag2aa, serious/critical only -> [{ruleId,impact,targets,selectors}] sorted unique, ruleId order) and tests/specs/axe-helper.spec.js (9 passed desktop-dark: ALIASES, descriptor cases, section#career subtree move/h3->span/01->04 same, h3-only move differs, [data-project=5] div->p same/text differs, project:5 != featured:5, alias same, missing selector throws, runAxe image-alt include); RED confirmed (module missing), SNAP 28 created, T axe-helper 9 passed, FULL 324 passed, VS OK, GATE 28 scope-snapshot: OK"
+    },
+    {
+      "step": 29,
+      "name": "axe-prepare-page",
+      "status": "completed",
+      "started_at": "2026-11-24T20:35:43+0900",
+      "completed_at": "2026-11-24T20:39:50+0900",
+      "summary": "reverify step29: no-op — tests/helpers/axe-prepare.js (PREPARE_PREFIX 'prepareForAxe: ', prepareError(code,cause?) message/code/cause, withPrepareCode keeps inner prepareError code else wraps with cause, preparePage fonts-not-ready race -> viewport scroll steps -> scrollTo 0 -> all .reveal .in else reveal-hidden:{n}, returns {revealChecked, scrollSteps}) and tests/specs/axe-prepare-page.spec.js already committed at c680b82; stale SNAP 29 (head cbeba3f, pre-commit) moved aside to tests/.tmp/*.bak, SNAP 29 created->reused; T axe-prepare-page 12 passed (desktop-dark/desktop-light/mobile-dark), FULL 336 passed, VS OK, GATE 29 scope-snapshot: OK; allowed files unchanged"
+    },
+    {
+      "step": 30,
+      "name": "axe-prepare-modal",
+      "status": "completed",
+      "started_at": "2026-11-24T20:39:51+0900",
+      "completed_at": "2026-11-24T20:45:02+0900",
+      "summary": "step30: tests/helpers/axe-prepare.js append-only (import gridCard from modal.js; MODAL_ROOT '#projectModal', MODAL_BODY_TEXT '#modalBody .modal-blurb, #modalBody .modal-section', assertContentLoaded(locator, timeoutMs, {textLocator=null}) polls img complete&&naturalWidth>0 -> svg rect>0 -> optional non-empty text else content-not-loaded:img|svg|text, prepareModal(page,{projectIndex=0,timeoutMs=10000}) clicks only #projectGrid card data-project=N (else project-card-not-found:N), waits !hidden + body.modal-open (withPrepareCode modal-not-open), assertContentLoaded(MODAL_ROOT, textLocator MODAL_BODY_TEXT), returns {include:'#projectModal'}); tests/specs/axe-prepare-modal.spec.js (8 tests desktop-dark/light: constants, real page PROJECTS[0].title + body, fixture grid click 1/featured 0/__opens 1, outside-grid -> project-card-not-found:3, no handler 500ms -> modal-not-open, empty blurb/no section -> content-not-loaded:text, empty div null pass/textLocator fail, broken img/zero svg); RED confirmed (export missing), SNAP 30 created, T modal+page 28 passed, FULL 352 passed, VS OK, GATE 30 scope-snapshot: OK"
+    },
+    {
+      "step": 31,
+      "name": "axe-prepare-lightbox",
+      "status": "completed",
+      "started_at": "2026-11-24T20:45:02+0900",
+      "completed_at": "2026-11-24T20:54:50+0900",
+      "summary": "step31: tests/helpers/axe-prepare.js append-only (prepareLightbox(page,{projectIndex?,timeoutMs=10000}): index given -> prepareModal + first #projectModal .shot-zoom click (none -> lightbox-not-open), else scans #projectGrid cards in DOM order opening each modal, keeps first with .shot-zoom open, closes others via .modal-close[data-modal-close] (none -> no-shots-project); lightbox wait visible .lightbox + focus inside (withPrepareCode lightbox-not-open) then assertContentLoaded -> {include:'.lightbox',projectIndex}; prepareOverlay modal|lightbox else unknown-scenario; prepareForAxe validates scenario page|modal|lightbox (else unknown-scenario) -> preparePage -> page {include:'body',projectIndex:null} | overlay) and tests/specs/axe-prepare-lightbox.spec.js (10 tests desktop-dark/light: page/modal/lightbox real page, overlay index 1, no-shots index -> lightbox-not-open, image abort -> content-not-loaded:img, unknown-scenario, no-shots fixture null/opens 2/closes 2/featured 0/no-shots-project, shots fixture -> 1 with opens 2 closes 1 then 2 after Esc x2, broken img/0x0 svg); RED confirmed (export missing), SNAP 31 created, T lightbox+modal+page 48 passed, FULL 372 passed, VS OK, GATE 31 scope-snapshot: OK. Note: step-30 prepareModal fails content-not-loaded:img on real project 2 (lazy shot imgs below modal fold) — not changed (step 30 behavior frozen)."
+    },
+    {
+      "step": 32,
+      "name": "axe-collect-tooling",
+      "status": "completed",
+      "started_at": "2026-11-24T20:54:50+0900",
+      "completed_at": "2026-11-24T21:01:03+0900",
+      "summary": "step32: tests/helpers/axe.js append-only (step-28 code untouched): makeEntryKey (`${scenario}:${project}:${ruleId}`, empty/':' throw), SCENARIOS/PROJECTS, COLLECT_DIR 'tests/.tmp/axe-collected', EXPECTED_FILES 10 sorted '{scenario}--{project}.json' (page x6, modal/lightbox x desktop-dark/light), resolveCollectDir (arg > AXE_COLLECT_DIR > COLLECT_DIR, repo-root relative, strictly under tests/.tmp, symlink components rejected), resetCollected (rm+mkdir), violationsToEntries (same ruleId merged, targets/selectors unique sorted, higher impact, key sorted, input unmutated), writeCollected(scenario,project,violations,{dir}) -> {scenario,project,entries} (bad scenario/project/unexpected pair throw), mergeCollected({collectDir,out}) -> 7-field MergedEntry key-sorted, missing:/extra:/invalid: problems thrown as Error.problems without writing, out limited to tests/fixtures/axe-collected.json (CLI default) or tests/.tmp/**; CLI --reset [--dir], --merge [--dir] [--out] (problems to stderr, exit 1); tests/specs/axe-helper.spec.js append-only step-32 describe (9 tests desktop-dark, tests/.tmp/axe-helper-test-<pid>-N dirs cleaned, real COLLECT_DIR and tests/fixtures/axe-collected.json state asserted unchanged after each test); RED confirmed (COLLECT_DIR export missing), SNAP 32 created, T axe-helper 18 passed, FULL 381 passed, VS OK, GATE 32 scope-snapshot: OK"
+    },
+    {
+      "step": 33,
+      "name": "axe-baseline-regression",
+      "status": "completed",
+      "started_at": "2026-11-24T21:01:03+0900",
+      "completed_at": "2026-11-24T21:07:58+0900",
+      "summary": "step33: tests/helpers/axe.js append (step-28/32 behavior unchanged; CLI parser only extended): BASELINE_PATH tests/fixtures/axe-baseline.json, COLLECTED_PATH (=DEFAULT_MERGE_OUT), PLAN_PATH tests/fixtures/axe-remediation-plan.json, frozen FIX_FILES_BY_KIND, baselineExists, loadBaseline (missing/invalid json/non-array throw), resolveBaselineMode({baselinePath,collectedPath,planPath}) check/pending/throw with no env bypass, validateBaseline per §6.4 (entry fields -> scenario/project/ruleId/key-mismatch (only when the 3 are valid)/impact/targets/selectors/fixes count; fix not-object/fields/target-mismatch/bad-fixKind (skips fixFiles + kind rule)/fixFiles-mismatch/bad-requiresColorChange (non-boolean or kind rule: css-token true, css-rule both, others false); union-mismatch only when no fix errors; duplicate-key, unsorted), checkRegression (new-key/new-target, sorted unique, inputs unmutated), assertEmptyFile, CLI --assert-empty [--baseline f]; tests/specs/axe-helper.spec.js append-only step-33 describe (8 tests desktop-dark, 6 §6.5 fixture constants, §6.4 A-E, rcc cases, other single errors, checkRegression, resolveBaselineMode incl. AXE_ALLOW_MISSING_BASELINE=1, loadBaseline, --assert-empty CLI; tmp dirs under tests/.tmp cleaned, real fixtures untouched); RED confirmed (BASELINE_PATH export missing), SNAP 33 created, T axe-helper 26 passed, FULL 389 passed, VS OK, GATE 33 scope-snapshot: OK"
+    },
+    {
+      "step": 34,
+      "name": "axe-baseline-projection",
+      "status": "completed",
+      "started_at": "2026-11-24T21:07:58+0900",
+      "completed_at": "2026-11-24T21:13:29+0900",
+      "summary": "step34: tests/helpers/axe.js append (step-28/32/33 behavior unchanged; CLI parser only extended): frozen PROJECTION_FIELDS [key,scenario,project,ruleId,impact,targets,selectors]; projectEntry (7 fields only, targets/selectors sorted unique, not-object/missing field/non-string list/key-mismatch throw, fixes/fixFiles/requiresColorChange excluded, input unmutated); compareCollectedBaseline(collected, baseline) -> {ok, missingEntries, extraEntries, missingTargets [{key,target}], extraTargets, fieldMismatches [{key,field}] over scenario/project/ruleId/impact/selectors}, all sorted, duplicate key throw, inputs unmutated; CLI --check-baseline-match [--collected] [--baseline] (defaults tests/fixtures/axe-collected.json / axe-baseline.json, stdout 'baseline-match: OK', mismatch stderr missing-entry/extra-entry/missing-target/extra-target/field-mismatch in that order exit 1, missing file/invalid JSON exit 1); tests/specs/axe-helper.spec.js append-only step-34 describe (4 tests desktop-dark on 2-entry strict baseline FIXTURE_OK+FIXTURE_RULE_COLOR: projection keys, requiresColorChange flip still ok, 5 mismatch kinds + duplicate throw, CLI exact lines/mixed order/0/1 cases; tmp dirs under tests/.tmp cleaned, real fixtures untouched); RED confirmed (PROJECTION_FIELDS export missing), SNAP 34 created, T axe-helper 30 passed, FULL 393 passed, VS OK, GATE 34 scope-snapshot: OK"
+    },
+    {
+      "step": 35,
+      "name": "axe-remediation-plan-schema",
+      "status": "completed",
+      "started_at": "2026-11-24T21:13:29+0900",
+      "completed_at": "2026-11-24T21:19:56+0900",
+      "summary": "step35: tests/helpers/axe.js append (step-28/32/33/34 behavior unchanged; CLI parser only extended): GROUP_ID_RE /^[a-z0-9]+(?:-[a-z0-9]+)*$/, loadPlan (missing/invalid json throw), requiredBlockReason(groupTargets, baseline) pure (text-change -> 'text change excluded', requiresColorChange true -> 'color change excluded (HOO-81 §16.3)', joined '; ' in that order, unknown targets ignored), validateRemediationPlan(plan, baseline, {coverage, requireEmpty}) per §6.5 (plan not-object/fields/groups not-array; groups[i] not-object/fields/bad-id/targets empty/targets[j] not-object|fields|unknown-target/targets duplicate|unsorted/fixFiles-mismatch (only without target errors)/bad-difficulty/bad-estMinutes/bad-blocked/blocked-required|reason-required|reason-mismatch|reason-must-be-empty using requiredBlockReason only; plan duplicate-id, groups unsorted, target-in-multiple-groups, uncovered, 'groups: expected empty, got n'); CLI --check-plan [--coverage] [--require-empty] [--plan] [--baseline] (stdout 'check-plan: OK', errors to stderr exit 1, missing/invalid json exit 1); tests/specs/axe-helper.spec.js append-only step-35 describe (5 tests desktop-dark: fixtures validateBaseline [], requiredBlockReason cases + immutability, FIXTURE_OK normal/error examples/ids/dup/sort/PlanTarget/field errors/coverage/requireEmpty, THEMES/RULE_PLAIN/RULE_COLOR/MIXED/COLOR_PLAIN blocked·reason, loadPlan + CLI 0/1 cases; tmp dirs under tests/.tmp cleaned, real fixtures untouched); RED confirmed (GROUP_ID_RE export missing), SNAP 35 created, T axe-helper 35 passed, FULL 398 passed, VS OK, GATE 35 scope-snapshot: OK"
+    },
+    {
+      "step": 36,
+      "name": "axe-plan-executable",
+      "status": "completed",
+      "started_at": "2026-11-24T21:19:56+0900",
+      "completed_at": "2026-11-24T21:25:17+0900",
+      "summary": "step36: tests/helpers/axe.js append (step-28/32~35 behavior unchanged; CLI parser only extended): EXECUTABLE_HEADER 'Harness 재계획 필요: 실행 불가 remediation 그룹', validateRemediationExecutable(plan, baseline) pure (premise validateRemediationPlan [] ; per group in order, blocked true only: blocked-group:{id} -> text-change:{id}:{key}:{target} for text-change fixes -> empty-fixfiles:{id}; no requiresColorChange re-judgement), CLI --check-executable [--plan] [--baseline] (stdout 'check-executable: OK', blocked -> stderr header + lines exit 1, missing plan/invalid baseline JSON exit 1); tests/specs/axe-helper.spec.js append-only step-36 describe (2 tests desktop-dark: every input first validateRemediationPlan [] then empty/OK/RULE_PLAIN false [], THEMES/RULE_COLOR/manual blocked-group, text-only baseline -> blocked-group+text-change+empty-fixfiles, MIXED and COLOR_PLAIN blocked-only, immutability; CLI 0/1 cases + RULE_COLOR blocked-false --check-plan exit 1 stops sh '&&' chain before --check-executable); RED confirmed (export missing), SNAP 36 created, T axe-helper 37 passed, FULL 400 passed, VS OK, GATE 36 scope-snapshot: OK"
+    },
+    {
+      "step": 37,
+      "name": "axe-current-checks",
+      "status": "completed",
+      "started_at": "2026-11-24T21:25:17+0900",
+      "completed_at": "2026-11-24T21:30:42+0900",
+      "summary": "step37: tests/helpers/axe.js append (step-28/32~36 behavior unchanged; CLI parser only extended): CURRENT_COLLECTED_PATH 'tests/.tmp/axe-current.json', checkGroupDone(collected, plan, id) -> {done, remaining} (group PlanTargets still in collected, {key,target} sorted unique; non-array/malformed collected Error('invalid collected'), missing/format-bad id Error('unknown group id: {id}')), checkCollectedCoverage(collected, plan) -> {ok, uncovered} (collected (key,target) not in any group, sorted), countCollectedTargets (unique (key,target) count); CLI --check-group-done <id> [--collected] [--plan] (stdout 'check-group-done: OK (id)', stderr remaining:{key}|{target}), --check-coverage [--collected] [--plan] ('check-coverage: OK' / uncovered:{key}|{target}), --assert-no-violations [--collected] ('assert-no-violations: OK' / 'violations: n'), missing/invalid files exit 1; tests/specs/axe-helper.spec.js append-only step-37 describe (3 tests desktop-dark: group done, lightbox:desktop-dark-only remaining 1, other group no effect, unknown/format-bad id and {} throw, coverage ok/1 uncovered/empty groups+residual, immutability, countCollectedTargets 0/3/2, CLI 0/1/missing 1, checkRegression [] but residual -> --assert-no-violations 1; tmp dirs cleaned, real fixtures untouched); RED confirmed (CURRENT_COLLECTED_PATH export missing), SNAP 37 created, T axe-helper 40 passed, FULL 403 passed, VS OK, GATE 37 scope-snapshot: OK"
+    },
+    {
+      "step": 38,
+      "name": "axe-regression-prune",
+      "status": "completed",
+      "started_at": "2026-11-24T21:30:42+0900",
+      "completed_at": "2026-11-24T21:37:39+0900",
+      "summary": "step38: tests/helpers/axe.js append (step-28/32~37 behavior unchanged; CLI parser only extended): checkCollectedRegression(collected, baseline) (invalid collected throw; key != makeEntryKey(scenario,project,ruleId) -> bad-key:{key}, baseline missing key -> new-key:{key}, new target -> new-target:{key}:{target}; vanished allowed; unique sorted; pure), prunePlan(plan, collected, baseline) per §6.5 (1)~(6) (drop absent PlanTargets keeping order, drop empty groups keeping order, fixFiles = sorted union of baseline fix fixFiles, R' via requiredBlockReason reuse -> blocked true/R', else manual block kept only if prior blocked true·non-empty reason != requiredBlockReason(prior targets), else false/''; id·difficulty·estMinutes kept, no extra fields, new objects, pure/deterministic); CLI --check-regression [--collected] [--baseline] ('check-regression: OK' / regression lines stderr exit 1) and --prune-plan [--collected] [--plan] [--baseline] (regression -> stderr exit 1 no write; input/pruned plan validated with validateRemediationPlan; writes JSON.stringify(plan,null,2)+'\\n', stdout 'prune-plan: OK (plan)'); collected default tests/.tmp/axe-current.json; tests/specs/axe-helper.spec.js append-only step-38 describe (4 tests desktop-dark: regression same/new-key/new-target/bad-key/vanished, basic prune with removal/order/fixFiles/empty groups/fields, MIXED (a)(b), COLOR_PLAIN derived-blocker removal, COLOR_PLAIN manual rejected by validator, RULE_PLAIN manual hold kept, false kept, every prune result validateRemediationPlan [] + immutability + determinism; CLI sha256·mtime unchanged on new-target/missing collected/broken baseline and sh -c chain failure, success writes exact pruned JSON; tmp dirs cleaned, real fixtures untouched); RED confirmed (checkCollectedRegression export missing), SNAP 38 created, T axe-helper 44 passed, FULL 407 passed, VS OK, GATE 38 scope-snapshot: OK"
+    },
+    {
+      "step": 39,
+      "name": "axe-collect",
+      "status": "completed",
+      "started_at": "2026-11-24T21:37:39+0900",
+      "completed_at": "2026-11-24T21:43:54+0900",
+      "summary": "step39: added tests/specs/axe.spec.js (§THEME test, scenarios page x6 projects + modal/lightbox desktop-dark/light, others skipped 'desktop only'; page.goto -> prepareForAxe -> runAxe({include}); AXE_COLLECT=1 -> writeCollected only; normal -> resolveBaselineMode before prepare: pending -> prepare then test.skip 'axe classification pending (step 40)', check -> checkRegression [] + desktop-dark page validateBaseline [] + plan validateRemediationPlan(coverage false) []); RED confirmed (resolveBaselineMode throw without collected), COLLECT_CHAIN OK -> tests/fixtures/axe-collected.json 12 entries / 139 targets (color-contrast 6 entries 61 targets, nested-interactive 6 entries 78 targets; page only, modal/lightbox 0), all keys = makeEntryKey; SNAP 39 created, FULL 407 passed (10 axe pending skips), VS OK, GATE 39 scope-snapshot: OK"
+    },
+    {
+      "step": 40,
+      "name": "axe-classify",
+      "status": "blocked",
+      "started_at": "2026-11-24T21:43:54+0900",
+      "blocked_reason": "step40 재계획 필요: 산정 초과 — tests/fixtures/axe-collected.json = 12 entries / 139 targets (color-contrast 6 entries 61 targets, nested-interactive 6 entries 78 targets; page 시나리오만, distinct ruleId|canonical target 25). 산정 = 묶음별 2분 + target×1분 + 6분 >= 2 + 139 + 6 = 147분 > 20분 (§6.2 단계 40 규칙). 규칙대로 axe-baseline.json·axe-remediation-plan.json을 쓰지 않음. SNAP 40 created, 파일 변경 없음. 하네스가 분류를 20분 이하 단위(예: ruleId×scenario/project 묶음 또는 canonical target 25개 기준 분할)로 재계획해야 함.",
+      "blocked_at": "2026-11-24T21:44:26+0900"
+    },
+    {
+      "step": 41,
+      "name": "featured-projects",
+      "status": "pending"
+    },
+    {
+      "step": 42,
+      "name": "hero-first-screen",
+      "status": "pending"
+    },
+    {
+      "step": 43,
+      "name": "hero-two-column",
+      "status": "pending"
+    },
+    {
+      "step": 44,
+      "name": "section-structure",
+      "status": "pending"
+    },
+    {
+      "step": 45,
+      "name": "section-layout",
+      "status": "pending"
+    },
+    {
+      "step": 46,
+      "name": "component-hit-open",
+      "status": "pending"
+    },
+    {
+      "step": 47,
+      "name": "state-sequence",
+      "status": "pending"
+    },
+    {
+      "step": 48,
+      "name": "state-colors-fixture",
+      "status": "pending"
+    },
+    {
+      "step": 49,
+      "name": "component-hover-active",
+      "status": "pending"
+    },
+    {
+      "step": 50,
+      "name": "component-clamp-stripe",
+      "status": "pending"
+    },
+    {
+      "step": 51,
+      "name": "focus-trap-modal",
+      "status": "pending"
+    },
+    {
+      "step": 52,
+      "name": "focus-trap-lightbox",
+      "status": "pending"
+    },
+    {
+      "step": 53,
+      "name": "print-pdf",
+      "status": "pending"
+    },
+    {
+      "step": 54,
+      "name": "axe-remediation-gate",
+      "status": "pending"
+    },
+    {
+      "step": 55,
+      "name": "axe-remediation-recheck",
+      "status": "pending"
+    },
+    {
+      "step": 56,
+      "name": "axe-finalize",
+      "status": "pending"
+    },
+    {
+      "step": 57,
+      "name": "final-verification",
+      "status": "pending"
+    }
+  ],
+  "reviewBaseSha": "d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d",
+  "created_at": "2026-11-24T19:22:15+0900"
+}

@@ -103,7 +103,7 @@ img { max-width: 100%; display: block; }
   height: 34px;
   border-radius: 9px;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg-elev);
   font-size: 0.85rem;
   letter-spacing: 0.5px;
 }
@@ -115,6 +115,9 @@ img { max-width: 100%; display: block; }
 }
 .nav-link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 0.5rem 0.9rem;
   font-size: 0.93rem;
   font-weight: 500;
@@ -134,8 +137,8 @@ img { max-width: 100%; display: block; }
 .theme-toggle {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--bg-elev);
@@ -158,8 +161,8 @@ img { max-width: 100%; display: block; }
   flex-direction: column;
   justify-content: center;
   gap: 5px;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--bg-elev);
@@ -197,11 +200,13 @@ img { max-width: 100%; display: block; }
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 0.2s var(--ease), border-color 0.2s var(--ease),
-    opacity 0.2s var(--ease);
+    opacity 0.2s var(--ease), transform 0.2s var(--ease);
 }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(0.98); }
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg-elev);
 }
 .btn-primary:hover { opacity: 0.88; }
 .btn-ghost {
@@ -235,7 +240,7 @@ img { max-width: 100%; display: block; }
   align-items: center;
   padding-top: 68px;
 }
-.hero-inner { text-align: center; padding-block: 3rem; }
+.hero-inner { text-align: left; padding-block: 3rem; }
 .hero-eyebrow {
   color: var(--text-muted);
   font-weight: 500;
@@ -268,22 +273,29 @@ img { max-width: 100%; display: block; }
 
 .hero-summary {
   max-width: 620px;
-  margin: 0 auto 2rem;
+  margin: 0 0 2rem;
   color: var(--text-muted);
   font-size: clamp(1rem, 2.4vw, 1.15rem);
 }
 .hero-cta {
   display: flex;
   gap: 0.9rem;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin-bottom: 3rem;
 }
+.hero-tagline {
+  font-weight: 500;
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  margin-bottom: 0.8rem;
+}
 .hero-stats {
-  display: flex;
-  gap: clamp(1.5rem, 6vw, 4rem);
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .hero-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 .hero-stats li { text-align: center; }
 .stat-value {
@@ -296,9 +308,57 @@ img { max-width: 100%; display: block; }
 }
 .stat-label {
   font-size: 0.82rem;
-  color: var(--text-faint);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+/* 대표 프로젝트 — 배치만 (색은 .project-card 색 규칙의 featured 대응 선택자로 얻는다) */
+#heroFeatured {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 2.5rem;
+}
+.featured-card {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: left;
+}
+.featured-title,
+.featured-blurb { display: block; }
+.featured-title { margin-bottom: 0.4rem; }
+/* span은 display: block 계약(원 §3) — block에서는 line-clamp가 그려지지 않으므로 3줄 높이로 자른다 */
+.featured-blurb {
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  max-height: 3lh;
+  overflow: hidden;
+}
+
+/* hero 2열(원 §11.2): ≥1024px 5:7 grid, DOM 순서 불변, 좌측 정렬 */
+@media (min-width: 1024px) {
+  .hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: 48px;
+    grid-template-areas:
+      "eyebrow summary"
+      "name summary"
+      "tagline summary"
+      "role cta"
+      "stats stats"
+      "featured featured";
+  }
+  .hero-eyebrow { grid-area: eyebrow; }
+  .hero-name { grid-area: name; }
+  .hero-tagline { grid-area: tagline; }
+  .hero-role { grid-area: role; }
+  .hero-summary { grid-area: summary; }
+  .hero-cta { grid-area: cta; }
+  #heroStats { grid-area: stats; }
+  #heroFeatured { grid-area: featured; }
 }
 
 .scroll-hint {
@@ -306,8 +366,8 @@ img { max-width: 100%; display: block; }
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  width: 26px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border: 2px solid var(--border-strong);
   border-radius: 14px;
   display: grid;
@@ -330,7 +390,7 @@ img { max-width: 100%; display: block; }
 /* ==========================================================================
    SECTIONS (공통)
    ========================================================================== */
-.section { padding-block: clamp(6rem, 14vw, 11rem); }
+.section { padding-block: 64px; }
 .section-alt { background: var(--bg-alt); }
 .section-head { margin-bottom: clamp(2rem, 5vw, 3.2rem); }
 .section-kicker {
@@ -394,7 +454,7 @@ img { max-width: 100%; display: block; }
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.8rem;
-  color: #fff;
+  color: var(--bg-elev);
   background: var(--accent);
   margin-bottom: 1.4rem;
 }
@@ -407,7 +467,7 @@ img { max-width: 100%; display: block; }
   padding-bottom: 0.7rem;
 }
 .about-meta > div:last-child { border-bottom: 0; padding-bottom: 0; }
-.about-meta dt { color: var(--text-faint); font-size: 0.85rem; }
+.about-meta dt { color: var(--text-muted); font-size: 0.85rem; }
 .about-meta dd { font-weight: 600; }
 
 /* ---------- TIMELINE ---------- */
@@ -496,10 +556,11 @@ img { max-width: 100%; display: block; }
 /* ---------- PROJECTS ---------- */
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.4rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
 }
-.project-card {
+.project-card,
+.featured-card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -508,9 +569,10 @@ img { max-width: 100%; display: block; }
   border-radius: var(--radius);
   padding: 1.5rem;
   overflow: hidden;
-  transition: border-color 0.28s var(--ease);
+  transition: border-color 0.28s var(--ease), transform 0.28s var(--ease);
 }
-.project-card::before {
+.project-card::before,
+.featured-card::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
@@ -519,11 +581,13 @@ img { max-width: 100%; display: block; }
   opacity: 0;
   transition: opacity 0.28s var(--ease);
 }
-.project-card:hover {
+.project-card:hover,
+.featured-card:hover {
   border-color: var(--card-hover-border);
 }
 .project-card:hover::before { opacity: 1; }
-.project-card:focus-visible {
+.project-card:focus-visible,
+.featured-card:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-color: var(--card-hover-border);
@@ -564,6 +628,12 @@ img { max-width: 100%; display: block; }
   margin-bottom: 0.4rem;
 }
 .project-blurb { color: var(--text-muted); font-size: 0.94rem; margin-bottom: 1rem; flex: 1; }
+.project-blurb {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
 .project-links { display: flex; gap: 1rem; }
 .project-links a {
@@ -886,8 +956,8 @@ body.modal-open { overflow: hidden; }
 /* ---------- STRENGTHS ---------- */
 .strengths-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
 }
 .strength-card {
   position: relative;
@@ -898,14 +968,6 @@ body.modal-open { overflow: hidden; }
   box-shadow: var(--shadow);
   transition: border-color 0.25s var(--ease);
   overflow: hidden;
-}
-.strength-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--border-strong);
-  opacity: 0.85;
 }
 .strength-card:hover {
   border-color: var(--card-hover-border);
@@ -1015,7 +1077,7 @@ body.modal-open { overflow: hidden; }
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  color: var(--text-faint);
+  color: var(--text-muted);
   font-size: 0.88rem;
 }
 .footer-top { color: var(--text-muted); font-weight: 600; }
@@ -1033,6 +1095,11 @@ body.modal-open { overflow: hidden; }
   opacity: 1;
   transform: none;
 }
+/* 카드 hover·active는 비색(transform)만 — .reveal.in의 transform: none 뒤에 둔다 */
+.project-card:hover,
+.featured-card:hover { transform: translateY(-3px); }
+.project-card:active,
+.featured-card:active { transform: translateY(-1px) scale(0.99); }
 /* Hero 내부 reveal은 순차 등장 */
 .hero .reveal:nth-child(1) { transition-delay: 0.05s; }
 .hero .reveal:nth-child(2) { transition-delay: 0.12s; }
@@ -1040,6 +1107,27 @@ body.modal-open { overflow: hidden; }
 .hero .reveal:nth-child(4) { transition-delay: 0.26s; }
 .hero .reveal:nth-child(5) { transition-delay: 0.33s; }
 .hero .reveal:nth-child(6) { transition-delay: 0.40s; }
+
+/* ==========================================================================
+   SECTION LAYOUT (원 §7: padding 64/80/96, card gap 24, 1/2/3열, Career 가로)
+   ========================================================================== */
+@media (min-width: 768px) {
+  .section { padding-block: 80px; }
+  .project-grid,
+  .strengths-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+  .timeline-item .timeline-card { margin-top: 0; }
+}
+@media (min-width: 1024px) {
+  .section { padding-block: 96px; }
+  .project-grid,
+  .strengths-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 
 /* ==========================================================================
    RESPONSIVE
@@ -1162,6 +1250,14 @@ body.modal-open { overflow: hidden; }
   }
   section,
   .section { padding: 1rem 0 !important; }
+
+  /* 종이에서는 blurb 전문을 보인다 — line clamp 해제 */
+  .featured-blurb,
+  .project-blurb {
+    -webkit-line-clamp: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
 
   /* About 첫 문단은 hero 소개와 동일 텍스트 — 인쇄에서는 중복 제거 */
   #aboutSummary { display: none !important; }

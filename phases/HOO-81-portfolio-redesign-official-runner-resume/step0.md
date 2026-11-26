@@ -1,0 +1,15 @@
+# Step 0: static-input-preflight
+
+## Current authoritative contract
+Always-on preparation: before each worker acts, read CLAUDE.md and both pinned design docs and apply every compatible guardrail; current step contracts replace only legacy execution wrappers, never repository instructions or approved product constraints. If any conflict exists, stop before writing. Preserve historical phase/evidence, copy/numbers/fonts/IA, three featured identities and all 13 PROJECTS/order. No new content/framework/custom coordinator/unrelated refactor/palette. css/themes.css read-only. Workers do not commit/push/merge/edit phase metadata.
+
+Static immutable-input contract only; do not read the launch descriptor, approval files, control directory or inherited pairs artifact from a worker/acceptance sandbox. Official Harness 2.0.1 validates descriptor, approval, plan/execution hashes, approvedPlanHead and control pin before creating step0; that supervisor gate is authoritative and is not reimplemented by repository code. `static-prepare` runs only in the lane worktree and verifies `CLAUDE.md` SHA b63e8c71bea72313c7ae312c6c5582e6fd1ccc98b122d2f4ade46f09e65cb8aa; original/resume design SHAs eb229f57acb23bd9a24d990d3c510ec3fb824fc24051909bb02665408cd54e49 and 351a18f1b6ca30f46606ab25ff310329eeecd8cd4db138d7848a86d414b3ffe1; lock/install/policy SHAs d7df38b1d032e1c7ef6c535f5257b69a42143ce323baf80cfc9bddee8be62aa3, a022500410b8a145121b6693f4315dfd90ae9a06f2082621a623ad5a39ec5e7f, ad59822299dee5f9aeaca8dba8ee6232e788b9e66af09c70b1ec4b9ba838aaa0. `static-post` is distinct exact argv used only in detached fan-in staging: it repeats those static hashes and requires the candidate diff paths to be exactly script/spec; deterministic output is automatically bound by Harness acceptanceEvidenceSha/inputsSha256 before commit publication. Both modes are executable with the scrubbed official lane/acceptance environment and require no hidden runtime path. Tests reject mode confusion, changed inputs and undeclared candidate paths. No-op forbidden.
+
+## Exact write boundary
+static-preflight: tests/scripts/continuation-preflight.mjs, tests/specs/continuation-preflight.spec.js
+
+## Output subject
+The worker output subject is exclusively the execution.json lane-file diff. Official runner deterministic fan-in is the only committer. Acceptance output is only pass/fail evidence, except an exact `checks.mutation.targetPaths` artifact which official fan-in folds into the same source tree; it is never a separate worker commit.
+
+## Acceptance
+Each worker runs only its own execution.json lane `requiredCommands` and `focusedTests` in order; it never runs index.json `acceptanceCommands` inside the uncommitted lane worktree. Nonzero blocks and `emptyAllowed=false` requires the declared lane artifact/spec/source change. After all lane outputs form one deterministic fan-in candidate, the official runner applies it to an isolated detached staging tree, runs this step's index.json `acceptanceCommands` exactly once there, binds acceptanceEvidenceSha/inputsSha256 into the completion record, and only then publishes fan-in commits. Legacy no-op branches do not apply.

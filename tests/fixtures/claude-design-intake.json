@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "summaryPath": "/Users/hoon/.hermes/company/development/product-management/HOO-81-evidence/claude-design-pattern-board-summary-2026-11-24.md",
+  "bundleDir": "/Users/hoon/.hermes/company/development/product-management/HOO-81-evidence/claude-design-pattern-board-2026-11-24",
+  "files": {
+    "canvas.json": "83c1c86506050649e92a6a8100bab41d99068856e472caf20f2d2b4eee27d811",
+    "Main.dc.html": "6d51dc701d49ef17e8bd2b1c2041d96c79b585f5139739c4862171db69deee9f",
+    "Foundations.dc.html": "27ecd3caa0c0b22e2eb5a8da03e9ac409c0ee7aa35e63a664fe17e9768e13b27",
+    "Components.dc.html": "abe37081269d8230b5ab3afbaf725399bf24f274dc31f8e003e1b152874f4a21",
+    "DesktopTop.dc.html": "48d5ba837d41b485df03199779eb84ebbc51ae494add2d6971648b52fbfb83ca",
+    "DesktopExplore.dc.html": "d83dda4dffdc93e95f52c368699ecee92740713838cb50b5b4f9987a62930287",
+    "DesktopFirstLight.dc.html": "bb7dff0e579762c4c77fe5ad7e8f60fd448947aa5fa9410a6e840a5c3e29c658",
+    "Mobile.dc.html": "6abe200fbbb1bbaf1306b784b0a04b700ff9345b44889c684b0dc801e5cc67b2",
+    "MobileMenu.dc.html": "c1ba1bc7ae336146357db585ca4408a9962f21c8e7eb3c76b654e49b7ac663e9"
+  },
+  "adopted": ["explore-surface", "hero-two-column-left", "mobile-single-column", "final-section-order", "featured-three", "projects-thirteen-order", "component-states", "hit-target-44", "section-padding", "card-gap", "type-hierarchy", "line-clamp", "strength-stripe-removal"],
+  "excluded": ["new-color", "color-role-change", "dark-text-0d0f12", "muted-grey-reassign", "font-asset-change", "new-copy-or-number", "new-section-image-icon", "project-order-or-ia-change", "placeholder-as-content"],
+  "tokens": {
+    "heroTwoColumnMinViewportPx": 1024,
+    "heroColumns": "minmax(0, 5fr) minmax(0, 7fr)",
+    "heroColumnGapPx": 48,
+    "heroAreas": ["eyebrow summary", "name summary", "tagline summary", "role cta", "stats stats", "featured featured"],
+    "sectionPaddingPx": { "375": 64, "768": 80, "1280": 96 },
+    "cardGapPx": 24,
+    "hitTargetMinPx": 44,
+    "blurbLineClamp": 3
+  }
+}

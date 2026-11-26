@@ -1,0 +1,8 @@
+{
+  "implGlobs": ["index.html", "css/**", "js/**"],
+  "testGlobs": ["tests/specs/**"],
+  "baseRef": "origin/main",
+  "testCwd": "tests",
+  "testCommand": ["node_modules/.bin/playwright", "test"],
+  "port": 4173
+}

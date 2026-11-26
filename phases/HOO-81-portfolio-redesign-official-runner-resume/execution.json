@@ -1,0 +1,2309 @@
+{
+  "schemaVersion": 1,
+  "initialSourceBaseSha": "5a34759acf16e7beb96c415101c152d6e786c4b3",
+  "waves": [
+    {
+      "waveId": "static-preflight-wave",
+      "step": 0,
+      "baseSelector": "approvedPlanHead",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "static-preflight",
+          "files": [
+            "tests/scripts/continuation-preflight.mjs",
+            "tests/specs/continuation-preflight.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/continuation-preflight.mjs",
+              "--mode",
+              "static-prepare",
+              "--document",
+              "CLAUDE.md:b63e8c71bea72313c7ae312c6c5582e6fd1ccc98b122d2f4ade46f09e65cb8aa",
+              "--document",
+              "docs/superpowers/specs/2026-11-23-portfolio-layout-redesign-design.md:eb229f57acb23bd9a24d990d3c510ec3fb824fc24051909bb02665408cd54e49",
+              "--document",
+              "docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md:351a18f1b6ca30f46606ab25ff310329eeecd8cd4db138d7848a86d414b3ffe1",
+              "--lock",
+              ".harness/harness.lock.json:d7df38b1d032e1c7ef6c535f5257b69a42143ce323baf80cfc9bddee8be62aa3",
+              "--lock",
+              ".harness/install-state.json:a022500410b8a145121b6693f4315dfd90ae9a06f2082621a623ad5a39ec5e7f",
+              "--lock",
+              ".harness/policy.json:ad59822299dee5f9aeaca8dba8ee6232e788b9e66af09c70b1ec4b9ba838aaa0"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/continuation-preflight.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "artifact-supply-wave",
+      "step": 1,
+      "baseSelector": "completedStep:0",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "artifact-supply",
+          "files": [
+            "tests/scripts/continuation-preflight.mjs",
+            "tests/specs/continuation-preflight.spec.js",
+            "tests/fixtures/axe-pairs-inherited.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/continuation-preflight.mjs",
+              "--mode",
+              "artifact-prepare",
+              "--pairs-source",
+              "/Volumes/P9/dev/hoonlabs/work/HOO-81-portfolio/tests/.tmp/axe-classify/pairs.json",
+              "--pairs-output",
+              "tests/fixtures/axe-pairs-inherited.json",
+              "--pairs-sha",
+              "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+              "--pairs-size",
+              "47392",
+              "--collected",
+              "tests/fixtures/axe-collected.json",
+              "--collected-sha",
+              "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
+              "--collected-size",
+              "28809"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/continuation-preflight.spec.js",
+              "specs/smoke.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "featured-wave",
+      "step": 2,
+      "baseSelector": "completedStep:1",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "featured",
+          "files": [
+            "index.html",
+            "js/data.js",
+            "js/main.js",
+            "css/style.css",
+            "tests/specs/featured.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/featured.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "hero-wave",
+      "step": 3,
+      "baseSelector": "completedStep:2",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "hero",
+          "files": [
+            "index.html",
+            "js/main.js",
+            "css/style.css",
+            "tests/specs/hero.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/hero.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "hero-structure-wave",
+      "step": 4,
+      "baseSelector": "completedStep:3",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "hero-layout",
+          "files": [
+            "css/style.css",
+            "tests/specs/hero-layout.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/hero-layout.spec.js",
+              "specs/hero.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "section-structure",
+          "files": [
+            "index.html",
+            "js/main.js",
+            "tests/specs/structure.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4176",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/structure.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "section-layout-wave",
+      "step": 5,
+      "baseSelector": "completedStep:4",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "section-layout",
+          "files": [
+            "css/style.css",
+            "tests/specs/layout.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/layout.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "component-hit-wave",
+      "step": 6,
+      "baseSelector": "completedStep:5",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "component-hit",
+          "files": [
+            "css/style.css",
+            "tests/helpers/component-state.js",
+            "tests/specs/component-hit.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/component-hit.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-sequence-wave",
+      "step": 7,
+      "baseSelector": "completedStep:6",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-sequence",
+          "files": [
+            "tests/helpers/state-sequence.js",
+            "tests/specs/state-sequence.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-sequence.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-base-lifecycle-wave",
+      "step": 8,
+      "baseSelector": "completedStep:7",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-base-lifecycle",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/specs/state-colors.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-base-measurement-wave",
+      "step": 9,
+      "baseSelector": "completedStep:8",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-base-measurement",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/fixtures/component-state-colors.candidate.json",
+            "tests/specs/state-colors.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "base-measurement",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--measure-write",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "base-measurement",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--measure-check",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js",
+              "specs/state-sequence.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-base-transaction-wave",
+      "step": 10,
+      "baseSelector": "completedStep:9",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-base-transaction",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/fixtures/component-state-colors.base.json",
+            "tests/fixtures/component-state-colors.json",
+            "tests/specs/state-colors.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "base-fixture-transaction",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
+              "--publish",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--fixture",
+              "tests/fixtures/component-state-colors.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "base-fixture-transaction",
+              "--candidate",
+              "tests/fixtures/component-state-colors.candidate.json",
+              "--check",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--fixture",
+              "tests/fixtures/component-state-colors.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "hover-wave",
+      "step": 11,
+      "baseSelector": "completedStep:10",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "hover",
+          "files": [
+            "css/style.css",
+            "tests/specs/component-hover.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/component-hover.spec.js",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "clamp-wave",
+      "step": 12,
+      "baseSelector": "completedStep:11",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "clamp",
+          "files": [
+            "css/style.css",
+            "tests/specs/component-clamp.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/component-clamp.spec.js",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "focus-modal-wave",
+      "step": 13,
+      "baseSelector": "completedStep:12",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "focus-modal",
+          "files": [
+            "js/main.js",
+            "tests/specs/focus-modal.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/focus-modal.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "focus-lightbox-wave",
+      "step": 14,
+      "baseSelector": "completedStep:13",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "focus-lightbox",
+          "files": [
+            "js/main.js",
+            "css/style.css",
+            "tests/specs/focus-lightbox.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/focus-lightbox.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "print-wave",
+      "step": 15,
+      "baseSelector": "completedStep:14",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "print",
+          "files": [
+            "css/style.css",
+            "tests/specs/print.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/print.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-occurrence-wave",
+      "step": 16,
+      "baseSelector": "completedStep:15",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-occurrence",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-baseline.json",
+            "tests/fixtures/axe-remediation-plan.json",
+            "tests/fixtures/axe-remediation-occurrences.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "collect-occurrences",
+              "--pairs",
+              "tests/fixtures/axe-pairs-inherited.json",
+              "--pairs-sha",
+              "1ba8778ab6cc9254b4404a5349f53c4463c0c55e4a1b2b447eac02a8bd8acaa1",
+              "--collected",
+              "tests/fixtures/axe-collected.json",
+              "--collected-sha",
+              "ff7c76a6214034251f5ebc028706b9ae383ec6ecb9ce8a4c3ed97e266672e63c",
+              "--baseline",
+              "tests/fixtures/axe-baseline.json",
+              "--plan",
+              "tests/fixtures/axe-remediation-plan.json",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--expect-pairs",
+              "25",
+              "--expect-occurrences",
+              "139",
+              "--expect-color",
+              "61",
+              "--expect-nested",
+              "78",
+              "--reject-new-rules"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-current-mapping-lifecycle-wave",
+      "step": 17,
+      "baseSelector": "completedStep:16",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-current-mapping-lifecycle",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-declaration-resolver-wave",
+      "step": 18,
+      "baseSelector": "completedStep:17",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-declaration-resolver",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "self-test-declaration-collector-core",
+              "--css",
+              "css/style.css",
+              "--server-root",
+              ".",
+              "--port",
+              "4188",
+              "--temp-root-env",
+              "TMPDIR"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-declaration-completion-wave",
+      "step": 19,
+      "baseSelector": "completedStep:18",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-declaration-completion",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "self-test-declaration-collector-completion",
+              "--css",
+              "css/style.css",
+              "--server-root",
+              ".",
+              "--port",
+              "4188",
+              "--temp-root-env",
+              "TMPDIR"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-declaration-winner-wave",
+      "step": 20,
+      "baseSelector": "completedStep:19",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-declaration-winner",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "self-test-declaration-winner",
+              "--css",
+              "css/style.css"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-scope-role-extractor-wave",
+      "step": 21,
+      "baseSelector": "completedStep:20",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-scope-role-extractor",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "self-test-scope-role-extractor",
+              "--css",
+              "css/style.css",
+              "--server-root",
+              ".",
+              "--port",
+              "4188",
+              "--temp-root-env",
+              "TMPDIR"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-current-declaration-wave",
+      "step": 22,
+      "baseSelector": "completedStep:21",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-current-declaration",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-current-declarations.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "resolve-current-declarations",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--css",
+              "css/style.css",
+              "--server-root",
+              ".",
+              "--port",
+              "4188",
+              "--temp-root-env",
+              "TMPDIR",
+              "--out",
+              "tests/fixtures/axe-contrast-current-declarations.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-change-unit-map-wave",
+      "step": 23,
+      "baseSelector": "completedStep:22",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-change-unit-map",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-change-units.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "map-change-units",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--declarations",
+              "tests/fixtures/axe-contrast-current-declarations.json",
+              "--css",
+              "css/style.css",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--out",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-contrast-target-wave",
+      "step": 24,
+      "baseSelector": "completedStep:23",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-contrast-target",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-base-targets.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "observe-contrast-targets",
+              "--map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--server-root",
+              ".",
+              "--port",
+              "4189",
+              "--temp-root-env",
+              "TMPDIR",
+              "--out",
+              "tests/fixtures/axe-contrast-base-targets.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-contrast-eligibility-wave",
+      "step": 25,
+      "baseSelector": "completedStep:24",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-contrast-eligibility",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-candidate-eligibility.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "evaluate-contrast-candidates",
+              "--map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--targets",
+              "tests/fixtures/axe-contrast-base-targets.json",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--server-root",
+              ".",
+              "--port",
+              "4190",
+              "--temp-root-env",
+              "TMPDIR",
+              "--out",
+              "tests/fixtures/axe-contrast-candidate-eligibility.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-contrast-measurement-wave",
+      "step": 26,
+      "baseSelector": "completedStep:25",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-contrast-measurement",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-measurements.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "build-contrast-measurements",
+              "--map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--targets",
+              "tests/fixtures/axe-contrast-base-targets.json",
+              "--eligibility",
+              "tests/fixtures/axe-contrast-candidate-eligibility.json",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--server-root",
+              ".",
+              "--port",
+              "4191",
+              "--temp-root-env",
+              "TMPDIR",
+              "--out",
+              "tests/fixtures/axe-contrast-measurements.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-contrast-validation-wave",
+      "step": 27,
+      "baseSelector": "completedStep:26",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-contrast-validation",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-contrast-base.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "validate-contrast-base",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--measurements",
+              "tests/fixtures/axe-contrast-measurements.json",
+              "--css",
+              "css/style.css",
+              "--out",
+              "tests/fixtures/axe-contrast-base.json",
+              "--expect-color",
+              "61"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-coupled-contrast-guard-wave",
+      "step": 28,
+      "baseSelector": "completedStep:27",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-coupled-contrast-guard",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "reject-coupled-contrast-units",
+              "--map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--read-only",
+              "--reject-foreground-background-coupling"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-color-derive-wave",
+      "step": 29,
+      "baseSelector": "completedStep:28",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-color-derive",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js",
+            "tests/fixtures/axe-remediation-evidence.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "derive-color-changes",
+              "--occurrences",
+              "tests/fixtures/axe-remediation-occurrences.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--css",
+              "css/style.css",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expect-occurrences",
+              "139",
+              "--expect-color",
+              "61",
+              "--expect-nested",
+              "78",
+              "--contrast-algorithm",
+              "wcag2-relative-luminance",
+              "--min-ratio",
+              "4.5",
+              "--token-choice",
+              "minimum-srgb-distance-sum-then-code-unit-token"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-winning-source-wave",
+      "step": 30,
+      "baseSelector": "completedStep:29",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation-winning-source",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/specs/state-colors.spec.js",
+            "tests/fixtures/component-state-color-winning-sources.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "remediation-winning-source-map",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175",
+              "--derive",
+              "--winning-sources",
+              "tests/fixtures/component-state-color-winning-sources.json"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "remediation-winning-source-map",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175",
+              "--validate",
+              "--winning-sources",
+              "tests/fixtures/component-state-color-winning-sources.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-remediation-influence-wave",
+      "step": 31,
+      "baseSelector": "completedStep:30",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation-influence",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/specs/state-colors.spec.js",
+            "tests/fixtures/component-state-color-influences.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "remediation-influence-classification",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--winning-sources",
+              "tests/fixtures/component-state-color-winning-sources.json",
+              "--derive",
+              "--influences",
+              "tests/fixtures/component-state-color-influences.json"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "remediation-influence-classification",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--winning-sources",
+              "tests/fixtures/component-state-color-winning-sources.json",
+              "--validate",
+              "--influences",
+              "tests/fixtures/component-state-color-influences.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-remediation-contract-wave",
+      "step": 32,
+      "baseSelector": "completedStep:31",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation-contract",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/specs/state-colors.spec.js",
+            "tests/fixtures/component-state-colors.remediation-expected.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "approved-remediation-expectation",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--influences",
+              "tests/fixtures/component-state-color-influences.json",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--derive",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "approved-remediation-expectation",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--influences",
+              "tests/fixtures/component-state-color-influences.json",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--validate",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-remediation-apply-wave",
+      "step": 33,
+      "baseSelector": "completedStep:32",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation-apply",
+          "files": [
+            "tests/scripts/make-state-colors.mjs",
+            "tests/specs/state-colors.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "approved-remediation-apply",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--self-test-atomic-live",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-lifecycle-wave",
+      "step": 34,
+      "baseSelector": "completedStep:33",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-lifecycle",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-live-scan-wave",
+      "step": 35,
+      "baseSelector": "completedStep:34",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-live-scan",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-observation-contract-wave",
+      "step": 36,
+      "baseSelector": "completedStep:35",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-observation-contract",
+          "files": [
+            "tests/scripts/verify-a11y-remediation.mjs",
+            "tests/specs/verify-a11y-remediation.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "self-test-live",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/verify-a11y-remediation.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-color-guard-wave",
+      "step": 37,
+      "baseSelector": "completedStep:36",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-color-guard",
+          "files": [
+            "tests/helpers/design-guard-color-rules.js",
+            "tests/specs/design-guard-color-rules.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ],
+            [
+              "node",
+              "tests/scripts/make-state-colors.mjs",
+              "--mode",
+              "approved-remediation-expectation",
+              "--base-ref",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--remediation",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--contrast-map",
+              "tests/fixtures/axe-contrast-change-units.json",
+              "--contrast-base",
+              "tests/fixtures/axe-contrast-base.json",
+              "--influences",
+              "tests/fixtures/component-state-color-influences.json",
+              "--expected-fixture",
+              "tests/fixtures/component-state-colors.remediation-expected.json",
+              "--validate",
+              "--base-fixture",
+              "tests/fixtures/component-state-colors.base.json",
+              "--server-root",
+              ".",
+              "--port",
+              "4175"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/design-guard-color-rules.spec.js",
+              "specs/state-colors.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "a11y-wave",
+      "step": 38,
+      "baseSelector": "completedStep:37",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "a11y-color",
+          "files": [
+            "css/style.css"
+          ],
+          "requiredCommands": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "verify-lane",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--rule",
+              "color-contrast",
+              "--expect-owned",
+              "0",
+              "--expect-other-from-evidence",
+              "--scenarios",
+              "all",
+              "--server-root",
+              ".",
+              "--forbid-existing-server"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/design-guard-color-rules.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        },
+        {
+          "laneId": "a11y-nested",
+          "files": [
+            "js/main.js"
+          ],
+          "requiredCommands": [
+            [
+              "env",
+              "PW_PORT=4176",
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "verify-lane",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--rule",
+              "nested-interactive",
+              "--expect-owned",
+              "0",
+              "--expect-other-from-evidence",
+              "--scenarios",
+              "all",
+              "--server-root",
+              ".",
+              "--forbid-existing-server"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4176",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/modal-regression.spec.js",
+              "specs/featured.spec.js",
+              "specs/focus-modal.spec.js",
+              "specs/focus-lightbox.spec.js",
+              "specs/component-hit.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "state-color-remediation-wave",
+      "step": 39,
+      "baseSelector": "completedStep:38",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "state-color-remediation",
+          "files": [
+            "tests/fixtures/component-state-colors.json"
+          ],
+          "requiredCommands": [
+            [
+              "python3",
+              "-I",
+              "-c",
+              "from pathlib import Path\nimport subprocess\np=Path('tests/fixtures/component-state-colors.json')\ncmds=[[\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--write\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"], [\"node\", \"tests/scripts/make-state-colors.mjs\", \"--mode\", \"approved-remediation-apply\", \"--expected-fixture\", \"tests/fixtures/component-state-colors.remediation-expected.json\", \"--check\", \"--base-fixture\", \"tests/fixtures/component-state-colors.base.json\", \"--fixture\", \"tests/fixtures/component-state-colors.json\", \"--server-root\", \".\", \"--port\", \"4175\"]]\nsnap=[]\nfor i,cmd in enumerate(cmds):\n subprocess.run(cmd,check=True)\n if i in (0,2): snap.append(p.read_bytes())\nassert len(snap)==2 and snap[0]==snap[1], 'approved-remediation-delta write is not byte-idempotent'\n"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/state-colors.spec.js",
+              "specs/component-hover.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "zero-observation-wave",
+      "step": 40,
+      "baseSelector": "completedStep:39",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "zero-observation",
+          "files": [
+            "tests/fixtures/axe-zero-observation.json"
+          ],
+          "requiredCommands": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "verify-full",
+              "--server-root",
+              ".",
+              "--forbid-existing-server",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expect-color",
+              "0",
+              "--expect-nested",
+              "0",
+              "--scenarios",
+              "page:mobile-dark:null,page:mobile-light:null,page:tablet-dark:null,page:tablet-light:null,page:desktop-dark:null,page:desktop-light:null,modal:desktop-dark:0,modal:desktop-light:0,lightbox:desktop-dark:0,lightbox:desktop-light:0",
+              "--require-nonempty-scenario-set",
+              "--write-observation",
+              "tests/fixtures/axe-zero-observation.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "node",
+              "tests/scripts/verify-a11y-remediation.mjs",
+              "verify-observation",
+              "--observation",
+              "tests/fixtures/axe-zero-observation.json",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--expect-color",
+              "0",
+              "--expect-nested",
+              "0",
+              "--require-complete-scenarios"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "final-transition-manifest-wave",
+      "step": 41,
+      "baseSelector": "completedStep:40",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "final-transition-manifest-contract",
+          "files": [
+            "tests/scripts/verify-final-contract.mjs",
+            "tests/specs/final-contract.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-final-contract.mjs",
+              "self-test-transition-manifest",
+              "--expect-original-occurrences",
+              "139",
+              "--no-browser"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/final-contract.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "final-transition-transaction-wave",
+      "step": 42,
+      "baseSelector": "completedStep:41",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "final-transition-transaction-contract",
+          "files": [
+            "tests/scripts/verify-final-contract.mjs",
+            "tests/specs/final-contract.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-final-contract.mjs",
+              "self-test-transition-transaction",
+              "--prepare-manifest-in-temp",
+              "--temp-root-env",
+              "TMPDIR",
+              "--baseline",
+              "tests/fixtures/axe-baseline.json",
+              "--plan",
+              "tests/fixtures/axe-remediation-plan.json",
+              "--inject-each-post-validation-failure",
+              "--require-original-bytes-restored",
+              "--no-browser"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/final-contract.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "final-prepare-wave",
+      "step": 43,
+      "baseSelector": "completedStep:42",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "final-transition",
+          "files": [
+            "tests/fixtures/final-transition-ready.json",
+            "tests/fixtures/axe-baseline.json",
+            "tests/fixtures/axe-remediation-plan.json"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-final-contract.mjs",
+              "prepare-transition-manifest",
+              "--base",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--zero-observation",
+              "tests/fixtures/axe-zero-observation.json",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--baseline",
+              "tests/fixtures/axe-baseline.json",
+              "--plan",
+              "tests/fixtures/axe-remediation-plan.json",
+              "--expect-original-occurrences",
+              "139",
+              "--out",
+              "tests/fixtures/final-transition-ready.json",
+              "--expect-worker-diff-only",
+              "tests/fixtures/final-transition-ready.json"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "node",
+              "tests/scripts/verify-final-contract.mjs",
+              "verify-transition-manifest",
+              "--base",
+              "5a34759acf16e7beb96c415101c152d6e786c4b3",
+              "--zero-observation",
+              "tests/fixtures/axe-zero-observation.json",
+              "--evidence",
+              "tests/fixtures/axe-remediation-evidence.json",
+              "--baseline",
+              "tests/fixtures/axe-baseline.json",
+              "--plan",
+              "tests/fixtures/axe-remediation-plan.json",
+              "--expect-original-occurrences",
+              "139",
+              "--manifest",
+              "tests/fixtures/final-transition-ready.json",
+              "--read-only"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "final-verify-wave",
+      "step": 44,
+      "baseSelector": "completedStep:43",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "final-verify",
+          "files": [
+            "tests/scripts/verify-final-contract.mjs",
+            "tests/specs/final-contract.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/final-contract.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    },
+    {
+      "waveId": "final-screenshot-wave",
+      "step": 45,
+      "baseSelector": "completedStep:44",
+      "emptyAllowed": false,
+      "lanes": [
+        {
+          "laneId": "final-screenshot",
+          "files": [
+            "tests/specs/screenshots.spec.js"
+          ],
+          "requiredCommands": [
+            [
+              "node",
+              "tests/scripts/verify-scope.mjs"
+            ]
+          ],
+          "focusedTests": [
+            [
+              "env",
+              "PW_PORT=4175",
+              "sh",
+              "tests/scripts/with-env.sh",
+              "npm",
+              "--prefix",
+              "tests",
+              "exec",
+              "playwright",
+              "test",
+              "specs/screenshots.spec.js",
+              "specs/final-contract.spec.js"
+            ]
+          ],
+          "maxAttempts": 2
+        }
+      ]
+    }
+  ]
+}
