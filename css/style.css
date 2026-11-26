@@ -279,11 +279,18 @@ img { max-width: 100%; display: block; }
   flex-wrap: wrap;
   margin-bottom: 3rem;
 }
+.hero-tagline {
+  font-weight: 500;
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  margin-bottom: 0.8rem;
+}
 .hero-stats {
-  display: flex;
-  gap: clamp(1.5rem, 6vw, 4rem);
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .hero-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 .hero-stats li { text-align: center; }
 .stat-value {

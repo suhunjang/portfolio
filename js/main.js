@@ -51,6 +51,7 @@
   setText("brandMark", PROFILE.initials);
   setText("brandName", PROFILE.name);
   setText("heroName", PROFILE.name);
+  setText('heroTagline', PROFILE.tagline);
   setText("heroSummary", PROFILE.summary);
   setText("aboutSummary", PROFILE.summary);
   setText("aboutAvatar", PROFILE.initials);
