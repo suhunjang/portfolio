@@ -35,6 +35,87 @@ export const HARNESS_OWNED_FILES = Object.freeze([
   'docs/superpowers/specs/2026-11-24-portfolio-redesign-resume-design.md',
   'harness-manifest.json',
   'docs/PRD.md', 'docs/UI_GUIDE.md', 'phases/index.json',
+  // compact §C10: committed exact path만 면제(staged·worktree·untracked는 위반). prefix·glob 금지.
+  'docs/superpowers/specs/2026-11-26-portfolio-redesign-compact-completion-design.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/index.json',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step0.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step1.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step10.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step11.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step2.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step3.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step4.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step5.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step6.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step7.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step8.md',
+  'phases/HOO-81-portfolio-redesign-compact-completion/step9.md',
+  // compact §C10: step 0이 열거한 이력 계획(보존 감사 증거) committed exact path
+  'docs/superpowers/specs/2026-11-25-portfolio-redesign-color-resume-design.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/index.json',
+  'phases/HOO-81-portfolio-redesign-color-resume/step0.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step1.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step2.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step3.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step4.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step5.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step6.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step7.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step8.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/step9.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/design.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/execution.json',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/index.json',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step0.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step1.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step10.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step11.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step12.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step13.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step14.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step15.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step16.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step17.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step18.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step19.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step2.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step20.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step21.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step22.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step23.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step24.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step25.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step26.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step27.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step28.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step29.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step3.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step30.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step31.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step32.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step33.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step34.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step35.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step36.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step37.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step38.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step39.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step4.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step40.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step41.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step42.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step43.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step44.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step45.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step46.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step47.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step48.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step49.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step5.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step6.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step7.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step8.md',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/step9.md',
 ]);
 export const HARNESS_OWNED_PREFIXES = Object.freeze([
   '.claude/', '.codex/', 'scripts/', 'templates/',
@@ -388,6 +469,7 @@ export function selfTest() {
       [`outside-scope:committed:${from}`]);
   }
   selfTestResume();
+  selfTestCompact();
   selfTestContent();
   return 'verify-scope: self-test OK';
 }
@@ -422,6 +504,38 @@ function selfTestResume() {
     [{ worktree: ['CLAUDE.md'] }, ['harness-uncommitted:worktree:CLAUDE.md']],
     [{ untracked: ['CLAUDE.md'] }, ['harness-uncommitted:untracked:CLAUDE.md']],
   ];
+  for (const [scenario, expected] of cases) {
+    assert.deepEqual(evalScenario(scenario), expected, JSON.stringify(scenario));
+  }
+}
+
+// ---------------------------------------------------------------- self-test (compact §C10)
+
+function selfTestCompact() {
+  const design = 'docs/superpowers/specs/2026-11-26-portfolio-redesign-compact-completion-design.md';
+  const phase = 'phases/HOO-81-portfolio-redesign-compact-completion';
+  const history = [
+    'docs/superpowers/specs/2026-11-25-portfolio-redesign-color-resume-design.md',
+    'phases/HOO-81-portfolio-redesign-color-resume/index.json',
+    'phases/HOO-81-portfolio-redesign-official-runner-resume/execution.json',
+  ];
+  // 허용: committed exact path
+  for (const p of [design, `${phase}/index.json`, `${phase}/step0.md`, `${phase}/step11.md`, ...history]) {
+    assert.deepEqual(evalScenario({ committed: [p] }), [], `committed ${p}`);
+  }
+  // 위반
+  const cases = [];
+  for (const p of [`${phase}/index.json`, `${phase}/step0.md`, design]) {
+    for (const layer of ['staged', 'worktree']) {
+      cases.push([{ [layer]: [p] }, [`harness-uncommitted:${layer}:${p}`]]);
+    }
+  }
+  cases.push(
+    [{ committed: [`${phase}/extra.md`] }, [`outside-scope:committed:${phase}/extra.md`]],
+    [{ worktree: [`${phase}/extra.md`] }, [`outside-scope:worktree:${phase}/extra.md`]],
+    [{ committed: [`${phase}-x/a.json`] }, [`outside-scope:committed:${phase}-x/a.json`]],
+    [{ untracked: [`${phase}-x/a.json`] }, [`outside-scope:untracked:${phase}-x/a.json`]],
+  );
   for (const [scenario, expected] of cases) {
     assert.deepEqual(evalScenario(scenario), expected, JSON.stringify(scenario));
   }

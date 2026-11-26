@@ -71,3 +71,43 @@ test.describe('verify-scope resume 면제 (§R3)', () => {
     });
   }
 });
+
+// compact step 0 — §C10 committed exact path 면제
+const COMPACT_DESIGN = 'docs/superpowers/specs/2026-11-26-portfolio-redesign-compact-completion-design.md';
+const COMPACT_PHASE = 'phases/HOO-81-portfolio-redesign-compact-completion';
+const HISTORY = [
+  'docs/superpowers/specs/2026-11-25-portfolio-redesign-color-resume-design.md',
+  'phases/HOO-81-portfolio-redesign-color-resume/index.json',
+  'phases/HOO-81-portfolio-redesign-official-runner-resume/execution.json',
+];
+
+test.describe('verify-scope compact 면제 (§C10)', () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'node 전용 검사는 desktop-dark에서만 실행');
+  });
+
+  for (const p of [COMPACT_DESIGN, `${COMPACT_PHASE}/index.json`, `${COMPACT_PHASE}/step0.md`,
+    `${COMPACT_PHASE}/step11.md`, ...HISTORY]) {
+    test(`허용: committed ${p}`, () => {
+      expect(evalScenario({ committed: [p] })).toEqual([]);
+    });
+  }
+
+  const compactViolations = [];
+  for (const p of [`${COMPACT_PHASE}/index.json`, `${COMPACT_PHASE}/step0.md`, COMPACT_DESIGN]) {
+    for (const layer of ['staged', 'worktree']) {
+      compactViolations.push([{ [layer]: [p] }, [`harness-uncommitted:${layer}:${p}`]]);
+    }
+  }
+  compactViolations.push(
+    [{ committed: [`${COMPACT_PHASE}/extra.md`] }, [`outside-scope:committed:${COMPACT_PHASE}/extra.md`]],
+    [{ worktree: [`${COMPACT_PHASE}/extra.md`] }, [`outside-scope:worktree:${COMPACT_PHASE}/extra.md`]],
+    [{ committed: [`${COMPACT_PHASE}-x/a.json`] }, [`outside-scope:committed:${COMPACT_PHASE}-x/a.json`]],
+    [{ untracked: [`${COMPACT_PHASE}-x/a.json`] }, [`outside-scope:untracked:${COMPACT_PHASE}-x/a.json`]],
+  );
+  for (const [scenario, expected] of compactViolations) {
+    test(`위반: ${JSON.stringify(scenario)}`, () => {
+      expect(evalScenario(scenario)).toEqual(expected);
+    });
+  }
+});
