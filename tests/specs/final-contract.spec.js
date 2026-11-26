@@ -431,3 +431,76 @@ test.describe('compact step 6 final-contract: component-states', () => {
     );
   });
 });
+
+// compact step 7 — print (원 §7 인쇄: A 기본 상태, B lightbox 열린 상태, clamp 해제, PDF 조건)
+// `/Type` 다음에 오는 `/Page`만 센다(`/Pages` 제외).
+const pdfPageCount = (buf) => (buf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length;
+
+const PRINT_HIDDEN = ['#themeToggle', '#menuToggle', '#navLinks', '.scroll-hint', '#projectModal'];
+const PRINT_VISIBLE = ['#hero', '#heroFeatured', '#career', '#projects', '#strengths', '#about', '#contact'];
+
+async function expectPdfOk(page) {
+  const buf = await page.pdf();
+  expect(buf.length, 'pdf bytes').toBeGreaterThan(10240);
+  expect(pdfPageCount(buf), 'pdf pages').toBeGreaterThanOrEqual(1);
+}
+
+test.describe('compact step 7 final-contract: print', () => {
+  test('pdfPageCount fixture 4개', () => {
+    const cases = [
+      ['/Type /Page', 1],
+      ['/Type/Page', 1],
+      ['/Type /Pages', 0],
+      ['/Page', 0],
+    ];
+    expect(cases.map(([s]) => pdfPageCount(Buffer.from(s, 'latin1')))).toEqual(cases.map(([, n]) => n));
+  });
+
+  test('A 기본 상태: 본문·대표 visible·opacity 1, reveal 비어 있지 않음, interaction·modal 숨김, lightbox 없음/none, clamp 해제, PDF', async ({ page }, testInfo) => {
+    test.skip(!/^desktop-(dark|light)$/.test(testInfo.project.name), 'desktop-dark·desktop-light 전용');
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    await page.emulateMedia({ media: 'print' });
+    for (const sel of PRINT_VISIBLE) {
+      await expect(page.locator(sel), sel).toBeVisible();
+      expect(await page.$eval(sel, (el) => getComputedStyle(el).opacity), `${sel} opacity`).toBe('1');
+    }
+    const reveals = await page.$$eval('.reveal', (els) =>
+      els
+        .filter((el) => getComputedStyle(el).display !== 'none')
+        .map((el, i) => ({
+          i,
+          cls: el.className,
+          opacity: getComputedStyle(el).opacity,
+          empty: el.textContent.trim() === '' && el.children.length === 0,
+        })),
+    );
+    expect(reveals.length).toBeGreaterThan(0);
+    expect(reveals.filter((r) => r.opacity !== '1' || r.empty)).toEqual([]);
+    for (const sel of PRINT_HIDDEN) await expect(page.locator(sel).first(), sel).toBeHidden();
+    const lb = await page.$$eval('.lightbox', (els) => els.map((el) => getComputedStyle(el).display));
+    expect(lb.every((d) => d === 'none'), `lightbox ${JSON.stringify(lb)}`).toBe(true);
+    const clamps = await page.$$eval('#heroFeatured .featured-blurb, #projectGrid .project-blurb', (els) =>
+      els.map((el) => getComputedStyle(el).webkitLineClamp),
+    );
+    expect(clamps).toHaveLength(16);
+    expect(clamps.filter((c) => c !== 'none' && c !== 'unset')).toEqual([]);
+    await expectPdfOk(page);
+  });
+
+  test('B lightbox 열린 상태: print에서 .lightbox·#projectModal none, PDF', async ({ page }, testInfo) => {
+    test.skip(!/^desktop-(dark|light)$/.test(testInfo.project.name), 'desktop-dark·desktop-light 전용');
+    await page.goto('/');
+    await page.locator('#projectGrid .project-card[data-project="0"]').click();
+    await expect(page.locator('#projectModal')).toBeVisible();
+    await page.locator('#projectModal .shot-zoom').first().click();
+    await expect(page.locator('.lightbox')).toBeVisible();
+    await page.emulateMedia({ media: 'print' });
+    const disp = await page.evaluate(() => ({
+      lightbox: getComputedStyle(document.querySelector('.lightbox')).display,
+      modal: getComputedStyle(document.getElementById('projectModal')).display,
+    }));
+    expect(disp).toEqual({ lightbox: 'none', modal: 'none' });
+    await expectPdfOk(page);
+  });
+});
