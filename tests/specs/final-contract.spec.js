@@ -132,3 +132,105 @@ test.describe('compact step 4 final-contract: section-structure', () => {
     await expect(page.locator('#projectGrid .project-card .project-title')).toHaveText(baseline.PROJECTS.map((p) => p.title));
   });
 });
+
+// compact step 5 — section-layout (원 §7·§11.2, tokens: tests/fixtures/claude-design-intake.json)
+const intake = JSON.parse(readFileSync(new URL('../fixtures/claude-design-intake.json', import.meta.url), 'utf8'));
+const TOKENS = intake.tokens;
+const LAYOUT_SECTIONS = FINAL_SECTIONS.slice(1).map((s) => s.id);
+const EXPECTED_COLUMNS = { 375: 1, 768: 2, 1280: 3 };
+
+function viewportKey(page) {
+  const w = page.viewportSize().width;
+  if (!(String(w) in TOKENS.sectionPaddingPx)) throw new Error(`layout: unexpected viewport width ${w}`);
+  return String(w);
+}
+
+test.describe('compact step 5 final-contract: section-layout', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+  });
+
+  test('가로 스크롤이 없다', async ({ page }) => {
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBe(0);
+  });
+
+  test('섹션 padding-top·bottom이 tokens.sectionPaddingPx[viewport]와 같다', async ({ page }) => {
+    const want = TOKENS.sectionPaddingPx[viewportKey(page)];
+    const pads = await page.$$eval('main > section', (els, ids) =>
+      els.filter((s) => ids.includes(s.id)).map((s) => {
+        const cs = getComputedStyle(s);
+        return { id: s.id, top: cs.paddingTop, bottom: cs.paddingBottom };
+      }), LAYOUT_SECTIONS);
+    expect(pads).toEqual(LAYOUT_SECTIONS.map((id) => ({ id, top: `${want}px`, bottom: `${want}px` })));
+  });
+
+  test('#heroFeatured·#projectGrid·#strengthsGrid의 row·column gap이 tokens.cardGapPx', async ({ page }) => {
+    const gaps = await page.evaluate(() =>
+      ['heroFeatured', 'projectGrid', 'strengthsGrid'].map((id) => {
+        const cs = getComputedStyle(document.getElementById(id));
+        return { id, row: cs.rowGap, column: cs.columnGap };
+      }),
+    );
+    const g = `${TOKENS.cardGapPx}px`;
+    expect(gaps).toEqual(['heroFeatured', 'projectGrid', 'strengthsGrid'].map((id) => ({ id, row: g, column: g })));
+  });
+
+  test('#projectGrid·#strengthsGrid 열 수가 375=1, 768=2, 1280=3', async ({ page }) => {
+    const want = EXPECTED_COLUMNS[viewportKey(page)];
+    const cols = await page.evaluate(() =>
+      ['projectGrid', 'strengthsGrid'].map((id) => {
+        const v = getComputedStyle(document.getElementById(id)).gridTemplateColumns;
+        return { id, n: v === 'none' ? 0 : v.trim().split(/\s+/).length };
+      }),
+    );
+    expect(cols).toEqual([{ id: 'projectGrid', n: want }, { id: 'strengthsGrid', n: want }]);
+  });
+
+  test('Career: 375 세로, 768·1280 가로(top 차 < 24px)', async ({ page }) => {
+    const horizontal = viewportKey(page) !== '375';
+    const items = await page.$$eval('#timeline .timeline-item', (els) =>
+      els.map((el) => {
+        const p = el.querySelector('.timeline-period').getBoundingClientRect();
+        const c = el.querySelector('.timeline-card').getBoundingClientRect();
+        return { pTop: p.top, pBottom: p.bottom, pRight: p.right, cTop: c.top, cLeft: c.left };
+      }),
+    );
+    expect(items.length).toBeGreaterThan(0);
+    for (const [i, it] of items.entries()) {
+      if (horizontal) {
+        expect(Math.abs(it.cTop - it.pTop), `item ${i} top diff`).toBeLessThan(24);
+        expect(it.cLeft, `item ${i} card right of period`).toBeGreaterThanOrEqual(it.pRight);
+      } else {
+        expect(it.cTop, `item ${i} card below period`).toBeGreaterThanOrEqual(it.pBottom);
+      }
+    }
+  });
+
+  test('375에서 Career highlights가 보인다', async ({ page }) => {
+    test.skip(viewportKey(page) !== '375', '375 전용');
+    const lists = page.locator('#timeline .timeline-highlights');
+    expect(await lists.count()).toBeGreaterThan(0);
+    for (let i = 0; i < (await lists.count()); i++) {
+      await lists.nth(i).scrollIntoViewIfNeeded();
+      await expect(lists.nth(i)).toBeVisible();
+      const box = await lists.nth(i).boundingBox();
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(375);
+    }
+  });
+
+  test('.subsection-title은 h2보다 위계가 낮다(weight ≤ h2, size < h2)', async ({ page }) => {
+    const t = await page.evaluate(() => {
+      const h2 = getComputedStyle(document.querySelector('#about h2.section-title'));
+      const h3 = getComputedStyle(document.querySelector('#about h3.subsection-title'));
+      return {
+        h2w: Number(h2.fontWeight), h3w: Number(h3.fontWeight),
+        h2s: parseFloat(h2.fontSize), h3s: parseFloat(h3.fontSize),
+      };
+    });
+    expect(t.h3w).toBeLessThanOrEqual(t.h2w);
+    expect(t.h3s).toBeLessThan(t.h2s);
+  });
+});
