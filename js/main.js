@@ -201,12 +201,26 @@
     }).join("");
   }
 
+  /* 대표 프로젝트 카드 — PROJECTS 원래 index 그대로, featured === true만 (그리드 직후 1회) */
+  const heroFeatured = $("#heroFeatured");
+  function renderFeaturedProjects() {
+    if (!heroFeatured) return;
+    heroFeatured.innerHTML = PROJECTS.map((p, idx) =>
+      p.featured === true
+        ? `<button type="button" class="featured-card" data-featured-card data-project="${idx}"><span class="featured-title">${esc(
+            p.title
+          )}</span><span class="featured-blurb">${esc(p.blurb)}</span></button>`
+        : ""
+    ).join("");
+  }
+  renderFeaturedProjects();
+
   /* ----------------------------------------------------------------
      6.5) 프로젝트 상세 모달
   ---------------------------------------------------------------- */
   const modal = $("#projectModal");
   const modalBody = $("#modalBody");
-  let lastFocused = null;
+  let lastModalTrigger = null;
 
   function listBlock(label, items) {
     if (!items || !items.length) return "";
@@ -255,7 +269,8 @@
       <figure class="diagram">${d.svg}${cap}</figure></div>`;
   }
 
-  function openProjectModal(idx) {
+  function openProjectModal(projectIndex, triggerElement = document.activeElement) {
+    const idx = projectIndex;
     const p = PROJECTS[idx];
     if (!p || !p.detail || !modal || !modalBody) return;
     const d = p.detail;
@@ -283,7 +298,7 @@
       ${shotsBlock(d.shots)}
       ${stack ? `<div class="modal-section"><h4>기술 스택</h4><div class="modal-stack">${stack}</div></div>` : ""}
     `;
-    lastFocused = document.activeElement;
+    lastModalTrigger = triggerElement;
     modal.hidden = false;
     document.body.classList.add("modal-open");
     const closeBtn = $(".modal-close", modal);
@@ -344,7 +359,9 @@
     closeLightbox();
     modal.hidden = true;
     document.body.classList.remove("modal-open");
-    if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+    const trigger = lastModalTrigger;
+    lastModalTrigger = null;
+    if (trigger && trigger.isConnected && typeof trigger.focus === "function") trigger.focus();
   }
 
   if (projectGrid && modal) {
@@ -360,6 +377,20 @@
       e.preventDefault();
       openProjectModal(Number(card.getAttribute("data-project")));
     });
+    if (heroFeatured) {
+      heroFeatured.addEventListener("click", (e) => {
+        const card = e.target.closest(".featured-card[data-project]");
+        if (!card) return;
+        openProjectModal(Number(card.getAttribute("data-project")), card);
+      });
+      heroFeatured.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        const card = e.target.closest(".featured-card[data-project]");
+        if (!card) return;
+        e.preventDefault();
+        openProjectModal(Number(card.getAttribute("data-project")), card);
+      });
+    }
     modal.addEventListener("click", (e) => {
       const zoom = e.target.closest(".shot-zoom");
       if (zoom) {
