@@ -1251,6 +1251,14 @@ body.modal-open { overflow: hidden; }
   section,
   .section { padding: 1rem 0 !important; }
 
+  /* 종이에서는 blurb 전문을 보인다 — line clamp 해제 */
+  .featured-blurb,
+  .project-blurb {
+    -webkit-line-clamp: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
   /* About 첫 문단은 hero 소개와 동일 텍스트 — 인쇄에서는 중복 제거 */
   #aboutSummary { display: none !important; }
 
