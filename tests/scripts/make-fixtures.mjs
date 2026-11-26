@@ -6,7 +6,8 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import vm from 'node:vm';
-import { BASE } from './scope-snapshot.mjs';
+// BASE = 리디자인 시작 기준 commit(origin/main). 이전에는 runner용 scope-snapshot.mjs에서 가져왔다(HOO-124에서 제거).
+const BASE = 'd0a8a6e462bc1366757b1401c3ba7aeb0fbf391d';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const FIXTURES = path.join(REPO_ROOT, 'tests', 'fixtures');
