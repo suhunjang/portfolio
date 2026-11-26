@@ -490,6 +490,30 @@ test.describe('compact step 7 final-contract: print', () => {
     await expectPdfOk(page);
   });
 
+  test('C 인쇄 대비: 흰 종이 위 step 9 변경 글자(.stat-label·.about-meta dt·.footer-inner) 대비 4.5 이상', async ({ page }, testInfo) => {
+    test.skip(!/^desktop-(dark|light)$/.test(testInfo.project.name), 'desktop-dark·desktop-light 전용');
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    await page.emulateMedia({ media: 'print' });
+    const ratios = await page.$$eval('.stat-label, .about-meta dt, .footer-inner', (els) => {
+      const lum = (c) => {
+        const [r, g, b] = c.match(/[\d.]+/g).slice(0, 3).map(Number).map((v) => {
+          const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const paper = 'rgb(255, 255, 255)';
+      return els.map((el) => {
+        const a = lum(getComputedStyle(el).color);
+        const b = lum(paper);
+        return { sel: el.className || el.tagName, ratio: (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) };
+      });
+    });
+    expect(ratios.length).toBeGreaterThan(0);
+    expect(ratios.filter((r) => r.ratio < 4.5)).toEqual([]);
+  });
+
   test('B lightbox 열린 상태: print에서 .lightbox·#projectModal none, PDF', async ({ page }, testInfo) => {
     test.skip(!/^desktop-(dark|light)$/.test(testInfo.project.name), 'desktop-dark·desktop-light 전용');
     await page.goto('/');

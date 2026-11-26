@@ -34,11 +34,11 @@ function isFocusOutlineException(rule, colorTokens) {
 // (file, chain, selector, occurrence, prop) 순 정렬. occurrence = 같은 file·chain·selector BASE Rule 중 순번(0부터).
 export const HOO81_COLOR_V52_ALLOW = [
   { file: 'css/style.css', chain: [], selector: '.about-avatar', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--bg-elev)' },
-  { file: 'css/style.css', chain: [], selector: '.about-meta dt', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--tag-text)' },
+  { file: 'css/style.css', chain: [], selector: '.about-meta dt', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--text-muted)' },
   { file: 'css/style.css', chain: [], selector: '.brand-mark', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--bg-elev)' },
   { file: 'css/style.css', chain: [], selector: '.btn-primary', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--bg-elev)' },
-  { file: 'css/style.css', chain: [], selector: '.footer-inner', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--tag-text)' },
-  { file: 'css/style.css', chain: [], selector: '.stat-label', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--tag-text)' },
+  { file: 'css/style.css', chain: [], selector: '.footer-inner', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--text-muted)' },
+  { file: 'css/style.css', chain: [], selector: '.stat-label', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--text-muted)' },
 ];
 
 // BASE Rule이 같은 file·chain·selector BASE Rule 중 몇 번째인가(0부터).

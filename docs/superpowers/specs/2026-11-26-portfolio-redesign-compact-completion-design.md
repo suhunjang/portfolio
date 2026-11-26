@@ -138,6 +138,7 @@
     - 다음 Esc에서 modal을 닫는다.
   - 기존 lightbox 개별 Tab listener는 제거한다.
 - step 6 hover·active 색 비교 기준(2026-11-26 대표 결정): BASE css에 `HOO81_COLOR_V52_ALLOW` 선언만 base→to로 적용한 css(`applyColorAllow`, `tests/helpers/design-guard-color-rules.js`). 허용 목록 밖 색 변화는 계속 실패한다.
+- step 9 token 선택 보정(2026-11-26 대표 결정, 최종 리뷰 blocker): `--tag-text`와 `--text-muted`는 화면 값이 같아 동점이지만 `--tag-text`는 인쇄용 값이 없어 흰 종이 대비 2.56이다. 인쇄 대비까지 4.5 이상인 `--text-muted`를 고른다(`.stat-label`·`.about-meta dt`·`.footer-inner`).
 - `HOO81_COLOR_V52_ALLOW`
   - 원소: `{file, chain, selector, occurrence, prop, base, to}`. `chain`은 기존 parser의 at-rule chain이고, `occurrence`는 같은 file·chain·selector rule 중 몇 번째인지(0부터)다.
   - 판정 기준(v92): 같은 file·chain·selector·occurrence·prop에 해당하는 선언 하나만 예외로 다룬다.
