@@ -136,6 +136,7 @@
     - 첫 Esc는 lightbox가 소비해 release하고 `.shot-zoom`으로 focus를 돌린다. 이때 modal trap이 다시 stack top이 된다.
     - 다음 Esc에서 modal을 닫는다.
   - 기존 lightbox 개별 Tab listener는 제거한다.
+- step 6 hover·active 색 비교 기준(2026-11-26 대표 결정): BASE css에 `HOO81_COLOR_V52_ALLOW` 선언만 base→to로 적용한 css(`applyColorAllow`, `tests/helpers/design-guard-color-rules.js`). 허용 목록 밖 색 변화는 계속 실패한다.
 - `HOO81_COLOR_V52_ALLOW`
   - 원소: `{file, chain, selector, occurrence, prop, base, to}`. `chain`은 기존 parser의 at-rule chain이고, `occurrence`는 같은 file·chain·selector rule 중 몇 번째인지(0부터)다.
   - 판정 기준(v92): 같은 file·chain·selector·occurrence·prop에 해당하는 선언 하나만 예외로 다룬다.

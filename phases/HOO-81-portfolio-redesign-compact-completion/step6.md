@@ -20,7 +20,7 @@
      - `#contactActions a`(있으면), `.scroll-hint`(보이면)
    - **hover/active**: desktop-dark/light에서 세 대상 모두
      - transform 또는 opacity가 바뀐다.
-     - 세 색 속성은 그대로다.
+     - 세 색 속성은 그대로다. 기준은 BASE에 step 9 `HOO81_COLOR_V52_ALLOW` 선언만 적용한 css다(`applyColorAllow`, 2026-11-26 대표 결정).
    - **clamp**
      - blurb 16개의 clamp가 `3`이다.
      - 각 textContent가 `PROJECTS[i].blurb`와 같다.

@@ -30,7 +30,37 @@ function isFocusOutlineException(rule, colorTokens) {
     && varRefs(value).every((n) => colorTokens.has(n)));
 }
 
-export function checkColorRules({ baseRules, currentRules, colorTokens }) {
+// compact step 9 (설계 §C6) — color-contrast 수정 선언 단위 예외. 원소 {file, chain, selector, occurrence, prop, base, to},
+// (file, chain, selector, occurrence, prop) 순 정렬. occurrence = 같은 file·chain·selector BASE Rule 중 순번(0부터).
+export const HOO81_COLOR_V52_ALLOW = [
+  { file: 'css/style.css', chain: [], selector: '.about-avatar', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--bg-elev)' },
+  { file: 'css/style.css', chain: [], selector: '.about-meta dt', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--tag-text)' },
+  { file: 'css/style.css', chain: [], selector: '.brand-mark', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--bg-elev)' },
+  { file: 'css/style.css', chain: [], selector: '.btn-primary', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--bg-elev)' },
+  { file: 'css/style.css', chain: [], selector: '.footer-inner', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--tag-text)' },
+  { file: 'css/style.css', chain: [], selector: '.stat-label', occurrence: 0, prop: 'color', base: 'var(--text-faint)', to: 'var(--tag-text)' },
+];
+
+// BASE Rule이 같은 file·chain·selector BASE Rule 중 몇 번째인가(0부터).
+const occurrenceOf = (baseRules, rule) => baseRules.filter((b) => b.file === rule.file
+  && sameList(b.chain, rule.chain)
+  && selectorsLabel(b) === selectorsLabel(rule)
+  && b.index < rule.index).length;
+
+// 짝 base·current의 비-custom 선언: 허용 항목과 정확히 맞는 선언 하나만 값 `to`를 `base`로 읽는다.
+function allowedDecls(base, current, baseRules, allow) {
+  const decls = current.decls.filter((d) => !isCustom(d));
+  const occ = occurrenceOf(baseRules, base);
+  for (const e of allow) {
+    if (e.file !== base.file || !sameList(e.chain, base.chain) || e.selector !== selectorsLabel(base)
+      || e.occurrence !== occ || !hasDecl(base.decls, [e.prop, e.base])) continue;
+    const i = decls.findIndex((d) => d[0] === e.prop && d[1] === e.to);
+    if (i >= 0) decls[i] = [e.prop, e.base];
+  }
+  return decls;
+}
+
+export function checkColorRules({ baseRules, currentRules, colorTokens, allow = HOO81_COLOR_V52_ALLOW }) {
   const out = [];
   const seen = new Set();
   const push = (s) => { if (!seen.has(s)) { seen.add(s); out.push(s); } };
@@ -45,7 +75,7 @@ export function checkColorRules({ baseRules, currentRules, colorTokens }) {
     paired.add(current);
     const label = selectorsLabel(base);
     const baseArr = colorDecls(base);
-    const curDecls = current.decls.filter((d) => !isCustom(d));
+    const curDecls = allowedDecls(base, current, baseRules, allow);
     let changed = false;
     for (const d of baseArr) {
       if (!hasDecl(curDecls, d)) { changed = true; push(`color-decl-changed:${label}`); }
@@ -79,6 +109,38 @@ export function checkColorRules({ baseRules, currentRules, colorTokens }) {
         && hasDecl(b.decls, d));
       if (!inBase) push(`color-decl-new:${label}`);
     }
+  }
+  return out;
+}
+
+// compact step 9 (설계 §C6, 2026-11-26 대표 결정) — BASE css에 HOO81_COLOR_V52_ALLOW 선언만 base→to로 적용한다.
+// 다른 선언은 바이트 그대로 둔다. 최상위(chain []) rule만, 주석 없는 블록만, 정확히 선언 경계로 1개 일치할 때만 바꾸고 아니면 throw한다.
+export function applyColorAllow(css, allow = HOO81_COLOR_V52_ALLOW) {
+  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const depthAt = (text, pos) => {
+    let d = 0;
+    for (let k = 0; k < pos; k += 1) { if (text[k] === '{') d += 1; else if (text[k] === '}') d -= 1; }
+    return d;
+  };
+  let out = css;
+  for (const e of allow) {
+    if (e.file !== 'css/style.css' || e.chain.length !== 0) throw new Error(`unsupported allow entry: ${e.selector}`);
+    const starts = [];
+    const re = new RegExp(`^${esc(e.selector)} \\{`, 'gm');
+    for (let m; (m = re.exec(out)); ) if (depthAt(out, m.index) === 0) starts.push(m.index);
+    const s = starts[e.occurrence];
+    if (s === undefined) throw new Error(`rule not found: ${e.selector}#${e.occurrence}`);
+    const open = out.indexOf('{', s);
+    const end = out.indexOf('}', open);
+    const body = out.slice(open + 1, end);
+    if (body.includes('/*') || body.includes('{')) throw new Error(`unsupported block: ${e.selector}`);
+    const declRe = new RegExp(`(^|;)(\\s*)${esc(e.prop)}\\s*:\\s*${esc(e.base)}\\s*(?=;)`, 'g');
+    const hits = [...body.matchAll(declRe)];
+    if (hits.length !== 1) throw new Error(`decl not unique: ${e.selector} ${e.prop}: ${e.base} (${hits.length})`);
+    const h = hits[0];
+    const at = open + 1 + h.index + h[1].length + h[2].length;
+    const len = h[0].length - h[1].length - h[2].length;
+    out = out.slice(0, at) + `${e.prop}: ${e.to}` + out.slice(at + len);
   }
   return out;
 }

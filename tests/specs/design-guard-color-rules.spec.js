@@ -1,7 +1,7 @@
 // step 16 — tests/helpers/design-guard-color-rules.js 색 선언 규칙 4~8·checkColorRules 순서·중복 제거 (설계 §11.4, node 전용, desktop-dark에서만 실행)
 import { test, expect } from '@playwright/test';
 import { parseCssRules } from '../helpers/css-parse.js';
-import { checkColorRules } from '../helpers/design-guard-color-rules.js';
+import { checkColorRules, applyColorAllow } from '../helpers/design-guard-color-rules.js';
 
 const ROOT = ':root{--card:#fff;--accent:#3355ff}';
 const PC = '.project-card{background:var(--card);padding:16px}';
@@ -109,5 +109,97 @@ test.describe('step 16 design-guard-color-rules', () => {
     const before = JSON.stringify({ baseRules, currentRules, tokens: [...colorTokens] });
     checkColorRules({ baseRules, currentRules, colorTokens });
     expect(JSON.stringify({ baseRules, currentRules, tokens: [...colorTokens] })).toBe(before);
+  });
+});
+
+// compact step 9 — HOO81_COLOR_V52_ALLOW 선언 단위 예외 (compact 설계 §C6 v92 판정 기준과 1:1)
+test.describe('compact step 9 HOO81_COLOR_V52_ALLOW', () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'node 전용 검사는 desktop-dark에서만 실행');
+  });
+
+  const A_BASE = [
+    ':root{--card:#fff;--accent:#3355ff}',
+    '.a{color:#fff;background:var(--accent)}',
+    '.a{color:#fff}',
+    '@media (max-width: 768px){.a{color:#fff}}',
+  ];
+  const A_TEXT = A_BASE.join(' ');
+  const entry = (over = {}) => ({
+    file: FILE, chain: [], selector: '.a', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--card)', ...over,
+  });
+  const checkA = (parts, allow) => checkColorRules({
+    baseRules: rules(A_TEXT),
+    currentRules: rules(parts.join(' ')),
+    colorTokens: COLOR_TOKENS,
+    allow,
+  });
+  const withPart = (i, text) => A_BASE.map((p, j) => (j === i ? text : p));
+
+  test('통과: 같은 file·chain·selector·occurrence·prop 값이 base', () => {
+    expect(checkA(A_BASE, [entry()])).toEqual([]);
+  });
+
+  test('통과: 같은 선언의 값이 정확히 to', () => {
+    expect(checkA(withPart(1, '.a{color:var(--card);background:var(--accent)}'), [entry()])).toEqual([]);
+  });
+
+  test('통과: 허용 목록 []이면 기존 동작과 같다', () => {
+    const changed = withPart(1, '.a{color:var(--card);background:var(--accent)}');
+    const legacy = checkColorRules({
+      baseRules: rules(A_TEXT), currentRules: rules(changed.join(' ')), colorTokens: COLOR_TOKENS, allow: [],
+    });
+    expect(legacy).toEqual(['color-decl-changed:.a', 'color-decl-new:.a']);
+    expect(checkA(A_BASE, [])).toEqual([]);
+    expect(check(BASE)).toEqual(checkColorRules({
+      baseRules: rules(BASE), currentRules: rules(BASE), colorTokens: COLOR_TOKENS, allow: [],
+    }));
+  });
+
+  test('실패: 같은 선언의 값이 base도 to도 아님', () => {
+    expect(checkA(withPart(1, '.a{color:var(--accent);background:var(--accent)}'), [entry()]))
+      .toEqual(['color-decl-changed:.a', 'color-decl-new:.a']);
+  });
+
+  test('실패: chain이 다른 같은 selector', () => {
+    expect(checkA(withPart(3, '@media (max-width: 768px){.a{color:var(--card)}}'), [entry()]))
+      .toEqual(['color-decl-changed:.a', 'color-decl-new:.a']);
+  });
+
+  test('실패: 같은 chain·selector에서 occurrence가 다름', () => {
+    expect(checkA(withPart(2, '.a{color:var(--card)}'), [entry()]))
+      .toEqual(['color-decl-changed:.a', 'color-decl-new:.a']);
+  });
+
+  test('실패: 같은 rule 안의 다른 선언이 바뀜', () => {
+    expect(checkA(withPart(1, '.a{color:var(--card);background:var(--card)}'), [entry()]))
+      .toEqual(['color-decl-changed:.a', 'color-decl-new:.a']);
+  });
+});
+
+test.describe('compact step 9 applyColorAllow (step 6 hover·active 기준 css)', () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-dark', 'node 전용, desktop-dark에서만');
+  });
+  const E = { file: 'css/style.css', chain: [], selector: '.a', occurrence: 0, prop: 'color', base: '#fff', to: 'var(--x)' };
+  test('허용 선언 하나만 base→to, 나머지 바이트 그대로', () => {
+    const css = '.a {\n  background-color: #fff;\n  color: #fff;\n}\n.b {\n  color: #fff;\n}\n';
+    expect(applyColorAllow(css, [E])).toBe('.a {\n  background-color: #fff;\n  color: var(--x);\n}\n.b {\n  color: #fff;\n}\n');
+  });
+  test('background-color: #fff만 있으면 throw(접미 일치 금지)', () => {
+    expect(() => applyColorAllow('.a {\n  background-color: #fff;\n}\n', [E])).toThrow(/decl not unique/);
+  });
+  test('주석이 있는 블록은 throw', () => {
+    expect(() => applyColorAllow('.a {\n  /* color: #fff; */\n  color: #fff;\n}\n', [E])).toThrow(/unsupported block/);
+  });
+  test('@media 안의 같은 selector는 최상위로 보지 않음', () => {
+    expect(() => applyColorAllow('@media print {\n.a {\n  color: #fff;\n}\n}\n', [E])).toThrow(/rule not found/);
+  });
+  test('occurrence는 최상위 같은 selector rule 순번', () => {
+    const css = '.a {\n  margin: 0;\n}\n.a {\n  color: #fff;\n}\n';
+    expect(applyColorAllow(css, [{ ...E, occurrence: 1 }])).toBe('.a {\n  margin: 0;\n}\n.a {\n  color: var(--x);\n}\n');
+  });
+  test('빈 허용 목록은 입력 그대로', () => {
+    expect(applyColorAllow('.a { color: #fff; }', [])).toBe('.a { color: #fff; }');
   });
 });

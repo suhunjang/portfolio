@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { expect } from '@playwright/test';
 import { test } from '../helpers/theme.js';
 import { GUARD_BASE } from '../helpers/design-guard.js';
+import { applyColorAllow } from '../helpers/design-guard-color-rules.js';
 
 const baseline = JSON.parse(readFileSync(new URL('../fixtures/baseline-data.json', import.meta.url), 'utf8'));
 
@@ -349,13 +350,14 @@ test.describe('compact step 6 final-contract: component-states', () => {
     expect(small).toEqual([]);
   });
 
-  test('hover·active: transform 또는 opacity가 바뀌고 색 3속성은 BASE 그대로', async ({ context }, testInfo) => {
+  test('hover·active: transform 또는 opacity가 바뀌고 색 3속성은 BASE(+§C6 허용 선언) 그대로', async ({ context }, testInfo) => {
     test.skip(!/^desktop-(dark|light)$/.test(testInfo.project.name), 'desktop-dark·desktop-light 전용');
     test.setTimeout(120000);
-    const baseCss = execFileSync('git', ['show', `${GUARD_BASE}:css/style.css`], {
+    // step 9 color-contrast 수정(HOO81_COLOR_V52_ALLOW)만 기준에 반영한다. 그 밖의 색 변화는 계속 실패.
+    const baseCss = applyColorAllow(execFileSync('git', ['show', `${GUARD_BASE}:css/style.css`], {
       cwd: fileURLToPath(new URL('../..', import.meta.url)),
       encoding: 'utf8',
-    });
+    }));
     const targets = [
       { name: 'hero-cta-btn-0', sel: '.hero-cta .btn', nth: 0 },
       { name: 'hero-cta-btn-1', sel: '.hero-cta .btn', nth: 1 },
