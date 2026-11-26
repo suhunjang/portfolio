@@ -1,7 +1,10 @@
 // compact step 4 — section-structure (설계 compact §C1, 원 §4·§5 예외 (2)~(5))
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { expect } from '@playwright/test';
 import { test } from '../helpers/theme.js';
+import { GUARD_BASE } from '../helpers/design-guard.js';
 
 const baseline = JSON.parse(readFileSync(new URL('../fixtures/baseline-data.json', import.meta.url), 'utf8'));
 
@@ -232,5 +235,199 @@ test.describe('compact step 5 final-contract: section-layout', () => {
     });
     expect(t.h3w).toBeLessThanOrEqual(t.h2w);
     expect(t.h3s).toBeLessThan(t.h2s);
+  });
+});
+
+// compact step 6 — component-states (원 §11.2 step 46·49·50: hit target, 비색 hover/active, blurb clamp, stripe)
+// 측정 전 대상과 조상의 유한 애니메이션만 기다린다(무한 장식 .caret·.scroll-hint span은 제외, 문서 전체 대기 금지).
+async function waitForFiniteAnimations(page, selector, nth = 0, timeoutMs = 5000) {
+  const done = page.evaluate(
+    async ([sel, i]) => {
+      const el = document.querySelectorAll(sel)[i];
+      if (!el) throw new Error(`missing:${sel}[${i}]`);
+      const anims = [...el.getAnimations({ subtree: true })];
+      for (let a = el.parentElement; a; a = a.parentElement) anims.push(...a.getAnimations());
+      const finite = anims.filter(
+        (x) => x.effect && x.effect.getComputedTiming().iterations !== Infinity && ['running', 'pending'].includes(x.playState),
+      );
+      await Promise.all(finite.map((x) => x.finished.catch(() => null)));
+    },
+    [selector, nth],
+  );
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`animation-timeout:${selector}`)), timeoutMs);
+  });
+  try {
+    await Promise.race([done, timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function measureState(page, selector, nth = 0) {
+  await waitForFiniteAnimations(page, selector, nth);
+  return page.evaluate(
+    ([sel, i]) => {
+      const cs = getComputedStyle(document.querySelectorAll(sel)[i]);
+      return {
+        color: cs.color,
+        backgroundColor: cs.backgroundColor,
+        borderColor: cs.borderColor,
+        transform: cs.transform,
+        opacity: cs.opacity,
+      };
+    },
+    [selector, nth],
+  );
+}
+
+const COLOR_KEYS = ['color', 'backgroundColor', 'borderColor'];
+const pickColors = (s) => Object.fromEntries(COLOR_KEYS.map((k) => [k, s[k]]));
+
+// 대상마다 새 page: default → hover → active(mouse.down 직후). mouse.up은 하지 않는다(이동·모달 열기 방지).
+async function measureStateSequence(context, selector, nth, { baseCss = null } = {}) {
+  const page = await context.newPage();
+  try {
+    if (baseCss !== null) {
+      await page.route('**/css/style.css', (route) => route.fulfill({ status: 200, contentType: 'text/css', body: baseCss }));
+    }
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const loc = page.locator(selector).nth(nth);
+    await loc.scrollIntoViewIfNeeded();
+    // 등장(.reveal → .in) 전환이 시작된 뒤에 기다려야 default가 등장 도중 값이 아니다.
+    await page.waitForFunction(([sel, i]) => {
+      const r = document.querySelectorAll(sel)[i].closest('.reveal');
+      return !r || r.classList.contains('in');
+    }, [selector, nth]);
+    await waitForFiniteAnimations(page, selector, nth);
+    await page.mouse.move(0, 0);
+    const def = await measureState(page, selector, nth);
+    await loc.hover();
+    const hover = await measureState(page, selector, nth);
+    await page.mouse.down();
+    const active = await measureState(page, selector, nth);
+    return { default: def, hover, active };
+  } finally {
+    await page.close();
+  }
+}
+
+const HIT_SINGLE = ['#themeToggle'];
+const HIT_ALL = ['.nav-link', '.hero-cta .btn', '.featured-card', '#projectGrid .project-card', '#contactActions a'];
+const HIT_IF_VISIBLE = ['#menuToggle', '.scroll-hint'];
+const HIT_COUNTS = { '.featured-card': 3, '#projectGrid .project-card': 13 };
+
+test.describe('compact step 6 final-contract: component-states', () => {
+  test('hit target: 기본 상태 대상 bbox w·h ≥ 44px', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const sizes = [];
+    const measureAll = async (sel) => {
+      const n = await page.locator(sel).count();
+      for (let i = 0; i < n; i++) {
+        await waitForFiniteAnimations(page, sel, i);
+        const r = await page.evaluate(([s, k]) => {
+          const b = document.querySelectorAll(s)[k].getBoundingClientRect();
+          return { w: b.width, h: b.height };
+        }, [sel, i]);
+        sizes.push({ target: `${sel}[${i}]`, ...r });
+      }
+      return n;
+    };
+    for (const sel of HIT_SINGLE) expect(await measureAll(sel), sel).toBe(1);
+    for (const sel of HIT_ALL) {
+      const n = await measureAll(sel);
+      if (sel in HIT_COUNTS) expect(n, sel).toBe(HIT_COUNTS[sel]);
+      else if (sel !== '#contactActions a') expect(n, sel).toBeGreaterThan(0);
+    }
+    for (const sel of HIT_IF_VISIBLE) {
+      if (await page.locator(sel).isVisible()) await measureAll(sel);
+    }
+    const small = sizes.filter((s) => s.w < 44 || s.h < 44).map((s) => `${s.target} ${s.w.toFixed(1)}x${s.h.toFixed(1)}`);
+    expect(small).toEqual([]);
+  });
+
+  test('hover·active: transform 또는 opacity가 바뀌고 색 3속성은 BASE 그대로', async ({ context }, testInfo) => {
+    test.skip(!/^desktop-(dark|light)$/.test(testInfo.project.name), 'desktop-dark·desktop-light 전용');
+    test.setTimeout(120000);
+    const baseCss = execFileSync('git', ['show', `${GUARD_BASE}:css/style.css`], {
+      cwd: fileURLToPath(new URL('../..', import.meta.url)),
+      encoding: 'utf8',
+    });
+    const targets = [
+      { name: 'hero-cta-btn-0', sel: '.hero-cta .btn', nth: 0 },
+      { name: 'hero-cta-btn-1', sel: '.hero-cta .btn', nth: 1 },
+      { name: 'grid-card-0', sel: '#projectGrid .project-card', nth: 0 },
+      { name: 'grid-card-1', sel: '#projectGrid .project-card', nth: 1 },
+    ];
+    const cur = {};
+    for (const t of targets) {
+      cur[t.name] = await measureStateSequence(context, t.sel, t.nth);
+      const base = await measureStateSequence(context, t.sel, t.nth, { baseCss });
+      for (const st of ['default', 'hover', 'active']) {
+        expect(pickColors(cur[t.name][st]), `${t.name} ${st} colors = BASE`).toEqual(pickColors(base[st]));
+      }
+    }
+    // 첫 .featured-card(data-project 1)는 grid-card-1과 같은 상태 색
+    const featured = await measureStateSequence(context, '.featured-card', 0);
+    for (const st of ['default', 'hover', 'active']) {
+      expect(pickColors(featured[st]), `featured-card-0 ${st} colors = grid-card-1`).toEqual(pickColors(cur['grid-card-1'][st]));
+    }
+    cur['featured-card-0'] = featured;
+    const unchanged = [];
+    for (const [name, s] of Object.entries(cur)) {
+      for (const st of ['hover', 'active']) {
+        if (s[st].transform === s.default.transform && s[st].opacity === s.default.opacity) unchanged.push(`${name}:${st}`);
+      }
+    }
+    expect(unchanged).toEqual([]);
+  });
+
+  test('blurb clamp: 대표 3 + grid 13은 line-clamp 3, 전문 유지, 모달은 none', async ({ page }) => {
+    await page.goto('/');
+    const blurbs = await page.$$eval('#heroFeatured .featured-blurb, #projectGrid .project-card .project-blurb', (els) =>
+      els.map((el) => ({
+        project: Number(el.closest('[data-project]').dataset.project),
+        clamp: getComputedStyle(el).webkitLineClamp,
+        text: el.textContent,
+        featured: el.classList.contains('featured-blurb'),
+        height: el.getBoundingClientRect().height,
+        maxHeight: parseFloat(getComputedStyle(el).lineHeight) * 3 + 1,
+      })),
+    );
+    expect(blurbs).toHaveLength(16);
+    for (const b of blurbs) {
+      expect(b.clamp, `project ${b.project}`).toBe('3');
+      // span은 display: block 계약이라 line-clamp가 그려지지 않는다 → 대표 카드 blurb는 화면 높이도 3줄 이하
+      if (b.featured) expect(b.height, `featured ${b.project} 화면에서 3줄 이하`).toBeLessThanOrEqual(b.maxHeight);
+      expect(b.text, `project ${b.project}`).toBe(baseline.PROJECTS[b.project].blurb);
+    }
+    await page.locator('#projectGrid .project-card[data-project="0"]').click();
+    await expect(page.locator('#projectModal')).toBeVisible();
+    const modal = await page.$eval('#projectModal .modal-blurb', (el) => ({ clamp: getComputedStyle(el).webkitLineClamp, text: el.textContent }));
+    expect(modal).toEqual({ clamp: 'none', text: baseline.PROJECTS[0].blurb });
+  });
+
+  test('stripe: .strength-card::before 없음(content none) 또는 크기 0, 카드 6개 순서·내용 = STRENGTHS', async ({ page }) => {
+    await page.goto('/');
+    const cards = await page.$$eval('#strengthsGrid .strength-card', (els) =>
+      els.map((el) => {
+        const b = getComputedStyle(el, '::before');
+        const q = (s) => (el.querySelector(s) ? el.querySelector(s).textContent : null);
+        return {
+          stripe: b.content === 'none' || parseFloat(b.width) === 0 || parseFloat(b.height) === 0,
+          icon: q('.strength-icon'),
+          title: q('.strength-title'),
+          summary: q('.strength-summary'),
+          proof: q('.strength-proof'),
+        };
+      }),
+    );
+    expect(cards.map((c) => c.stripe)).toEqual(baseline.STRENGTHS.map(() => true));
+    expect(cards.map(({ stripe, ...rest }) => rest)).toEqual(
+      baseline.STRENGTHS.map((s) => ({ icon: s.icon || '◆', title: s.title, summary: s.summary, proof: s.proof || null })),
+    );
   });
 });
