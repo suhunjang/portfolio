@@ -378,7 +378,7 @@ img { max-width: 100%; display: block; }
 /* ==========================================================================
    SECTIONS (공통)
    ========================================================================== */
-.section { padding-block: clamp(6rem, 14vw, 11rem); }
+.section { padding-block: 64px; }
 .section-alt { background: var(--bg-alt); }
 .section-head { margin-bottom: clamp(2rem, 5vw, 3.2rem); }
 .section-kicker {
@@ -544,8 +544,8 @@ img { max-width: 100%; display: block; }
 /* ---------- PROJECTS ---------- */
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.4rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
 }
 .project-card,
 .featured-card {
@@ -938,8 +938,8 @@ body.modal-open { overflow: hidden; }
 /* ---------- STRENGTHS ---------- */
 .strengths-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
 }
 .strength-card {
   position: relative;
@@ -1092,6 +1092,27 @@ body.modal-open { overflow: hidden; }
 .hero .reveal:nth-child(4) { transition-delay: 0.26s; }
 .hero .reveal:nth-child(5) { transition-delay: 0.33s; }
 .hero .reveal:nth-child(6) { transition-delay: 0.40s; }
+
+/* ==========================================================================
+   SECTION LAYOUT (원 §7: padding 64/80/96, card gap 24, 1/2/3열, Career 가로)
+   ========================================================================== */
+@media (min-width: 768px) {
+  .section { padding-block: 80px; }
+  .project-grid,
+  .strengths-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+  .timeline-item .timeline-card { margin-top: 0; }
+}
+@media (min-width: 1024px) {
+  .section { padding-block: 96px; }
+  .project-grid,
+  .strengths-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 
 /* ==========================================================================
    RESPONSIVE
