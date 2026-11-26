@@ -1,5 +1,8 @@
 // step 21 — §THEME (설계 §8.3): installProjectTheme · test fixture · collectConsoleErrors
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test as base } from '@playwright/test';
 
 const MAIN_JS = new URL('../../js/main.js', import.meta.url);
@@ -30,10 +33,51 @@ export async function installProjectTheme(context, testInfo) {
   await context.addInitScript(nullOnlyThemeInit, { key, theme: m[1] });
 }
 
+// 외부 Google Fonts 요청은 간헐적으로 응답이 멈춰 page.goto 'load'를 30초 넘게 막는다(2026-11-26 확인).
+// 실제 글꼴(Inter·Space Grotesk)은 유지해야 geometry 검사(첫 화면·hit target·3줄 높이)의 의미가 같다.
+// 그래서 막지 않고, 처음 한 번 받은 응답을 tests/.tmp/font-cache(gitignore)에 저장해 이후에는 로컬에서 응답한다.
+// 받지 못하면 대체 글꼴로 조용히 통과하지 않도록 fixture가 테스트를 실패시킨다. index.html은 그대로다.
+const FONT_CACHE = fileURLToPath(new URL('../.tmp/font-cache/', import.meta.url));
+const GOOGLE_FONTS_RE = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
+
+export async function serveGoogleFontsFromCache(context, failures) {
+  mkdirSync(FONT_CACHE, { recursive: true });
+  await context.route(GOOGLE_FONTS_RE, async (route) => {
+    const url = route.request().url();
+    const key = createHash('sha256').update(url).digest('hex');
+    const bodyPath = path.join(FONT_CACHE, key);
+    const metaPath = `${bodyPath}.json`;
+    if (existsSync(bodyPath) && existsSync(metaPath)) {
+      const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
+      await route.fulfill({ status: 200, headers: meta.headers, body: readFileSync(bodyPath) });
+      return;
+    }
+    try {
+      const resp = await route.fetch({ timeout: 15000 });
+      if (resp.status() !== 200) throw new Error(`status ${resp.status()}`);
+      const body = await resp.body();
+      const headers = {
+        'content-type': resp.headers()['content-type'] || 'application/octet-stream',
+        'access-control-allow-origin': '*',
+      };
+      writeFileSync(`${bodyPath}.tmp`, body);
+      renameSync(`${bodyPath}.tmp`, bodyPath);
+      writeFileSync(metaPath, JSON.stringify({ url, headers }));
+      await route.fulfill({ status: 200, headers, body });
+    } catch (e) {
+      failures.push(`${url}: ${e.message}`);
+      await route.abort('failed');
+    }
+  });
+}
+
 export const test = base.extend({
   context: async ({ context }, use, testInfo) => {
     await installProjectTheme(context, testInfo);
+    const fontFailures = [];
+    await serveGoogleFontsFromCache(context, fontFailures);
     await use(context);
+    if (fontFailures.length) throw new Error(`google-fonts-unavailable: ${fontFailures.join('; ')}`);
   },
 });
 

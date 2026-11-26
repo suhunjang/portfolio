@@ -63,6 +63,20 @@ export async function preparePage(page, { timeoutMs = 10000 } = {}) {
     if (hidden > 0) throw prepareError(`reveal-hidden:${hidden}`, e);
   }
 
+  // .in이 붙어도 opacity transition(0.7s)이 진행 중이면 대비가 낮게 측정된다. 유한 애니메이션이 끝날 때까지 기다린다.
+  // 무한 장식 애니메이션(caret blink, scrollDot)은 제외한다.
+  await withPrepareCode('animations-not-finished', () =>
+    page.waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .filter((a) => a.effect && a.effect.getComputedTiming().endTime !== Infinity)
+          .every((a) => a.playState !== 'running' && !a.pending),
+      null,
+      { timeout: timeoutMs },
+    ),
+  );
+
   const revealChecked = await page.evaluate(() => document.querySelectorAll('.reveal').length);
   return { revealChecked, scrollSteps };
 }
