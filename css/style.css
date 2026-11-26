@@ -103,7 +103,7 @@ img { max-width: 100%; display: block; }
   height: 34px;
   border-radius: 9px;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg-elev);
   font-size: 0.85rem;
   letter-spacing: 0.5px;
 }
@@ -206,7 +206,7 @@ img { max-width: 100%; display: block; }
 .btn:active { transform: translateY(0) scale(0.98); }
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg-elev);
 }
 .btn-primary:hover { opacity: 0.88; }
 .btn-ghost {
@@ -308,7 +308,7 @@ img { max-width: 100%; display: block; }
 }
 .stat-label {
   font-size: 0.82rem;
-  color: var(--text-faint);
+  color: var(--tag-text);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -454,7 +454,7 @@ img { max-width: 100%; display: block; }
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.8rem;
-  color: #fff;
+  color: var(--bg-elev);
   background: var(--accent);
   margin-bottom: 1.4rem;
 }
@@ -467,7 +467,7 @@ img { max-width: 100%; display: block; }
   padding-bottom: 0.7rem;
 }
 .about-meta > div:last-child { border-bottom: 0; padding-bottom: 0; }
-.about-meta dt { color: var(--text-faint); font-size: 0.85rem; }
+.about-meta dt { color: var(--tag-text); font-size: 0.85rem; }
 .about-meta dd { font-weight: 600; }
 
 /* ---------- TIMELINE ---------- */
@@ -1077,7 +1077,7 @@ body.modal-open { overflow: hidden; }
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  color: var(--text-faint);
+  color: var(--tag-text);
   font-size: 0.88rem;
 }
 .footer-top { color: var(--text-muted); font-weight: 600; }

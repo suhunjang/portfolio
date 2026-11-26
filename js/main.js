@@ -188,7 +188,7 @@
         : "";
       return `
         <article class="project-card reveal${hasDetail ? " has-detail" : ""}"${
-        hasDetail ? ` data-project="${idx}" tabindex="0" role="button" aria-label="${esc(p.title)} 자세히 보기"` : ""
+        hasDetail ? ` data-project="${idx}" tabindex="0" aria-label="${esc(p.title)} 자세히 보기"` : ""
       }>
           <div class="project-thumb ${thumbClass}${p.hero ? " has-visual" : ""}">${thumbInner}</div>
           <h3 class="project-title">${esc(p.title)}</h3>
