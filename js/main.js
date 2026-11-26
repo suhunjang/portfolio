@@ -425,7 +425,7 @@
         : "";
       return `
         <div class="skill-group reveal">
-          <h3>${esc(g.category)}</h3>
+          <h4>${esc(g.category)}</h4>
           ${note}
           <div class="skill-list">${items}</div>
         </div>`;
@@ -491,7 +491,7 @@
   }
 
   // 스크롤스파이 — 현재 섹션 메뉴 하이라이트
-  const sections = ["about", "strengths", "career", "projects", "contact"]
+  const sections = ["career", "projects", "strengths", "about", "contact"]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
   const linkFor = {};
