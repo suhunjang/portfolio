@@ -311,3 +311,104 @@ test.describe('compact step 2 hero-first-screen', () => {
     }
   });
 });
+
+// compact step 3 — hero-two-column (설계 compact Step 3, 원 §7·§11.2)
+const TOKENS = JSON.parse(readFileSync(new URL('../fixtures/claude-design-intake.json', import.meta.url), 'utf8')).tokens;
+const HERO_KIDS_SEL = '#hero > .hero-inner > *';
+
+// .hero-inner 레이아웃 측정: content-box, computed grid, 직계 자식 8개 bbox.
+async function heroLayout(page) {
+  return page.evaluate((sel) => {
+    const inner = document.querySelector('#hero > .hero-inner');
+    const cs = getComputedStyle(inner);
+    const rect = inner.getBoundingClientRect();
+    const padL = parseFloat(cs.paddingLeft);
+    const padR = parseFloat(cs.paddingRight);
+    const rectOf = (el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right, top: r.top, width: r.width };
+    };
+    const cols = (cs.gridTemplateColumns.match(/-?\d+(\.\d+)?px/g) || []).map(parseFloat);
+    return {
+      display: cs.display,
+      areas: cs.gridTemplateAreas,
+      columnGap: cs.columnGap,
+      cols,
+      W: inner.clientWidth - padL - padR,
+      contentLeft: rect.left + parseFloat(cs.borderLeftWidth) + padL,
+      kids: Array.from(document.querySelectorAll(sel)).map(rectOf),
+      name: rectOf(document.getElementById('heroName')),
+      summary: rectOf(document.getElementById('heroSummary')),
+      cta: rectOf(document.querySelector('#hero .hero-cta')),
+      stats: rectOf(document.getElementById('heroStats')),
+      featured: rectOf(document.getElementById('heroFeatured')),
+      scrollW: document.documentElement.scrollWidth,
+      clientW: document.documentElement.clientWidth,
+    };
+  }, HERO_KIDS_SEL);
+}
+
+function expectedAreas() {
+  return TOKENS.heroAreas.map((r) => '"' + r + '"').join(' ');
+}
+
+// 2열 계약(원 §11.2 열 폭 계약 + compact step 3).
+async function expectTwoColumn(page) {
+  await page.evaluate(() => document.fonts.ready.then(() => true));
+  const L = await heroLayout(page);
+  const gap = TOKENS.heroColumnGapPx;
+  expect(L.display).toBe('grid');
+  expect(L.areas).toBe(expectedAreas());
+  expect(L.columnGap).toBe(gap + 'px');
+  expect(L.cols).toHaveLength(2);
+  const [a, b] = L.cols;
+  expect(Math.abs(a - ((L.W - gap) * 5) / 12)).toBeLessThanOrEqual(1);
+  expect(Math.abs(b - ((L.W - gap) * 7) / 12)).toBeLessThanOrEqual(1);
+  expect(Math.abs(a + gap + b - L.W)).toBeLessThanOrEqual(1);
+  expect(L.name.right).toBeLessThanOrEqual(L.summary.left);
+  expect(Math.abs(L.cta.left - L.summary.left)).toBeLessThanOrEqual(1);
+  expect(L.stats.width).toBeGreaterThanOrEqual(L.W * 0.95);
+  expect(L.featured.width).toBeGreaterThanOrEqual(L.W * 0.95);
+}
+
+// 1열 계약: grid 아님 또는 px 열 ≤ 1개, 직계 자식 8개 left = content-box left ±1, top DOM 순 증가.
+async function expectOneColumn(page) {
+  await page.evaluate(() => document.fonts.ready.then(() => true));
+  const L = await heroLayout(page);
+  expect(L.display !== 'grid' || L.cols.length <= 1, `display=${L.display} cols=${L.cols}`).toBe(true);
+  expect(L.kids).toHaveLength(8);
+  L.kids.forEach((k, i) => {
+    expect(Math.abs(k.left - L.contentLeft), `child ${i} left`).toBeLessThanOrEqual(1);
+    if (i > 0) expect(k.top, `child ${i} top`).toBeGreaterThan(L.kids[i - 1].top);
+  });
+  return L;
+}
+
+test.describe('compact step 3 hero-two-column', () => {
+  test('1280: 5:7 2열 grid, areas = tokens.heroAreas, gap 48', async ({ page }, testInfo) => {
+    test.skip(!['desktop-dark', 'desktop-light'].includes(testInfo.project.name), 'desktop 1280 전용');
+    await page.goto('/');
+    expect(page.viewportSize().width).toBe(1280);
+    await expectTwoColumn(page);
+  });
+
+  test('1023×800: 1열(left 일치, top 증가)', async ({ page }) => {
+    await page.setViewportSize({ width: 1023, height: 800 });
+    await page.goto('/');
+    await expectOneColumn(page);
+  });
+
+  test('1024×800: 1280의 2열 계약 그대로', async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.goto('/');
+    await expectTwoColumn(page);
+  });
+
+  test('375·768: 1열, 가로 스크롤 없음', async ({ page }, testInfo) => {
+    const width = page.viewportSize().width;
+    test.skip(![375, 768].includes(width), `375·768 전용 (${testInfo.project.name})`);
+    await page.goto('/');
+    const L = await expectOneColumn(page);
+    expect(L.scrollW).toBeLessThanOrEqual(L.clientW);
+  });
+});
