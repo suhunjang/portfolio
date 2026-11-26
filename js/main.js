@@ -425,7 +425,7 @@
         : "";
       return `
         <div class="skill-group reveal">
-          <h4>${esc(g.category)}</h4>
+          <h3>${esc(g.category)}</h3>
           ${note}
           <div class="skill-list">${items}</div>
         </div>`;
