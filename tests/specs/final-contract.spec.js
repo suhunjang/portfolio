@@ -506,3 +506,119 @@ test.describe('compact step 7 final-contract: print', () => {
     await expectPdfOk(page);
   });
 });
+
+// compact step 10 — visual-final-contract (§C1 bytes·콘텐츠·menu·modal). screenshot 결과에는 의존하지 않는다.
+const REPO_ROOT_DIR = fileURLToPath(new URL('../..', import.meta.url));
+const EVIDENCE_STEP0 = new URL('../.tmp/compact/evidence-step0.json', import.meta.url);
+const FEATURED_INDEXES = [1, 5, 7];
+const MODAL_CHECK_INDEXES = [0, 1, 2, 5, 7, 12];
+
+const gitShowBytes = (rev, file) => execFileSync('git', ['show', `${rev}:${file}`], { cwd: REPO_ROOT_DIR, maxBuffer: 64 * 1024 * 1024 });
+
+// baseline data.js에서 PROJECTS[k] title 줄 바로 다음에 `featured: true,`를 넣은 기대 bytes. title 줄은 정확히 1개여야 한다.
+function expectedDataJs(baseText, titles) {
+  const lines = baseText.split('\n');
+  const inserts = FEATURED_INDEXES.map((k) => {
+    const want = `title: ${JSON.stringify(titles[k])},`;
+    const at = lines.flatMap((l, i) => (l.trim() === want ? [i] : []));
+    if (at.length !== 1) throw new Error(`data.js: title line for PROJECTS[${k}] found ${at.length}x`);
+    return { at: at[0], indent: lines[at[0]].match(/^\s*/)[0] };
+  });
+  for (const { at, indent } of [...inserts].sort((a, b) => b.at - a.at)) lines.splice(at + 1, 0, `${indent}featured: true,`);
+  return lines.join('\n');
+}
+
+// 현재 bytes가 기대 bytes와 정확히 같을 때만 통과(featured: false·다른 field·형식 변경·줄 수 차이 모두 거부).
+function dataJsViolations(baseBuf, curBuf, titles) {
+  const want = Buffer.from(expectedDataJs(baseBuf.toString('utf8'), titles), 'utf8');
+  return Buffer.compare(want, curBuf) === 0 ? [] : ['data.js: bytes != baseline + featured 3줄'];
+}
+
+test.describe('compact step 10 final-contract: bytes·content·menu·modal', () => {
+  const evidence = () => JSON.parse(readFileSync(EVIDENCE_STEP0, 'utf8'));
+  const titles = baseline.PROJECTS.map((p) => p.title);
+
+  test('js/data.js = evidence-step0 baselineHead + index 1·5·7 title 다음 featured: true, 3줄', () => {
+    const head = evidence().baselineHead;
+    expect(head).toMatch(/^[0-9a-f]{40}$/);
+    const base = gitShowBytes(head, 'js/data.js');
+    const cur = readFileSync(new URL('../../js/data.js', import.meta.url));
+    expect(cur.length - base.length).toBe(3 * Buffer.byteLength('    featured: true,\n'));
+    expect(dataJsViolations(base, cur, titles)).toEqual([]);
+  });
+
+  test('data.js 판정은 featured: false·다른 field·형식 변경·줄 수 차이를 거부한다', () => {
+    const base = gitShowBytes(evidence().baselineHead, 'js/data.js');
+    const good = expectedDataJs(base.toString('utf8'), titles);
+    const mutate = (from, to) => {
+      expect(good.includes(from), `fixture source: ${from}`).toBe(true);
+      return Buffer.from(good.replace(from, to), 'utf8');
+    };
+    const motion = `title: ${JSON.stringify(titles[1])},`;
+    const cases = {
+      ok: Buffer.from(good, 'utf8'),
+      featuredFalse: mutate(`${motion}\n    featured: true,`, `${motion}\n    featured: false,`),
+      noSpace: mutate(`${motion}\n    featured: true,`, `${motion}\n    featured:true,`),
+      indent: mutate(`${motion}\n    featured: true,`, `${motion}\n  featured: true,`),
+      extraField: mutate(`${motion}\n    featured: true,`, `${motion}\n    featured: true,\n    pinned: true,`),
+      fourthLine: mutate(`title: ${JSON.stringify(titles[0])},`, `title: ${JSON.stringify(titles[0])},\n    featured: true,`),
+      missing: mutate(`${motion}\n    featured: true,\n`, `${motion}\n`),
+      // featured 줄을 title 앞으로 옮긴다(줄 수·내용 같음, 위치만 다름) → title 다음 줄 계약 위반
+      wrongPlace: mutate(`\n    ${motion}\n    featured: true,\n`, `\n    featured: true,\n    ${motion}\n`),
+      crlf: Buffer.from(good.replace('\n', '\r\n'), 'utf8'),
+      otherEdit: mutate(JSON.stringify(titles[12]), JSON.stringify(titles[12] + ' ')),
+    };
+    const verdict = Object.fromEntries(Object.entries(cases).map(([k, buf]) => [k, dataJsViolations(base, buf, titles).length === 0]));
+    expect(verdict).toEqual({
+      ok: true, featuredFalse: false, noSpace: false, indent: false, extraField: false,
+      fourthLine: false, missing: false, wrongPlace: false, crlf: false, otherEdit: false,
+    });
+  });
+
+  test('css/themes.css bytes = BASE d0a8a6e…', () => {
+    expect(GUARD_BASE).toBe('d0a8a6e462bc1366757b1401c3ba7aeb0fbf391d');
+    const base = gitShowBytes(GUARD_BASE, 'css/themes.css');
+    const cur = readFileSync(new URL('../../css/themes.css', import.meta.url));
+    expect(Buffer.compare(base, cur)).toBe(0);
+  });
+
+  test('PROJECTS 13개 순서·title 그대로(live data)', async ({ page }) => {
+    await page.goto('/');
+    const live = await page.evaluate(() => PROJECTS.map((p) => p.title)); // eslint-disable-line no-undef
+    expect(titles).toHaveLength(13);
+    expect(live).toEqual(titles);
+  });
+
+  test('mobile-dark: menu를 열고 닫을 수 있다', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile-dark', 'mobile-dark 전용');
+    await page.goto('/');
+    const toggle = page.locator('#menuToggle');
+    const nav = page.locator('#navLinks');
+    await expect(toggle).toBeVisible();
+    await expect(nav).not.toHaveClass(/(^|\s)open(\s|$)/);
+    await toggle.click();
+    await expect(nav).toHaveClass(/(^|\s)open(\s|$)/);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(nav.locator('.nav-link').first()).toBeVisible();
+    await toggle.click();
+    await expect(nav).not.toHaveClass(/(^|\s)open(\s|$)/);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  for (const n of MODAL_CHECK_INDEXES) {
+    test(`project ${n} modal을 열고 닫을 수 있다`, async ({ page }) => {
+      await page.goto('/');
+      const card = page.locator(`#projectGrid .project-card[data-project="${n}"]`);
+      await card.scrollIntoViewIfNeeded();
+      await card.click();
+      const modal = page.locator('#projectModal');
+      await expect(modal).toBeVisible();
+      await expect(page.locator('body')).toHaveClass(/(^|\s)modal-open(\s|$)/);
+      await expect(page.locator('#projectModal #modalTitle')).toHaveText(titles[n]);
+      await page.locator('#projectModal .modal-close[data-modal-close]').click();
+      await expect(modal).toBeHidden();
+      await expect(page.locator('body')).not.toHaveClass(/(^|\s)modal-open(\s|$)/);
+      await expect(card).toBeFocused();
+    });
+  }
+});

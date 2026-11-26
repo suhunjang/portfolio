@@ -78,7 +78,8 @@
   5. `sh tests/scripts/with-env.sh node tests/helpers/axe.js --assert-no-violations --collected tests/.tmp/axe-current.json`
 - `OWN_SPEC <p>` = `python3 -I -c "import os,stat,sys; p=sys.argv[1]; sys.exit('own-spec: '+p) if not os.path.lexists(p) or not stat.S_ISREG(os.lstat(p).st_mode) else print('own-spec: OK '+p)" <p>`
 - `SPEC_GATE`(step 11에서만) = `python3 -I -c "import os,stat,sys; P=['tests/specs/featured.spec.js','tests/specs/focus-modal.spec.js','tests/specs/screenshots.spec.js','tests/specs/final-contract.spec.js']; bad=[p for p in P if not os.path.lexists(p) or not stat.S_ISREG(os.lstat(p).st_mode)]; sys.exit('spec-gate: '+','.join(bad)) if bad else print('spec-gate: OK 4')"`
-- `SHOT <prefix> <tag>` = `sh -c 'id=<prefix>-$(date -u +%Y%m%dT%H%M%SZ); mkdir -p tests/.tmp/compact; printf %s "$id" > tests/.tmp/compact/shot-id-<tag>.txt; COMPACT_RUN_ID=$id sh tests/scripts/with-env.sh npm --prefix tests test -- specs/screenshots.spec.js --project=desktop-dark'`
+- `SHOT <prefix> <tag>` = `sh -c 'id=<prefix>-$(date -u +%Y%m%dT%H%M%SZ | tr A-Z a-z); mkdir -p tests/.tmp/compact; printf %s "$id" > tests/.tmp/compact/shot-id-<tag>.txt; COMPACT_RUN_ID=$id sh tests/scripts/with-env.sh npm --prefix tests test -- specs/screenshots.spec.js --project=desktop-dark'`
+  - ID는 소문자로 변환한다(`tr A-Z a-z`). §C7 ID 정규식 `^[a-z0-9][a-z0-9-]{2,40}$`와 맞추기 위함(2026-11-26 대표 결정). 예: `s10-20261126t083427z`.
   - 사용하는 prefix/tag:
     - step 10: `s10`/`s10`
     - step 11: `final`/`final`
