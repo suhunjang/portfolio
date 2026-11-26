@@ -222,6 +222,51 @@
   const modal = $("#projectModal");
   const modalBody = $("#modalBody");
   let lastModalTrigger = null;
+  let releaseModalTrap = null;
+
+  /* focus trap — stack으로 관리하고, document Tab handler 1개가 맨 위 trap만 처리한다 */
+  const FOCUSABLE =
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const trapStack = [];
+
+  function focusablesIn(container) {
+    return $$(FOCUSABLE, container).filter(
+      (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
+    );
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab" || trapStack.length === 0) return;
+    const { container } = trapStack[trapStack.length - 1];
+    const items = focusablesIn(container);
+    if (items.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    const inside = container.contains(active);
+    if (e.shiftKey ? !inside || active === first : !inside || active === last) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+    }
+  });
+
+  function trapFocus(container, { returnFocusTo = null } = {}) {
+    const entry = { container };
+    trapStack.push(entry);
+    let released = false;
+    return function release() {
+      if (released) return;
+      released = true;
+      const i = trapStack.indexOf(entry);
+      if (i !== -1) trapStack.splice(i, 1);
+      if (returnFocusTo && returnFocusTo.isConnected && typeof returnFocusTo.focus === "function") {
+        returnFocusTo.focus();
+      }
+    };
+  }
 
   function listBlock(label, items) {
     if (!items || !items.length) return "";
@@ -302,6 +347,8 @@
     lastModalTrigger = triggerElement;
     modal.hidden = false;
     document.body.classList.add("modal-open");
+    if (releaseModalTrap) releaseModalTrap();
+    releaseModalTrap = trapFocus($(".modal-dialog", modal) || modal);
     const closeBtn = $(".modal-close", modal);
     if (closeBtn) closeBtn.focus();
   }
@@ -309,7 +356,7 @@
   /* 갤러리 이미지 확대(lightbox) — 모달 위에 한 겹 더 띄워 원본 크기로 본다.
      모달 폭(640px)에 눌려 글씨가 안 읽히는 가로 캡처용. body.modal-open은 건드리지 않는다. */
   let lightbox = null;
-  let lightboxOpener = null;
+  let releaseLightboxTrap = null;
 
   function ensureLightbox() {
     if (lightbox) return lightbox;
@@ -325,12 +372,6 @@
     lightbox.addEventListener("click", (e) => {
       if (e.target.tagName !== "IMG") closeLightbox();
     });
-    // 포커스 가능한 요소가 닫기 버튼 하나뿐이라 Tab은 거기에 묶어 둔다
-    lightbox.addEventListener("keydown", (e) => {
-      if (e.key !== "Tab") return;
-      e.preventDefault();
-      $(".modal-close", lightbox).focus();
-    });
     document.body.appendChild(lightbox);
     return lightbox;
   }
@@ -342,8 +383,9 @@
     const img = $("img", lb);
     img.src = src.currentSrc || src.src;
     img.alt = src.alt;
-    lightboxOpener = btn;
     lb.hidden = false;
+    if (releaseLightboxTrap) releaseLightboxTrap();
+    releaseLightboxTrap = trapFocus(lb, { returnFocusTo: btn });
     $(".modal-close", lb).focus();
   }
 
@@ -351,8 +393,9 @@
     if (!lightbox || lightbox.hidden) return;
     lightbox.hidden = true;
     $("img", lightbox).removeAttribute("src");
-    if (lightboxOpener) lightboxOpener.focus();
-    lightboxOpener = null;
+    // release가 .shot-zoom으로 focus를 돌려주고, modal trap이 다시 stack 맨 위가 된다
+    if (releaseLightboxTrap) releaseLightboxTrap();
+    releaseLightboxTrap = null;
   }
 
   function closeProjectModal() {
@@ -360,6 +403,8 @@
     closeLightbox();
     modal.hidden = true;
     document.body.classList.remove("modal-open");
+    if (releaseModalTrap) releaseModalTrap();
+    releaseModalTrap = null;
     const trigger = lastModalTrigger;
     lastModalTrigger = null;
     if (trigger && trigger.isConnected && typeof trigger.focus === "function") trigger.focus();
