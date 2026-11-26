@@ -1,29 +1,19 @@
 # 프로젝트: {프로젝트명}
 
-{이 프로젝트의 목적·기술 스택·고유 규칙을 여기에 적는다. 아래 harness 블록 밖은 프로젝트가 소유한다.}
+개인 포트폴리오 정적 사이트(index.html·css·js, GitHub Pages). 테스트는 tests/ 아래 Playwright. 아래 개발 방식 블록을 따른다.
 
-<!-- harness:begin -->
-## 하네스 계약 (Discord↔Claude 하네스 모드 — 중앙 release)
+<!-- dev-lite:begin -->
+## 개발 방식 (DEV-LITE-001, 2026-11-26 대표 승인)
 
-이 블록은 하네스가 요구하는 최소 규칙이다(merge-required). `harness --project-root . check`가 아래
-marker와 문장을 확인한다 — 지우거나 바꾸면 check·update가 `merge-needed`로 멈춘다.
+정본: `~/.hermes/company/operations/dev-workflow-lite-policy.md`. 외부 Harness runner는 쓰지 않는다.
 
-- 실행 모드는 **하네스 모드 하나**다. SDD(`subagent-driven-development`) 경로로 라우팅하지 마라.
-- 하네스 코드·회귀 테스트·템플릿은 이 프로젝트에 없다. 호스트의 중앙 store에 있는 immutable release를
-  stable launcher `harness`가 실행한다. 이 프로젝트가 실행할 release(exact commit·manifest hash)는
-  커밋된 `.harness/harness.lock.json`이 고정한다 — 손으로 고치지 마라. 갱신·되돌리기는
-  `harness update --target . --release <40자 commit SHA>`.
-- 모든 운영 명령은 `harness --project-root . check`처럼 stable launcher를 거친다(`plan-session`·
-  `review-plan`·`approval`·`runner`).
-- 계획 대화는 `harness --project-root . plan-session ...`이 read-only Claude 세션
-  (`--permission-mode plan`)으로 돌린다. 합의 전 파일 작성·구현 금지.
-- 계획 합의 메시지와 구현 승인 메시지는 **별개**다. 승인 본문은 정확히
-  `APPROVE <ISSUE> PLAN <40자 commit SHA> REVIEW <64자 review-record SHA>`.
-- 승인자·승인 thread·issue key 규칙·리뷰 model은 `.harness/policy.json`이 유일한 입력이다.
-  secret(토큰·비밀번호)을 넣지 마라. 호스트 전용 값은 커밋하지 않는 `.harness/policy.local.json`.
-- git checkout·add·commit은 하네스(외부 runner)만 한다. 자동 branch 전환, `--push`,
-  `HARNESS_NO_GIT`, 리뷰 backend 폴백은 없다(명시적으로 거부한다).
-- 권한 우회(`--dangerously-skip-permissions`)는 중앙 release `execute.py`의 구현·리뷰 수정 Claude에만
-  있고 항상 sandbox-exec deny-default profile 안에서 돈다.
-- 흐름 상세·복구 절차는 `/harness` 또는 `harness --project-root . docs harness`.
-<!-- harness:end -->
+- feature branch에서만 작업한다. main 직접 변경·push·merge 금지(대표 승인 후 PM이 수행).
+- **TDD 필수:** 구현 전에 `superpowers:test-driven-development` 스킬을 불러온다.
+  1. `tests/specs/`에 실패하는 테스트를 쓰고 RED를 확인한 뒤 **테스트만 담은 commit**을 만든다.
+  2. 최소 구현으로 GREEN을 만들고 구현 commit을 따로 만든다.
+  - 편집 hook(`scripts/hooks/tdd-guard.py`)은 테스트 변경 없이 `index.html`·`css/**`·`js/**`를 고치면 막는다.
+  - 동작 불변 리팩터링은 계획 승인 때 `tdd-exception.json`에 등록된 파일만 예외다.
+- 테스트: `sh tests/scripts/with-env.sh npm --prefix tests test` (기존 4173 서버를 재사용하지 않도록 먼저 비어 있는지 확인).
+- 완료 확인은 PM이 `python3 scripts/tdd-verify.py`로 RED→GREEN을 재현하고, 변경분은 GPT-6 Astra가 리뷰한다.
+- 위험 명령(`rm -rf`, `git push --force`, `git reset --hard`, `DROP TABLE`)은 `scripts/hooks/block-dangerous.sh`가 막는다.
+<!-- dev-lite:end -->

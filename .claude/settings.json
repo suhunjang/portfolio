@@ -1,7 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(harness --project-root .:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)"
@@ -15,34 +14,17 @@
     ]
   },
   "hooks": {
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "harness hook cross-review-nudge --project-root \"$CLAUDE_PROJECT_DIR\""
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "harness hook block-dangerous --project-root \"$CLAUDE_PROJECT_DIR\" || exit 2"
-          }
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/block-dangerous.sh\" || exit 2" }
         ]
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          {
-            "type": "command",
-            "command": "harness hook tdd-guard --project-root \"$CLAUDE_PROJECT_DIR\""
-          }
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/tdd-guard.py\"" }
         ]
       }
     ]
