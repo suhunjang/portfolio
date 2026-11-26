@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { expect } from '@playwright/test';
 import { test } from '../helpers/theme.js';
-import { readLiveData } from '../helpers/content.js';
+import { readLiveData, norm } from '../helpers/content.js';
 import { gridCard, closeVia, expectFocused, modalTitle } from '../helpers/modal.js';
 
 const baseline = JSON.parse(readFileSync(new URL('../fixtures/baseline-data.json', import.meta.url), 'utf8'));
@@ -168,6 +168,146 @@ test.describe('compact step 1 featured-cards', () => {
           }, N)
         )
         .toBe('same');
+    }
+  });
+});
+
+// compact step 2 — hero-first-screen (설계 compact Step 2, 원 §3·§7)
+const MAIN_JS_SRC = readFileSync(new URL('../../js/main.js', import.meta.url), 'utf8');
+const STAT_ITEM = '#heroStats > li';
+const STAT_VALUE = '.stat-value';
+const STAT_LABEL = '.stat-label';
+const HERO_CHILDREN = [
+  { tag: 'P', id: null, cls: 'hero-eyebrow' },
+  { tag: 'H1', id: 'heroName', cls: 'hero-name' },
+  { tag: 'P', id: 'heroTagline', cls: 'hero-tagline' },
+  { tag: 'H2', id: null, cls: 'hero-role' },
+  { tag: 'P', id: 'heroSummary', cls: 'hero-summary' },
+  { tag: 'DIV', id: null, cls: 'hero-cta' },
+  { tag: 'UL', id: 'heroStats', cls: 'hero-stats' },
+  { tag: 'DIV', id: 'heroFeatured', cls: null },
+];
+const STATS_ROWS = { 375: [2, 2], 768: [4], 1280: [4] };
+const FEATURED_ROWS = { 375: [1, 1, 1], 768: [2, 1], 1280: [3] };
+
+// 요소 bbox top(반올림)으로 묶은 행별 개수(위→아래).
+async function rowCounts(page, selector) {
+  return page.evaluate((sel) => {
+    const rows = new Map();
+    for (const el of document.querySelectorAll(sel)) {
+      const top = Math.round(el.getBoundingClientRect().top);
+      rows.set(top, (rows.get(top) || 0) + 1);
+    }
+    return Array.from(rows.entries()).sort((a, b) => a[0] - b[0]).map((e) => e[1]);
+  }, selector);
+}
+
+test.describe('compact step 2 hero-first-screen', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
+  test('.hero-inner 직계 자식 정확히 8개, 원 §3 순서', async ({ page }) => {
+    const kids = await page.evaluate(() =>
+      Array.from(document.querySelector('#hero > .hero-inner').children).map((el) => ({
+        tag: el.tagName,
+        id: el.id || null,
+        classes: Array.from(el.classList),
+      }))
+    );
+    expect(kids).toHaveLength(HERO_CHILDREN.length);
+    kids.forEach((k, i) => {
+      const want = HERO_CHILDREN[i];
+      expect(k.tag, `child ${i}`).toBe(want.tag);
+      expect(k.id, `child ${i}`).toBe(want.id);
+      if (want.cls) expect(k.classes, `child ${i}`).toContain(want.cls);
+    });
+  });
+
+  test('tagline: #heroTagline 텍스트 = PROFILE.tagline, main.js에 정확한 setText 1줄', async ({ page }) => {
+    const live = await readLiveData(page);
+    expect(live.PROFILE.tagline).toBe(baseline.PROFILE.tagline);
+    await expect(page.locator('#heroTagline')).toHaveText(baseline.PROFILE.tagline);
+    const lines = MAIN_JS_SRC.split('\n').filter((l) => l.includes('heroTagline'));
+    expect(lines.map((l) => l.trim())).toEqual(["setText('heroTagline', PROFILE.tagline);"]);
+  });
+
+  test('eyebrow·typed·CTA·#heroFeatured role/label 유지', async ({ page }) => {
+    await expect(page.locator('#hero .hero-eyebrow')).toHaveText('👋 안녕하세요, 저는');
+    await expect(page.locator('#hero .hero-role > #typed.typed')).toHaveCount(1);
+    await expect(page.locator('#hero .hero-role > .caret[aria-hidden="true"]')).toHaveCount(1);
+    const cta = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('#hero .hero-cta > *')).map((a) => ({
+        tag: a.tagName,
+        cls: a.className,
+        href: a.getAttribute('href'),
+        text: a.textContent.trim(),
+      }))
+    );
+    expect(cta).toEqual([
+      { tag: 'A', cls: 'btn btn-primary', href: '#projects', text: '프로젝트 보기' },
+      { tag: 'A', cls: 'btn btn-ghost', href: '#contact', text: '연락하기' },
+    ]);
+    const region = page.locator('#heroFeatured');
+    await expect(region).toHaveAttribute('role', 'region');
+    await expect(region).toHaveAttribute('aria-label', '대표 프로젝트');
+  });
+
+  test('STATS: 375 2×2, 768·1280 4×1', async ({ page }) => {
+    const width = page.viewportSize().width;
+    await expect(page.locator(STAT_ITEM)).toHaveCount(4);
+    await expect.poll(() => rowCounts(page, STAT_ITEM)).toEqual(STATS_ROWS[width]);
+  });
+
+  test('#heroFeatured: 375/768/1280에서 1/2/3열', async ({ page }) => {
+    const width = page.viewportSize().width;
+    await expect(page.locator('#heroFeatured > .featured-card')).toHaveCount(3);
+    await expect.poll(() => rowCounts(page, '#heroFeatured > .featured-card')).toEqual(FEATURED_ROWS[width]);
+  });
+
+  test('첫 화면 AC(1280×800): 이름·tagline·STATS 4개·대표 제목 3개가 화면 안에 완전히 보인다', async ({ page }, testInfo) => {
+    test.skip(!['desktop-dark', 'desktop-light'].includes(testInfo.project.name), 'desktop 1280×800 전용');
+    expect(page.viewportSize()).toEqual({ width: 1280, height: 800 });
+    await page.evaluate(() => document.fonts.ready.then(() => true));
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+    const items = page.locator(STAT_ITEM);
+    await expect(items).toHaveCount(4);
+    const targets = [page.locator('#heroName'), page.locator('#heroTagline'), page.locator('#heroStats')];
+    const titles = page.locator('#heroFeatured .featured-title');
+    await expect(titles).toHaveCount(3);
+    for (let i = 0; i < 3; i++) targets.push(titles.nth(i));
+    for (let i = 0; i < 4; i++) {
+      const item = items.nth(i);
+      const value = item.locator(STAT_VALUE);
+      const label = item.locator(STAT_LABEL);
+      expect(norm(await value.textContent())).toBe(norm(baseline.STATS[i].value));
+      expect(norm(await label.textContent())).toBe(norm(baseline.STATS[i].label));
+      targets.push(item, value, label);
+    }
+
+    for (const loc of targets) {
+      await expect(loc).toBeVisible();
+      await expect
+        .poll(() =>
+          loc.evaluate((el) => {
+            const bad = [];
+            for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+              const cs = getComputedStyle(n);
+              if (cs.visibility !== 'visible' || cs.opacity !== '1') bad.push(n.tagName + '.' + n.className);
+            }
+            return bad;
+          })
+        )
+        .toEqual([]);
+      const box = await loc.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box.width).toBeGreaterThan(0);
+      expect(box.height).toBeGreaterThan(0);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.y).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(1280);
+      expect(box.y + box.height).toBeLessThanOrEqual(800);
     }
   });
 });
