@@ -235,7 +235,7 @@ img { max-width: 100%; display: block; }
   align-items: center;
   padding-top: 68px;
 }
-.hero-inner { text-align: center; padding-block: 3rem; }
+.hero-inner { text-align: left; padding-block: 3rem; }
 .hero-eyebrow {
   color: var(--text-muted);
   font-weight: 500;
@@ -268,14 +268,14 @@ img { max-width: 100%; display: block; }
 
 .hero-summary {
   max-width: 620px;
-  margin: 0 auto 2rem;
+  margin: 0 0 2rem;
   color: var(--text-muted);
   font-size: clamp(1rem, 2.4vw, 1.15rem);
 }
 .hero-cta {
   display: flex;
   gap: 0.9rem;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin-bottom: 3rem;
 }
@@ -324,6 +324,30 @@ img { max-width: 100%; display: block; }
 .featured-title,
 .featured-blurb { display: block; }
 .featured-title { margin-bottom: 0.4rem; }
+
+/* hero 2열(원 §11.2): ≥1024px 5:7 grid, DOM 순서 불변, 좌측 정렬 */
+@media (min-width: 1024px) {
+  .hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: 48px;
+    grid-template-areas:
+      "eyebrow summary"
+      "name summary"
+      "tagline summary"
+      "role cta"
+      "stats stats"
+      "featured featured";
+  }
+  .hero-eyebrow { grid-area: eyebrow; }
+  .hero-name { grid-area: name; }
+  .hero-tagline { grid-area: tagline; }
+  .hero-role { grid-area: role; }
+  .hero-summary { grid-area: summary; }
+  .hero-cta { grid-area: cta; }
+  #heroStats { grid-area: stats; }
+  #heroFeatured { grid-area: featured; }
+}
 
 .scroll-hint {
   position: absolute;
