@@ -36,4 +36,3 @@ __pycache__/
 /.harness/install.lock
 /.harness/policy.local.json
 .claude/.cross-review-state
-tdd-evidence*.json

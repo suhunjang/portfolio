@@ -36,17 +36,33 @@ def git(root, *args):
     return [l for l in r.stdout.splitlines() if l]
 
 
+def git_paths(root, *args):
+    """경로 목록은 -z(NUL 구분)로 읽는다. core.quotePath 인용("\355...")으로 비ASCII 경로를 놓치지 않기 위함."""
+    r = subprocess.run(["git", "-C", root] + list(args) + ["-z"], capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.decode("utf-8", "replace").strip())
+    return [p.decode("utf-8", "surrogateescape") for p in r.stdout.split(b"\0") if p]
+
+
 def paths_from_input(d):
-    ti = d.get("tool_input") or {}
-    tool = d.get("tool_name") or ""
+    ti = d.get("tool_input")
+    tool = d.get("tool_name")
+    if ti is None:
+        ti = {}
+    if tool is None:
+        tool = ""
+    if not isinstance(ti, dict) or not isinstance(tool, str):
+        deny("hook 입력 형식이 올바르지 않습니다(tool_input은 객체, tool_name은 문자열).")
     paths = []
     for k in ("file_path", "path", "notebook_path"):
         if isinstance(ti.get(k), str):
             paths.append(ti[k])
-    for k in ("edits",):
-        for e in ti.get(k) or []:
-            if isinstance(e, dict) and isinstance(e.get("file_path"), str):
-                paths.append(e["file_path"])
+    edits = ti.get("edits")
+    if edits is not None and not isinstance(edits, list):
+        deny("hook 입력 형식이 올바르지 않습니다(edits는 배열).")
+    for e in edits or []:
+        if isinstance(e, dict) and isinstance(e.get("file_path"), str):
+            paths.append(e["file_path"])
     text = ""
     for k in ("command", "patch", "input"):
         v = ti.get(k)
@@ -103,13 +119,13 @@ def main():
         sys.exit(0)
 
     try:
-        unc = set(git(root, "diff", "--name-only")) | set(git(root, "diff", "--name-only", "--cached")) \
-            | set(git(root, "ls-files", "--others", "--exclude-standard"))
+        unc = set(git_paths(root, "diff", "--name-only")) | set(git_paths(root, "diff", "--name-only", "--cached")) \
+            | set(git_paths(root, "ls-files", "--others", "--exclude-standard"))
         if any(match(f, tests) for f in unc):
             sys.exit(0)
         mb = git(root, "merge-base", base, "HEAD")[0]
         for c in git(root, "rev-list", "%s..HEAD" % mb):
-            files = git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", c)
+            files = git_paths(root, "diff-tree", "--no-commit-id", "--name-only", "-r", c)
             if any(match(f, impl) for f in files):
                 break  # 최근 구현 commit 이후 테스트 변경 없음
             if any(match(f, tests) for f in files):
@@ -121,4 +137,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:  # 예상 못 한 오류가 exit 1(통과)로 새지 않게 한다
+        deny("hook 내부 오류: %s: %s" % (type(e).__name__, e))
