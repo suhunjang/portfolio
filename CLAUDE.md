@@ -14,6 +14,6 @@
   - 편집 hook(`scripts/hooks/tdd-guard.py`)은 테스트 변경 없이 `index.html`·`css/**`·`js/**`를 고치면 막는다.
   - 동작 불변 리팩터링은 계획 승인 때 `tdd-exception.json`에 등록된 파일만 예외다.
 - 테스트: `sh tests/scripts/with-env.sh npm --prefix tests test` (기존 4173 서버를 재사용하지 않도록 먼저 비어 있는지 확인).
-- 완료 확인은 PM이 `python3 scripts/tdd-verify.py`로 RED→GREEN을 재현하고, 변경분은 GPT-6 Astra가 리뷰한다.
+- 완료 확인은 PM이 테스트 commit에서 RED, 최종 commit에서 같은 테스트 GREEN을 직접 재현하고(Harness 2.1 설치 후에는 스텝 판정 명령), 변경분은 GPT-6 Astra가 리뷰한다.
 - 위험 명령(`rm -rf`, `git push --force`, `git reset --hard`, `DROP TABLE`)은 `scripts/hooks/block-dangerous.sh`가 막는다.
 <!-- dev-lite:end -->
