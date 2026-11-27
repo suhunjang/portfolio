@@ -83,7 +83,35 @@ class TddGuardTest(unittest.TestCase):
         self.assertEqual(self.run_hook({"tool_name": "MultiEdit", "tool_input": {"edits": 5}}), 2)
 
     def test_tool_name_not_string_is_denied(self):
-        self.assertEqual(self.run_hook({"tool_name": 5, "tool_input": {"file_path": "js/main.js"}}), 2)
+        self.assertEqual(self.run_hook({"tool_name": 5, "tool_input": {"file_path": "README.md"}}), 2)
+
+    # closure1: null·누락·배열 원소 형태 오류도 exit 2
+    def test_tool_input_null_is_denied(self):
+        self.assertEqual(self.run_hook({"tool_name": "Edit", "tool_input": None}), 2)
+
+    def test_tool_input_missing_is_denied(self):
+        self.assertEqual(self.run_hook({"tool_name": "Edit"}), 2)
+
+    # 문서 경로(정상이면 허용)를 써서, 차단이 입력 형식 검사 때문인지 확인한다
+    def test_tool_name_null_is_denied(self):
+        self.assertEqual(self.run_hook({"tool_name": None, "tool_input": {"file_path": "README.md"}}), 2)
+
+    def test_tool_name_missing_is_denied(self):
+        self.assertEqual(self.run_hook({"tool_input": {"file_path": "README.md"}}), 2)
+
+    def test_edits_null_is_denied(self):
+        self.assertEqual(self.run_hook({"tool_name": "MultiEdit", "tool_input": {"edits": None}}), 2)
+
+    def test_edits_item_not_object_is_denied(self):
+        self.assertEqual(self.run_hook({"tool_name": "MultiEdit", "tool_input": {"edits": [5]}}), 2)
+
+    def test_multiedit_normal_shape_still_checked(self):
+        payload = {"tool_name": "MultiEdit", "tool_input": {
+            "file_path": os.path.join(self.repo, "js/main.js"),
+            "edits": [{"old_string": "v1", "new_string": "v2"}]}}
+        self.assertEqual(self.run_hook(payload), 2)
+        self.write("tests/specs/a.spec.js", "// a2\n")
+        self.assertEqual(self.run_hook(payload), 0)
 
     # blocker 5: 한글 이름 테스트 파일 변경을 인식
     def test_untracked_korean_test_allows_impl(self):
