@@ -47,22 +47,20 @@ def git_paths(root, *args):
 def paths_from_input(d):
     ti = d.get("tool_input")
     tool = d.get("tool_name")
-    if ti is None:
-        ti = {}
-    if tool is None:
-        tool = ""
+    # null·누락도 형식 오류로 본다(기본값으로 바꾸면 검사를 건너뛰어 통과된다).
     if not isinstance(ti, dict) or not isinstance(tool, str):
-        deny("hook 입력 형식이 올바르지 않습니다(tool_input은 객체, tool_name은 문자열).")
+        deny("hook 입력 형식이 올바르지 않습니다(tool_input은 객체, tool_name은 문자열이어야 합니다).")
     paths = []
     for k in ("file_path", "path", "notebook_path"):
         if isinstance(ti.get(k), str):
             paths.append(ti[k])
-    edits = ti.get("edits")
-    if edits is not None and not isinstance(edits, list):
-        deny("hook 입력 형식이 올바르지 않습니다(edits는 배열).")
-    for e in edits or []:
-        if isinstance(e, dict) and isinstance(e.get("file_path"), str):
-            paths.append(e["file_path"])
+    if "edits" in ti:
+        edits = ti["edits"]
+        if not isinstance(edits, list) or not all(isinstance(e, dict) for e in edits):
+            deny("hook 입력 형식이 올바르지 않습니다(edits는 객체 배열이어야 합니다).")
+        for e in edits:
+            if isinstance(e.get("file_path"), str):
+                paths.append(e["file_path"])
     text = ""
     for k in ("command", "patch", "input"):
         v = ti.get(k)
